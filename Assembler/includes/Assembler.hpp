@@ -3,14 +3,16 @@
 
 #include <string>
 
+#include "Token.hpp"
+
 class Assembler
 {
 public:
         Assembler();
-        static void parseFile(std::string &fileName);
-        static void parseLine(std::string &line); // This should return a vector
+        void parseFile(std::string &fileName);
+        void parseLine(std::string &line); // This should return a vector
 
-        static void decode(std::string &word);
+        Token encode(std::string &word);
 };
 
 #endif // LC3_SIMULATOR_ASSEMBLER_HPP

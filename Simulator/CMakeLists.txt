@@ -9,12 +9,22 @@ set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wpedantic" )
 
 set ( SIMULATOR_SOURCE_FILES
       source/Simulator.cpp
-      ../main.cpp
+      main.cpp
       )
 
 set ( SIMULATOR_HEADER_FILES
       includes/Simulator.hpp
       )
+
+set ( ASSEMBLER_SOURCE_FILES
+      Assembler/source/Assembler.cpp
+      Assembler/source/Token.cpp
+      PARENT_SCOPE )
+
+set ( ASSEMBLER_HEADER_FILES
+      Assembler/includes/Assembler.hpp
+      Assembler/includes/Token.hpp
+      PARENT_SCOPE )
 
 set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic" )
 
@@ -27,5 +37,5 @@ endif ()
 
 find_library ( Curses curses )
 
-add_executable ( LC3_simulator ${SIMULATOR_SOURCE_FILES} ${SIMULATOR_HEADER_FILES} )
+add_executable ( LC3_simulator ${SIMULATOR_SOURCE_FILES} ${SIMULATOR_HEADER_FILES} ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
 target_link_libraries ( LC3_simulator ${Curses} )

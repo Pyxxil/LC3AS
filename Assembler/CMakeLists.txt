@@ -13,7 +13,6 @@ set ( SOURCE_FILES
 
 set ( ASSEMBLER_SOURCE_FILES
       source/Assembler.cpp
-      source/Token.cpp
       )
 
 set ( ASSEMBLER_HEADER_FILES

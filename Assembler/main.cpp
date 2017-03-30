@@ -23,7 +23,8 @@ public:
 int main(int, char **argv)
 {
         std::string fileName = argv[1];
-        Assembler::parseFile(fileName);
+        Assembler as;
+        as.parseFile(fileName);
 
         Base b;
         Sub s;

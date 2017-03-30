@@ -3,9 +3,6 @@
 #include <fstream>
 #include <iostream>
 
-#define ERROR(str, ...)   fprintf(stderr, "ERROR: "   str ".\n", __VA_ARGS__)
-#define WARNING(str, ...) fprintf(stderr, "WARNING: " str ".\n")
-
 Assembler::Assembler()
 {
 
@@ -53,12 +50,13 @@ void Assembler::parseLine(std::string &line)
 
                         if (!current.empty()) {
                                 std::cout << current << std::endl;
+                                encode(current);
                                 current.erase();
                         }
 
                         //std::cout << "Char after whitespace is '" << character << "'" << std::endl;
 
-                        // Later, change it to vector.push_back(decode(current));
+                        // Later, change it to vector.push_back(encode(current));
                         // Then update the vector we want to return, and then continue.
                 }
 
@@ -70,7 +68,7 @@ void Assembler::parseLine(std::string &line)
                         // '//' is a comment as well.
                         if (index + 1 > line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
-                                WARNING("Expected '//', but found '/'. Treating it as if it's '//' (i.e. comment)", );
+                                WARNING("Expected '//', but found '/'. Treating it as if it's '//' (i.e. comment)");
                         }
 
                         // std::cout << "Reached comment, so end of line" << std::endl;
@@ -84,14 +82,39 @@ void Assembler::parseLine(std::string &line)
         //std::cout << "Reached end of line, dumping contents" << std::endl;
         if (!current.empty()) {
                 std::cout << current << std::endl;
+                encode(current);
                 current.erase();
         }
 }
 
-void Assembler::decode(std::string &word)
-{ // This should really return a Token instance
-        (void) word;
-        if (word.at(0) == '.') {
+Token Assembler::encode(std::string &word)
+{
+        std::transform(word.begin(), word.end(), word.begin(), ::toupper);
 
+        if (word.at(0) == '.') {
+                if (!word.compare(".ORIG")) {
+                        // Return a Orig_Directive token
+                        return Orig();
+                } else if (!word.compare(".END")) {
+                        return End();
+                } else if (!word.compare(".FILL")) {
+                        return Fill();
+                } else if (!word.compare(".BLKW")) {
+                        return Blkw();
+                } else if (!word.compare(".STRINGZ")) {
+                        return Stringz();
+                }
+                std::cout << "HERE IT IS: " << word << std::endl;
+                return Token(word).expected("one of .FILL, .ORIG, .END, .STRINGZ, .BLKW.");
+        } else {
+                if (word.compare("ADD")) {
+
+                } else if (word.compare("AND")) {
+
+                } else if (word.compare("")) {
+
+                }
         }
+
+        return Token();
 }
