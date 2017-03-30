@@ -1,0 +1,30 @@
+// Symbol table
+// Scope level 0:
+//	Symbol Name        Page Address
+//	-----------------  ------------
+//	INIT_REGISTERS     3000
+//	CREATE_NULL        300A
+//	CREATE_STACK       300D
+//	GET_R1             3010
+//	PROCESS_R1         3019
+//	MAKE_R1_NEGATIVE   3044
+//	GET_R2             3047
+//	GET_R2_LOOP        3048
+//	PROCESS_R2         3051
+//	MAKE_R2_NEGATIVE   307C
+//	CHECKING_LOOP      307F
+//	R1_NEGATIVE        3086
+//	R1_NEGATIVE_R2_POSITIVE 3089
+//	R1_POSITIVE_R2_NEGATIVE 308B
+//	R1_R2_SAME_SIGN    308D
+//	POSITIVE           3096
+//	PRINT              3097
+//	SET_R0             3098
+//	SET_R0_ZERO        309E
+//	DONE               309F
+//	INPUT_STACK        30A0
+//	LookUp10           30A5
+//	LookUp100          30AF
+//	NEGATIVE_ONE       30B9
+//	POSITIVE_ONE       30BC
+//	ZERO               30BE

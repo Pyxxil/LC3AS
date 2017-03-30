@@ -1,0 +1,9 @@
+#ifndef LC3_SIMULATOR_SIMULATOR_HPP
+#define LC3_SIMULATOR_SIMULATOR_HPP
+
+class Simulator
+{
+
+};
+
+#endif // LC3_SIMULATOR_SIMULATOR_HPP

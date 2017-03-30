@@ -1,0 +1,9 @@
+#ifndef LC3_SIMULATOR_TOKEN_HPP
+#define LC3_SIMULATOR_TOKEN_HPP
+
+class Token
+{
+
+};
+
+#endif // LC3_SIMULATOR_TOKEN_HPP
