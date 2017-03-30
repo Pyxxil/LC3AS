@@ -40,6 +40,8 @@ void Assembler::parseLine(std::string &line)
         for (std::size_t index = 0; index < line.length(); /* Is this the place to update? */) {
                 character = line.at(index);
 
+                // Deal with strings here, it'll be much simpler.
+
                 if (std::isspace(character)) {
                         //std::cout << "Found some whitespace, skipping and dumping contents" << std::endl;
                         // We don't care about space characters.
@@ -89,32 +91,84 @@ void Assembler::parseLine(std::string &line)
 
 Token Assembler::encode(std::string &word)
 {
-        std::transform(word.begin(), word.end(), word.begin(), ::toupper);
+        std::string copy = word;
+        std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
-        if (word.at(0) == '.') {
-                if (!word.compare(".ORIG")) {
-                        // Return a Orig_Directive token
+        switch (copy.at(0)) {
+                // This is checked because a label can't contain '.'
+        case '.':
+                if (copy == ".ORIG") {
                         return Orig();
-                } else if (!word.compare(".END")) {
+                } else if (copy == ".END") {
                         return End();
-                } else if (!word.compare(".FILL")) {
+                } else if (copy == ".FILL") {
                         return Fill();
-                } else if (!word.compare(".BLKW")) {
+                } else if (copy == ".BLKW") {
                         return Blkw();
-                } else if (!word.compare(".STRINGZ")) {
+                } else if (copy == ".STRINGZ") {
                         return Stringz();
                 }
-                std::cout << "HERE IT IS: " << word << std::endl;
                 return Token(word).expected("one of .FILL, .ORIG, .END, .STRINGZ, .BLKW.");
-        } else {
-                if (word.compare("ADD")) {
-
-                } else if (word.compare("AND")) {
-
-                } else if (word.compare("")) {
+        case '0':
+                if (copy.at(1) == 'X') {
 
                 }
+                break;
+        case '#': break;
+        case '-': break;
+        case 'B':
+                if (copy.at(1) == '0' || copy.at(1) == '1') {
+                        copy = word.substr(1);
+                        return Binary(copy);
+                }
+                break;
+        case 'X':
+                // We basically just assume it's a hexadecimal number right?
+                break;
+        default:break;
         }
 
-        return Token();
+        if (copy == "ADD") {
+
+        } else if (copy == "AND") {
+
+        } else if (copy == "NOT") {
+
+        } else if (copy == "JSR") {
+
+        } else if (copy == "JSRR") {
+
+        } else if (copy == "JMP") {
+
+        } else if (copy == "ST") {
+
+        } else if (copy == "STR") {
+
+        } else if (copy == "STI") {
+
+        } else if (copy == "LD") {
+
+        } else if (copy == "LEA") {
+
+        } else if (copy == "LDI") {
+
+        } else if (copy == "LDR") {
+
+        } else if (copy == "PUTS") {
+
+        } else if (copy == "PUTSP") {
+
+        } else if (copy == "HALT") {
+
+        } else if (copy == "TRAP") {
+
+        } else if (copy == "GETC") {
+
+        } else if (copy == "OUT") {
+
+        } else if (copy == "IN") {
+
+        }
+
+        return Label(word);
 }
