@@ -28,7 +28,7 @@
 
 ; Prompt for input, also the entry for the program
 OUT_PROMPT:
-	LEA R0, PROMPT		/ Load the prompt into R0
+	LEA R0, PROMPT		// Load the prompt into R0
 	PUTS			// Put it to the display
 
 	; Initialise Registers for the beginning of the program
