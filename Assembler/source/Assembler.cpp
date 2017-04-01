@@ -35,7 +35,7 @@
 
 #include <fstream>
 
-static std::size_t hash(std::string string)
+static std::size_t hash(std::string &string)
 {
         static const std::size_t hashed_letters[26] = {
                 100363, 99989, 97711, 97151, 92311, 80147,
@@ -51,7 +51,6 @@ static std::size_t hash(std::string string)
 
         std::size_t _hash = 37;
         std::size_t first_char_on_directive = static_cast<std::size_t>(string.at(1));
-
 
         for (const auto &character : string) {
                 if (string.at(0) == '.') {
@@ -114,7 +113,6 @@ std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
 
 std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
 {
-        (void) line_number;
         char character;
 
         std::string current;
@@ -185,6 +183,7 @@ Token Assembler::tokenize(std::string &word, int line_number)
         std::string copy = word;
         std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
+        // While this makes it a bit more efficient, is it worth double checking?
         std::size_t hashed = hash(copy);
 
         switch (copy.at(0)) {

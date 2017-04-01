@@ -19,7 +19,11 @@ public:
                 }
 
                 try {
-                        immediate = static_cast<uint16_t>(std::strtoul(value.c_str(), nullptr, 16));
+                        std::size_t check = 0;
+                        immediate = static_cast<uint16_t>(std::stoi(value, &check, 16));
+                        if (check != value.length()) {
+                                Token::expected("valid decimal value");
+                        }
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid hexadecimal value");
                 }

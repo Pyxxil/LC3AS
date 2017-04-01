@@ -15,9 +15,13 @@ public:
 
                 try {
                         if (value.at(0) == '#') {
-                                value.erase(0);
+                                value.erase(0, 1);
                         }
-                        immediate = static_cast<uint16_t>(std::strtol(value.c_str(), nullptr, 10));
+                        std::size_t check = 0;
+                        immediate = static_cast<uint16_t>(std::stoi(value, &check, 10));
+                        if (check != value.length()) {
+                                Token::expected("valid decimal value");
+                        }
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid decimal value");
                 }
