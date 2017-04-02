@@ -50,7 +50,7 @@ static std::size_t hash(std::string &string)
         }
 
         std::size_t _hash = 37;
-        std::size_t first_char_on_directive = static_cast<std::size_t>(string.at(1));
+        std::size_t first_char_on_directive = string.length() > 1 ? static_cast<std::size_t>(string.at(1)) : 0;
 
         for (const auto &character : string) {
                 if (string.at(0) == '.') {
@@ -59,7 +59,8 @@ static std::size_t hash(std::string &string)
                                         (first_char_on_directive * hashed_letters[first_char_on_directive - 0x41u]);
                         } else {
                                 _hash = (_hash * hashed_letters[static_cast<std::size_t>(character) - 0x41u]) ^
-                                        (first_char_on_directive * hashed_letters[static_cast<std::size_t>(character) - 0x41u]);
+                                        (first_char_on_directive * hashed_letters[
+                                                static_cast<std::size_t>(character) - 0x41u]);
                         }
                 } else {
                         _hash = (_hash * hashed_letters[static_cast<std::size_t>(character) - 0x41u]) ^
@@ -76,6 +77,12 @@ Assembler::Assembler()
 
 }
 
+/**
+ * Given a file name, open the file, then tokenize it line by line.
+ *
+ * @param fileName The name of the file to read.
+ * @return A 2D std::vector containing each tokenized line.
+ */
 std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
 {
         std::ifstream file(fileName);
@@ -105,34 +112,45 @@ std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
                         errors += tokens.back().front().is_error;
                 }
 
-                std::cout << std::endl;
+                std::cout << "\n";
         }
 
         return tokens;
 }
 
+/**
+ * Go through each string (terminated by ',', space character (as defined by std::isspace),
+ * or a comment (denoted by ';', "//"), and tokenize it, adding it to a vector until the end
+ * of the line is reached.
+ * The end of a line is determined when either a comment is hit, or the end of the line is
+ * reached (that is, when the current index into the string is >= to the length of the string).
+ *
+ * @param line The line to tokenize
+ * @param line_number The current line number. This is only relevant when dealing with files,
+ *                    so defaults to 0.
+ *
+ * @return A std::vector<Token> which contains the tokens that were found in the line.
+ */
 std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
 {
         char character;
 
         std::string current;
 
-        std::cout << "Going in: " << line << std::endl;
+        std::cout << "Going in: " << line << "\n";
 
         std::vector<Token> tokens;
 
-        for (std::size_t index = 0; index < line.length(); /* Is this the place to update? */) {
+        for (std::size_t index = 0; index < line.length(); ) {
                 character = line.at(index);
-
-                // Deal with strings here, it'll be much simpler.
 
                 if (std::isspace(character)) {
                         // We don't care about space characters.
-                        // However, it does mean we want to check what we just got.
                         while (line.length() > index + 1 && std::isspace(character)) {
                                 character = line.at(++index);
                         }
 
+                        // However, it does mean we want to check what we just got.
                         addToken(current, tokens, line_number);
                 }
 
@@ -178,6 +196,24 @@ std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
         return tokens;
 }
 
+/**
+ * Using a hashed string, compare this to pre-computed hashes to determine what Token the string
+ * represents.
+ *
+ * If the string begins with '.', it is decidedly a Directive Token, as Label's aren't allowed to
+ * start with '.'.
+ *
+ * If the string begins with '#' or '-', then it is determined to be a Decimal Token. Likewise if
+ * it begins with 'x' or 'X', it is a Hexadecimal number, and 'b' or 'B' it is a Binary number. If
+ * it begins with '0', it could be any of the above, and this is determined by the second character
+ * in the string, or is a simple Decimal 0 if it's the only character in the string.
+ *
+ * A string beginning with 'R' or 'r' is quite possibly a Register.
+ *
+ * @param word The string to tokenize
+ * @param line_number The current line number. This is only relevant when assembling a file.
+ * @return The Token that the string corresponds to.
+ */
 Token Assembler::tokenize(std::string &word, int line_number)
 {
         std::string copy = word;
@@ -318,8 +354,7 @@ Token Assembler::tokenize(std::string &word, int line_number)
                 break;
         }
 
-        // DEBUG: next line
-        std::cout << copy << " hashed to " << std::hex << hashed << std::endl;
+        std::cout << "DEBUG: " << copy << " hashed to " << std::hex << hashed << "\n";
         return Label(word, line_number);
 }
 

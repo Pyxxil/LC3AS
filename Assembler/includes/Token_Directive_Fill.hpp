@@ -6,6 +6,8 @@
 class Fill : public Directive
 {
 public:
+        // TODO: When actually implementing this, what about allowing .FILL LABEL, which
+        // TODO: would fill the address with the address of LABEL?
         Fill(std::string &word, int line_number = 0) : Directive(word, line_number)
         {}
 

@@ -11,6 +11,10 @@ public:
                 if (value.length() > 16) {
                         Token::expected("binary value up to 16 bits");
                         return;
+                } else if (value.length() > 2 && std::toupper(value.at(1)) == 'B') {
+                        value.erase(0, 2);
+                } else if (std::toupper(value.at(0)) == 'B') {
+                        value.erase(0, 1);
                 }
 
                 try {
@@ -18,6 +22,8 @@ public:
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid binary value");
                 }
+
+                std::cout << "Binary literal " << immediate << " ";
         }
 
         uint64_t requires() override
