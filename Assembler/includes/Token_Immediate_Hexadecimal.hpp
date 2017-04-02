@@ -13,9 +13,11 @@ public:
                         return;
                 }
 
-                if (std::toupper(value.at(1)) == 'X' && value.length() == 2) {
+                if (value.length() == 2 && std::toupper(value.at(1)) == 'X') {
                         Token::expected("hexadecimal value up to 16 bits in length");
                         return;
+                } else if (std::toupper(value.at(0)) == 'X') {
+                        value.insert(0, 1, '0');
                 }
 
                 try {

@@ -35,16 +35,40 @@
 
 #include <fstream>
 
+static constexpr std::size_t hashed_letters[26] = {
+        100363, 99989, 97711, 97151, 92311, 80147,
+        82279,  72997, 66457, 65719, 70957, 50262,
+        48407,  51151, 41047, 39371, 35401, 37039,
+        28697,  27791, 20201, 21523, 6449,  4813,
+        16333,  13337,
+};
+
+static constexpr std::size_t hash(const char *const string, std::size_t length) {
+        std::size_t _hash = 37;
+        std::size_t first_char_on_directive = length > 1 ? static_cast<std::size_t>(*(string + 1)) : 0;
+
+        for (std::size_t index = 0; index < length; ++index) {
+                if (*string == '.') {
+                        if (*(string + index) == '.') {
+                                _hash = (_hash * hashed_letters[first_char_on_directive - 0x41u]) ^
+                                        (first_char_on_directive * hashed_letters[first_char_on_directive - 0x41u]);
+                        } else {
+                                _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
+                                        (first_char_on_directive * hashed_letters[
+                                                static_cast<std::size_t>(*(string + index)) - 0x41u]);
+                        }
+                } else {
+                        _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
+                                (static_cast<std::size_t>(*string) *
+                                        hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
+                }
+        }
+
+        return _hash;
+}
+
 static std::size_t hash(std::string &string)
 {
-        static const std::size_t hashed_letters[26] = {
-                100363, 99989, 97711, 97151, 92311, 80147,
-                82279,  72997, 66457, 65719, 70957, 50262,
-                48407,  51151, 41047, 39371, 35401, 37039,
-                28697,  27791, 20201, 21523, 6449,  4813,
-                16333,  13337,
-        };
-
         if (string.at(0) != '.' && !std::isalpha(string.at(0))) {
                 return 0;
         }
@@ -74,7 +98,10 @@ static std::size_t hash(std::string &string)
 
 Assembler::Assembler()
 {
-
+        // TODO: Instead of the pre-computed hash's, maybe compute them here?
+        // TODO:        - Possibly by having constexpr std::size_t hash(const char *string)
+        // TODO: Of course, this would require more memory.
+        // TODO: But what about as class members?
 }
 
 /**
@@ -225,15 +252,15 @@ Token Assembler::tokenize(std::string &word, int line_number)
         switch (copy.at(0)) {
         case '.':
                 switch (hashed) {
-                case 0xae00dbad81af1338:  // hash(".ORIG")
+                case hash(".ORIG", 5):
                         return Orig(word, line_number);
-                case 0xd143ba5fa8981851:  // hash(".END")
+                case hash(".END", 4):
                         return End(word, line_number);
-                case 0x66e0b0b6cd5a4e20:  // hash(".FILL")
+                case hash(".FILL", 5):
                         return Fill(word, line_number);
-                case 0xb97d9f7e2d9fd702:  // hash(".BLKW")
+                case hash(".BLKW", 5):
                         return Blkw(word, line_number);
-                case 0xef479fa15c8dd7c1:  // hash(".STRINGZ")
+                case hash(".STRINGZ", 8):
                         return Stringz(word, line_number);
                 default:
                         return Token(word, line_number).expected("one of .FILL, .ORIG, .END, .STRINGZ, .BLKW");
@@ -270,7 +297,7 @@ Token Assembler::tokenize(std::string &word, int line_number)
                         if (copy.length() < 3 || std::isspace(copy.at(2)) || copy.at(2) == ',') {
                                 return Register(word);
                         }
-                } else if (hashed == 0x230e9051f39cad) { // hash("RET")
+                } else if (hashed == hash("RET", 3)) {
                         return Ret(word, line_number);
                 }
                 return Label(word, line_number);
@@ -280,75 +307,63 @@ Token Assembler::tokenize(std::string &word, int line_number)
 
 
         switch (hashed) {
-        case 0x00c847e7858f3bda:  // hash("ADD")
+        case hash("ADD", 3):
                 return Add(word, line_number);
-        case 0x006972ca4e0fe6aa:  // hash("AND")
+        case hash("AND", 3):
                 return And(word, line_number);
-        case 0x000880559a3c58a1:  // hash("NOT")
+        case hash("NOT", 3):
                 return Not(word, line_number);
-        case 0x001b83c7f078f08f:  // hash("JSR")
+        case hash("JSR", 3):
                 return Jsr(word, line_number);
-        case 0x8cef8cf169d53357:  // hash("JSRR")
+        case hash("JSRR", 4):
                 return Jsrr(word, line_number);
-        case 0x003155da34ef9599:  // hash("JMP")
+        case hash("JMP", 3):
                 return Jmp(word, line_number);
-        case 0x000000163a87a587:  // hash("ST")
+        case hash("ST", 2):
                 return St(word, line_number);
-        case 0x000c901e4ff8fff4:  // hash("STR")
+        case hash("STR", 3):
                 return Str(word, line_number);
-        case 0x00168a8037dda834:  // hash("STI")
+        case hash("STI", 3):
                 return Sti(word, line_number);
-        case 0x000000389286e2ae:  // hash("LD")
+        case hash("LD", 2):
                 return Ld(word, line_number);
-        case 0x005251df343da02e:  // hash("LEA")
+        case hash("LEA", 3):
                 return Lea(word, line_number);
-        case 0x00395e0e09be9292:  // hash("LDI")
+        case hash("LDI", 3):
                 return Ldi(word, line_number);
-        case 0x001ff918099c2706:  // hash("LDR")
+        case hash("LDR", 3):
                 return Ldr(word, line_number);
-        case 0x2fd2a79caa1c2dd9:  // hash("PUTS")
+        case hash("PUTS", 4):
                 return Puts(word, line_number);
-        case 0x45f5f141ac74c8d6:  // hash("HALT")
+        case hash("HALT", 4):
                 return Halt(word, line_number);
-        case 0xf8bf61331cc727e5:  // hash("TRAP")
+        case hash("TRAP", 4):
                 return Trap(word, line_number);
-        case 0x41ca364764d222c1:  // hash("GETC")
+        case hash("GETC", 4):
                 return Getc(word, line_number);
-        case 0x000502dd326219b2:  // hash("OUT")
+        case hash("OUT", 3):
                 return Out(word, line_number);
-        case 0x0000005709aa5303:  // hash("IN")
+        case hash("IN", 2):
                 return In(word, line_number);
-        case 0x000000346c5d7733:  // hash("BR")
+        case hash("BR", 2):
                 // FALLTHROUGH
-        case 0x6c916d80285dac45:  // hash("BRNZP")
+        case hash("BRNZP", 5): case hash("BRNPZ", 5):
                 // FALLTHROUGH
-        case 0x6c916d7ab103e58d:  // hash("BRNPZ")
+        case hash("BRZNP", 5): case hash("BRZPN", 5):
                 // FALLTHROUGH
-        case 0x6c9902f926350905:  // hash("BRZNP")
-                // FALLTHROUGH
-        case 0x6c990314abe22845:  // hash("BRZPN")
-                // FALLTHROUGH
-        case 0x6c9c36bfd651af8d:  // hash("BRPNZ")
-                // FALLTHROUGH
-        case 0x6c9c36c1713fab8d:  // hash("BRPZN")
+        case hash("BRPNZ", 5): case hash("BRPZN", 5):
                 return Br(word, line_number, true, true, true);
-        case 0x0028eaa0470f8463:  // hash("BRN")
+        case hash("BRN", 3):
                 return Br(word, line_number, true, false, false);
-        case 0x000aab21915b9189:  // hash("BRZ")
+        case hash("BRZ", 3):
                 return Br(word, line_number, false, true, false);
-        case 0x001f7e55ca7ca627:  // hash("BRp")
+        case hash("BRP", 3):
                 return Br(word, line_number, false, false, true);
-        case 0x53a77816176567d9:  // hash("BRNZ")
-                // FALLTHROUGH
-        case 0x53a77822b71faf99:  // hash("BRZN")
+        case hash("BRNZ", 4): case hash("BRZN", 4):
                 return Br(word, line_number, true, true, false);
-        case 0x94abd7909f4a83d7:  // hash("BRNP")
-                // FALLTHROUGH
-        case 0x94abd7c59fc129d7:  // hash("BRPN")
+        case hash("BRNP", 4): case hash("BRPN", 4):
                 return Br(word, line_number, true, false, true);
-        case 0x68bcc37dfdb0eef5:  // hash("BRZP")
-                // FALLTHROUGH
-        case 0x68bcc38217e14bbd:  // hash("BRPZ")
+        case hash("BRZP", 4): case hash("BRPZ", 4):
                 return Br(word, line_number, false, true, true);
         default:
                 break;
