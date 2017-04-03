@@ -18,7 +18,7 @@ public:
                 }
 
                 try {
-                        immediate = static_cast<uint16_t >(std::bitset<16>(value).to_ulong());
+                        immediate = static_cast<std::uint16_t >(std::bitset<16>(value).to_ulong());
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid binary value");
                 }
@@ -26,8 +26,8 @@ public:
                 std::cout << "Binary literal " << immediate << " ";
         }
 
-        uint64_t requires() override
-        { return static_cast<uint64_t >(Token::token_type::NONE); }
+        std::uint64_t requires() override
+        { return static_cast<std::uint64_t >(Token::token_type::NONE); }
 };
 
 #endif // PROJECT_TOKEN_IMMEDIATE_BINARY_HPP

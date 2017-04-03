@@ -10,19 +10,19 @@ public:
                 : Operator(oper, line_number), N(n), Z(z), P(p)
         {}
 
-        Token::token_type type() override
+        virtual Token::token_type type() const override
         {
                 return Token::token_type::OP_BR;
         }
 
-        uint64_t requires() override
+        std::uint64_t requires() override
         {
-                return static_cast<uint64_t>(Token::token_type::REGISTER | Token::token_type::IMMEDIATE);
+                return static_cast<std::uint64_t>(Token::token_type::REGISTER | Token::token_type::IMMEDIATE);
         }
 
-        uint16_t assemble() override
+        std::uint16_t assemble() override
         {
-                return static_cast<uint16_t >(0x0 | N << 10 | Z << 9 | P << 8);
+                return static_cast<std::uint16_t >(0x0 | N << 10 | Z << 9 | P << 8);
         }
 
 private:

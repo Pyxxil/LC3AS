@@ -11,12 +11,12 @@ public:
                 std::cout << '"' << string << '"';
         }
 
-        Token::token_type type() override
+        virtual Token::token_type type() const override
         {
                 return Token::token_type::_STRING;
         }
 
-        Token expected(std::string expects) override
+        Token &expected(const char *const expects) override
         {
                 std::cerr << "ERROR: ";
                 if (at_line) {

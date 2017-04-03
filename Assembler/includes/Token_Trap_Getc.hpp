@@ -9,14 +9,14 @@ public:
         Getc(std::string &oper, int line_number = 0) : Operator(oper, line_number)
         {}
 
-        Token::token_type type() override
+        virtual Token::token_type type() const override
         {
                 return Token::token_type::TRAP_GETC;
         }
 
-        uint64_t requires() override
+        std::uint64_t requires() override
         {
-                return static_cast<uint64_t>(Token::token_type::NONE);
+                return static_cast<std::uint64_t>(Token::token_type::NONE);
         }
 };
 

@@ -12,12 +12,13 @@ public:
         {}
 
         std::string label;
+        std::uint16_t address;
 
-        Token::token_type type() override
+        virtual Token::token_type type() const override
         { return Token::token_type::LABEL; }
 
-        uint64_t requires() override
-        { return static_cast<uint64_t >(Token::token_type::NONE); }
+        std::uint64_t requires() override
+        { return static_cast<std::uint64_t >(Token::token_type::NONE); }
 };
 
 #endif //PROJECT_TOKEN_LABEL_HPP

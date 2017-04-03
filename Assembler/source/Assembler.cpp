@@ -97,6 +97,7 @@ static std::size_t hash(std::string &string)
 }
 
 Assembler::Assembler()
+        : errors(0), file_memory_orig_addr(0)
 {
         // TODO: Instead of the pre-computed hash's, maybe compute them here?
         // TODO:        - Possibly by having constexpr std::size_t hash(const char *string)
@@ -110,8 +111,10 @@ Assembler::Assembler()
  * @param fileName The name of the file to read.
  * @return A 2D std::vector containing each tokenized line.
  */
-std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
+std::vector<std::vector<std::unique_ptr<Token>>> Assembler::tokenizeFile(std::string &fileName)
 {
+        errors = 0;  // TODO: Is this the right choice? What if we want to keep them?
+
         std::ifstream file(fileName);
 
         if (!file.is_open()) {
@@ -121,9 +124,8 @@ std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
 
         std::string line;
         int line_number = 0;
-        int errors = 0;
 
-        std::vector<std::vector<Token>> tokens;
+        std::vector<std::vector<std::unique_ptr<Token>>> tokens;
 
         while (std::getline(file, line)) {
                 line_number++;
@@ -132,15 +134,19 @@ std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
                         continue;
                 }
 
-                tokens.push_back(tokenizeLine(line, line_number));
-                generate_symbols(tokens.back());
+                std::vector<std::unique_ptr<Token>> tokenized_line = tokenizeLine(line, line_number);
+                if (!tokenized_line.empty()) {
+                        tokens.push_back(std::move(tokenized_line));
+                }
 
                 if (!tokens.empty() && !tokens.back().empty()) {
-                        errors += tokens.back().front().is_error;
+                        errors += tokens.back().front()->is_error;
                 }
 
                 std::cout << "\n";
         }
+
+        generate_symbols(tokens);
 
         return tokens;
 }
@@ -158,7 +164,7 @@ std::vector<std::vector<Token>> Assembler::tokenizeFile(std::string &fileName)
  *
  * @return A std::vector<Token> which contains the tokens that were found in the line.
  */
-std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
+std::vector<std::unique_ptr<Token>> Assembler::tokenizeLine(std::string &line, int line_number)
 {
         char character;
 
@@ -166,7 +172,7 @@ std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
 
         std::cout << "Going in: " << line << "\n";
 
-        std::vector<Token> tokens;
+        std::vector<std::unique_ptr<Token>> tokens;
 
         for (std::size_t index = 0; index < line.length(); ) {
                 character = line.at(index);
@@ -206,9 +212,10 @@ std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
                         }
 
                         if (index == line.length() && last_character != '"') {
-                                tokens.push_back(String(current, line_number).expected("to find closing '\"'"));
+                                tokens.push_back(std::unique_ptr<Token>{ new String(current, line_number) });
+                                tokens.back()->expected("to find closing '\"'");
                         } else {
-                                tokens.push_back(String(current, line_number));
+                                tokens.push_back(std::unique_ptr<Token> { new String(current, line_number ) });
                         }
 
                         current.erase();
@@ -224,11 +231,8 @@ std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
 }
 
 /**
- * Using a hashed string, compare this to pre-computed hashes to determine what Token the string
- * represents.
- *
- * If the string begins with '.', it is decidedly a Directive Token, as Label's aren't allowed to
- * start with '.'.
+ * Using a hashed string, compare this to pre-computed (constexpr) hashes to determine what Token
+ * the string represents.
  *
  * If the string begins with '#' or '-', then it is determined to be a Decimal Token. Likewise if
  * it begins with 'x' or 'X', it is a Hexadecimal number, and 'b' or 'B' it is a Binary number. If
@@ -241,7 +245,7 @@ std::vector<Token> Assembler::tokenizeLine(std::string &line, int line_number)
  * @param line_number The current line number. This is only relevant when assembling a file.
  * @return The Token that the string corresponds to.
  */
-Token Assembler::tokenize(std::string &word, int line_number)
+std::unique_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
 {
         std::string copy = word;
         std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
@@ -250,101 +254,87 @@ Token Assembler::tokenize(std::string &word, int line_number)
         std::size_t hashed = hash(copy);
 
         switch (copy.at(0)) {
-        case '.':
-                switch (hashed) {
-                case hash(".ORIG", 5):
-                        return Orig(word, line_number);
-                case hash(".END", 4):
-                        return End(word, line_number);
-                case hash(".FILL", 5):
-                        return Fill(word, line_number);
-                case hash(".BLKW", 5):
-                        return Blkw(word, line_number);
-                case hash(".STRINGZ", 8):
-                        return Stringz(word, line_number);
-                default:
-                        return Token(word, line_number).expected("one of .FILL, .ORIG, .END, .STRINGZ, .BLKW");
-                }
         case '0':
                 if (copy.length() == 1) {
-                        return Decimal(word, line_number);
+                        return std::unique_ptr<Token>{ new Decimal(word, line_number) };
                 } else if (copy.at(1) == 'X') {
-                        return Hexadecimal(word, line_number);
+                        return std::unique_ptr<Token>{ new Hexadecimal(word, line_number) };
                 } else if (copy.at(1) == 'B') {
-                        return Binary(word, line_number);
+                        return std::unique_ptr<Token>{ new Binary(word, line_number) };
                 } else {
-                        return Decimal(word, line_number);
+                        return std::unique_ptr<Token>{ new Decimal(word, line_number) };
                 }
         case '#':  // FALLTHROUGH
         case '-':
-                return Decimal(copy, line_number);
+                return std::unique_ptr<Token>{ new Decimal(copy, line_number) };
         case 'B':
                 if (copy.length() > 1 && (copy.at(1) == '0' || copy.at(1) == '1')) {
                         copy = word.substr(1);
-                        return Binary(copy, line_number);
+                        return std::unique_ptr<Token>{ new Binary(copy, line_number) };
                 }
                 break;
         case 'X':
                 if (copy.length() > 1 && std::isxdigit(copy.at(1))) {
-                        return Hexadecimal(word, line_number);
+                        return std::unique_ptr<Token>{ new Hexadecimal(word, line_number) };
                 }
-                return Label(word, line_number);
+                return std::unique_ptr<Token>{ new Label(word, line_number) };
         case 'R':
                 if (copy.length() < 2) {
-                        return Label(word, line_number);
+                        return std::unique_ptr<Token>{ new Label(word, line_number) };
                 }
                 if (std::isdigit(copy.at(1))) {
                         if (copy.length() < 3 || std::isspace(copy.at(2)) || copy.at(2) == ',') {
-                                return Register(word);
+                                return std::unique_ptr<Token>{ new Register(word) };
                         }
                 } else if (hashed == hash("RET", 3)) {
-                        return Ret(word, line_number);
+                        return std::unique_ptr<Token>{ new Ret(word, line_number) };
                 }
-                return Label(word, line_number);
+                return std::unique_ptr<Token>{ new Label(word, line_number) };
         default:
                 break;
         }
 
-
         switch (hashed) {
         case hash("ADD", 3):
-                return Add(word, line_number);
+                return std::unique_ptr<Token>{ new Add(word, line_number) };
         case hash("AND", 3):
-                return And(word, line_number);
+                return std::unique_ptr<Token>{ new And(word, line_number) };
         case hash("NOT", 3):
-                return Not(word, line_number);
+                return std::unique_ptr<Token>{ new Not(word, line_number) };
         case hash("JSR", 3):
-                return Jsr(word, line_number);
+                return std::unique_ptr<Token>{ new Jsr(word, line_number) };
         case hash("JSRR", 4):
-                return Jsrr(word, line_number);
+                return std::unique_ptr<Token>{ new Jsrr(word, line_number) };
         case hash("JMP", 3):
-                return Jmp(word, line_number);
+                return std::unique_ptr<Token>{ new Jmp(word, line_number) };
         case hash("ST", 2):
-                return St(word, line_number);
+                return std::unique_ptr<Token>{ new St(word, line_number) };
         case hash("STR", 3):
-                return Str(word, line_number);
+                return std::unique_ptr<Token>{ new Str(word, line_number) };
         case hash("STI", 3):
-                return Sti(word, line_number);
+                return std::unique_ptr<Token>{ new Sti(word, line_number) };
         case hash("LD", 2):
-                return Ld(word, line_number);
+                return std::unique_ptr<Token>{ new Ld(word, line_number) };
         case hash("LEA", 3):
-                return Lea(word, line_number);
+                return std::unique_ptr<Token>{ new Lea(word, line_number) };
         case hash("LDI", 3):
-                return Ldi(word, line_number);
+                return std::unique_ptr<Token>{ new Ldi(word, line_number) };
         case hash("LDR", 3):
-                return Ldr(word, line_number);
+                return std::unique_ptr<Token>{ new Ldr(word, line_number) };
         case hash("PUTS", 4):
-                return Puts(word, line_number);
+                return std::unique_ptr<Token>{ new Puts(word, line_number) };
+        case hash("PUTSP", 5):
+                return std::unique_ptr<Token>{ new Putsp(word, line_number) };
         case hash("HALT", 4):
-                return Halt(word, line_number);
+                return std::unique_ptr<Token>{ new Halt(word, line_number) };
         case hash("TRAP", 4):
-                return Trap(word, line_number);
+                return std::unique_ptr<Token>{ new Trap(word, line_number) };
         case hash("GETC", 4):
-                return Getc(word, line_number);
+                return std::unique_ptr<Token>{ new Getc(word, line_number) };
         case hash("OUT", 3):
-                return Out(word, line_number);
+                return std::unique_ptr<Token>{ new Out(word, line_number) };
         case hash("IN", 2):
-                return In(word, line_number);
+                return std::unique_ptr<Token>{ new In(word, line_number) };
         case hash("BR", 2):
                 // FALLTHROUGH
         case hash("BRNZP", 5): case hash("BRNPZ", 5):
@@ -352,25 +342,35 @@ Token Assembler::tokenize(std::string &word, int line_number)
         case hash("BRZNP", 5): case hash("BRZPN", 5):
                 // FALLTHROUGH
         case hash("BRPNZ", 5): case hash("BRPZN", 5):
-                return Br(word, line_number, true, true, true);
+                return std::unique_ptr<Token>{ new Br(word, line_number, true, true, true) };
         case hash("BRN", 3):
-                return Br(word, line_number, true, false, false);
+                return std::unique_ptr<Token>{ new Br(word, line_number, true, false, false) };
         case hash("BRZ", 3):
-                return Br(word, line_number, false, true, false);
+                return std::unique_ptr<Token>{ new Br(word, line_number, false, true, false) };
         case hash("BRP", 3):
-                return Br(word, line_number, false, false, true);
+                return std::unique_ptr<Token>{ new Br(word, line_number, false, false, true) };
         case hash("BRNZ", 4): case hash("BRZN", 4):
-                return Br(word, line_number, true, true, false);
+                return std::unique_ptr<Token>{ new Br(word, line_number, true, true, false) };
         case hash("BRNP", 4): case hash("BRPN", 4):
-                return Br(word, line_number, true, false, true);
+                return std::unique_ptr<Token>{ new Br(word, line_number, true, false, true) };
         case hash("BRZP", 4): case hash("BRPZ", 4):
-                return Br(word, line_number, false, true, true);
+                return std::unique_ptr<Token>{ new Br(word, line_number, false, true, true) };
+        case hash(".ORIG", 5):
+                return std::unique_ptr<Token>{ new Orig(word, line_number) };
+        case hash(".END", 4):
+                return std::unique_ptr<Token>{ new End(word, line_number) };
+        case hash(".FILL", 5):
+                return std::unique_ptr<Token>{ new Fill(word, line_number) };
+        case hash(".BLKW", 5):
+                return std::unique_ptr<Token>{ new Blkw(word, line_number) };
+        case hash(".STRINGZ", 8):
+                return std::unique_ptr<Token>{ new Stringz(word, line_number) };
         default:
                 break;
         }
 
         std::cout << "DEBUG: " << copy << " hashed to " << std::hex << hashed << "\n";
-        return Label(word, line_number);
+        return std::unique_ptr<Token>{ new Label(word, line_number) };
 }
 
 bool Assembler::validate(std::vector<Token> &tokens)
@@ -379,17 +379,38 @@ bool Assembler::validate(std::vector<Token> &tokens)
         return false;
 }
 
-std::map<Token, uint16_t> &Assembler::generate_symbols(std::vector<Token, std::allocator<Token>> &tokens)
+std::map<Token, std::uint16_t> &Assembler::generate_symbols(std::vector<std::vector<std::unique_ptr<Token>>> &tokens)
 {
-        (void) tokens;
+        std::size_t orig_index = 0;
+
+        if (tokens.empty()) {
+                return symbols;
+        }
+
+        for (; orig_index < tokens.size(); ++orig_index) {
+               if (tokens.at(orig_index).front()->type() == Token::token_type::DIR_ORIG) {
+                       if (tokens[orig_index].front()->validate(tokens[orig_index])) {
+                               file_memory_orig_addr =
+                                       dynamic_cast<Immediate *>(tokens[orig_index].back().get())->immediate;
+                       }
+                       errors++;
+                       break;
+               } else {
+                       tokens[orig_index].front()->expected(".ORIG directive");
+                       ++errors;
+               }
+        }
+
+        //for (const auto & tokenizedLine : tokens) {
+        //}
         return symbols;
 }
 
-void Assembler::addToken(std::string &token, std::vector<Token> &tokens, int line_number)
+void Assembler::addToken(std::string &token, std::vector<std::unique_ptr<Token>> &tokens, int line_number)
 {
         if (!token.empty()) {
                 tokens.push_back(tokenize(token, line_number));
-                std::cout << tokens.back().word << " ";
+                std::cout << tokens.back()->word << " ";
                 token.erase();
         }
 }

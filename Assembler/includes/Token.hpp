@@ -2,7 +2,7 @@
 #define LC3_SIMULATOR_TOKEN_HPP
 
 #include <iostream>
-#include <tic.h>
+#include <vector>
 
 inline void ERROR(const char *const str, ...)
 {
@@ -31,7 +31,7 @@ public:
         Token(std::string &word, int line = 0) : word(word), at_line(line)
         {}
 
-        Token operator=(Token &other)
+        Token &operator=(Token &other)
         {
                 word = other.word;
                 is_error = other.is_error;
@@ -83,13 +83,13 @@ public:
                 _STRING,
         };
 
-        virtual token_type type()
-        { return token_type::NONE; }
+        virtual Token::token_type type() const
+        { return Token::token_type::NONE; }
 
-        virtual uint64_t requires()
-        { return static_cast<uint64_t >(token_type::NONE); }
+        virtual std::uint64_t requires()
+        { return static_cast<std::uint64_t >(token_type::NONE); }
 
-        virtual Token expected(std::string expects)
+        virtual Token &expected(const char *const expects)
         {
                 std::cerr << "ERROR: ";
                 if (at_line) {
@@ -102,10 +102,14 @@ public:
                 return *this;
         }
 
-        virtual Token note(std::string)
+        virtual bool validate(std::vector<std::unique_ptr<Token>> &) {
+                return true;
+        }
+
+        virtual Token &note(std::string)
         { return *this; }
 
-        virtual uint16_t assemble() {
+        virtual std::uint16_t assemble() {
                 return 0;
         }
 };

@@ -22,7 +22,7 @@ public:
 
                 try {
                         std::size_t check = 0;
-                        immediate = static_cast<uint16_t>(std::stoi(value, &check, 16));
+                        immediate = static_cast<std::uint16_t>(std::stoi(value, &check, 16));
                         if (check != value.length()) {
                                 Token::expected("valid decimal value");
                         }
@@ -31,8 +31,8 @@ public:
                 }
         }
 
-        uint64_t requires() override
-        { return static_cast<uint64_t >(Token::token_type::NONE); }
+        std::uint64_t requires() override
+        { return static_cast<std::uint64_t >(Token::token_type::NONE); }
 };
 
 #endif //PROJECT_TOKEN_IMMEDIATE_HEXADECIMAL_HPP
