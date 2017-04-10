@@ -13,12 +13,6 @@ public:
         {
                 return Token::token_type::OP_STR;
         }
-
-        std::uint64_t requires() override
-        {
-                return static_cast<std::uint64_t>(Token::token_type::REGISTER | Token::token_type::IMMEDIATE);
-        }
 };
-
 
 #endif //PROJECT_TOKEN_OPERATOR_STR_HPP

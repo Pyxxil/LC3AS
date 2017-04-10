@@ -11,7 +11,7 @@ public:
         Immediate(std::string &word, int line_number = 0) : Token(word, line_number)
         {}
 
-        std::uint16_t immediate = 0;
+        std::int16_t immediate = 0;
 
         virtual Token::token_type type() const
         { return Token::token_type::IMMEDIATE; }

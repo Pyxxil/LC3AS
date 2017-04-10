@@ -13,12 +13,6 @@ public:
         {
                 return Token::token_type::OP_JSRR;
         }
-
-        std::uint64_t requires() override
-        {
-                return static_cast<std::uint64_t>(Token::token_type::REGISTER);
-        }
 };
-
 
 #endif //PROJECT_TOKEN_OPERATOR_JSRR_HPP

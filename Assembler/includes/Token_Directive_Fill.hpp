@@ -14,9 +14,27 @@ public:
         virtual Token::token_type type() const override
         { return Token::token_type::DIR_FILL; }
 
-        std::uint64_t requires() override
+        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
         {
-                return static_cast<std::uint64_t >(Token::token_type::IMMEDIATE);
+                if (tokens.size() != 2) {
+                        return -1;
+                }
+
+                // TODO: Change this so it accepts labels as well (just fills that area of memory with the address
+                // TODO: of the label.
+                if (tokens[1]->type() != Token::IMMEDIATE && tokens[1]->type() != Token::LABEL) {
+                        return -1;
+                }
+
+                if (!*orig_seen) {
+                        expected(".ORIG directive");
+                        return -1;
+                } else if (*end_seen) {
+                        WARNING(".END directive before .FILL directive, .FILL directive will be ignored.");
+                        return 0;
+                }
+
+                return 1;
         }
 };
 

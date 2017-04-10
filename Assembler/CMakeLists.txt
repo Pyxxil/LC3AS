@@ -5,8 +5,6 @@ set ( CMAKE_CXX_STANDARD 14 )
 
 add_definitions ( "-DPROJECT=\"${PROJECT_NAME}\"" )
 
-set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wpedantic" )
-
 set ( SOURCE_FILES
       main.cpp
       )

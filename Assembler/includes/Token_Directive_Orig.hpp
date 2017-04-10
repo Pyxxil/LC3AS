@@ -10,11 +10,33 @@ public:
         {}
 
         virtual Token::token_type type() const override
-        { return Token::token_type::DIR_ORIG; }
+        { return Token::DIR_ORIG; }
 
-        std::uint64_t requires() override
+        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
         {
-                return static_cast<std::uint64_t >(Token::token_type::IMMEDIATE);
+                if (tokens.size() != 2) {
+                        return -1;
+                }
+
+                if (tokens[1]->type() != Token::IMMEDIATE) {
+                        tokens[1]->expected("immediate value");
+                }
+
+                if (*orig_seen) {
+                        std::cerr << "ERROR: ";
+                        if (at_line) {
+                                std::cerr << "Line " << at_line << ": ";
+                        }
+                        std::cerr << "Multiple .ORIG statements \n";
+
+                        is_error = true;
+                        return -1;
+                } else if (*end_seen) {
+                        WARNING(".ORIG directive after .END");
+                }
+
+                *orig_seen = true;
+                return 0;
         }
 };
 

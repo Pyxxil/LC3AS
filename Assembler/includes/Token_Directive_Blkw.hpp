@@ -2,6 +2,7 @@
 #define PROJECT_TOKEN_DIRECTIVE_BLKW_HPP
 
 #include "Token_Directive.hpp"
+#include "Token_Immediate.hpp"
 
 class Blkw : public Directive
 {
@@ -12,9 +13,25 @@ public:
         virtual Token::token_type type() const override
         { return Token::token_type::DIR_BLKW; }
 
-        std::uint64_t requires() override
+        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
         {
-                return static_cast<std::uint64_t >(Token::token_type::IMMEDIATE);
+                if (tokens.size() != 2) {
+                        return -1;
+                }
+
+                if (tokens[1]->type() != Token::IMMEDIATE) {
+                        return -1;
+                }
+
+                if (!*orig_seen) {
+                        expected(".ORIG directive");
+                        return -1;
+                } else if (*end_seen) {
+                        WARNING(".END directive before .BLKW directive, .BLKW directive will be ignored.");
+                        return 0;
+                }
+
+                return static_cast<Immediate *>(tokens[1])->immediate;
         }
 };
 

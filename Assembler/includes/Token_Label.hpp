@@ -11,14 +11,34 @@ public:
         Label(std::string &name, int line_number) : Token(name, line_number), label(name)
         {}
 
+        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        {
+                if (tokens.size() == 1) {
+                        return 0;
+                }
+
+                std::vector<Token *> vec(tokens.begin() + 1, tokens.end());
+                std::int32_t ret = vec.front()->assemble(vec, orig_seen, end_seen);
+                assembled = vec.front()->assembled;
+                return ret;
+        }
+
         std::string label;
-        std::uint16_t address;
+        std::uint16_t address = 0;
 
         virtual Token::token_type type() const override
         { return Token::token_type::LABEL; }
 
-        std::uint64_t requires() override
-        { return static_cast<std::uint64_t >(Token::token_type::NONE); }
+        void not_found()
+        {
+                std::cerr << "ERROR: ";
+                if (at_line) {
+                        std::cerr << "Line " << at_line << ": ";
+                }
+                std::cerr << "No such label '" << label << "'\n";
+
+                is_error = true;
+        }
 };
 
 #endif //PROJECT_TOKEN_LABEL_HPP

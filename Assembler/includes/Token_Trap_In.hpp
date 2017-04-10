@@ -13,11 +13,6 @@ public:
         {
                 return Token::token_type::TRAP_IN;
         }
-
-        std::uint64_t requires() override
-        {
-                return static_cast<std::uint64_t>(Token::token_type::NONE);
-        }
 };
 
 

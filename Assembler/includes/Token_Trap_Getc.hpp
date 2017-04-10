@@ -13,11 +13,6 @@ public:
         {
                 return Token::token_type::TRAP_GETC;
         }
-
-        std::uint64_t requires() override
-        {
-                return static_cast<std::uint64_t>(Token::token_type::NONE);
-        }
 };
 
 #endif //PROJECT_TOKEN_TRAP_GETC_HPP

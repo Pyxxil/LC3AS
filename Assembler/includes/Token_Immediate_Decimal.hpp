@@ -19,17 +19,16 @@ public:
                         }
 
                         std::size_t check = 0;
-                        immediate = static_cast<std::uint16_t>(std::stoi(value, &check, 10));
+                        immediate = static_cast<std::int16_t>(std::stoi(value, &check, 10));
                         if (check != value.length()) {
                                 Token::expected("valid decimal value");
                         }
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid decimal value");
                 }
-        }
 
-        std::uint64_t requires() override
-        { return static_cast<std::uint64_t >(Token::token_type::NONE); }
+                std::cout << "Immediate value " << immediate << '\n';
+        }
 };
 
 #endif //PROJECT_TOKEN_IMMEDIATE_DECIMAL_HPP

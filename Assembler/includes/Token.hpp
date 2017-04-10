@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 inline void ERROR(const char *const str, ...)
 {
@@ -45,6 +46,7 @@ public:
         std::string word;
         bool is_error = false;
         int at_line = 0;
+        std::vector<std::uint16_t> assembled;
 
         enum token_type
         {
@@ -84,10 +86,7 @@ public:
         };
 
         virtual Token::token_type type() const
-        { return Token::token_type::NONE; }
-
-        virtual std::uint64_t requires()
-        { return static_cast<std::uint64_t >(token_type::NONE); }
+        { return Token::NONE; }
 
         virtual Token &expected(const char *const expects)
         {
@@ -102,16 +101,19 @@ public:
                 return *this;
         }
 
-        virtual bool validate(std::vector<std::unique_ptr<Token>> &) {
-                return true;
-        }
-
         virtual Token &note(std::string)
         { return *this; }
 
-        virtual std::uint16_t assemble() {
-                return 0;
+        virtual std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen)
+        {
+                (void) tokens;
+                (void) orig_seen;
+                (void) end_seen;
+                return -1;
         }
+
+        virtual std::vector<std::uint16_t> as_assembled()
+        { return assembled; }
 };
 
 #endif // LC3_SIMULATOR_TOKEN_HPP

@@ -12,8 +12,26 @@ public:
         virtual Token::token_type type() const override
         { return Token::token_type::DIR_STRINGZ; }
 
-        std::uint64_t requires() override
-        { return static_cast<std::uint64_t >(Token::token_type::_STRING); }
+        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        {
+                if (tokens.size() != 2) {
+                        return -1;
+                }
+
+                if (tokens[1]->type() != Token::_STRING) {
+                        return -1;
+                }
+
+                if (!*orig_seen) {
+                        expected(".ORIG directive");
+                        return -1;
+                } else if (*end_seen) {
+                        WARNING(".END directive before .STRINGZ directive, .STRINGZ directive will be ignored.");
+                        return 0;
+                }
+
+                return static_cast<std::int32_t>(static_cast<String *>(tokens[1])->word.length() + 1);
+        }
 };
 
 #endif //PROJECT_TOKEN_DIRECTIVE_STRINGZ_HPP

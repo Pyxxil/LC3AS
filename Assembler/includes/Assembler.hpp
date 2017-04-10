@@ -6,24 +6,30 @@
 #include <map>
 
 #include "Token.hpp"
+#include "Token_Label.hpp"
+
+#include <memory>
 
 class Assembler
 {
 public:
         Assembler();
-        std::vector<std::vector<std::unique_ptr<Token>>> tokenizeFile(std::string &fileName);
-        std::vector<std::unique_ptr<Token>> tokenizeLine(std::string &line, int line_number = 0); // This should return a vector
+        ~Assembler();
+        std::vector<std::vector<Token *>> &tokenizeFile(std::string &fileName);
+        std::vector<Token *> tokenizeLine(std::string &line, int line_number = 0); // This should return a vector
 
-        std::unique_ptr<Token> tokenize(std::string &word, int line_number);
-        bool validate(std::vector<Token> &tokens);
-        std::map<Token, std::uint16_t> &generate_symbols(std::vector<std::vector<std::unique_ptr<Token>>> &tokens);
+        Token *tokenize(std::string &word, int line_number);
+        void assemble();
+        std::vector<std::uint16_t> assembled();
 
-        std::size_t errors;
-        std::uint16_t file_memory_orig_addr;
+        std::size_t error_count;
+        std::uint16_t internal_program_counter = 0;
+        std::uint16_t file_memory_origin_address = 0;
 
 private:
-        std::map<Token, std::uint16_t> symbols;
-        void addToken(std::string &token, std::vector<std::unique_ptr<Token>> &tokens, int line_number);
+        std::map<std::uint16_t, Label> symbols;
+        std::vector<std::vector<Token *>> tokens;
+        void addToken(std::string &token, std::vector<Token *> &toks, int line_number);
 };
 
 #endif // LC3_SIMULATOR_ASSEMBLER_HPP

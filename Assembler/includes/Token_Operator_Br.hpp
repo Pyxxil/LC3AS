@@ -12,17 +12,36 @@ public:
 
         virtual Token::token_type type() const override
         {
-                return Token::token_type::OP_BR;
+                return Token::OP_BR;
         }
 
-        std::uint64_t requires() override
+        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
         {
-                return static_cast<std::uint64_t>(Token::token_type::REGISTER | Token::token_type::IMMEDIATE);
+                if (tokens.size() != 2) {
+                        return -1;
+                }
+
+                if (tokens[1]->type() != Token::LABEL) {
+                        return -1;
+                }
+
+                if (!*orig_seen) {
+                        expected(".ORIG directive");
+                } else if (*end_seen) {
+                        WARNING(".END directive before .BLKW directive, .BLKW directive will be ignored.");
+                } else {
+                        return 1;
+                }
+
+                return -1;
         }
 
-        std::uint16_t assemble() override
+        std::vector<uint16_t, std::allocator<uint16_t>> as_assembled() override
         {
-                return static_cast<std::uint16_t >(0x0 | N << 10 | Z << 9 | P << 8);
+                (void) N;
+                (void) Z;
+                (void) P;
+                return Token::as_assembled();
         }
 
 private:
