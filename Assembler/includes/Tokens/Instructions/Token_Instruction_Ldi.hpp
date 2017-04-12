@@ -1,0 +1,18 @@
+#ifndef PROJECT_TOKEN_OPERATOR_LDI_HPP
+#define PROJECT_TOKEN_OPERATOR_LDI_HPP
+
+#include "../Token_Instruction.hpp"
+
+class Ldi : public Instruction
+{
+public:
+        Ldi(std::string &oper, int line_number = 0) : Instruction(oper, line_number)
+        {}
+
+        virtual Token::token_type type() const override
+        {
+                return Token::token_type::OP_LDI;
+        }
+};
+
+#endif //PROJECT_TOKEN_OPERATOR_LDI_HPP

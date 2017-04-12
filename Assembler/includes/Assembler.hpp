@@ -6,7 +6,7 @@
 #include <map>
 
 #include "Token.hpp"
-#include "Token_Label.hpp"
+#include "Tokens/Token_Label.hpp"
 
 #include <memory>
 
