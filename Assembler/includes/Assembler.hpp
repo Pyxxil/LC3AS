@@ -27,7 +27,7 @@ public:
         std::uint16_t file_memory_origin_address = 0;
 
 private:
-        std::map<std::uint16_t, Label> symbols;
+        std::map<std::uint16_t, Label *> symbols;
         std::vector<std::vector<Token *>> tokens;
         void addToken(std::string &token, std::vector<Token *> &toks, int line_number);
 };

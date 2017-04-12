@@ -26,8 +26,6 @@ public:
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid decimal value");
                 }
-
-                std::cout << "Immediate value " << immediate << '\n';
         }
 };
 

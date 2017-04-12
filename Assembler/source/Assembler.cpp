@@ -158,11 +158,10 @@ std::vector<std::vector<Token *>> &Assembler::tokenizeFile(std::string &fileName
                 if (!tokens.empty() && !tokens.back().empty()) {
                         error_count += tokens.back().front()->is_error;
                 }
-
-                std::cout << "\n";
         }
 
         assemble();
+        assembled();
         return tokens;
 }
 
@@ -184,8 +183,6 @@ std::vector<Token *> Assembler::tokenizeLine(std::string &line, int line_number)
         char character;
 
         std::string current;
-
-        std::cout << "Going in: " << line << "\n";
 
         std::vector<Token *> tokenenized_line;
 
@@ -256,7 +253,6 @@ void Assembler::addToken(std::string &token, std::vector<Token *> &toks, int lin
 {
         if (!token.empty()) {
                 toks.push_back(tokenize(token, line_number));
-                std::cout << toks.back()->word << " ";
                 token.erase();
         }
 }
@@ -400,7 +396,6 @@ Token *Assembler::tokenize(std::string &word, int line_number)
                 return new Stringz(word, line_number);
         default:
                 // Of course, if it doesn't match the above, then we'll treat it as a label.
-                std::cout << "DEBUG: " << copy << " hashed to " << std::hex << hashed << "\n";
                 return new Label(word, line_number);
         }
 }
@@ -420,27 +415,63 @@ void Assembler::assemble()
 
         // It would be best to go through the tokens line by line and check the first element
         // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
+        for (auto &tokenized_line : tokens) {
+                if (tokenized_line.front()->type() == Token::LABEL) {
+                        static_cast<Label *>(tokenized_line.front())->address = file_memory_origin_address;
+                        symbols.insert(std::pair<std::uint16_t, Label *>(
+                                file_memory_origin_address,
+                                static_cast<Label *>(tokenized_line.front()))
+                        );
+                } else if (tokenized_line.front()->type() == Token::DIR_END) {
+                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
+                                tokenized_line, &origin_seen, &end_seen)
+                        );
+                } else if (tokenized_line.front()->type() == Token::DIR_ORIG) {
+                        //tokenized_line.front()->assemble(tokenized_line, &origin_seen, &end_seen);
+                        origin_seen = true;
+                        file_memory_origin_address = static_cast<Orig *>(tokenized_line.front())->origin;
+                } else if (tokenized_line.front()->type() == Token::DIR_BLKW) {
+                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
+                                tokenized_line,&origin_seen, &end_seen)
+                        );
+                } else if (tokenized_line.front()->type() == Token::DIR_FILL) {
+                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
+                                tokenized_line, &origin_seen, &end_seen)
+                        );
+                } else if (tokenized_line.front()->type() == Token::DIR_STRINGZ) {
+                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
+                                tokenized_line, &origin_seen, &end_seen)
+                        );
+                } else {
+                        if (!origin_seen) {
+                                tokenized_line.front()->expected(".ORIG statement");
+                        }
 
-        for (auto &tokenised_line : tokens) {
+                        if (end_seen) {
+                                WARNING("%s found after .END. It will be ignored", tokenized_line.front()->word.c_str());
+                        }
+
+                        if (origin_seen && !end_seen) {
+                                ++file_memory_origin_address;
+                        }
+                }
+        }
+
+        end_seen = false;
+        origin_seen = false;
+
+        for (auto &tokenized_line : tokens) {
                 // This should return >= 0 on success (where the value is then used to advance the pc),
                 // -1 if there was an error.
                 // Arguably, it's probably better to pass a reference to the assembler class with this, and
                 // from that it can be determined if the origin has been seen, or if the end has been seen,
                 // and if a label is actually in the file.
-                memory_required = tokenised_line.front()->assemble(tokenised_line, &origin_seen, &end_seen);
-
-                if (tokenised_line.front()->type() == Token::LABEL) {
-                        static_cast<Label *>(tokenised_line.front())->address = internal_program_counter;
-                }
-
-                std::cout << "Line " << tokenised_line.front()->at_line << " with "
-                          << tokenised_line.front()->word << '\n';
+                memory_required = tokenized_line.front()->assemble(tokenized_line, &origin_seen, &end_seen);
 
                 if (memory_required == -1) {
                         errors++;
                 } else if (memory_required > 0) {
                         internal_program_counter += memory_required;
-                        std::cout << "Memory required now " << internal_program_counter << '\n';
                 }
         }
 }
@@ -449,8 +480,9 @@ std::vector<std::uint16_t> Assembler::assembled()
 {
         std::vector<std::uint16_t> assembled_tokens;
 
-        for (const auto &tokenised_line : tokens) {
-                for (const auto & assembled_line : tokenised_line.front()->as_assembled()) {
+        for (const auto &tokenized_line : tokens) {
+                for (const auto & assembled_line : tokenized_line.front()->as_assembled()) {
+                        std::cout << std::hex << assembled_line << '\n';
                         assembled_tokens.push_back(assembled_line);
                 }
         }

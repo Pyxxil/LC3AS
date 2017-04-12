@@ -7,9 +7,7 @@ class String : public Token
 {
 public:
         String(std::string &string, int line_number = 0) : Token(string, line_number)
-        {
-                std::cout << '"' << string << '"';
-        }
+        {}
 
         virtual Token::token_type type() const override
         {

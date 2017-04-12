@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+class Assembler;
+
 inline void ERROR(const char *const str, ...)
 {
         va_list args;
@@ -104,8 +106,9 @@ public:
         virtual Token &note(std::string)
         { return *this; }
 
-        virtual std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen)
+        virtual int32_t assemble(std::vector<Token *, std::allocator<Token *>> &tokens, bool *orig_seen, bool *end_seen)
         {
+                std::cerr << word << " not implemented\n";
                 (void) tokens;
                 (void) orig_seen;
                 (void) end_seen;
@@ -113,7 +116,9 @@ public:
         }
 
         virtual std::vector<std::uint16_t> as_assembled()
-        { return assembled; }
+        {
+                return assembled;
+        }
 };
 
 #endif // LC3_SIMULATOR_TOKEN_HPP

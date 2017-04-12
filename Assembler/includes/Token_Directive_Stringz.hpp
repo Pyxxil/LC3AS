@@ -19,6 +19,7 @@ public:
                 }
 
                 if (tokens[1]->type() != Token::_STRING) {
+                        tokens[1]->expected("String literal");
                         return -1;
                 }
 

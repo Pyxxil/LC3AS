@@ -2,6 +2,7 @@
 #define PROJECT_TOKEN_LABEL_HPP
 
 #include "Token.hpp"
+#include "Assembler.hpp"
 
 class Label : public Token
 {
@@ -11,7 +12,7 @@ public:
         Label(std::string &name, int line_number) : Token(name, line_number), label(name)
         {}
 
-        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        int32_t assemble(std::vector<Token *, std::allocator<Token *>> &tokens, bool *orig_seen, bool *end_seen) override
         {
                 if (tokens.size() == 1) {
                         return 0;

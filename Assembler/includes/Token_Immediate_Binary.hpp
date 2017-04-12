@@ -24,8 +24,6 @@ public:
                 } catch (const std::invalid_argument &e) {
                         Token::expected("valid binary value");
                 }
-
-                std::cout << "Binary literal " << immediate << " ";
         }
 };
 

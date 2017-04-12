@@ -14,15 +14,15 @@
 ; NOTE: As R1 is used as the input and the counter, we don't want to overwrite at
 ;	all by anything other than the Iteration part of the program.
 
-;       Getting input			| Converting to ASCII		| Iteration
-; R0 -- Input and output		| R0 --	Output			| R0 -- Unused
-; R1 -- The current input		| R1 --	Unused			| R1 -- Loop counter
-; R2 -- Unused				| R2 --	The digit position	| R2 -- Unused
+;       Getting input			    | Converting to ASCII		    | Iteration
+; R0 -- Input and output	        | R0 --	Output			        | R0 -- Unused
+; R1 -- The current input	        | R1 --	Unused			        | R1 -- Loop counter
+; R2 -- Unused			            | R2 --	The digit position	    | R2 -- Unused
 ; R3 -- Used to compare values		| R3 --	Number of digits output	| R3 -- The lower fibonacci number
-; R4 -- Used to multiply by ten		| R4 --	The current place	| R4 -- The higher fibonacci number
+; R4 -- Used to multiply by ten		| R4 --	The current place	    | R4 -- The higher fibonacci number
 ; R5 -- Used as the character count	| R5 --	The number to convert	| R5 -- Current Fibonacci Number
-; R6 -- Used to multiply by ten		| R6 --	The current digit	| R6 -- Temporary Value
-; R7 -- Return address			| R7 --	Return address		| R7 -- Return address
+; R6 -- Used to multiply by ten		| R6 --	The current digit	    | R6 -- Temporary Value
+; R7 -- Return address			    | R7 --	Return address		    | R7 -- Return address
 
 .ORIG 0x3000
 

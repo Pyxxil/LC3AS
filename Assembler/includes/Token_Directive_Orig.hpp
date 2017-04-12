@@ -2,12 +2,15 @@
 #define PROJECT_TOKEN_DIRECTIVE_ORIG_HPP
 
 #include "Token_Directive.hpp"
+#include "Token_Immediate.hpp"
 
 class Orig : public Directive
 {
 public:
         Orig(std::string &word, int line_number = 0) : Directive(word, line_number)
         {}
+
+        std::uint16_t origin = 0x3000;
 
         virtual Token::token_type type() const override
         { return Token::DIR_ORIG; }
@@ -34,6 +37,9 @@ public:
                 } else if (*end_seen) {
                         WARNING(".ORIG directive after .END");
                 }
+
+                origin = static_cast<std::uint16_t>(static_cast<Immediate *>(tokens[1])->immediate);
+                assembled.push_back(origin);
 
                 *orig_seen = true;
                 return 0;
