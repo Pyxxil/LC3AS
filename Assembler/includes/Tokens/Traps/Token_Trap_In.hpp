@@ -6,14 +6,9 @@
 class In : public Instruction
 {
 public:
-        In(std::string &oper, int line_number = 0) : Instruction(oper, line_number)
-        {}
+        In(std::string &oper, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::TRAP_IN;
-        }
+        virtual Token::token_type type() const override;
 };
-
 
 #endif //PROJECT_TOKEN_TRAP_IN_HPP

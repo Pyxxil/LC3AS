@@ -6,30 +6,11 @@
 class Ret : public Instruction
 {
 public:
-        Ret(std::string &word, int line_number = 0) : Instruction(word, line_number)
-        {}
+        Ret(std::string &word, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::OP_RET;
-        }
+        virtual Token::token_type type() const override;
 
-        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
-        {
-                if (tokens.size() != 1) {
-                        return -1;
-                }
-
-                if (!*orig_seen) {
-                        expected(".ORIG directive");
-                        return -1;
-                } else if (*end_seen) {
-                        WARNING("RET after .END directive. It will be ignored");
-                        return 0;
-                }
-
-                return 1;
-        }
+        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override;
 };
 
 #endif //PROJECT_TOKEN_OPERATOR_RET_HPP

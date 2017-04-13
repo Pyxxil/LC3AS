@@ -1,7 +1,7 @@
 #ifndef PROJECT_TOKEN_DIRECTIVE_ORIG_HPP
 #define PROJECT_TOKEN_DIRECTIVE_ORIG_HPP
 
-#include "Token_Directive.hpp"
+#include "../Token_Directive.hpp"
 #include "../Token_Immediate.hpp"
 
 class Orig : public Directive

@@ -1,7 +1,7 @@
 #ifndef PROJECT_TOKEN_DIRECTIVE_HPP
 #define PROJECT_TOKEN_DIRECTIVE_HPP
 
-#include "../../Token.hpp"
+#include "../Token.hpp"
 
 class Directive : public Token
 {

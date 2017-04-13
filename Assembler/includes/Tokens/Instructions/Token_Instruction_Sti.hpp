@@ -6,13 +6,9 @@
 class Sti : public Instruction
 {
 public:
-        Sti(std::string &oper, int line_number = 0) : Instruction(oper, line_number)
-        {}
+        Sti(std::string &oper, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::OP_STI;
-        }
+        virtual Token::token_type type() const override;
 };
 
 #endif //PROJECT_TOKEN_OPERATOR_STI_HPP

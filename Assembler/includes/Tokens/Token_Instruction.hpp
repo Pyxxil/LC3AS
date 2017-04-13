@@ -6,10 +6,8 @@
 class Instruction : public Token
 {
 public:
-        Instruction() : Token()
-        {}
-        Instruction(std::string &oper, int line_number = 0) : Token(oper, line_number)
-        {}
+        Instruction();
+        Instruction(std::string &instruction, int line_number = 0);
 };
 
 #endif // PROJECT_TOKEN_INSTRUCTION_HPP

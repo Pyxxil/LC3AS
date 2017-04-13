@@ -6,13 +6,9 @@
 class Putsp : public Instruction
 {
 public:
-        Putsp(std::string &oper, int line_number = 0) : Instruction(oper, line_number)
-        {}
+        Putsp(std::string &oper, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::TRAP_PUTSP;
-        }
+        virtual Token::token_type type() const override;
 };
 
 #endif //PROJECT_TOKEN_TRAP_PUTSP_HPP

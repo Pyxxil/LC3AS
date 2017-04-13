@@ -19,6 +19,7 @@ set ( SIMULATOR_HEADER_FILES
 set ( ASSEMBLER_SOURCE_FILES
       Assembler/source/Assembler.cpp
       Assembler/source/Token.cpp
+      Assembler/source/Tokens/Directives/Token_Directive_End.cpp
       PARENT_SCOPE )
 
 set ( ASSEMBLER_HEADER_FILES

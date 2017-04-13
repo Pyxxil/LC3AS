@@ -1,42 +1,6 @@
-#include "../includes/Assembler.hpp"
+#include "Assembler.hpp"
 
-#include "../includes/Tokens/Token_Register.hpp"
-#include "../includes/Tokens/Token_String.hpp"
-#include "../includes/Tokens/Token_Label.hpp"
-
-#include "../includes/Tokens/Directives/Token_Directive_Orig.hpp"
-#include "../includes/Tokens/Directives/Token_Directive_Fill.hpp"
-#include "../includes/Tokens/Directives/Token_Directive_Blkw.hpp"
-#include "../includes/Tokens/Directives/Token_Directive_End.hpp"
-#include "../includes/Tokens/Directives/Token_Directive_Stringz.hpp"
-
-#include "../includes/Tokens/Immediate/Token_Immediate_Hexadecimal.hpp"
-#include "../includes/Tokens/Immediate/Token_Immediate_Binary.hpp"
-#include "../includes/Tokens/Immediate/Token_Immediate_Decimal.hpp"
-
-#include "../includes/Tokens/Traps/Token_Trap_In.hpp"
-#include "../includes/Tokens/Traps/Token_Trap_Getc.hpp"
-#include "../includes/Tokens/Traps/Token_Trap_Out.hpp"
-#include "../includes/Tokens/Traps/Token_Trap_Halt.hpp"
-#include "../includes/Tokens/Traps/Token_Trap_Putsp.hpp"
-#include "../includes/Tokens/Traps/Token_Trap_Puts.hpp"
-
-#include "../includes/Tokens/Instructions/Token_Instruction_Add.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Br.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Trap.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Ldr.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Ldi.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Lea.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Ld.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Sti.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Str.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_St.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Jmp.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Jsrr.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Jsr.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Not.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_And.hpp"
-#include "../includes/Tokens/Instructions/Token_Instruction_Ret.hpp"
+#include "Tokens/All_Tokens.hpp"
 
 #include <fstream>
 #include <algorithm>
@@ -409,11 +373,24 @@ void Assembler::assemble()
         // It would be best to go through the tokens line by line and check the first element
         // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
         for (auto &tokenized_line : tokens) {
+                std::cout << "Instruction " << tokenized_line.front()->word << " at address " << std::hex << file_memory_origin_address << '\n';
                 if (tokenized_line.front()->type() == Token::LABEL) {
                         std::static_pointer_cast<Label>(tokenized_line.front())->address = file_memory_origin_address;
+                        if (symbols.count(file_memory_origin_address)) {
+                                WARNING("Multiple labels found at address %d", file_memory_origin_address);
+                                WARNING("\tPrevious label '%s' found on line %d", tokenized_line.front()->word.c_str(),
+                                        tokenized_line.front()->at_line);
+                        }
                         symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
                                 file_memory_origin_address,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
+                        );
+                        std::cout << "Label " << tokenized_line.front()->word << " at address " << std::hex
+                                  << std::static_pointer_cast<Label>(tokenized_line.front())->address
+                                  << ' ' << tokenized_line.front()->at_line
+                                  << '\n';
+                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
+                                tokenized_line, &origin_seen, &end_seen)
                         );
                 } else if (tokenized_line.front()->type() == Token::DIR_END) {
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
@@ -422,28 +399,21 @@ void Assembler::assemble()
                 } else if (tokenized_line.front()->type() == Token::DIR_ORIG) {
                         origin_seen = true;
                         file_memory_origin_address = std::static_pointer_cast<Orig>(tokenized_line.front())->origin;
-                } else if (tokenized_line.front()->type() == Token::DIR_BLKW) {
-                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line,&origin_seen, &end_seen)
-                        );
-                } else if (tokenized_line.front()->type() == Token::DIR_FILL) {
-                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, &origin_seen, &end_seen)
-                        );
-                } else if (tokenized_line.front()->type() == Token::DIR_STRINGZ) {
+                } else if (tokenized_line.front()->type() == Token::DIR_BLKW ||
+                                tokenized_line.front()->type() == Token::DIR_FILL ||
+                                tokenized_line.front()->type() == Token::DIR_STRINGZ) {
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
                                 tokenized_line, &origin_seen, &end_seen)
                         );
                 } else {
                         if (!origin_seen) {
                                 tokenized_line.front()->expected(".ORIG statement");
+                                continue;
                         }
 
                         if (end_seen) {
                                 WARNING("%s found after .END. It will be ignored", tokenized_line.front()->word.c_str());
-                        }
-
-                        if (origin_seen && !end_seen) {
+                        } else {
                                 ++file_memory_origin_address;
                         }
                 }
@@ -458,6 +428,7 @@ void Assembler::assemble()
                 // Arguably, it's probably better to pass a reference to the assembler class with this, and
                 // from that it can be determined if the origin has been seen, or if the end has been seen,
                 // and if a label is actually in the file.
+
                 memory_required = tokenized_line.front()->assemble(tokenized_line, &origin_seen, &end_seen);
 
                 if (memory_required == -1) {
@@ -473,6 +444,7 @@ std::vector<std::uint16_t> Assembler::assembled()
         std::vector<std::uint16_t> assembled_tokens;
 
         for (const auto &tokenized_line : tokens) {
+                std::cout << "Assembling " << tokenized_line.front()->word << '\n';
                 for (const auto & assembled_line : tokenized_line.front()->as_assembled()) {
                         std::cout << std::hex << assembled_line << '\n';
                         assembled_tokens.push_back(assembled_line);

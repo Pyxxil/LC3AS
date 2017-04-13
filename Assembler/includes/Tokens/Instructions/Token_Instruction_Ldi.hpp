@@ -6,13 +6,9 @@
 class Ldi : public Instruction
 {
 public:
-        Ldi(std::string &oper, int line_number = 0) : Instruction(oper, line_number)
-        {}
+        Ldi(std::string &oper, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::OP_LDI;
-        }
+        virtual Token::token_type type() const override;
 };
 
 #endif //PROJECT_TOKEN_OPERATOR_LDI_HPP

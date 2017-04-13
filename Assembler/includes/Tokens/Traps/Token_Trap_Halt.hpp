@@ -6,32 +6,11 @@
 class Halt : public Instruction
 {
 public:
-        Halt(std::string &oper, int line_number = 0) : Instruction(oper, line_number)
-        {}
+        Halt(std::string &oper, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::TRAP_HALT;
-        }
+        virtual Token::token_type type() const override;
 
-        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
-        {
-                if (tokens.size() > 1) {
-                        for (auto it = tokens.begin() + 1; it != tokens.end(); it++) {
-                                (*it)->expected("new line or comment");
-                        }
-
-                        return -1;
-                } else if (!*orig_seen) {
-                        Token::expected(".ORIG statement");
-                        return -1;
-                } else if (*end_seen) {
-                        WARNING(".END directive before .BLKW directive, .BLKW directive will be ignored.");
-                        return 0;
-                } else {
-                        return 1;
-                }
-        }
+        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override;
 };
 
 #endif //PROJECT_TOKEN_OPERATOR_HALT_HPP

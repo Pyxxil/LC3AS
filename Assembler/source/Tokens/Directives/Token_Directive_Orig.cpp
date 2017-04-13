@@ -1,4 +1,4 @@
-#include "../includes/Tokens/Directives/Token_Directive_Orig.hpp"
+#include "../../../includes/Tokens/Directives/Token_Directive_Orig.hpp"
 
 Orig::Orig(std::string &word, int line_number) : Directive(word, line_number)
 {}

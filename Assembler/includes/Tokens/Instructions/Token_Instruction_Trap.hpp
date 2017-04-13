@@ -6,13 +6,9 @@
 class Trap : public Instruction
 {
 public:
-        Trap(std::string &word, int line_number = 0) : Instruction(word, line_number)
-        {}
+        Trap(std::string &word, int line_number = 0);
 
-        virtual Token::token_type type() const override
-        {
-                return Token::token_type::OP_TRAP;
-        }
+        virtual Token::token_type type() const override;
 };
 
 #endif //PROJECT_TOKEN_OPERATOR_TRAP_HPP
