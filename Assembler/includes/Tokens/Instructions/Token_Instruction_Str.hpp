@@ -14,7 +14,7 @@ public:
                 return Token::token_type::OP_STR;
         }
 
-        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
         {
                 if (tokens.size() != 4) {
                         return -1;
@@ -37,8 +37,8 @@ public:
                 } else if (tokens[3]->type() != Token::IMMEDIATE) {
                         tokens[3]->expected("immediate value");
                         return -1;
-                } else if (static_cast<Immediate *>(tokens[3])->immediate > 31 ||
-                        static_cast<Immediate *>(tokens[3])->immediate < -32) {
+                } else if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 31 ||
+                        std::static_pointer_cast<Immediate>(tokens[3])->immediate < -32) {
                         tokens[3]->expected("6 bit offset");
                         return -1;
                 }

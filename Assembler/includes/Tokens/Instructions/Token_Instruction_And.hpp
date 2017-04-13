@@ -14,7 +14,7 @@ public:
                 return Token::OP_AND;
         }
 
-        int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
         {
                 if (tokens.size() != 4) {
                         return -1;
@@ -40,15 +40,15 @@ public:
                 }
 
                 assembled.push_back(static_cast<std::uint16_t> (
-                        0x5000 | static_cast<std::uint16_t >(((static_cast<Register *>(tokens[1])->reg & 7) << 9) |
-                                        ((static_cast<Register *>(tokens[2])->reg) & 0x7) << 6)
+                        0x5000 | static_cast<std::uint16_t >(((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                                        ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6)
                 ));
 
                 if (tokens[3]->type() == Token::REGISTER) {
-                        assembled.front() |= (static_cast<Register *>(tokens[3])->reg & 0x7);
+                        assembled.front() |= (std::static_pointer_cast<Register>(tokens[3])->reg & 0x7);
                 } else {
                         assembled.front() |= (0x20 |
-                                static_cast<std::uint16_t>(static_cast<Immediate *>(tokens[3])->immediate & 0x1F));
+                                static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[3])->immediate & 0x1F));
                 }
 
                 return 1;

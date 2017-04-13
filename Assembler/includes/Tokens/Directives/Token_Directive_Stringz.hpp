@@ -12,7 +12,7 @@ public:
         virtual Token::token_type type() const override
         { return Token::token_type::DIR_STRINGZ; }
 
-        std::int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
         {
                 if (tokens.size() != 2) {
                         return -1;
@@ -31,7 +31,7 @@ public:
                         return 0;
                 }
 
-                return static_cast<std::int32_t>(static_cast<String *>(tokens[1])->word.length() + 1);
+                return static_cast<std::int32_t>(std::static_pointer_cast<String>(tokens[1])->word.length() + 1);
         }
 };
 

@@ -12,13 +12,13 @@ public:
         Label(std::string &name, int line_number) : Token(name, line_number), label(name)
         {}
 
-        int32_t assemble(std::vector<Token *, std::allocator<Token *>> &tokens, bool *orig_seen, bool *end_seen) override
+        int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
         {
                 if (tokens.size() == 1) {
                         return 0;
                 }
 
-                std::vector<Token *> vec(tokens.begin() + 1, tokens.end());
+                std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
                 std::int32_t ret = vec.front()->assemble(vec, orig_seen, end_seen);
                 assembled = vec.front()->assembled;
                 return ret;

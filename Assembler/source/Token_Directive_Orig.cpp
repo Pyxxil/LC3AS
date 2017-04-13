@@ -3,7 +3,7 @@
 Orig::Orig(std::string &word, int line_number) : Directive(word, line_number)
 {}
 
-std::int32_t Orig::assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
 {
         if (tokens.size() != 2) {
                 return -1;
@@ -26,7 +26,7 @@ std::int32_t Orig::assemble(std::vector<Token *> &tokens, bool *orig_seen, bool 
                 WARNING(".ORIG directive after .END");
         }
 
-        origin = static_cast<std::uint16_t>(static_cast<Immediate *>(tokens[1])->immediate);
+        origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate);
         assembled.push_back(origin);
 
         *orig_seen = true;

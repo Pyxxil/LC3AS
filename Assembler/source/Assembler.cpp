@@ -116,25 +116,13 @@ Assembler::Assembler()
 {
 }
 
-Assembler::~Assembler()
-{
-        for (std::size_t index = 0; index < tokens.size(); ++index) {
-                for (std::size_t iindex = 0; iindex < tokens[index].size(); ++iindex) {
-                        delete tokens[index][iindex];
-                }
-                tokens[index].clear();
-        }
-
-        tokens.clear();
-}
-
 /**
  * Given a file name, open the file, then tokenize it line by line.
  *
  * @param fileName The name of the file to read.
  * @return A 2D std::vector containing each tokenized line.
  */
-std::vector<std::vector<Token *>> &Assembler::tokenizeFile(std::string &fileName)
+std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::string &fileName)
 {
         error_count = 0;  // TODO: Is this the right choice? What if we want to keep them?
 
@@ -155,7 +143,7 @@ std::vector<std::vector<Token *>> &Assembler::tokenizeFile(std::string &fileName
                         continue;
                 }
 
-                std::vector<Token *> tokenized_line = tokenizeLine(line, line_number);
+                std::vector<std::shared_ptr<Token>> tokenized_line = tokenizeLine(line, line_number);
                 if (!tokenized_line.empty()) {
                         tokens.push_back(tokenized_line);
                 }
@@ -183,13 +171,13 @@ std::vector<std::vector<Token *>> &Assembler::tokenizeFile(std::string &fileName
  *
  * @return A std::vector<Token> which contains the tokens that were found in the line.
  */
-std::vector<Token *> Assembler::tokenizeLine(std::string &line, int line_number)
+std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, int line_number)
 {
         char character;
 
         std::string current;
 
-        std::vector<Token *> tokenenized_line;
+        std::vector<std::shared_ptr<Token>> tokenenized_line;
 
         for (std::size_t index = 0; index < line.length(); ) {
                 character = line.at(index);
@@ -229,10 +217,10 @@ std::vector<Token *> Assembler::tokenizeLine(std::string &line, int line_number)
                         }
 
                         if (index == line.length() && last_character != '"') {
-                                tokenenized_line.push_back(new String(current, line_number));
+                                tokenenized_line.push_back(std::make_shared<String>(current, line_number));
                                 tokenenized_line.back()->expected("to find closing '\"'");
                         } else {
-                                tokenenized_line.push_back(new String(current, line_number));
+                                tokenenized_line.push_back(std::make_shared<String>(current, line_number));
                         }
 
                         current.erase();
@@ -254,7 +242,7 @@ std::vector<Token *> Assembler::tokenizeLine(std::string &line, int line_number)
  * @param toks The current tokens in the line.
  * @param line_number The line number (only relevant for working with files).
  */
-void Assembler::addToken(std::string &token, std::vector<Token *> &toks, int line_number)
+void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number)
 {
         if (!token.empty()) {
                 toks.push_back(tokenize(token, line_number));
@@ -277,7 +265,7 @@ void Assembler::addToken(std::string &token, std::vector<Token *> &toks, int lin
  * @param line_number The current line number. This is only relevant when assembling a file.
  * @return The Token that the string corresponds to.
  */
-Token *Assembler::tokenize(std::string &word, int line_number)
+std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
 {
         std::string copy = word;
         std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
@@ -290,85 +278,85 @@ Token *Assembler::tokenize(std::string &word, int line_number)
         switch (copy.at(0)) {
         case '0':
                 if (copy.length() == 1) {
-                        return new Decimal(word, line_number);
+                        return std::make_shared<Decimal>(word, line_number);
                 } else if (copy.at(1) == 'X') {
-                        return new Hexadecimal(word, line_number);
+                        return std::make_shared<Hexadecimal>(word, line_number);
                 } else if (copy.at(1) == 'B') {
-                        return new Binary(word, line_number);
+                        return std::make_shared<Binary>(word, line_number);
                 } else {
-                        return new Decimal(word, line_number);
+                        return std::make_shared<Decimal>(word, line_number);
                 }
         case '#':  // FALLTHROUGH
         case '-':
-                return new Decimal(copy, line_number);
+                return std::make_shared<Decimal>(copy, line_number);
         case 'B':
                 if (copy.length() > 1 && (copy.at(1) == '0' || copy.at(1) == '1')) {
                         copy = word.substr(1);
-                        return new Binary(copy, line_number);
+                        return std::make_shared<Binary>(copy, line_number);
                 }
                 break;
         case 'X':
                 if (copy.length() > 1 && std::isxdigit(copy.at(1))) {
-                        return new Hexadecimal(word, line_number);
+                        return std::make_shared<Hexadecimal>(word, line_number);
                 }
-                return new Label(word, line_number);
+                return std::make_shared<Label>(word, line_number);
         case 'R':
                 if (copy.length() < 2) {
-                        return new Label(word, line_number);
+                        return std::make_shared<Label>(word, line_number);
                 }
                 if (std::isdigit(copy.at(1))) {
                         if (copy.length() < 3 || std::isspace(copy.at(2)) || copy.at(2) == ',') {
-                                return new Register(word);
+                                return std::make_shared<Register>(word);
                         }
                 } else if (hashed == hash("RET", 3)) {
-                        return new Ret(word, line_number);
+                        return std::make_shared<Ret>(word, line_number);
                 }
-                return new Label(word, line_number);
+                return std::make_shared<Label>(word, line_number);
         default:
                 break;
         }
 
         switch (hashed) {
         case hash("ADD", 3):
-                return new Add(word, line_number);
+                return std::make_shared<Add>(word, line_number);
         case hash("AND", 3):
-                return new And(word, line_number);
+                return std::make_shared<And>(word, line_number);
         case hash("NOT", 3):
-                return new Not(word, line_number);
+                return std::make_shared<Not>(word, line_number);
         case hash("JSR", 3):
-                return new Jsr(word, line_number);
+                return std::make_shared<Jsr>(word, line_number);
         case hash("JSRR", 4):
-                return new Jsrr(word, line_number);
+                return std::make_shared<Jsrr>(word, line_number);
         case hash("JMP", 3):
-                return new Jmp(word, line_number);
+                return std::make_shared<Jmp>(word, line_number);
         case hash("ST", 2):
-                return new St(word, line_number);
+                return std::make_shared<St>(word, line_number);
         case hash("STR", 3):
-                return new Str(word, line_number);
+                return std::make_shared<Str>(word, line_number);
         case hash("STI", 3):
-                return new Sti(word, line_number);
+                return std::make_shared<Sti>(word, line_number);
         case hash("LD", 2):
-                return new Ld(word, line_number);
+                return std::make_shared<Ld>(word, line_number);
         case hash("LEA", 3):
-                return new Lea(word, line_number);
+                return std::make_shared<Lea>(word, line_number);
         case hash("LDI", 3):
-                return new Ldi(word, line_number);
+                return std::make_shared<Ldi>(word, line_number);
         case hash("LDR", 3):
-                return new Ldr(word, line_number);
+                return std::make_shared<Ldr>(word, line_number);
         case hash("PUTS", 4):
-                return new Puts(word, line_number);
+                return std::make_shared<Puts>(word, line_number);
         case hash("PUTSP", 5):
-                return new Putsp(word, line_number);
+                return std::make_shared<Putsp>(word, line_number);
         case hash("HALT", 4):
-                return new Halt(word, line_number);
+                return std::make_shared<Halt>(word, line_number);
         case hash("TRAP", 4):
-                return new Trap(word, line_number);
+                return std::make_shared<Trap>(word, line_number);
         case hash("GETC", 4):
-                return new Getc(word, line_number);
+                return std::make_shared<Getc>(word, line_number);
         case hash("OUT", 3):
-                return new Out(word, line_number);
+                return std::make_shared<Out>(word, line_number);
         case hash("IN", 2):
-                return new In(word, line_number);
+                return std::make_shared<In>(word, line_number);
         case hash("BR", 2):
                 // FALLTHROUGH
         case hash("BRNZP", 5): case hash("BRNPZ", 5):
@@ -376,32 +364,32 @@ Token *Assembler::tokenize(std::string &word, int line_number)
         case hash("BRZNP", 5): case hash("BRZPN", 5):
                 // FALLTHROUGH
         case hash("BRPNZ", 5): case hash("BRPZN", 5):
-                return new Br(word, line_number, true, true, true);
+                return std::make_shared<Br>(word, line_number, true, true, true);
         case hash("BRN", 3):
-                return new Br(word, line_number, true, false, false);
+                return std::make_shared<Br>(word, line_number, true, false, false);
         case hash("BRZ", 3):
-                return new Br(word, line_number, false, true, false);
+                return std::make_shared<Br>(word, line_number, false, true, false);
         case hash("BRP", 3):
-                return new Br(word, line_number, false, false, true);
+                return std::make_shared<Br>(word, line_number, false, false, true);
         case hash("BRNZ", 4): case hash("BRZN", 4):
-                return new Br(word, line_number, true, true, false);
+                return std::make_shared<Br>(word, line_number, true, true, false);
         case hash("BRNP", 4): case hash("BRPN", 4):
-                return new Br(word, line_number, true, false, true);
+                return std::make_shared<Br>(word, line_number, true, false, true);
         case hash("BRZP", 4): case hash("BRPZ", 4):
-                return new Br(word, line_number, false, true, true);
+                return std::make_shared<Br>(word, line_number, false, true, true);
         case hash(".ORIG", 5):
-                return new Orig(word, line_number);
+                return std::make_shared<Orig>(word, line_number);
         case hash(".END", 4):
-                return new End(word, line_number);
+                return std::make_shared<End>(word, line_number);
         case hash(".FILL", 5):
-                return new Fill(word, line_number);
+                return std::make_shared<Fill>(word, line_number);
         case hash(".BLKW", 5):
-                return new Blkw(word, line_number);
+                return std::make_shared<Blkw>(word, line_number);
         case hash(".STRINGZ", 8):
-                return new Stringz(word, line_number);
+                return std::make_shared<Stringz>(word, line_number);
         default:
                 // Of course, if it doesn't match the above, then we'll treat it as a label.
-                return new Label(word, line_number);
+                return std::make_shared<Label>(word, line_number);
         }
 }
 
@@ -422,19 +410,18 @@ void Assembler::assemble()
         // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
         for (auto &tokenized_line : tokens) {
                 if (tokenized_line.front()->type() == Token::LABEL) {
-                        static_cast<Label *>(tokenized_line.front())->address = file_memory_origin_address;
-                        symbols.insert(std::pair<std::uint16_t, Label *>(
+                        std::static_pointer_cast<Label>(tokenized_line.front())->address = file_memory_origin_address;
+                        symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
                                 file_memory_origin_address,
-                                static_cast<Label *>(tokenized_line.front()))
+                                std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
                 } else if (tokenized_line.front()->type() == Token::DIR_END) {
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
                                 tokenized_line, &origin_seen, &end_seen)
                         );
                 } else if (tokenized_line.front()->type() == Token::DIR_ORIG) {
-                        //tokenized_line.front()->assemble(tokenized_line, &origin_seen, &end_seen);
                         origin_seen = true;
-                        file_memory_origin_address = static_cast<Orig *>(tokenized_line.front())->origin;
+                        file_memory_origin_address = std::static_pointer_cast<Orig>(tokenized_line.front())->origin;
                 } else if (tokenized_line.front()->type() == Token::DIR_BLKW) {
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
                                 tokenized_line,&origin_seen, &end_seen)

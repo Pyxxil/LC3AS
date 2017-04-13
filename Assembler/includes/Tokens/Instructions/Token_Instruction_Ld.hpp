@@ -14,7 +14,7 @@ public:
                 return Token::token_type::OP_LD;
         }
 
-        int32_t assemble(std::vector<Token *> &tokens, bool *orig_seen, bool *end_seen) override
+        int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen) override
         {
                 if (tokens.size() != 3) {
                         return -1;
@@ -37,8 +37,8 @@ public:
                 }
 
                 assembled.push_back(static_cast<std::uint16_t >(0x2000 |
-                        ((static_cast<Register *>(tokens[1])->reg & 7) << 9) |
-                        (static_cast<Label *>(tokens[2])->address & 0x1FF)));
+                        ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                        (std::static_pointer_cast<Label>(tokens[2])->address & 0x1FF)));
 
                 return 1;
         }
