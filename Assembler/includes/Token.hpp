@@ -106,12 +106,11 @@ public:
         virtual Token &note(std::string)
         { return *this; }
 
-        virtual int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+        virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
         {
                 std::cerr << word << " not implemented\n";
                 (void) tokens;
-                (void) orig_seen;
-                (void) end_seen;
+                (void) assembler;
                 return -1;
         }
 

@@ -1,18 +1,19 @@
+#include <Assembler.hpp>
 #include "Tokens/Instructions/Token_Instruction_St.hpp"
 
 St::St(std::string &oper, int line_number) : Instruction(oper, line_number)
 {}
 
-std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 3) {
                 return -1;
         }
 
-        if (!*orig_seen) {
+        if (!assembler.origin_seen) {
                 expected(".ORIG directive");
                 return -1;
-        } else if (*end_seen) {
+        } else if (assembler.end_seen) {
                 WARNING("PUTS after .END directive. It will be ignored");
                 return 0;
         }

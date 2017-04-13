@@ -16,18 +16,22 @@ public:
         Assembler();
         ~Assembler() = default;
         std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &fileName);
-        std::vector<std::shared_ptr<Token>> tokenizeLine(std::string &line, int line_number = 0); // This should return a vector
+        std::vector<std::shared_ptr<Token>> tokenizeLine(std::string &line, int line_number = 0);
 
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
         void assemble();
         std::vector<std::uint16_t> assembled();
 
-        std::size_t error_count;
+        std::size_t error_count = 0;
         std::uint16_t internal_program_counter = 0;
         std::uint16_t file_memory_origin_address = 0;
 
-private:
+        bool origin_seen;
+        bool end_seen;
+
         std::map<std::uint16_t, std::shared_ptr<Label>> symbols;
+
+private:
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
         void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number);
 };

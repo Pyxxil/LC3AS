@@ -1,9 +1,10 @@
-#include "../../../includes/Tokens/Directives/Token_Directive_Orig.hpp"
+#include <Assembler.hpp>
+#include "Tokens/Directives/Token_Directive_Orig.hpp"
 
 Orig::Orig(std::string &word, int line_number) : Directive(word, line_number)
 {}
 
-std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 2) {
                 return -1;
@@ -13,7 +14,7 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *o
                 tokens[1]->expected("immediate value");
         }
 
-        if (*orig_seen) {
+        if (assembler.origin_seen) {
                 std::cerr << "ERROR: ";
                 if (at_line) {
                         std::cerr << "Line " << at_line << ": ";
@@ -22,14 +23,14 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *o
 
                 is_error = true;
                 return -1;
-        } else if (*end_seen) {
+        } else if (assembler.end_seen) {
                 WARNING(".ORIG directive after .END");
         }
 
         origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate);
         assembled.push_back(origin);
 
-        *orig_seen = true;
+        assembler.origin_seen = true;
         return 0;
 }
 

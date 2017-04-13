@@ -1,19 +1,20 @@
+#include <Assembler.hpp>
 #include "Tokens/Instructions/Token_Instruction_Jsr.hpp"
 #include "Tokens/Token_Label.hpp"
 
 Jsr::Jsr(std::string &oper, int line_number) : Instruction(oper, line_number)
 {}
 
-std::int32_t Jsr::assemble(std::vector <std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 2) {
                 return -1;
         }
 
-        if (!*orig_seen) {
+        if (!assembler.origin_seen) {
                 expected(".ORIG directive");
                 return -1;
-        } else if (*end_seen) {
+        } else if (assembler.end_seen) {
                 WARNING("JSR after .END directive. It will be ignored");
                 return 0;
         }
@@ -32,4 +33,9 @@ std::int32_t Jsr::assemble(std::vector <std::shared_ptr<Token>> &tokens, bool *o
 Token::token_type Jsr::type() const
 {
         return Token::token_type::OP_JSR;
+}
+
+std::vector<std::uint16_t> Jsr::as_assembled()
+{
+        return Token::as_assembled();
 }

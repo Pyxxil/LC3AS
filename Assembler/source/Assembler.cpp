@@ -3,7 +3,6 @@
 #include "Tokens/All_Tokens.hpp"
 
 #include <fstream>
-#include <algorithm>
 
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147,
@@ -76,7 +75,7 @@ static std::size_t hash(std::string &string)
 }
 
 Assembler::Assembler()
-        : error_count(0), internal_program_counter(0)
+        : error_count(0), internal_program_counter(0), origin_seen(false), end_seen(false)
 {
 }
 
@@ -365,15 +364,11 @@ void Assembler::assemble()
 
         std::size_t errors = 0;
 
-        bool origin_seen = false;
-        bool end_seen = false;
-
         std::int32_t memory_required = 0;
 
         // It would be best to go through the tokens line by line and check the first element
         // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
         for (auto &tokenized_line : tokens) {
-                std::cout << "Instruction " << tokenized_line.front()->word << " at address " << std::hex << file_memory_origin_address << '\n';
                 if (tokenized_line.front()->type() == Token::LABEL) {
                         std::static_pointer_cast<Label>(tokenized_line.front())->address = file_memory_origin_address;
                         if (symbols.count(file_memory_origin_address)) {
@@ -385,16 +380,12 @@ void Assembler::assemble()
                                 file_memory_origin_address,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
-                        std::cout << "Label " << tokenized_line.front()->word << " at address " << std::hex
-                                  << std::static_pointer_cast<Label>(tokenized_line.front())->address
-                                  << ' ' << tokenized_line.front()->at_line
-                                  << '\n';
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, &origin_seen, &end_seen)
+                                tokenized_line, *this)
                         );
                 } else if (tokenized_line.front()->type() == Token::DIR_END) {
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, &origin_seen, &end_seen)
+                                tokenized_line, *this)
                         );
                 } else if (tokenized_line.front()->type() == Token::DIR_ORIG) {
                         origin_seen = true;
@@ -403,7 +394,7 @@ void Assembler::assemble()
                                 tokenized_line.front()->type() == Token::DIR_FILL ||
                                 tokenized_line.front()->type() == Token::DIR_STRINGZ) {
                         file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, &origin_seen, &end_seen)
+                                tokenized_line, *this)
                         );
                 } else {
                         if (!origin_seen) {
@@ -428,8 +419,12 @@ void Assembler::assemble()
                 // Arguably, it's probably better to pass a reference to the assembler class with this, and
                 // from that it can be determined if the origin has been seen, or if the end has been seen,
                 // and if a label is actually in the file.
-
-                memory_required = tokenized_line.front()->assemble(tokenized_line, &origin_seen, &end_seen);
+                std::cout << "Assembling ";
+                for (const auto &token : tokenized_line) {
+                        std::cout << token->word << " ";
+                }
+                std::cout << '\n';
+                memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
                 if (memory_required == -1) {
                         errors++;
@@ -444,9 +439,7 @@ std::vector<std::uint16_t> Assembler::assembled()
         std::vector<std::uint16_t> assembled_tokens;
 
         for (const auto &tokenized_line : tokens) {
-                std::cout << "Assembling " << tokenized_line.front()->word << '\n';
                 for (const auto & assembled_line : tokenized_line.front()->as_assembled()) {
-                        std::cout << std::hex << assembled_line << '\n';
                         assembled_tokens.push_back(assembled_line);
                 }
         }

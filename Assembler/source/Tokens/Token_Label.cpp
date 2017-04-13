@@ -1,16 +1,16 @@
-#include "../../includes/Tokens/Token_Label.hpp"
+#include "Tokens/Token_Label.hpp"
 
 Label::Label(std::string &name, int line_number) : Token(name, line_number), label(name)
 {}
 
-std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() == 1) {
                 return 0;
         }
 
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
-        std::int32_t ret = vec.front()->assemble(vec, orig_seen, end_seen);
+        std::int32_t ret = vec.front()->assemble(vec, assembler);
         assembled = vec.front()->assembled;
         return ret;
 }

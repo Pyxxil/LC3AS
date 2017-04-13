@@ -1,9 +1,11 @@
 #include "Tokens/Directives/Token_Directive_Blkw.hpp"
 
+#include "Assembler.hpp"
+
 Blkw::Blkw(std::string &word, int line_number) : Directive(word, line_number)
 {}
 
-std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (assembled.size()) {
                 return static_cast<std::int32_t>(assembled.size());
@@ -17,10 +19,10 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, bool *o
                 return -1;
         }
 
-        if (!*orig_seen) {
+        if (!assembler.origin_seen) {
                 expected(".ORIG directive");
                 return -1;
-        } else if (*end_seen) {
+        } else if (assembler.end_seen) {
                 WARNING(".END directive before .BLKW directive, .BLKW directive will be ignored.");
                 return 0;
         }

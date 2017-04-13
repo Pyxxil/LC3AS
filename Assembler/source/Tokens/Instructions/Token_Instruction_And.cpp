@@ -1,3 +1,4 @@
+#include <Assembler.hpp>
 #include "Tokens/Instructions/Token_Instruction_And.hpp"
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
@@ -5,16 +6,16 @@
 And::And(std::string &oper, int line_number) : Instruction(oper, line_number)
 {}
 
-std::int32_t And::assemble(std::vector <std::shared_ptr<Token>> &tokens, bool *orig_seen, bool *end_seen)
+std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 4) {
                 return -1;
         }
 
-        if (!*orig_seen) {
+        if (!assembler.origin_seen) {
                 expected(".ORIG directive");
                 return -1;
-        } else if (*end_seen) {
+        } else if (assembler.end_seen) {
                 WARNING(".END directive before %s, %s will be ignored", word.c_str(), word.c_str());
                 return 0;
         }
@@ -28,6 +29,29 @@ std::int32_t And::assemble(std::vector <std::shared_ptr<Token>> &tokens, bool *o
         } else if (tokens[3]->type() != Token::REGISTER && tokens[3]->type() != Token::IMMEDIATE) {
                 tokens[3]->expected("register or immediate value");
                 return -1;
+        }
+
+        if (tokens[1]->is_error) {
+                tokens[1]->expected("valid register");
+                return -1;
+        } else if (tokens[2]->is_error) {
+                tokens[2]->expected("valid register");
+                return -1;
+        } else if (tokens[3]->is_error) {
+                if (tokens[3]->type() == Token::REGISTER) {
+                        expected("valid register");
+                } else {
+                        expected("valid immediate value");
+                }
+                return -1;
+        }
+
+        if (tokens[3]->type() == Token::IMMEDIATE) {
+                if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 15 ||
+                                std::static_pointer_cast<Immediate>(tokens[3])->immediate < -16) {
+                        tokens[3]->expected("5 bit immediate value");
+                        return -1;
+                }
         }
 
         assembled.push_back(static_cast<std::uint16_t> (
