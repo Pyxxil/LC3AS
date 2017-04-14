@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "includes/Assembler.hpp"
 
 int main(int, char **argv)

@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 
-#include "Token.hpp"
 #include "Tokens/Token_Label.hpp"
 
 #include <memory>

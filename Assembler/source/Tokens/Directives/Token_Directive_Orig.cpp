@@ -12,11 +12,11 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         if (assembler.origin_seen) {
-                std::cerr << "ERROR: ";
+                fprintf(stderr, "ERROR: ");
                 if (at_line) {
-                        std::cerr << "Line " << at_line << ": ";
+                        fprintf(stderr, "Line %d:", at_line);
                 }
-                std::cerr << "Multiple .ORIG statements \n";
+                fprintf(stderr, "Multiple .ORIG statements\n");
 
                 is_error = true;
                 return -1;

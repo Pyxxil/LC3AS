@@ -15,10 +15,6 @@ std::int32_t End::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 expected(".ORIG directive");
                 return -1;
         } else if (assembler.end_seen) {
-                std::cerr << "ERROR: ";
-                if (at_line) {
-                        std::cerr << "Line " << at_line << ": ";
-                }
                 WARNING("Multiple .END statements");
                 is_error = true;
         }

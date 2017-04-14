@@ -11,11 +11,11 @@ Token::token_type String::type() const
 
 Token &String::expected(const char *const expects)
 {
-        std::cerr << "ERROR: ";
+        fprintf(stderr, "ERROR: ");
         if (at_line) {
-                std::cerr << "Line " << at_line << ": ";
+                fprintf(stderr, "Line %d:", at_line);
         }
-        std::cerr << "Expected " << expects << "." << std::endl;
+        fprintf(stderr, "Expected %s. Found '%s' instead.\n", expects, word.c_str());
 
         is_error = true;
 

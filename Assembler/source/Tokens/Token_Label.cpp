@@ -18,11 +18,11 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemb
 
 void Label::not_found()
 {
-        std::cerr << "ERROR: ";
+        fprintf(stderr, "ERROR: ");
         if (at_line) {
-                std::cerr << "Line " << at_line << ": ";
+                fprintf(stderr, "Line %d:", at_line);
         }
-        std::cerr << "No such label '" << label << "'\n";
+        fprintf(stderr, "No such label '%s'\n", label.c_str());
 
         is_error = true;
 }

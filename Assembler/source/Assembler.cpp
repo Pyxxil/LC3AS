@@ -327,12 +327,15 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         case hash("BR", 2):
                 // FALLTHROUGH
         case hash("BRNZP", 5):
+                // FALLTHROUGH
         case hash("BRNPZ", 5):
                 // FALLTHROUGH
         case hash("BRZNP", 5):
+                // FALLTHROUGH
         case hash("BRZPN", 5):
                 // FALLTHROUGH
         case hash("BRPNZ", 5):
+                // FALLTHROUGH
         case hash("BRPZN", 5):
                 return std::make_shared<Br>(word, line_number, true, true, true);
         case hash("BRN", 3):
@@ -342,12 +345,15 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         case hash("BRP", 3):
                 return std::make_shared<Br>(word, line_number, false, false, true);
         case hash("BRNZ", 4):
+                // FALLTHROUGH
         case hash("BRZN", 4):
                 return std::make_shared<Br>(word, line_number, true, true, false);
         case hash("BRNP", 4):
+                // FALLTHROUGH
         case hash("BRPN", 4):
                 return std::make_shared<Br>(word, line_number, true, false, true);
         case hash("BRZP", 4):
+                // FALLTHROUGH
         case hash("BRPZ", 4):
                 return std::make_shared<Br>(word, line_number, false, true, true);
         case hash(".ORIG", 5):
@@ -376,7 +382,8 @@ void Assembler::assemble()
 
         // It would be best to go through the tokens line by line and check the first element
         // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
-        std::cout << "Starting first pass\n";
+        puts("Starting first pass");
+
         for (auto &tokenized_line : tokens) {
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
@@ -426,7 +433,7 @@ void Assembler::assemble()
                 }
         }
 
-        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
+        printf("%ld error%s found on the first pass\n", error_count, error_count == 1 ? "" : "'s");
 
         if (error_count) {
                 return;
@@ -436,7 +443,7 @@ void Assembler::assemble()
         origin_seen = false;
         internal_program_counter = file_memory_origin_address;
 
-        std::cout << "Starting second pass\n";
+        puts("Starting second pass");
 
         for (auto &tokenized_line : tokens) {
                 // This should return >= 0 on success (where the value is then used to advance the pc),
@@ -453,7 +460,7 @@ void Assembler::assemble()
                 }
         }
 
-        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
+        printf("%ld error%s found on the second pass\n", error_count, error_count == 1 ? "" : "'s");
 }
 
 std::vector<std::uint16_t> Assembler::assembled()

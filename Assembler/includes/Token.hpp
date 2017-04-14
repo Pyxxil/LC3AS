@@ -1,7 +1,7 @@
 #ifndef LC3_SIMULATOR_TOKEN_HPP
 #define LC3_SIMULATOR_TOKEN_HPP
 
-#include <iostream>
+#include <string>
 #include <vector>
 #include <memory>
 
@@ -22,7 +22,7 @@ inline void WARNING(const char *const str, ...)
         va_list args;
         va_start(args, str);
         fprintf(stderr, "WARNING: ");
-        std::fprintf(stderr, str, args);
+        fprintf(stderr, str, args);
         fprintf(stderr, ".\n");
         va_end(args);
 }
@@ -34,17 +34,6 @@ public:
         Token(std::string &word, int line = 0)
                 : word(word), at_line(line)
         {}
-
-        Token &operator=(Token &other)
-        {
-                word = other.word;
-                is_error = other.is_error;
-                at_line = other.at_line;
-
-                return *this;
-        }
-
-        virtual ~Token() = default;
 
         std::string word;
         bool is_error = false;
@@ -93,11 +82,11 @@ public:
 
         virtual Token &expected(const char *const expects)
         {
-                std::cerr << "ERROR: ";
+                fprintf(stderr, "ERROR: ");
                 if (at_line) {
-                        std::cerr << "Line " << at_line << ": ";
+                        fprintf(stderr, "Line %d: ", at_line);
                 }
-                std::cerr << "Expected " << expects << ". Found '" << word << "' instead." << std::endl;
+                fprintf(stderr, "Expected %s. Found '%s' instead\n", expects, word.c_str());
 
                 is_error = true;
 
@@ -109,7 +98,7 @@ public:
 
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
         {
-                std::cerr << word << " not implemented\n";
+                fprintf(stderr, "%s not implemented\n", word.c_str());
                 (void) tokens;
                 (void) assembler;
                 return -1;
