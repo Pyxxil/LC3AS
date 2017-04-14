@@ -2,7 +2,8 @@
 #include "Tokens/Directives/Token_Directive_Stringz.hpp"
 #include "Tokens/Token_String.hpp"
 
-Stringz::Stringz(std::string &word, int line_number) : Directive(word, line_number)
+Stringz::Stringz(std::string &word, int line_number)
+        : Directive(word, line_number)
 {}
 
 std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

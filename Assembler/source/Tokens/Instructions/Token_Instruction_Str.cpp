@@ -3,7 +3,8 @@
 #include "Tokens/Token_Immediate.hpp"
 #include <Assembler.hpp>
 
-Str::Str(std::string &oper, int line_number) : Instruction(oper, line_number)
+Str::Str(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

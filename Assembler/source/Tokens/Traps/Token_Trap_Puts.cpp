@@ -1,7 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Traps/Token_Trap_Puts.hpp"
 
-Puts::Puts(std::string &oper, int line_number) : Instruction(oper, line_number)
+Puts::Puts(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 Token::token_type Puts::type() const

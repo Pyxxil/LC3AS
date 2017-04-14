@@ -4,7 +4,8 @@
 
 #include <Assembler.hpp>
 
-Add::Add(std::string &oper, int line_number) : Instruction(oper, line_number)
+Add::Add(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -56,8 +57,9 @@ std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         }
 
         assembled.push_back(static_cast<std::uint16_t> (
-                                    0x1000 | static_cast<std::uint16_t >(((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                                            ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6)
+                                    0x1000 | static_cast<std::uint16_t >(
+                                            ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                                                    ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6)
                             ));
 
         if (tokens[3]->type() == Token::REGISTER) {

@@ -1,7 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Traps/Token_Trap_Out.hpp"
 
-Out::Out(std::string &oper, int line_number) : Instruction(oper, line_number)
+Out::Out(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 Token::token_type Out::type() const

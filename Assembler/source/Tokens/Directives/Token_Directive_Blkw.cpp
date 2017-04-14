@@ -2,7 +2,8 @@
 
 #include "Assembler.hpp"
 
-Blkw::Blkw(std::string &word, int line_number) : Directive(word, line_number)
+Blkw::Blkw(std::string &word, int line_number)
+        : Directive(word, line_number)
 {}
 
 std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

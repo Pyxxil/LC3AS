@@ -1,6 +1,7 @@
 #include "Tokens/Immediate/Token_Immediate_Binary.hpp"
 
-Binary::Binary(std::string &value, int line_number) : Immediate(value, line_number)
+Binary::Binary(std::string &value, int line_number)
+        : Immediate(value, line_number)
 {
         if (value.length() > 16) {
                 Token::expected("binary value up to 16 bits");

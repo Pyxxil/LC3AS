@@ -1,6 +1,7 @@
 #include "Tokens/Token_Label.hpp"
 
-Label::Label(std::string &name, int line_number) : Token(name, line_number), label(name)
+Label::Label(std::string &name, int line_number)
+        : Token(name, line_number), label(name)
 {}
 
 std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

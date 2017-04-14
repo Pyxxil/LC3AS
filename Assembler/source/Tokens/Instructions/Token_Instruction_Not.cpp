@@ -2,7 +2,8 @@
 
 #include <Assembler.hpp>
 
-Not::Not(std::string &oper, int line_number) : Instruction(oper, line_number)
+Not::Not(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Not::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

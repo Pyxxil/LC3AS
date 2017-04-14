@@ -1,7 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Instructions/Token_Instruction_St.hpp"
 
-St::St(std::string &oper, int line_number) : Instruction(oper, line_number)
+St::St(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

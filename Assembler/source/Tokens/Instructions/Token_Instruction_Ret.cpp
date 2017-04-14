@@ -1,7 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Instructions/Token_Instruction_Ret.hpp"
 
-Ret::Ret(std::string &word, int line_number) : Instruction(word, line_number)
+Ret::Ret(std::string &word, int line_number)
+        : Instruction(word, line_number)
 {}
 
 std::int32_t Ret::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

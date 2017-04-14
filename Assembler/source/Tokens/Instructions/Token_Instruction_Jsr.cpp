@@ -2,7 +2,8 @@
 #include "Tokens/Instructions/Token_Instruction_Jsr.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Jsr::Jsr(std::string &oper, int line_number) : Instruction(oper, line_number)
+Jsr::Jsr(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -24,7 +25,7 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.push_back(static_cast<std::uint16_t >(0x4800 |
+        assembled.push_back(static_cast<std::uint16_t>(0x4800 |
                 (std::static_pointer_cast<Label>(tokens[1])->address & 0x7FF)));
 
         return 1;

@@ -3,7 +3,8 @@
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Ld::Ld(std::string &oper, int line_number) : Instruction(oper, line_number)
+Ld::Ld(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

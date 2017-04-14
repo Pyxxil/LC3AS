@@ -31,7 +31,8 @@ class Token
 {
 public:
         Token() = default;
-        Token(std::string &word, int line = 0) : word(word), at_line(line)
+        Token(std::string &word, int line = 0)
+                : word(word), at_line(line)
         {}
 
         Token &operator=(Token &other)

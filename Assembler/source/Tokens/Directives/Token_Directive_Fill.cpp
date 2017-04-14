@@ -4,7 +4,8 @@
 
 #include <Assembler.hpp>
 
-Fill::Fill(std::string &word, int line_number) : Directive(word, line_number), first_time(true)
+Fill::Fill(std::string &word, int line_number)
+        : Directive(word, line_number), first_time(true)
 {}
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -33,7 +34,8 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         } else if (tokens[1]->type() == Token::LABEL && !tokens[1]->is_error) {
                 if (!first_time) {
                         auto label = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                                  [this, tokens](std::pair<std::uint16_t, std::shared_ptr<Label>> symbol) -> bool {
+                                                  [this, tokens](std::pair<std::uint16_t,
+                                                                           std::shared_ptr<Label>> symbol) -> bool {
                                                           return symbol.second->word == tokens[1]->word;
                                                   }
                         );

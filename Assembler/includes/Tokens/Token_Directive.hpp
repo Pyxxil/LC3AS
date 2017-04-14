@@ -6,9 +6,11 @@
 class Directive : public Token
 {
 public:
-        Directive() : Token()
+        Directive()
+                : Token()
         {}
-        Directive(std::string &word, int line_number = 0) : Token(word, line_number)
+        Directive(std::string &word, int line_number = 0)
+                : Token(word, line_number)
         {}
 };
 

@@ -1,7 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Traps/Token_Trap_Getc.hpp"
 
-Getc::Getc(std::string &oper, int line_number) : Instruction(oper, line_number)
+Getc::Getc(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 Token::token_type Getc::type() const

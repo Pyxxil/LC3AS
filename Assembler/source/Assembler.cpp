@@ -6,10 +6,10 @@
 
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147,
-        82279,  72997, 66457, 65719, 70957, 50262,
-        48407,  51151, 41047, 39371, 35401, 37039,
-        28697,  27791, 20201, 21523, 6449,  4813,
-        16333,  13337,
+        82279, 72997, 66457, 65719, 70957, 50262,
+        48407, 51151, 41047, 39371, 35401, 37039,
+        28697, 27791, 20201, 21523, 6449, 4813,
+        16333, 13337,
 };
 
 /**
@@ -21,7 +21,8 @@ static constexpr std::size_t hashed_letters[26] = {
  * @param length The length of the c-string.
  * @return The hash.
  */
-static constexpr std::size_t hash(const char *const string, std::size_t length) {
+static constexpr std::size_t hash(const char *const string, std::size_t length)
+{
         std::size_t _hash = 37;
         std::size_t first_char_on_directive = length > 1 ? static_cast<std::size_t>(*(string + 1)) : 0;
 
@@ -75,7 +76,10 @@ static std::size_t hash(std::string &string)
 }
 
 Assembler::Assembler()
-        : error_count(0), internal_program_counter(0), origin_seen(false), end_seen(false)
+        : error_count(0)
+          , internal_program_counter(0)
+          , origin_seen(false)
+          , end_seen(false)
 {
 }
 
@@ -142,7 +146,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 
         std::vector<std::shared_ptr<Token>> tokenenized_line;
 
-        for (std::size_t index = 0; index < line.length(); ) {
+        for (std::size_t index = 0; index < line.length();) {
                 character = line.at(index);
 
                 if (std::isspace(character)) {
@@ -167,7 +171,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         break;
                 } else if (character == ',' || character == ':') {
                         addToken(current, tokenenized_line, line_number);
-                } else if (character == '"')  {
+                } else if (character == '"') {
                         addToken(current, tokenenized_line, line_number);
 
                         char last_character = 0;
@@ -322,11 +326,14 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 return std::make_shared<In>(word, line_number);
         case hash("BR", 2):
                 // FALLTHROUGH
-        case hash("BRNZP", 5): case hash("BRNPZ", 5):
+        case hash("BRNZP", 5):
+        case hash("BRNPZ", 5):
                 // FALLTHROUGH
-        case hash("BRZNP", 5): case hash("BRZPN", 5):
+        case hash("BRZNP", 5):
+        case hash("BRZPN", 5):
                 // FALLTHROUGH
-        case hash("BRPNZ", 5): case hash("BRPZN", 5):
+        case hash("BRPNZ", 5):
+        case hash("BRPZN", 5):
                 return std::make_shared<Br>(word, line_number, true, true, true);
         case hash("BRN", 3):
                 return std::make_shared<Br>(word, line_number, true, false, false);
@@ -334,11 +341,14 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 return std::make_shared<Br>(word, line_number, false, true, false);
         case hash("BRP", 3):
                 return std::make_shared<Br>(word, line_number, false, false, true);
-        case hash("BRNZ", 4): case hash("BRZN", 4):
+        case hash("BRNZ", 4):
+        case hash("BRZN", 4):
                 return std::make_shared<Br>(word, line_number, true, true, false);
-        case hash("BRNP", 4): case hash("BRPN", 4):
+        case hash("BRNP", 4):
+        case hash("BRPN", 4):
                 return std::make_shared<Br>(word, line_number, true, false, true);
-        case hash("BRZP", 4): case hash("BRPZ", 4):
+        case hash("BRZP", 4):
+        case hash("BRPZ", 4):
                 return std::make_shared<Br>(word, line_number, false, true, true);
         case hash(".ORIG", 5):
                 return std::make_shared<Orig>(word, line_number);
@@ -362,16 +372,25 @@ void Assembler::assemble()
                 return;
         }
 
-        std::size_t errors = 0;
-
         std::int32_t memory_required = 0;
 
         // It would be best to go through the tokens line by line and check the first element
         // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
+        std::cout << "Starting first pass\n";
         for (auto &tokenized_line : tokens) {
-                if (tokenized_line.front()->type() == Token::LABEL) {
-                        std::static_pointer_cast<Label>(tokenized_line.front())->address = file_memory_origin_address;
-                        if (symbols.count(file_memory_origin_address)) {
+                switch (tokenized_line.front()->type()) {
+                case Token::DIR_ORIG:
+                        memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
+                        if (memory_required < 0) {
+                                ++error_count;
+                        } else {
+                                internal_program_counter = file_memory_origin_address =
+                                        static_cast<std::uint16_t>(memory_required);
+                        }
+                        break;
+                case Token::LABEL:
+                        std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
+                        if (symbols.count(internal_program_counter)) {
                                 WARNING("Multiple labels found at address %d", file_memory_origin_address);
                                 WARNING("\tPrevious label '%s' found on line %d", tokenized_line.front()->word.c_str(),
                                         tokenized_line.front()->at_line);
@@ -380,38 +399,44 @@ void Assembler::assemble()
                                 file_memory_origin_address,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
-                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, *this)
-                        );
-                } else if (tokenized_line.front()->type() == Token::DIR_END) {
-                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, *this)
-                        );
-                } else if (tokenized_line.front()->type() == Token::DIR_ORIG) {
-                        origin_seen = true;
-                        file_memory_origin_address = std::static_pointer_cast<Orig>(tokenized_line.front())->origin;
-                } else if (tokenized_line.front()->type() == Token::DIR_BLKW ||
-                                tokenized_line.front()->type() == Token::DIR_FILL ||
-                                tokenized_line.front()->type() == Token::DIR_STRINGZ) {
-                        file_memory_origin_address += std::max(0, tokenized_line.front()->assemble(
-                                tokenized_line, *this)
-                        );
-                } else {
+                case Token::DIR_END:            // FALLTHROUGH
+                case Token::DIR_BLKW:           // FALLTHROUGH
+                case Token::DIR_FILL:           // FALLTHROUGH
+                case Token::DIR_STRINGZ:        // FALLTHROUGH
+                        memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
+                        if (memory_required < 0) {
+                                ++error_count;
+                        } else {
+                                internal_program_counter += memory_required;
+                        }
+                        break;
+                default:
                         if (!origin_seen) {
                                 tokenized_line.front()->expected(".ORIG statement");
+                                ++error_count;
                                 continue;
                         }
 
                         if (end_seen) {
-                                WARNING("%s found after .END. It will be ignored", tokenized_line.front()->word.c_str());
+                                WARNING("%s found after .END. It will be ignored",
+                                        tokenized_line.front()->word.c_str());
                         } else {
-                                ++file_memory_origin_address;
+                                ++internal_program_counter;
                         }
                 }
         }
 
+        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
+
+        if (error_count) {
+                return;
+        }
+
         end_seen = false;
         origin_seen = false;
+        internal_program_counter = file_memory_origin_address;
+
+        std::cout << "Starting second pass\n";
 
         for (auto &tokenized_line : tokens) {
                 // This should return >= 0 on success (where the value is then used to advance the pc),
@@ -419,19 +444,16 @@ void Assembler::assemble()
                 // Arguably, it's probably better to pass a reference to the assembler class with this, and
                 // from that it can be determined if the origin has been seen, or if the end has been seen,
                 // and if a label is actually in the file.
-                std::cout << "Assembling ";
-                for (const auto &token : tokenized_line) {
-                        std::cout << token->word << " ";
-                }
-                std::cout << '\n';
                 memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
                 if (memory_required == -1) {
-                        errors++;
+                        error_count++;
                 } else if (memory_required > 0) {
                         internal_program_counter += memory_required;
                 }
         }
+
+        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
 }
 
 std::vector<std::uint16_t> Assembler::assembled()
@@ -439,7 +461,7 @@ std::vector<std::uint16_t> Assembler::assembled()
         std::vector<std::uint16_t> assembled_tokens;
 
         for (const auto &tokenized_line : tokens) {
-                for (const auto & assembled_line : tokenized_line.front()->as_assembled()) {
+                for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
                         assembled_tokens.push_back(assembled_line);
                 }
         }

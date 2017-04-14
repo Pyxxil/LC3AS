@@ -1,6 +1,7 @@
 #include <Tokens/All_Tokens.hpp>
 
-String::String(std::string &string, int line_number) : Token(string, line_number)
+String::String(std::string &string, int line_number)
+        : Token(string, line_number)
 {}
 
 Token::token_type String::type() const

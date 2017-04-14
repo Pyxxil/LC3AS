@@ -3,7 +3,8 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-And::And(std::string &oper, int line_number) : Instruction(oper, line_number)
+And::And(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -48,15 +49,16 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
 
         if (tokens[3]->type() == Token::IMMEDIATE) {
                 if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 15 ||
-                                std::static_pointer_cast<Immediate>(tokens[3])->immediate < -16) {
+                        std::static_pointer_cast<Immediate>(tokens[3])->immediate < -16) {
                         tokens[3]->expected("5 bit immediate value");
                         return -1;
                 }
         }
 
         assembled.push_back(static_cast<std::uint16_t> (
-                                    0x5000 | static_cast<std::uint16_t >(((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                                            ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6)
+                                    0x5000 | static_cast<std::uint16_t >(
+                                            ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                                                    ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6)
                             ));
 
         if (tokens[3]->type() == Token::REGISTER) {

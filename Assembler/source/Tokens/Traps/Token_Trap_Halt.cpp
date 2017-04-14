@@ -1,7 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Traps/Token_Trap_Halt.hpp"
 
-Halt::Halt(std::string &oper, int line_number) : Instruction(oper, line_number)
+Halt::Halt(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 Token::token_type Halt::type() const

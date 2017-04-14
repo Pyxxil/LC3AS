@@ -2,7 +2,8 @@
 #include "Tokens/Instructions/Token_Instruction_Ldr.hpp"
 #include "Tokens/Token_Immediate.hpp"
 
-Ldr::Ldr(std::string &oper, int line_number) : Instruction(oper, line_number)
+Ldr::Ldr(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -29,7 +30,7 @@ std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 tokens[3]->expected("immediate value");
                 return -1;
         } else if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 31 ||
-                        std::static_pointer_cast<Immediate>(tokens[3])->immediate < -32) {
+                std::static_pointer_cast<Immediate>(tokens[3])->immediate < -32) {
                 tokens[3]->expected("6 bit offset");
                 return -1;
         }

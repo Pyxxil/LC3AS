@@ -2,7 +2,8 @@
 #include "Tokens/Instructions/Token_Instruction_Lea.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Lea::Lea(std::string &oper, int line_number) : Instruction(oper, line_number)
+Lea::Lea(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 std::int32_t Lea::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -39,7 +40,7 @@ Token::token_type Lea::type() const
         return Token::token_type::OP_LEA;
 }
 
-std::vector<std::uint16_t > Lea::as_assembled()
+std::vector<std::uint16_t> Lea::as_assembled()
 {
         return Token::as_assembled();
 }

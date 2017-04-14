@@ -1,6 +1,7 @@
 #include "Tokens/Instructions/Token_Instruction_Sti.hpp"
 
-Sti::Sti(std::string &oper, int line_number) : Instruction(oper, line_number)
+Sti::Sti(std::string &oper, int line_number)
+        : Instruction(oper, line_number)
 {}
 
 Token::token_type Sti::type() const
