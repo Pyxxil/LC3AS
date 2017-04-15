@@ -1,6 +1,6 @@
-#include <Assembler.hpp>
 #include "Tokens/Directives/Token_Directive_Stringz.hpp"
-#include "Tokens/Token_String.hpp"
+
+#include <Assembler.hpp>
 
 Stringz::Stringz(std::string &word, int line_number)
         : Directive(word, line_number)
@@ -25,7 +25,7 @@ std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Asse
         }
 
         if (tokens[1]->type() != Token::_STRING) {
-                tokens[1]->expected("String literal");
+                tokens[1]->expected("string literal");
                 return -1;
         }
 

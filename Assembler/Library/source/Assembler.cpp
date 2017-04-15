@@ -34,8 +34,8 @@ static constexpr std::size_t hash(const char *const string, std::size_t length)
                                         (first_char_on_directive * hashed_letters[first_char_on_directive - 0x41u]);
                         } else {
                                 _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
-                                        (first_char_on_directive * hashed_letters[
-                                                static_cast<std::size_t>(*(string + index)) - 0x41u]);
+                                        (first_char_on_directive *
+                                                hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
                         }
                 } else {
                         _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
@@ -97,7 +97,7 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
         std::ifstream file(fileName);
 
         if (!file.is_open()) {
-                perror(PROJECT);
+                perror(fileName.c_str());
                 exit(EXIT_FAILURE);
         }
 
@@ -122,7 +122,11 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
         }
 
         assemble();
-        assembled();
+
+        if (!error_count) {
+                assembled();
+        }
+
         return tokens;
 }
 
@@ -254,13 +258,12 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
 
         switch (copy.at(0)) {
         case '0':
-                if (copy.length() == 1) {
-                        return std::make_shared<Decimal>(word, line_number);
-                } else if (copy.at(1) == 'X') {
+                if (copy.at(1) == 'X') {
                         return std::make_shared<Hexadecimal>(word, line_number);
                 } else if (copy.at(1) == 'B') {
                         return std::make_shared<Binary>(word, line_number);
                 }
+                break;
         case '#':  // FALLTHROUGH
         case '-':
                 return std::make_shared<Decimal>(copy, line_number);
@@ -402,9 +405,6 @@ void Assembler::assemble()
                         }
                         break;
                 case Token::LABEL:
-                        if (tokenized_line.front()->word.empty()) {
-                                continue;
-                        }
                         std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
                         if (symbols.count(internal_program_counter)) {
                                 WARNING("Multiple labels found at address %d", file_memory_origin_address);

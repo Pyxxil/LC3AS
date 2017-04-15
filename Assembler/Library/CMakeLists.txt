@@ -1,8 +1,6 @@
 cmake_minimum_required ( VERSION 3.6 )
 project ( LC3Assembler )
 
-add_definitions ( "-DPROJECT=\"${PROJECT_NAME}\"" )
-
 include_directories ( includes )
 
 set ( ASSEMBLER_SOURCE_FILES
@@ -86,11 +84,11 @@ set ( ASSEMBLER_HEADER_FILES
       includes/Tokens/All_Tokens.hpp
       )
 
-if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug" )
-        set ( CMAKE_CXX_FLAGS "-O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor" )
-        set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual" )
-        set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion -Wsign-conversion -Weffc++ -Wno-error=effc++" )
-        set ( CMAKE_VERBOSE_MAKEFILE ON )
-endif ()
+set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
+set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
+set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ )
 
-add_library ( ${PROJECT_NAME} SHARED ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
+add_library ( ${PROJECT_NAME} ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
+
+target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
+target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )

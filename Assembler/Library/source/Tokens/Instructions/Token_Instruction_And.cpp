@@ -41,16 +41,16 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         } else if (tokens[3]->is_error) {
                 if (tokens[3]->type() == Token::REGISTER) {
-                        expected("valid register");
+                        tokens[3]->expected("valid register");
                 } else {
-                        expected("valid immediate value");
+                        tokens[3]->expected("valid immediate value");
                 }
                 return -1;
         }
 
         if (tokens[3]->type() == Token::IMMEDIATE) {
                 if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 15 ||
-                        std::static_pointer_cast<Immediate>(tokens[3])->immediate < -16) {
+                                std::static_pointer_cast<Immediate>(tokens[3])->immediate < -16) {
                         tokens[3]->expected("5 bit immediate value");
                         return -1;
                 }
