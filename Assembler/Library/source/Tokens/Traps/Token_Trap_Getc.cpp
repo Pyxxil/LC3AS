@@ -1,5 +1,6 @@
-#include <Assembler.hpp>
 #include "Tokens/Traps/Token_Trap_Getc.hpp"
+
+#include "Assembler.hpp"
 
 Getc::Getc(std::string &oper, int line_number)
         : Instruction(oper, line_number)
@@ -23,6 +24,8 @@ std::int32_t Getc::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 WARNING("GETC after .END directive. It will be ignored");
                 return 0;
         }
+
+        assembled.push_back(static_cast<std::uint16_t>(0xF020));
 
         return 1;
 }

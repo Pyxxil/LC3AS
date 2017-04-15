@@ -7,6 +7,11 @@ Orig::Orig(std::string &word, int line_number)
 
 std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
+        if (assembled.size()) {
+                assembler.origin_seen = true;
+                return 0;
+        }
+
         if (tokens.size() != 2) {
                 return -1;
         }

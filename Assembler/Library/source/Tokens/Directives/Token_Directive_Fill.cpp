@@ -10,6 +10,10 @@ Fill::Fill(std::string &word, int line_number)
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
+        if (assembled.size()) {
+                return 1;
+        }
+
         if (tokens.size() != 2) {
                 return -1;
         }
@@ -34,14 +38,15 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         } else if (tokens[1]->type() == Token::LABEL && !tokens[1]->is_error) {
                 if (!first_time) {
                         auto label = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                                  [this, tokens](std::pair<std::uint16_t,
-                                                                           std::shared_ptr<Label>> symbol) -> bool {
+                                                  [&tokens](auto symbol) -> bool
+                                                  {
                                                           return symbol.second->word == tokens[1]->word;
                                                   }
                         );
 
                         if (label == assembler.symbols.end()) {
                                 tokens[1]->expected("valid label");
+                                return -1;
                         } else {
                                 assembled.push_back(label->second->address);
                         }

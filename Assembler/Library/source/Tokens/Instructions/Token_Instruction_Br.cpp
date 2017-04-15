@@ -29,8 +29,29 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                 return -1;
         }
 
+        auto symbol = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
+                                  [&tokens](auto sym) -> bool
+                                  {
+                                          return sym.second->word == tokens[1]->word;
+                                  }
+        );
+
+        if (symbol == assembler.symbols.end()) {
+                tokens[1]->expected("valid label");
+                return -1;
+        }
+
+        int offset = static_cast<int>(symbol->second->address);
+        offset -= (static_cast<int>(assembler.internal_program_counter) + 1);
+
+        if (offset > 255 || offset < -256) {
+                // TODO: Change this to actually tell the user what's wrong (difference wise).
+                tokens[1]->expected("9 bit immediate value");
+                return -1;
+        }
+
         assembled.push_back(
-                static_cast<std::uint16_t>(0x0000 | N << 10 | Z << 9 | P << 8)
+                static_cast<std::uint16_t>(0x0000 | N << 11 | Z << 10 | P << 9 | (offset & 0x1FF))
         );
 
         return 1;

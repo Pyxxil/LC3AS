@@ -16,17 +16,6 @@ set ( SIMULATOR_HEADER_FILES
       includes/Simulator.hpp
       )
 
-set ( ASSEMBLER_SOURCE_FILES
-      Assembler/source/Assembler.cpp
-      Assembler/source/Token.cpp
-      Assembler/source/Tokens/Directives/Token_Directive_End.cpp
-      PARENT_SCOPE )
-
-set ( ASSEMBLER_HEADER_FILES
-      Assembler/includes/Assembler.hpp
-      Assembler/includes/Token.hpp
-      PARENT_SCOPE )
-
 set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic" )
 
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
@@ -38,5 +27,5 @@ endif ()
 
 find_library ( Curses curses )
 
-add_executable ( LC3_simulator ${SIMULATOR_SOURCE_FILES} ${SIMULATOR_HEADER_FILES} ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
-target_link_libraries ( LC3_simulator ${Curses} )
+add_executable ( LC3_simulator ${SIMULATOR_SOURCE_FILES} ${SIMULATOR_HEADER_FILES} )
+target_link_libraries ( LC3_simulator ${Curses} LC3Assembler )

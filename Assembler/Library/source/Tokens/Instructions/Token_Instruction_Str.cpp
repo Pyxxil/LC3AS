@@ -1,5 +1,6 @@
 #include "Tokens/Instructions/Token_Instruction_Str.hpp"
 
+#include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Immediate.hpp"
 #include <Assembler.hpp>
 
@@ -30,11 +31,25 @@ std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         } else if (tokens[3]->type() != Token::IMMEDIATE) {
                 tokens[3]->expected("immediate value");
                 return -1;
-        } else if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 31 ||
+        }
+
+        if (tokens[1]->is_error || tokens[2]->is_error || tokens[3]->is_error) {
+                return 0;
+        }
+
+        if (std::static_pointer_cast<Immediate>(tokens[3])->immediate > 31 ||
                 std::static_pointer_cast<Immediate>(tokens[3])->immediate < -32) {
                 tokens[3]->expected("6 bit offset");
                 return -1;
         }
+
+        assembled.push_back(
+                static_cast<std::uint16_t>(0x7000 |
+                        ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+                        ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
+                        (std::static_pointer_cast<Immediate>(tokens[3])->immediate & 0x3F)
+                )
+        );
 
         return 1;
 }

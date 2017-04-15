@@ -8,6 +8,15 @@ Immediate::Immediate(std::string &word, int line_number)
         : Token(word, line_number)
 {}
 
+std::int32_t Immediate::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+{
+        (void) tokens;
+        (void) assembler;
+
+        expected("label, instruction, or directive");
+        return -1;
+}
+
 Token::token_type Immediate::type() const
 {
         return Token::token_type::IMMEDIATE;

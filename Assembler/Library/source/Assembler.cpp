@@ -3,6 +3,7 @@
 #include "Tokens/All_Tokens.hpp"
 
 #include <fstream>
+#include <iostream>
 
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147,
@@ -171,6 +172,9 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         break;
                 } else if (character == ',' || character == ':') {
                         addToken(current, tokenenized_line, line_number);
+                } else if (character == '\r') {
+                        // getline won't consume '\r' (at least on OSX)
+                        break;
                 } else if (character == '"') {
                         addToken(current, tokenenized_line, line_number);
 
@@ -242,6 +246,12 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         // measure.
         std::size_t hashed = hash(copy);
 
+        if (std::isdigit(word.at(0))) {
+                if (std::all_of(word.begin(), word.end(), ::isdigit)) {
+                        return std::make_shared<Decimal>(word, line_number);
+                }
+        }
+
         switch (copy.at(0)) {
         case '0':
                 if (copy.length() == 1) {
@@ -250,8 +260,6 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                         return std::make_shared<Hexadecimal>(word, line_number);
                 } else if (copy.at(1) == 'B') {
                         return std::make_shared<Binary>(word, line_number);
-                } else {
-                        return std::make_shared<Decimal>(word, line_number);
                 }
         case '#':  // FALLTHROUGH
         case '-':
@@ -380,8 +388,6 @@ void Assembler::assemble()
 
         std::int32_t memory_required = 0;
 
-        // It would be best to go through the tokens line by line and check the first element
-        // and if it's a LABEL, add it to the symbol table, otherwise don't worry about it.
         puts("Starting first pass");
 
         for (auto &tokenized_line : tokens) {
@@ -396,14 +402,17 @@ void Assembler::assemble()
                         }
                         break;
                 case Token::LABEL:
+                        if (tokenized_line.front()->word.empty()) {
+                                continue;
+                        }
                         std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
                         if (symbols.count(internal_program_counter)) {
                                 WARNING("Multiple labels found at address %d", file_memory_origin_address);
-                                WARNING("\tPrevious label '%s' found on line %d", tokenized_line.front()->word.c_str(),
-                                        tokenized_line.front()->at_line);
+                                WARNING("\tPrevious label '%s' found on line %d", symbols[internal_program_counter]->word.c_str(),
+                                        symbols[internal_program_counter]->at_line);
                         }
                         symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
-                                file_memory_origin_address,
+                                internal_program_counter,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
                 case Token::DIR_END:            // FALLTHROUGH

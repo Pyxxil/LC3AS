@@ -16,11 +16,6 @@ std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Asse
                 return -1;
         }
 
-        if (tokens[1]->type() != Token::_STRING) {
-                tokens[1]->expected("String literal");
-                return -1;
-        }
-
         if (!assembler.origin_seen) {
                 expected(".ORIG directive");
                 return -1;
@@ -29,13 +24,14 @@ std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Asse
                 return 0;
         }
 
-        for (const auto &character : std::static_pointer_cast<String>(tokens[1])->word) {
-                assembled.push_back(static_cast<std::uint16_t>(character));
+        if (tokens[1]->type() != Token::_STRING) {
+                tokens[1]->expected("String literal");
+                return -1;
         }
-        // Don't forget the implicit NULL character.
-        assembled.push_back(0);
 
-        return static_cast<std::int32_t>(std::static_pointer_cast<String>(tokens[1])->word.length() + 1);
+        assembled = tokens[1]->assembled;
+
+        return static_cast<std::int32_t>(assembled.size());
 }
 
 Token::token_type Stringz::type() const

@@ -10,6 +10,10 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemb
                 return 0;
         }
 
+        if (tokens[1]->assembled.size()) {
+                return static_cast<std::int32_t>(tokens[1]->assembled.size());
+        }
+
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
         std::int32_t ret = vec.front()->assemble(vec, assembler);
         assembled = vec.front()->assembled;
