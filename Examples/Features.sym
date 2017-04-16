@@ -1,0 +1,10 @@
+// Symbol table
+// Scope Level 0:
+//	Symbol Name          Page Address
+//	-----------          ------------
+//	cheat                3020
+//	BEGIN_TEST           3028
+//	addr                 302D
+//	b                    302E
+//	bin                  302F
+//	hex                  3030
