@@ -1,8 +1,10 @@
 #include "Tokens/Instructions/Token_Instruction_St.hpp"
 
+#include <algorithm>
+
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
-#include <Assembler.hpp>
+#include "Assembler.hpp"
 
 St::St(std::string &oper, int line_number)
         : Instruction(oper, line_number)

@@ -1,5 +1,7 @@
 #include "Tokens/Instructions/Token_Instruction_Ldi.hpp"
 
+#include <algorithm>
+
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"

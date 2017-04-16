@@ -1,5 +1,7 @@
 #include "Tokens/Directives/Token_Directive_Blkw.hpp"
 
+#include <algorithm>
+
 #include "Assembler.hpp"
 
 Blkw::Blkw(std::string &word, int line_number)

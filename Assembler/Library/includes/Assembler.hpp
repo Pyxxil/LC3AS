@@ -13,12 +13,14 @@ class Assembler
 public:
         Assembler();
         ~Assembler() = default;
+
         std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &fileName);
         std::vector<std::shared_ptr<Token>> tokenizeLine(std::string &line, int line_number = 0);
 
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
-        void assemble();
         std::vector<uint16_t> &generate_machine_code();
+
+        void assemble();
         void write(std::string &prefix);
 
         std::size_t   error_count                = 0;

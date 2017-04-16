@@ -1,8 +1,10 @@
 #include "Tokens/Directives/Token_Directive_Fill.hpp"
+
+#include <algorithm>
+
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
-
-#include <Assembler.hpp>
+#include "Assembler.hpp"
 
 Fill::Fill(std::string &word, int line_number)
         : Directive(word, line_number), first_time(true)

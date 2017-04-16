@@ -1,5 +1,8 @@
-#include <Assembler.hpp>
 #include "Tokens/Instructions/Token_Instruction_Br.hpp"
+
+#include <algorithm>
+
+#include "Assembler.hpp"
 
 Br::Br(std::string &oper, int line_number, bool n, bool z, bool p)
         : Instruction(oper, line_number), N(n), Z(z), P(p)

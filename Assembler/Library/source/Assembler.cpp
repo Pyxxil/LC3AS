@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 #include "Tokens/All_Tokens.hpp"
 
@@ -492,6 +493,11 @@ void Assembler::assemble()
         }
 }
 
+/**
+ * Generate the machine code for the file.
+ *
+ * @return The machine code gathered into a vector.
+ */
 std::vector<std::uint16_t> &Assembler::generate_machine_code()
 {
         if (as_assembled.size()) {
