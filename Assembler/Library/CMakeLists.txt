@@ -40,7 +40,7 @@ set ( ASSEMBLER_SOURCE_FILES
       source/Tokens/Instructions/Token_Instruction_Sti.cpp
       source/Tokens/Instructions/Token_Instruction_Str.cpp
       source/Tokens/Instructions/Token_Instruction_Trap.cpp
-      )
+      source/Tokens/Immediate/Token_Immediate_Octal.cpp includes/Tokens/Immediate/Token_Immediate_Octal.hpp )
 
 set ( ASSEMBLER_HEADER_FILES
       includes/Assembler.hpp

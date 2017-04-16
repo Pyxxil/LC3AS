@@ -255,6 +255,12 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                         return std::make_shared<Binary>(word, line_number);
                 }
                 break;
+        case '\\':
+                if (copy.length() > 1 && std::isdigit(copy.at(1))) {
+                        return std::make_shared<Octal>(word, line_number);
+                }
+                // What else could it be?
+                return std::make_shared<Token>(word, line_number);
         case '#':  // FALLTHROUGH
         case '-':
                 return std::make_shared<Decimal>(copy, line_number);

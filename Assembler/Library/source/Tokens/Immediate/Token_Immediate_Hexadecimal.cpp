@@ -19,7 +19,7 @@ Hexadecimal::Hexadecimal(std::string &value, int line_number)
                 std::size_t check = 0;
                 immediate = static_cast<std::int16_t>(std::stoi(value, &check, 16));
                 if (check != value.length()) {
-                        Token::expected("valid decimal value");
+                        Token::expected("valid hexadecimal value");
                 }
         } catch (const std::invalid_argument &e) {
                 Token::expected("valid hexadecimal value");

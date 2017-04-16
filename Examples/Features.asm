@@ -14,6 +14,8 @@ cheat .BLKW b1 addr     ; Create a single block of memory initialised to the
                         ; multiple labels found for an address. This leads to
                         ; an error if BEGIN_TEST is used at any point.
 
+oct .FILL \700          ; Octal values are also acceptable
+
 ; This is a label
 BEGIN_TEST:
         AND R5, R5, #-10; Comments can be as close to the instruction as you'd

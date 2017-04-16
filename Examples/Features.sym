@@ -3,8 +3,9 @@
 //	Symbol Name          Page Address
 //	-----------          ------------
 //	cheat                3020
-//	BEGIN_TEST           3028
-//	addr                 302D
-//	b                    302E
-//	bin                  302F
-//	hex                  3030
+//	oct                  3028
+//	BEGIN_TEST           3029
+//	addr                 302E
+//	b                    302F
+//	bin                  3030
+//	hex                  3031
