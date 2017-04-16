@@ -35,14 +35,16 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         if (std::static_pointer_cast<Immediate>(tokens[1])->immediate > 0x25 ||
-                std::static_pointer_cast<Immediate>(tokens[1])->immediate < 0x20) {
+            std::static_pointer_cast<Immediate>(tokens[1])->immediate < 0x20) {
                 WARNING("TRAP supplied %d, which is possibly an illegal trap vector",
                         std::static_pointer_cast<Immediate>(tokens[1])->immediate);
         }
 
         assembled.push_back(
-                static_cast<std::uint16_t>(0xF000 |
-                        (std::static_pointer_cast<Immediate>(tokens[1])->immediate & 0xFF))
+                static_cast<std::uint16_t>(
+                        0xF000 |
+                        (std::static_pointer_cast<Immediate>(tokens[1])->immediate & 0xFF)
+                )
         );
 
         return 1;

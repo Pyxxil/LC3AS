@@ -14,6 +14,7 @@ public:
         void not_found();
 
         std::string label;
+
         std::uint16_t address = 0;
 };
 

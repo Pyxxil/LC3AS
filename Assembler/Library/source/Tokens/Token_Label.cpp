@@ -15,18 +15,20 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemb
         }
 
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
+
         std::int32_t ret = vec.front()->assemble(vec, assembler);
+
         assembled = vec.front()->assembled;
         return ret;
 }
 
 void Label::not_found()
 {
-        fprintf(stderr, "ERROR: ");
+        std::cerr << "ERROR: ";
         if (at_line) {
-                fprintf(stderr, "Line %d:", at_line);
+                std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        fprintf(stderr, "No such label '%s'\n", label.c_str());
+        std::cerr << "No such label '" << label << "'\n";
 
         is_error = true;
 }

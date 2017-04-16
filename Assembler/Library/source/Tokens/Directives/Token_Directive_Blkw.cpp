@@ -33,6 +33,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         std::uint16_t fill = 0;
+
         bool do_fill = true;
 
         if (tokens.size() == 3) {
@@ -44,14 +45,16 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[2])->immediate);
                 } else if (tokens[2]->type() == Token::LABEL) {
                         if (!first_time) {
-                                auto label = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                                          [&tokens](auto symbol) -> bool {
-                                                                  return symbol.second->word == tokens[2]->word;
-                                                          }
+                                auto label = std::find_if(
+                                        assembler.symbols.begin(), assembler.symbols.end(),
+                                        [&tokens](auto symbol) -> bool
+                                        {
+                                                return symbol.second->word == tokens[2]->word;
+                                        }
                                 );
 
                                 if (label == assembler.symbols.end()) {
-                                        tokens[2]->expected("valid label");
+                                        std::static_pointer_cast<Label>(tokens[2])->not_found();
                                         return -1;
                                 }
 
@@ -80,16 +83,16 @@ void Blkw::invalid_argument_count(std::size_t provided, std::size_t expected)
 {
         (void) expected;
 
-        provided -= 1;  // This is not the best idea, but because tokens.size() returns
-                        // the number of arguments + the token itself, it's a little easier to do here.
-        fprintf(stderr, "ERROR: ");
-        if (at_line) {
-                fprintf(stderr, "Line %d: ", at_line);
-        }
-        fprintf(stderr, ".BLKW expects 1 or 2 arguments, but %ld argument%s provided.\n",
-                provided, provided == 1 ? "" : "'s");
+        provided -= 1;
 
-        is_error = true;
+        std::cerr << "ERROR: ";
+        if (at_line) {
+                std::cerr << "Line " << std::dec << at_line << ": ";
+        }
+        std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided
+                  << " argument" << (provided == 1 ? "" : "'s") << " provided.\n",
+
+                is_error = true;
 }
 
 Token::token_type Blkw::type() const

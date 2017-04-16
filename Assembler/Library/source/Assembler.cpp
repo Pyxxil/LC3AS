@@ -7,11 +7,8 @@
 #include "Tokens/All_Tokens.hpp"
 
 static constexpr std::size_t hashed_letters[26] = {
-        100363, 99989, 97711, 97151, 92311, 80147,
-        82279, 72997, 66457, 65719, 70957, 50262,
-        48407, 51151, 41047, 39371, 35401, 37039,
-        28697, 27791, 20201, 21523, 6449, 4813,
-        16333, 13337,
+        100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957, 50262, 48407, 51151, 41047, 39371
+        , 35401, 37039, 28697, 27791, 20201, 21523, 6449, 4813, 16333, 13337,
 };
 
 /**
@@ -26,6 +23,7 @@ static constexpr std::size_t hashed_letters[26] = {
 static constexpr std::size_t hash(const char *const string, std::size_t length)
 {
         std::size_t _hash = 37;
+
         std::size_t first_char_on_directive = length > 1 ? static_cast<std::size_t>(*(string + 1)) : 0;
 
         for (std::size_t index = 0; index < length; ++index) {
@@ -36,12 +34,12 @@ static constexpr std::size_t hash(const char *const string, std::size_t length)
                         } else {
                                 _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
                                         (first_char_on_directive *
-                                                hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
+                                         hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
                         }
                 } else {
                         _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
                                 (static_cast<std::size_t>(*string) *
-                                        hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
+                                 hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
                 }
         }
 
@@ -55,6 +53,7 @@ static std::size_t hash(std::string &string)
         }
 
         std::size_t _hash = 37;
+
         std::size_t first_char_on_directive = string.length() > 1 ? static_cast<std::size_t>(string.at(1)) : 0;
 
         for (const auto &character : string) {
@@ -70,7 +69,7 @@ static std::size_t hash(std::string &string)
                 } else {
                         _hash = (_hash * hashed_letters[static_cast<std::size_t>(character) - 0x41u]) ^
                                 (static_cast<std::size_t>(string.at(0)) *
-                                        hashed_letters[static_cast<std::size_t>(character) - 0x41u]);
+                                 hashed_letters[static_cast<std::size_t>(character) - 0x41u]);
                 }
         }
 
@@ -103,6 +102,7 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
         }
 
         std::string line;
+
         int line_number = 0;
 
         while (std::getline(file, line)) {
@@ -400,7 +400,8 @@ void Assembler::do_first_pass()
                                 std::cerr << "WARNING: Multiple labels found for address 0x"
                                           << std::hex << internal_program_counter << '\n';
                                 std::cerr << "WARNING: \tPrevious label '" << symbols.at(internal_program_counter)->word
-                                          << "' found on line " << std::dec << symbols.at(internal_program_counter)->at_line
+                                          << "' found on line " << std::dec
+                                          << symbols.at(internal_program_counter)->at_line
                                           << '\n';
                         }
 
@@ -476,8 +477,8 @@ void Assembler::assemble()
                 return;
         }
 
-        end_seen = false;
-        origin_seen = false;
+        end_seen                 = false;
+        origin_seen              = false;
         internal_program_counter = file_memory_origin_address;
 
         do_second_pass();
@@ -525,13 +526,13 @@ void Assembler::write(std::string &prefix)
 
         int length = std::max(
                 static_cast<int>(
-                        std::max_element(symbols.begin(), symbols.end(),
-                                         [](const auto &a, const auto &b) -> bool
-                                         {
-                                                 return a.second->word.length() < b.second->word.length();
-                                         }
-                        )->second->word.length())
-                        , 20
+                        std::max_element(
+                                symbols.begin(), symbols.end(),
+                                [](const auto &a, const auto &b) -> bool
+                                {
+                                        return a.second->word.length() < b.second->word.length();
+                                }
+                        )->second->word.length()), 20
         );
 
         symbol_file << "// Symbol table\n";

@@ -31,14 +31,14 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
         }
 
         auto symbol = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                  [&tokens](auto sym) -> bool
-                                  {
-                                          return sym.second->word == tokens[1]->word;
-                                  }
+                                   [&tokens](auto sym) -> bool
+                                   {
+                                           return sym.second->word == tokens[1]->word;
+                                   }
         );
 
         if (symbol == assembler.symbols.end()) {
-                tokens[1]->expected("valid label");
+                std::static_pointer_cast<Label>(tokens[1])->not_found();
                 return -1;
         }
 

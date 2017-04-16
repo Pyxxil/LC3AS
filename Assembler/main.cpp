@@ -10,7 +10,7 @@ int main(int argc, char **argv)
         }
 
         std::string fileName = argv[1];
-        std::string prefix = fileName.substr(0, fileName.find_first_of('.'));
+        std::string prefix   = fileName.substr(0, fileName.find_first_of('.'));
 
         Assembler as;
 

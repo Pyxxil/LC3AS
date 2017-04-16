@@ -33,14 +33,16 @@ class Token
 public:
         Token() = default;
         Token(std::string &word, int line = 0)
-                : word(word), at_line(line)
+                : at_line(line), word(word)
         {}
 
         virtual ~Token() = default;
 
-        std::string word;
         bool is_error = false;
-        int at_line = 0;
+        int  at_line  = 0;
+
+        std::string word;
+
         std::vector<std::uint16_t> assembled;
 
         enum token_type
@@ -89,7 +91,7 @@ public:
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                std::cerr <<  "Expected " <<  expects << ". Found " << word << "' instead\n";
+                std::cerr << "Expected " << expects << ". Found " << word << "' instead\n";
 
                 is_error = true;
 
@@ -115,13 +117,13 @@ public:
         virtual void invalid_argument_count(std::size_t provided, std::size_t expected)
         {
                 provided -= 1;  // This is not the best idea, but because tokens.size() returns
-                                // the number of arguments + the token itself, it's a little easier to do here.
+                // the number of arguments + the token itself, it's a little easier to do here.
                 std::cerr << "ERROR: ";
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
                 std::cerr << word << "expects " << expected << " argument" << (expected == 1 ? "" : "'s")
-                        << ", but %ld argument%s provided.\n";
+                          << ", but %ld argument%s provided.\n";
 
                 is_error = true;
         }

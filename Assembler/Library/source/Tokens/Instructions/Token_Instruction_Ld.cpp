@@ -43,7 +43,7 @@ std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
         );
 
         if (symbol == assembler.symbols.end()) {
-                tokens[2]->expected("valid label");
+                std::static_pointer_cast<Label>(tokens[2])->not_found();
                 return -1;
         }
 
@@ -56,8 +56,13 @@ std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                 return -1;
         }
 
-        assembled.push_back(static_cast<std::uint16_t >(0x2000 |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) | (offset & 0x1FF)));
+        assembled.push_back(
+                static_cast<std::uint16_t >(
+                        0x2000 |
+                        ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                        (offset & 0x1FF)
+                )
+        );
 
         return 1;
 }

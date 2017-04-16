@@ -21,8 +21,8 @@ public:
         std::vector<uint16_t> &generate_machine_code();
         void write(std::string &prefix);
 
-        std::size_t error_count = 0;
-        std::uint16_t internal_program_counter = 0;
+        std::size_t   error_count                = 0;
+        std::uint16_t internal_program_counter   = 0;
         std::uint16_t file_memory_origin_address = 0;
 
         bool origin_seen;
@@ -31,9 +31,10 @@ public:
         std::map<std::uint16_t, std::shared_ptr<Label>> symbols;
 
 private:
+        std::vector<std::uint16_t> as_assembled;
+
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
         void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number);
-        std::vector<std::uint16_t> as_assembled;
 
         void do_first_pass();
         void do_second_pass();

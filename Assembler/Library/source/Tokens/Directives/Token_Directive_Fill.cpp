@@ -31,24 +31,25 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 return -1;
         }
 
-        if (tokens[1]->type() == Token::IMMEDIATE ) {
+        if (tokens[1]->type() == Token::IMMEDIATE) {
                 assembled.push_back(
                         static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate)
                 );
         } else if (tokens[1]->type() == Token::LABEL) {
                 if (!first_time) {
-                        auto label = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                                  [&tokens](auto symbol) -> bool
-                                                  {
-                                                          return symbol.second->word == tokens[1]->word;
-                                                  }
+                        auto symbol = std::find_if(
+                                assembler.symbols.begin(), assembler.symbols.end(),
+                                [&tokens](auto sym) -> bool
+                                {
+                                        return sym.second->word == tokens[1]->word;
+                                }
                         );
 
-                        if (label == assembler.symbols.end()) {
-                                tokens[1]->expected("valid label");
+                        if (symbol == assembler.symbols.end()) {
+                                std::static_pointer_cast<Label>(tokens[1])->not_found();
                                 return -1;
                         } else {
-                                assembled.push_back(label->second->address);
+                                assembled.push_back(symbol->second->address);
                         }
                 }
         } else {

@@ -2,7 +2,7 @@ cmake_minimum_required ( VERSION 3.6 )
 
 set ( CMAKE_CXX_STANDARD 14 )
 
-set ( COMPILE_FLAGS -Wall -Wextra -Wpedantic)
+set ( COMPILE_FLAGS -Wall -Wextra -Wpedantic )
 
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
         set ( CMAKE_VERBOSE_MAKEFILE ON )
