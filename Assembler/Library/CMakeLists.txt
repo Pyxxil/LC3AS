@@ -86,7 +86,7 @@ set ( ASSEMBLER_HEADER_FILES
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
-set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ )
+set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ -Wno-error=sign-conversion -Wno-error=conversion)
 
 add_library ( ${PROJECT_NAME} STATIC ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
 

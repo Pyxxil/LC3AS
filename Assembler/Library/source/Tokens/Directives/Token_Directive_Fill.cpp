@@ -6,8 +6,8 @@
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"
 
-Fill::Fill(std::string &word, int line_number)
-        : Directive(word, line_number), first_time(true)
+Fill::Fill(std::string &token, int line_number)
+        : Directive(token, line_number), first_time(true)
 {}
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

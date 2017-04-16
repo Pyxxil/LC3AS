@@ -2,8 +2,8 @@
 
 #include <Assembler.hpp>
 
-Stringz::Stringz(std::string &word, int line_number)
-        : Directive(word, line_number)
+Stringz::Stringz(std::string &token, int line_number)
+        : Directive(token, line_number)
 {}
 
 std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

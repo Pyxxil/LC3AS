@@ -444,9 +444,9 @@ void Assembler::do_first_pass()
                 case Token::DIR_STRINGZ:        // FALLTHROUGH
                         memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
                         if (memory_required < 0) {
-                                error_count += -memory_required;
+                                error_count += static_cast<std::size_t>(-memory_required);
                         } else {
-                                internal_program_counter += memory_required;
+                                internal_program_counter += static_cast<std::uint16_t>(memory_required);
                         }
                         break;
                 default:
@@ -475,9 +475,9 @@ void Assembler::do_second_pass()
                 memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
                 if (memory_required < 0) {
-                        error_count += -memory_required;
+                        error_count += static_cast<std::size_t>(-memory_required);
                 } else {
-                        internal_program_counter += memory_required;
+                        internal_program_counter += static_cast<std::uint16_t>(memory_required);
                 }
         }
 

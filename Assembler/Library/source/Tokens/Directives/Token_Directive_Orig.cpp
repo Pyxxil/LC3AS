@@ -1,8 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Directives/Token_Directive_Orig.hpp"
 
-Orig::Orig(std::string &word, int line_number)
-        : Directive(word, line_number)
+Orig::Orig(std::string &token, int line_number)
+        : Directive(token, line_number)
 {}
 
 std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

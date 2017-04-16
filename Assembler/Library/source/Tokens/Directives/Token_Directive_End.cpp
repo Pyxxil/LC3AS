@@ -1,8 +1,8 @@
 #include <Assembler.hpp>
 #include "Tokens/Directives/Token_Directive_End.hpp"
 
-End::End(std::string &word, int line_number)
-        : Directive(word, line_number)
+End::End(std::string &token, int line_number)
+        : Directive(token, line_number)
 {}
 
 std::int32_t End::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

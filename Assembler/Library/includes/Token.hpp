@@ -12,8 +12,8 @@ class Token
 {
 public:
         Token() = default;
-        Token(std::string &word, int line = 0)
-                : at_line(line), word(word)
+        Token(std::string &token, int line = 0)
+                : at_line(line), word(token), assembled()
         {}
 
         virtual ~Token() = default;
