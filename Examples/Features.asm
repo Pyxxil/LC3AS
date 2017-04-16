@@ -78,6 +78,8 @@ cheat .BLKW b1 addr     ; Create a single block of memory initialised to the
                         ; an error if BEGIN_TEST is used at any point.
 
 oct .FILL \700          ; Octal values are also acceptable
+;oct .FILL \600         ; This should throw an error about multiple definitions
+                        ; of a label.
 
 ; This is a label
 BEGIN_TEST:
@@ -102,8 +104,10 @@ b       .FILL 0x0       ; Put the value 0 into memory, and allow us to reference
                         ; this address by giving it a label.
 bin     .FILL b1010     ; Binary literals are also supported.
 hex     .FILL x0000     ; Hexadecimal too.
+;oct     .FILL \0000    ; Octal as well. This should throw an error about
+                        ; multiple definitions of a label
 
 .END                    ; Each program needs to terminate with a .END directive.
                         ; If it's not found, then it just throws a warning.
-ADD R0, R0, R1          ; This should throw a warning.
+;ADD R0, R0, R1         ; This should throw a warning.
 

@@ -41,11 +41,11 @@ int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &as
                 return 0;
         }
 
-        auto symbol = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                   [&tokens](auto sym) -> bool
-                                   {
-                                           return sym.second->word == tokens[2]->word;
-                                   }
+        const auto symbol = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
+                                         [&tokens](auto sym) -> bool
+                                         {
+                                                 return sym.second->word == tokens[2]->word;
+                                         }
         );
 
         if (symbol == assembler.symbols.end()) {
@@ -53,8 +53,8 @@ int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &as
                 return -1;
         }
 
-        int offset = static_cast<int>(symbol->second->address);
-        offset -= (static_cast<int>(assembler.internal_program_counter) + 1);
+        const int offset = static_cast<int>(symbol->second->address) -
+                           (static_cast<int>(assembler.internal_program_counter) + 1);
 
         if (offset > 255 || offset < -256) {
                 // TODO: Change this to actually tell the user what's wrong (difference wise).

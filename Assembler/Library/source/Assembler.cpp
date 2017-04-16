@@ -412,11 +412,25 @@ void Assembler::do_first_pass()
 
                         if (symbols.count(internal_program_counter)) {
                                 std::cerr << "WARNING: Multiple labels found for address 0x"
-                                          << std::hex << internal_program_counter << '\n';
-                                std::cerr << "WARNING: \tPrevious label '" << symbols.at(internal_program_counter)->word
+                                          << std::hex << internal_program_counter;
+                                std::cerr << "\nNOTE: \tPrevious label '"
+                                          << symbols.at(internal_program_counter)->word
                                           << "' found on line " << std::dec
                                           << symbols.at(internal_program_counter)->at_line
                                           << '\n';
+                        } else {
+                                for (const auto &symbol : symbols) {
+                                        if (symbol.second->word == tokenized_line.front()->word) {
+                                                std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
+                                                          << ": Multiple definitions of label '"
+                                                          << tokenized_line.front()->word
+                                                          << "'\nNOTE: \tLabel was first defined on line "
+                                                          << symbol.second->at_line
+                                                          << '\n';
+                                                ++error_count;
+                                                break;
+                                        }
+                                }
                         }
 
                         symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
@@ -430,7 +444,7 @@ void Assembler::do_first_pass()
                 case Token::DIR_STRINGZ:        // FALLTHROUGH
                         memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
                         if (memory_required < 0) {
-                                ++error_count;
+                                error_count += -memory_required;
                         } else {
                                 internal_program_counter += memory_required;
                         }
@@ -460,9 +474,9 @@ void Assembler::do_second_pass()
         for (auto &tokenized_line : tokens) {
                 memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
-                if (memory_required == -1) {
-                        error_count++;
-                } else if (memory_required > 0) {
+                if (memory_required < 0) {
+                        error_count += -memory_required;
+                } else {
                         internal_program_counter += memory_required;
                 }
         }

@@ -51,7 +51,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[2])->immediate);
                 } else if (tokens[2]->type() == Token::LABEL) {
                         if (!first_time) {
-                                auto label = std::find_if(
+                                const auto label = std::find_if(
                                         assembler.symbols.begin(), assembler.symbols.end(),
                                         [&tokens](auto symbol) -> bool
                                         {

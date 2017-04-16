@@ -78,8 +78,8 @@ public:
                 return *this;
         }
 
-        virtual Token &note(std::string)
-        { return *this; }
+        virtual void note(std::string)
+        {}
 
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
         {

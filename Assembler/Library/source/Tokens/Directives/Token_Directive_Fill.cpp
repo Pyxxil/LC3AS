@@ -43,7 +43,7 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 );
         } else if (tokens[1]->type() == Token::LABEL) {
                 if (!first_time) {
-                        auto symbol = std::find_if(
+                        const auto symbol = std::find_if(
                                 assembler.symbols.begin(), assembler.symbols.end(),
                                 [&tokens](auto sym) -> bool
                                 {
