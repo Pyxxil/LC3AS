@@ -93,6 +93,8 @@ BEGIN_TEST:
                         ; 'addr' or at the address of label 'cheat'
         RET
 
+BRnzp BEGIN_TEST
+
 addr    .FILL BEGIN_TEST; Put the address of the label 'BEGIN_TEST' into
                         ; memory at the address of the label 'addr'
 

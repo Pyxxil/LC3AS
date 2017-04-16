@@ -30,6 +30,8 @@ public:
 
         std::map<std::uint16_t, std::shared_ptr<Label>> symbols;
 
+        std::string disassemble(std::uint16_t instruction, std::uint16_t pc);
+
 private:
         std::vector<std::uint16_t> as_assembled;
 
