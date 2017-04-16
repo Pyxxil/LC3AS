@@ -436,6 +436,10 @@ void Assembler::assemble()
                 }
         }
 
+        if (!end_seen) {
+                WARNING("Reached the end of the file, and found no .END directive");
+        }
+
         printf("%ld error%s found on the first pass\n", error_count, error_count == 1 ? "" : "'s");
 
         if (error_count) {

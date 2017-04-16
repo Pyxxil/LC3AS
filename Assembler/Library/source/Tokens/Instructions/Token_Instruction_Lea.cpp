@@ -11,6 +11,7 @@ Lea::Lea(std::string &oper, int line_number)
 std::int32_t Lea::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 3) {
+                invalid_argument_count(tokens.size(), 2);
                 return -1;
         }
 

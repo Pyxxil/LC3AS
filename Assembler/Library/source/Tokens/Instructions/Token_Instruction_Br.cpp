@@ -13,6 +13,7 @@ Token::token_type Br::type() const
 std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 2) {
+                invalid_argument_count(tokens.size(), 1);
                 return -1;
         }
 

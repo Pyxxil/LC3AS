@@ -11,6 +11,7 @@ Sti::Sti(std::string &oper, int line_number)
 int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 3) {
+                invalid_argument_count(tokens.size(), 2);
                 return -1;
         }
 
@@ -56,8 +57,7 @@ int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &as
         }
 
         assembled.push_back(static_cast<std::uint16_t >(0xB000 |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                (std::static_pointer_cast<Label>(tokens[2])->address & 0x1FF)));
+                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) | (offset & 0x1FF)));
 
         return 1;
 }

@@ -11,6 +11,7 @@ Ldi::Ldi(std::string &oper, int line_number)
 std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() != 3) {
+                invalid_argument_count(tokens.size(), 2);
                 return -1;
         }
 
@@ -55,9 +56,8 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.push_back(static_cast<std::uint16_t >(0x2000 |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                (std::static_pointer_cast<Label>(tokens[2])->address & 0x1FF)));
+        assembled.push_back(static_cast<std::uint16_t >(0xA000 |
+                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) | (offset & 0x1FF)));
 
         return 1;
 }

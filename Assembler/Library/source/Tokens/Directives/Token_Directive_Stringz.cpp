@@ -13,6 +13,7 @@ std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Asse
         }
 
         if (tokens.size() != 2) {
+                invalid_argument_count(tokens.size(), 1);
                 return -1;
         }
 

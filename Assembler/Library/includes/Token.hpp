@@ -110,6 +110,21 @@ public:
         {
                 return assembled;
         }
+
+        virtual void invalid_argument_count(std::size_t provided, std::size_t expected)
+        {
+                provided -= 1;  // This is not the best idea, but because tokens.size() returns
+                                // the number of arguments + the token itself, it's a little easier to do here.
+                fprintf(stderr, "ERROR: ");
+                if (at_line) {
+                        fprintf(stderr, "Line %d: ", at_line);
+                }
+                fprintf(stderr, "%s expects %ld argument%s, but %ld argument%s provided.\n",
+                        word.c_str(), expected, expected == 1 ? "" : "'s",
+                        provided, provided == 1 ? "" : "'s");
+
+                is_error = true;
+        }
 };
 
 #endif // LC3_SIMULATOR_TOKEN_HPP

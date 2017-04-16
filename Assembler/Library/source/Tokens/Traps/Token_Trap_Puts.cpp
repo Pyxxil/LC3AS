@@ -9,11 +9,12 @@ Puts::Puts(std::string &oper, int line_number)
 std::int32_t Puts::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (tokens.size() > 1) {
+                invalid_argument_count(tokens.size(), 0);
                 return -1;
         }
 
         if (!assembler.origin_seen) {
-                Token::expected(".ORIG statement");
+                expected(".ORIG statement");
                 return -1;
         } else if (assembler.end_seen) {
                 WARNING("PUTS after .END directive. It will be ignored");

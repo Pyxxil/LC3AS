@@ -12,27 +12,84 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 return static_cast<std::int32_t>(assembled.size());
         }
 
-        if (tokens.size() != 2) {
-                return -1;
-        }
-
-        if (tokens[1]->type() != Token::IMMEDIATE || tokens[1]->is_error) {
-                return -1;
-        }
-
         if (!assembler.origin_seen) {
                 expected(".ORIG directive");
                 return -1;
         } else if (assembler.end_seen) {
-                WARNING(".END directive before .BLKW directive, .BLKW directive will be ignored.");
+                WARNING(".BLKW after .END directive. It will be ignored");
                 return 0;
         }
 
-        for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens[1])->immediate; ++block) {
-                assembled.push_back(0);
+        if (tokens.size() > 3 || !tokens.size()) {
+                invalid_argument_count(tokens.size(), 1);
+                return -1;
         }
 
+        if (tokens[1]->type() != Token::IMMEDIATE) {
+                tokens[1]->expected("immediate value");
+                return -1;
+        } else if (tokens[1]->is_error) {
+                return -1;
+        }
+
+        std::uint16_t fill = 0;
+        bool do_fill = true;
+
+        if (tokens.size() == 3) {
+                if (tokens[2]->is_error) {
+                        return -1;
+                }
+
+                if (tokens[2]->type() == Token::IMMEDIATE) {
+                        fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[2])->immediate);
+                } else if (tokens[2]->type() == Token::LABEL) {
+                        if (!first_time) {
+                                auto label = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
+                                                          [&tokens](auto symbol) -> bool {
+                                                                  return symbol.second->word == tokens[2]->word;
+                                                          }
+                                );
+
+                                if (label == assembler.symbols.end()) {
+                                        tokens[2]->expected("valid label");
+                                        return -1;
+                                }
+
+                                fill = label->second->address;
+                        } else {
+                                do_fill = false;
+                        }
+                } else {
+                        tokens[2]->expected("either an immediate value or label");
+                        return -1;
+                }
+        }
+
+        if (do_fill) {
+                for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens[1])->immediate;
+                     ++block) {
+                        assembled.push_back(fill);
+                }
+        }
+
+        first_time = false;
         return std::static_pointer_cast<Immediate>(tokens[1])->immediate;
+}
+
+void Blkw::invalid_argument_count(std::size_t provided, std::size_t expected)
+{
+        (void) expected;
+
+        provided -= 1;  // This is not the best idea, but because tokens.size() returns
+                        // the number of arguments + the token itself, it's a little easier to do here.
+        fprintf(stderr, "ERROR: ");
+        if (at_line) {
+                fprintf(stderr, "Line %d: ", at_line);
+        }
+        fprintf(stderr, ".BLKW expects 1 or 2 arguments, but %ld argument%s provided.\n",
+                provided, provided == 1 ? "" : "'s");
+
+        is_error = true;
 }
 
 Token::token_type Blkw::type() const
