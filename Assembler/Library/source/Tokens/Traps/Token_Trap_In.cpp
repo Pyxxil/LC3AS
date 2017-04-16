@@ -17,7 +17,7 @@ int32_t In::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &ass
                 expected(".ORIG statement");
                 return -1;
         } else if (assembler.end_seen) {
-                WARNING("IN after .END directive. It will be ignored");
+                std::cerr << "IN after .END directive. It will be ignored\n";
                 return 0;
         }
 

@@ -103,4 +103,5 @@ hex     .FILL x0000     ; Hexadecimal too.
 
 .END                    ; Each program needs to terminate with a .END directive.
                         ; If it's not found, then it just throws a warning.
+ADD R0, R0, R1          ; This should throw a warning.
 

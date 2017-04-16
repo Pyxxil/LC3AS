@@ -18,7 +18,11 @@ std::int32_t Jmp::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 expected(".ORIG directive");
                 return -1;
         } else if (assembler.end_seen) {
-                WARNING("JMP after .END directive. It will be ignored");
+                std::cerr << "WARNING: ";
+                if (at_line) {
+                        std::cerr << "Line " << std::dec << at_line << ": ";
+                }
+                std::cerr << "JMP after .END directive. It will be ignored.\n";
                 return 0;
         }
 

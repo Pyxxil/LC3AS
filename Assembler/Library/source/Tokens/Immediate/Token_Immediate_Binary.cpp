@@ -5,7 +5,7 @@ Binary::Binary(std::string &value, int line_number)
 {
         if (value.length() > 2 && std::toupper(value.at(1)) == 'B') {
                 value.erase(0, 2);
-        }  else if (std::toupper(value.at(0)) == 'B') {
+        } else if (std::toupper(value.at(0)) == 'B') {
                 value.erase(0, 1);
         }
 

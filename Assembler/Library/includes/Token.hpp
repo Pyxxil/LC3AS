@@ -8,26 +8,6 @@
 
 class Assembler;
 
-inline void ERROR(const char *const str, ...)
-{
-        va_list args;
-        va_start(args, str);
-        fprintf(stderr, "ERROR: ");
-        fprintf(stderr, str, args);
-        fprintf(stderr, ".\n");
-        va_end(args);
-}
-
-inline void WARNING(const char *const str, ...)
-{
-        va_list args;
-        va_start(args, str);
-        fprintf(stderr, "WARNING: ");
-        fprintf(stderr, str, args);
-        fprintf(stderr, ".\n");
-        va_end(args);
-}
-
 class Token
 {
 public:
@@ -103,7 +83,7 @@ public:
 
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
         {
-                fprintf(stderr, "%s not implemented\n", word.c_str());
+                std::cerr << word << ".assemble() not implemented\n";
                 (void) tokens;
                 (void) assembler;
                 return -1;

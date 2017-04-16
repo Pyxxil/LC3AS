@@ -18,16 +18,21 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         if (assembler.origin_seen) {
-                fprintf(stderr, "ERROR: ");
+                std::cerr << "ERROR: ";
                 if (at_line) {
-                        fprintf(stderr, "Line %d:", at_line);
+                        std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                fprintf(stderr, "Multiple .ORIG statements\n");
+                std::cerr << "Multiple .ORIG statements\n";
 
                 is_error = true;
                 return -1;
         } else if (assembler.end_seen) {
-                WARNING(".ORIG directive after .END");
+                std::cerr << "WARNING: ";
+                if (at_line) {
+                        std::cerr << "Line " << std::dec << at_line << ": ";
+                }
+                std::cerr << ".ORIG after .END directive. It will be ignored.\n";
+                return 0;
         }
 
         if (tokens[1]->type() != Token::IMMEDIATE) {

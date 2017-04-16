@@ -19,7 +19,11 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 expected(".ORIG directive");
                 return -1;
         } else if (assembler.end_seen) {
-                WARNING("LDI after .END directive. It will be ignored");
+                std::cerr << "WARNING: ";
+                if (at_line) {
+                        std::cerr << "Line " << std::dec << at_line << ": ";
+                }
+                std::cerr << "LDI after .END directive. It will be ignored.\n";
                 return 0;
         }
 
@@ -58,9 +62,9 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
 
         assembled.push_back(
                 static_cast<std::uint16_t >(
-                                    0xA000 |
-                                    ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                                    (offset & 0x1FF)
+                        0xA000 |
+                        ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                        (offset & 0x1FF)
                 )
         );
 

@@ -162,7 +162,12 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         // '//' is a comment as well.
                         if (index + 1 > line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
-                                WARNING("Expected '//', but found '/'. Treating it as if it's '//' (i.e. comment)");
+                                std::cerr << "WARNING: ";
+                                if (line_number) {
+                                        std::cerr << "Line " << std::dec << line_number << ": ";
+                                }
+                                std::cerr
+                                        << "Expected '//', but found '/'. Treating it as if it's '//' (i.e. comment)\n";
                         }
                         break;
                 } else if (character == ',' || character == ':') {
@@ -402,7 +407,8 @@ void Assembler::do_first_pass()
                         break;
                 case Token::LABEL:
                         std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
-                        if (symbols.find(internal_program_counter) != symbols.end()) {
+
+                        if (symbols.count(internal_program_counter)) {
                                 std::cerr << "WARNING: Multiple labels found for address 0x"
                                           << std::hex << internal_program_counter << '\n';
                                 std::cerr << "WARNING: \tPrevious label '" << symbols.at(internal_program_counter)->word
@@ -415,6 +421,7 @@ void Assembler::do_first_pass()
                                 internal_program_counter,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
+
                 case Token::DIR_END:            // FALLTHROUGH
                 case Token::DIR_BLKW:           // FALLTHROUGH
                 case Token::DIR_FILL:           // FALLTHROUGH
@@ -427,26 +434,16 @@ void Assembler::do_first_pass()
                         }
                         break;
                 default:
-                        if (!origin_seen) {
-                                tokenized_line.front()->expected(".ORIG statement");
-                                ++error_count;
-                                continue;
-                        }
-
-                        if (end_seen) {
-                                WARNING("%s found after .END. It will be ignored",
-                                        tokenized_line.front()->word.c_str());
-                        } else {
-                                ++internal_program_counter;
-                        }
+                        ++internal_program_counter;
+                        break;
                 }
         }
 
         if (!end_seen) {
-                WARNING("Reached the end of the file, and found no .END directive");
+                std::cerr << "Reached the end of the file, and found no .END directive\n";
         }
 
-        printf("%ld error%s found on the first pass\n", error_count, error_count == 1 ? "" : "'s");
+        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
 }
 
 /**
@@ -468,7 +465,7 @@ void Assembler::do_second_pass()
                 }
         }
 
-        printf("%ld error%s found on the second pass\n", error_count, error_count == 1 ? "" : "'s");
+        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
 }
 
 void Assembler::assemble()

@@ -16,7 +16,11 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 expected(".ORIG directive");
                 return -1;
         } else if (assembler.end_seen) {
-                WARNING(".BLKW after .END directive. It will be ignored");
+                std::cerr << "WARNING: ";
+                if (at_line) {
+                        std::cerr << "Line " << std::dec << at_line << ": ";
+                }
+                std::cerr << ".BLKW after .END directive. It will be ignored.\n";
                 return 0;
         }
 
