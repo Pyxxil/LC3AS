@@ -34,18 +34,7 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        if (tokens[1]->is_error) {
-                tokens[1]->expected("valid register");
-                return -1;
-        } else if (tokens[2]->is_error) {
-                tokens[2]->expected("valid register");
-                return -1;
-        } else if (tokens[3]->is_error) {
-                if (tokens[3]->type() == Token::REGISTER) {
-                        tokens[3]->expected("valid register");
-                } else {
-                        tokens[3]->expected("valid immediate value");
-                }
+        if (tokens[1]->is_error || tokens[2]->is_error || tokens[3]->is_error) {
                 return -1;
         }
 

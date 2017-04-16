@@ -10,7 +10,9 @@ cheat .BLKW b1 addr     ; Create a single block of memory initialised to the
 .FILL 0x0               ; Set the address of this to 0.
 .STRINGZ "Hello"        ; Create a null-terminated string.
 
-warning_check
+; warning_check         ; Uncommenting this line should throw a warning about
+                        ; multiple labels found for an address. This leads to
+                        ; an error if BEGIN_TEST is used at any point.
 
 ; This is a label
 BEGIN_TEST:

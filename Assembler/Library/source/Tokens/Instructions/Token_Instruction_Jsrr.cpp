@@ -26,7 +26,7 @@ std::int32_t Jsrr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 tokens[1]->expected("register");
                 return -1;
         } else if (tokens[1]->is_error) {
-                return 0;
+                return -1;
         }
 
         assembled.push_back(static_cast<std::uint16_t>(0x4000 |

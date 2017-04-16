@@ -1,6 +1,7 @@
 #include "Assembler.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 
 #include "Tokens/All_Tokens.hpp"
@@ -114,10 +115,6 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
                 std::vector<std::shared_ptr<Token>> tokenized_line = tokenizeLine(line, line_number);
                 if (!tokenized_line.empty()) {
                         tokens.push_back(tokenized_line);
-                }
-
-                if (!tokens.empty() && !tokens.back().empty()) {
-                        error_count += tokens.back().front()->is_error;
                 }
         }
 
@@ -377,12 +374,11 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         }
 }
 
-void Assembler::assemble()
+/**
+ * The first pass of the assembler generates the symbol table.
+ */
+void Assembler::do_first_pass()
 {
-        if (tokens.empty()) {
-                return;
-        }
-
         std::int32_t memory_required = 0;
 
         puts("Starting first pass");
@@ -400,11 +396,14 @@ void Assembler::assemble()
                         break;
                 case Token::LABEL:
                         std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
-                        if (symbols.count(internal_program_counter)) {
-                                WARNING("Multiple labels found at address %d", file_memory_origin_address);
-                                WARNING("\tPrevious label '%s' found on line %d", symbols[internal_program_counter]->word.c_str(),
-                                        symbols[internal_program_counter]->at_line);
+                        if (symbols.find(internal_program_counter) != symbols.end()) {
+                                std::cerr << "WARNING: Multiple labels found for address 0x"
+                                          << std::hex << internal_program_counter << '\n';
+                                std::cerr << "WARNING: \tPrevious label '" << symbols.at(internal_program_counter)->word
+                                          << "' found on line " << std::dec << symbols.at(internal_program_counter)->at_line
+                                          << '\n';
                         }
+
                         symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
                                 internal_program_counter,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
@@ -441,23 +440,18 @@ void Assembler::assemble()
         }
 
         printf("%ld error%s found on the first pass\n", error_count, error_count == 1 ? "" : "'s");
+}
 
-        if (error_count) {
-                return;
-        }
-
-        end_seen = false;
-        origin_seen = false;
-        internal_program_counter = file_memory_origin_address;
+/**
+ * The second pass of the assembler actually assembles the program.
+ */
+void Assembler::do_second_pass()
+{
+        std::int32_t memory_required = 0;
 
         puts("Starting second pass");
 
         for (auto &tokenized_line : tokens) {
-                // This should return >= 0 on success (where the value is then used to advance the pc),
-                // -1 if there was an error.
-                // Arguably, it's probably better to pass a reference to the assembler class with this, and
-                // from that it can be determined if the origin has been seen, or if the end has been seen,
-                // and if a label is actually in the file.
                 memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
                 if (memory_required == -1) {
@@ -468,13 +462,32 @@ void Assembler::assemble()
         }
 
         printf("%ld error%s found on the second pass\n", error_count, error_count == 1 ? "" : "'s");
+}
+
+void Assembler::assemble()
+{
+        if (tokens.empty()) {
+                return;
+        }
+
+        do_first_pass();
+
+        if (error_count) {
+                return;
+        }
+
+        end_seen = false;
+        origin_seen = false;
+        internal_program_counter = file_memory_origin_address;
+
+        do_second_pass();
 
         if (!error_count) {
-                assembled();
+                generate_machine_code();
         }
 }
 
-std::vector<uint16_t, std::allocator<uint16_t>> &Assembler::assembled()
+std::vector<std::uint16_t> &Assembler::generate_machine_code()
 {
         if (as_assembled.size()) {
                 return as_assembled;

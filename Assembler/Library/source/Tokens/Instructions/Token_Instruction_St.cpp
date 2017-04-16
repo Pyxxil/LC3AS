@@ -32,7 +32,7 @@ std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
         }
 
         if (tokens[1]->is_error || tokens[2]->is_error) {
-                return 0;
+                return -1;
         }
 
         auto symbol = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),

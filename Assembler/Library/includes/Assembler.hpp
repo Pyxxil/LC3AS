@@ -18,7 +18,7 @@ public:
 
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
         void assemble();
-        std::vector<uint16_t> &assembled();
+        std::vector<uint16_t> &generate_machine_code();
         void write(std::string &prefix);
 
         std::size_t error_count = 0;
@@ -34,6 +34,9 @@ private:
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
         void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number);
         std::vector<std::uint16_t> as_assembled;
+
+        void do_first_pass();
+        void do_second_pass();
 };
 
 #endif // LC3_SIMULATOR_ASSEMBLER_HPP

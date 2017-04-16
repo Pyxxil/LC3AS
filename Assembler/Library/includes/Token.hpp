@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <iostream>
 
 class Assembler;
 
@@ -84,11 +85,11 @@ public:
 
         virtual Token &expected(const char *const expects)
         {
-                fprintf(stderr, "ERROR: ");
+                std::cerr << "ERROR: ";
                 if (at_line) {
-                        fprintf(stderr, "Line %d: ", at_line);
+                        std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                fprintf(stderr, "Expected %s. Found '%s' instead\n", expects, word.c_str());
+                std::cerr <<  "Expected " <<  expects << ". Found " << word << "' instead\n";
 
                 is_error = true;
 
@@ -115,13 +116,12 @@ public:
         {
                 provided -= 1;  // This is not the best idea, but because tokens.size() returns
                                 // the number of arguments + the token itself, it's a little easier to do here.
-                fprintf(stderr, "ERROR: ");
+                std::cerr << "ERROR: ";
                 if (at_line) {
-                        fprintf(stderr, "Line %d: ", at_line);
+                        std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                fprintf(stderr, "%s expects %ld argument%s, but %ld argument%s provided.\n",
-                        word.c_str(), expected, expected == 1 ? "" : "'s",
-                        provided, provided == 1 ? "" : "'s");
+                std::cerr << word << "expects " << expected << " argument" << (expected == 1 ? "" : "'s")
+                        << ", but %ld argument%s provided.\n";
 
                 is_error = true;
         }

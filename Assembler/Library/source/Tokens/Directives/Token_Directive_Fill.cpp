@@ -27,16 +27,15 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 return 0;
         }
 
-        if (tokens[1]->type() != Token::IMMEDIATE && tokens[1]->type() != Token::LABEL) {
-                tokens[1]->expected("valid immediate value or label");
+        if (tokens[1]->is_error) {
                 return -1;
         }
 
-        if (!assembled.size() && tokens[1]->type() == Token::IMMEDIATE && !tokens[1]->is_error) {
+        if (tokens[1]->type() == Token::IMMEDIATE ) {
                 assembled.push_back(
                         static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate)
                 );
-        } else if (tokens[1]->type() == Token::LABEL && !tokens[1]->is_error) {
+        } else if (tokens[1]->type() == Token::LABEL) {
                 if (!first_time) {
                         auto label = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
                                                   [&tokens](auto symbol) -> bool
@@ -52,6 +51,9 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                                 assembled.push_back(label->second->address);
                         }
                 }
+        } else {
+                tokens[1]->expected("valid immediate value or label");
+                return -1;
         }
 
         first_time = false;
