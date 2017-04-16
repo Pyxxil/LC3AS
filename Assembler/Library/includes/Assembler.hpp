@@ -4,10 +4,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "Tokens/Token_Label.hpp"
-
-#include <memory>
 
 class Assembler
 {
@@ -19,7 +18,8 @@ public:
 
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
         void assemble();
-        std::vector<std::uint16_t> assembled();
+        std::vector<uint16_t> &assembled();
+        void write(std::string &prefix);
 
         std::size_t error_count = 0;
         std::uint16_t internal_program_counter = 0;
@@ -33,6 +33,7 @@ public:
 private:
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
         void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number);
+        std::vector<std::uint16_t> as_assembled;
 };
 
 #endif // LC3_SIMULATOR_ASSEMBLER_HPP

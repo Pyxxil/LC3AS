@@ -1,9 +1,9 @@
 #include "Assembler.hpp"
 
-#include "Tokens/All_Tokens.hpp"
-
 #include <fstream>
-#include <iostream>
+#include <iomanip>
+
+#include "Tokens/All_Tokens.hpp"
 
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147,
@@ -119,12 +119,6 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
                 if (!tokens.empty() && !tokens.back().empty()) {
                         error_count += tokens.back().front()->is_error;
                 }
-        }
-
-        assemble();
-
-        if (!error_count) {
-                assembled();
         }
 
         return tokens;
@@ -470,17 +464,68 @@ void Assembler::assemble()
         }
 
         printf("%ld error%s found on the second pass\n", error_count, error_count == 1 ? "" : "'s");
+
+        if (!error_count) {
+                assembled();
+        }
 }
 
-std::vector<std::uint16_t> Assembler::assembled()
+std::vector<uint16_t, std::allocator<uint16_t>> &Assembler::assembled()
 {
-        std::vector<std::uint16_t> assembled_tokens;
+        if (as_assembled.size()) {
+                return as_assembled;
+        }
 
         for (const auto &tokenized_line : tokens) {
                 for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
-                        assembled_tokens.push_back(assembled_line);
+                        as_assembled.push_back(assembled_line);
                 }
         }
 
-        return assembled_tokens;
+        return as_assembled;
+}
+
+void Assembler::write(std::string &prefix)
+{
+        if (!as_assembled.size()) {
+                return;
+        }
+
+        std::ofstream binary_file(prefix + ".bin");
+        std::ofstream hex_file(prefix + ".hex");
+        std::ofstream object_file(prefix + ".obj", std::ofstream::binary);
+
+        for (const auto &instruction : as_assembled) {
+                object_file.put(static_cast<char>((instruction >> 8) & 0xFF));
+                object_file.put(static_cast<char>(instruction & 0xFF));
+
+                binary_file << std::bitset<16>(instruction).to_string() << '\n';
+
+                hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << instruction << '\n';
+        }
+
+        std::ofstream symbol_file(prefix + ".sym");
+
+        int length = std::max(
+                static_cast<int>(
+                        std::max_element(symbols.begin(), symbols.end(),
+                                         [](const auto &a, const auto &b) -> bool
+                                         {
+                                                 return a.second->word.length() < b.second->word.length();
+                                         }
+                        )->second->word.length())
+                        , 20
+        );
+
+        symbol_file << "// Symbol table\n";
+        symbol_file << "// Scope Level 0:\n";
+        symbol_file << "//\t" << std::left << std::setw(length) << "Symbol Name" << " Page Address\n";
+        symbol_file << "//\t" << std::left << std::setw(length) << "-----------" << " ------------\n";
+
+        for (const auto &symbol : symbols) {
+                symbol_file << "//\t" << std::left << std::setw(length) << symbol.second->word
+                            << " " << std::uppercase << std::hex << symbol.first << '\n';
+        }
+
+        std::ofstream lst_file(prefix + ".lst");
 }
