@@ -552,23 +552,18 @@ void Assembler::write(std::string &prefix)
         std::ofstream symbol_file(prefix + ".sym");
 
         int length = std::max(
-                static_cast<int>(
-                        std::max_element(
-                                symbols.begin(), symbols.end(),
-                                [](const auto &a, const auto &b) -> bool
-                                {
-                                        return a.second->word.length() < b.second->word.length();
-                                }
-                        )->second->word.length()), 20
+                static_cast<int>(std::max_element(
+                        symbols.begin(), symbols.end(),
+                        [](const auto &a, const auto &b) -> bool
+                        {
+                                return a.second->word.length() < b.second->word.length();
+                        })->second->word.length()), 20
         );
 
-        symbol_file << "// Symbol table\n";
-        symbol_file << "// Scope Level 0:\n";
-        symbol_file << "//\t" << std::left << std::setw(length) << "Symbol Name" << " Page Address\n";
-        symbol_file << "//\t" << std::left << std::setw(length) << "-----------" << " ------------\n";
-
-        std::uint16_t pc   = 0;
-        std::size_t   line = 1;
+        symbol_file << "// Symbol table\n"
+                    << "// Scope Level 0:\n"
+                    << "//\t" << std::left << std::setw(length) << "Symbol Name" << " Page Address\n"
+                    << "//\t" << std::setw(length) << std::setfill('-') << '-' << " ------------\n";
 
         const auto write_list = [&lst_file, length](
                 const auto &instruction, const std::uint16_t program_counter, const std::size_t line_number,
@@ -584,12 +579,27 @@ void Assembler::write(std::string &prefix)
                          << std::left << label << disassembled << '\n';
         };
 
+        std::size_t   line          = 1;
+        std::uint16_t pc            = 0;
+        auto          &&symbol      = symbols.cbegin();
+        auto          &&instruction = as_assembled.cbegin();
+
+        std::stringstream ss;
+        ss << " .ORIG 0x" << std::hex << *instruction;
+        write_list(*instruction, pc, line, " ", ss.str());
+
+        object_file.put(static_cast<char>((*instruction >> 8) & 0xFF));
+        object_file.put(static_cast<char>(*instruction & 0xFF));
+
+        binary_file << std::bitset<16>(*instruction).to_string() << '\n';
+
+        hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << *instruction << '\n';
+
+        pc = *instruction;
+
         // TODO: Is it worth it to figure out if there's a .BLKW over using a lot of .FILL's?
-
-        auto &&symbol = symbols.cbegin();
-        auto &&instruction = as_assembled.cbegin();
-
-        for (; instruction != as_assembled.cend() || symbol != symbols.cend(); ++instruction) {
+        for (++instruction, ++line; instruction != as_assembled.cend() || symbol != symbols.cend();
+             ++instruction, ++pc, ++line) {
 
                 object_file.put(static_cast<char>((*instruction >> 8) & 0xFF));
                 object_file.put(static_cast<char>(*instruction & 0xFF));
@@ -598,25 +608,17 @@ void Assembler::write(std::string &prefix)
 
                 hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << *instruction << '\n';
 
-                if (!pc) {
-                        std::stringstream ss;
-                        ss << " .ORIG 0x" << std::hex << *instruction;
-                        write_list(*instruction, pc, line, " ", ss.str());
-                        pc = *instruction;
+                if (symbol != symbols.cend() && symbol->first == pc) {
+                        write_list(*instruction, pc, line, symbol->second->word, disassemble(*instruction, pc));
+
+                        symbol_file << "//\t" << std::left << std::setw(length) << std::setfill(' ')
+                                    << symbol->second->word << " " << std::uppercase << std::hex
+                                    << symbol->first << '\n';
+
+                        ++symbol;
                 } else {
-                        if (symbol != symbols.cend() && symbol->first == pc) {
-                                write_list(*instruction, pc, line, symbol->second->word, disassemble(*instruction, pc));
-
-                                symbol_file << "//\t" << std::left << std::setw(length) << symbol->second->word
-                                            << " " << std::uppercase << std::hex << symbol->first << '\n';
-
-                                ++symbol;
-                        } else {
-                                write_list(*instruction, pc, line, " ", disassemble(*instruction, pc));
-                        }
-                        ++pc;
+                        write_list(*instruction, pc, line, " ", disassemble(*instruction, pc));
                 }
-                ++line;
         }
 
         write_list(0ull, 0u, line, " ", " .END");

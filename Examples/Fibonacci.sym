@@ -1,7 +1,7 @@
 // Symbol table
 // Scope Level 0:
 //	Symbol Name             Page Address
-//	-----------             ------------
+//	----------------------- ------------
 //	OUT_PROMPT              3000
 //	GET_INPUT               3006
 //	DECREMENT_INPUT_COUNTER 3018

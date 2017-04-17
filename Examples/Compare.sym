@@ -1,7 +1,7 @@
 // Symbol table
 // Scope Level 0:
 //	Symbol Name             Page Address
-//	-----------             ------------
+//	----------------------- ------------
 //	INIT_REGISTERS          3000
 //	CREATE_NULL             300A
 //	CREATE_STACK            300D

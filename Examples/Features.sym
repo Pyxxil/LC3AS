@@ -1,7 +1,7 @@
 // Symbol table
 // Scope Level 0:
 //	Symbol Name          Page Address
-//	-----------          ------------
+//	-------------------- ------------
 //	cheat                3020
 //	oct                  3028
 //	BEGIN_TEST           3029
