@@ -560,29 +560,39 @@ void Assembler::write(std::string &prefix)
                         })->second->word.length()), 20
         );
 
+        const auto write_list = [&lst_file, length](
+                const std::uint16_t instruction, const std::uint16_t program_counter,
+                const std::size_t line_number, const auto &label, const auto &disassembled
+        )
+        {
+                // Address
+                lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4)
+                         << std::hex << program_counter << ") ";
+                // Hexadecimal representation
+                lst_file << std::uppercase << std::setfill('0') << std::setw(4)
+                         << std::hex << std::right << instruction;
+                // Binary representation
+                lst_file << ' ' << std::bitset<16>(instruction);
+                // Line number
+                lst_file << " (" << std::setfill(' ') << std::right << std::setw(4)
+                         << std::dec << line_number << ") ";
+                // Label (if any)
+                lst_file << std::setfill(' ') << std::setw(length) << std::left
+                         << label;
+                // Disassembled instruction
+                lst_file << disassembled << '\n';
+        };
+
+        std::size_t   line = 1;
+        std::uint16_t pc   = 0;
+
+        auto &&symbol      = symbols.cbegin();
+        auto &&instruction = as_assembled.cbegin();
+
         symbol_file << "// Symbol table\n"
                     << "// Scope Level 0:\n"
                     << "//\t" << std::left << std::setw(length) << "Symbol Name" << " Page Address\n"
                     << "//\t" << std::setw(length) << std::setfill('-') << '-' << " ------------\n";
-
-        const auto write_list = [&lst_file, length](
-                const auto &instruction, const std::uint16_t program_counter, const std::size_t line_number,
-                const auto &label, const auto &disassembled
-        )
-        {
-                lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4)
-                         << std::hex << program_counter << ") " << std::uppercase
-                         << std::setfill('0') << std::setw(4) << std::hex << std::right
-                         << instruction << " " << std::bitset<16>(instruction) << " ("
-                         << std::setfill(' ') << std::right << std::setw(3) << std::dec
-                         << line_number << ") " << std::setfill(' ') << std::setw(length)
-                         << std::left << label << disassembled << '\n';
-        };
-
-        std::size_t   line          = 1;
-        std::uint16_t pc            = 0;
-        auto          &&symbol      = symbols.cbegin();
-        auto          &&instruction = as_assembled.cbegin();
 
         std::stringstream ss;
         ss << " .ORIG 0x" << std::hex << *instruction;

@@ -229,9 +229,9 @@ NUMBER      .FILL 0                     ; The number that we will use as the num
 FLAG        .FILL 0                     ; A way to tell the program we've received input we don't want.
 
 ; ASCII values that will be used to check input, as well as convert to ASCII.
-ZERO        .FILL        #48
-THREE       .FILL        #51
-NINE        .FILL        #58
+ZERO        .FILL #48
+THREE       .FILL #51
+NINE        .FILL #57
 
 ; Values that we will use to output the current fibonacci number to the screen.
 NUMBERS     .FILL #10000
