@@ -548,16 +548,7 @@ void Assembler::write(std::string &prefix)
         std::ofstream binary_file(prefix + ".bin");
         std::ofstream hex_file(prefix + ".hex");
         std::ofstream object_file(prefix + ".obj", std::ofstream::binary);
-
-        for (const auto &instruction : as_assembled) {
-                object_file.put(static_cast<char>((instruction >> 8) & 0xFF));
-                object_file.put(static_cast<char>(instruction & 0xFF));
-
-                binary_file << std::bitset<16>(instruction).to_string() << '\n';
-
-                hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << instruction << '\n';
-        }
-
+        std::ofstream lst_file(prefix + ".lst");
         std::ofstream symbol_file(prefix + ".sym");
 
         int length = std::max(
@@ -576,50 +567,59 @@ void Assembler::write(std::string &prefix)
         symbol_file << "//\t" << std::left << std::setw(length) << "Symbol Name" << " Page Address\n";
         symbol_file << "//\t" << std::left << std::setw(length) << "-----------" << " ------------\n";
 
-        for (const auto &symbol : symbols) {
-                symbol_file << "//\t" << std::left << std::setw(length) << symbol.second->word
-                            << " " << std::uppercase << std::hex << symbol.first << '\n';
-        }
-
-        std::ofstream lst_file(prefix + ".lst");
-
         std::uint16_t pc   = 0;
         std::size_t   line = 1;
 
+        const auto write_list = [&lst_file, length](
+                const auto &instruction, const std::uint16_t program_counter, const std::size_t line_number,
+                const auto &label, const auto &disassembled
+        )
+        {
+                lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4)
+                         << std::hex << program_counter << ") " << std::uppercase
+                         << std::setfill('0') << std::setw(4) << std::hex << std::right
+                         << instruction << " " << std::bitset<16>(instruction) << " ("
+                         << std::setfill(' ') << std::right << std::setw(3) << std::dec
+                         << line_number << ") " << std::setfill(' ') << std::setw(length)
+                         << std::left << label << disassembled << '\n';
+        };
 
         // TODO: Is it worth it to figure out if there's a .BLKW over using a lot of .FILL's?
-        for (const auto &instruction : as_assembled) {
+
+        auto &&symbol = symbols.cbegin();
+        auto &&instruction = as_assembled.cbegin();
+
+        for (; instruction != as_assembled.cend() || symbol != symbols.cend(); ++instruction) {
+
+                object_file.put(static_cast<char>((*instruction >> 8) & 0xFF));
+                object_file.put(static_cast<char>(*instruction & 0xFF));
+
+                binary_file << std::bitset<16>(*instruction).to_string() << '\n';
+
+                hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << *instruction << '\n';
+
                 if (!pc) {
-                        lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << pc << ") "
-                                 << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << instruction
-                                 << " " << std::bitset<16>(instruction) << " ("
-                                 << std::setfill(' ') << std::setw(3) << std::dec << line << ") "
-                                 << std::setw(length) << " " << " .ORIG 0x" << std::hex << instruction << '\n';
-                        pc = instruction;
+                        std::stringstream ss;
+                        ss << " .ORIG 0x" << std::hex << *instruction;
+                        write_list(*instruction, pc, line, " ", ss.str());
+                        pc = *instruction;
                 } else {
-                        lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << pc << ") "
-                                 << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << instruction
-                                 << " " << std::bitset<16>(instruction) << " ("
-                                 << std::setfill(' ') << std::setw(3) << std::dec << std::right << line << ") ";
+                        if (symbol != symbols.cend() && symbol->first == pc) {
+                                write_list(*instruction, pc, line, symbol->second->word, disassemble(*instruction, pc));
 
-                        if (symbols.count(pc)) {
-                                lst_file << std::setfill(' ') << std::setw(length) << std::left << symbols.at(pc)->word;
+                                symbol_file << "//\t" << std::left << std::setw(length) << symbol->second->word
+                                            << " " << std::uppercase << std::hex << symbol->first << '\n';
+
+                                ++symbol;
                         } else {
-                                lst_file << std::setfill(' ') << std::setw(length) << " ";
+                                write_list(*instruction, pc, line, " ", disassemble(*instruction, pc));
                         }
-
-                        lst_file << disassemble(instruction, pc) << '\n';
-
                         ++pc;
                 }
-
                 ++line;
         }
 
-        lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << 0 << ") "
-                 << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << 0 << " "
-                 << std::bitset<16>(0) << " (" << std::setfill(' ') << std::setw(3) << std::dec << std::right
-                 << line << ") " << std::setw(length) << " " << " .END\n";
+        write_list(0ull, 0u, line, " ", " .END");
 }
 
 /**
