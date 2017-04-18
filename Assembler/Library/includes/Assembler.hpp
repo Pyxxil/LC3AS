@@ -15,6 +15,11 @@ public:
         ~Assembler() = default;
 
         std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &fileName);
+        std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &&fileName)
+        {
+                return tokenizeFile(fileName);
+        }
+
         std::vector<std::shared_ptr<Token>> tokenizeLine(std::string &line, int line_number = 0);
 
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
@@ -22,6 +27,10 @@ public:
 
         void assemble();
         void write(std::string &prefix);
+        void write(std::string &&prefix)
+        {
+                write(prefix);
+        }
 
         std::size_t   error_count                = 0;
         std::uint16_t internal_program_counter   = 0;
@@ -38,7 +47,7 @@ private:
         std::vector<std::uint16_t> as_assembled;
 
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
-        void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number);
+        void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number);
 
         void do_first_pass();
         void do_second_pass();

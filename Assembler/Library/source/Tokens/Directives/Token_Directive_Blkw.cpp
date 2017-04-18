@@ -51,20 +51,20 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[2])->immediate);
                 } else if (tokens[2]->type() == Token::LABEL) {
                         if (!first_time) {
-                                const auto label = std::find_if(
-                                        assembler.symbols.begin(), assembler.symbols.end(),
-                                        [&tokens](auto symbol) -> bool
+                                const auto &&symbol = std::find_if(
+                                        assembler.symbols.cbegin(), assembler.symbols.cend(),
+                                        [&tokens](const auto &sym) -> bool
                                         {
-                                                return symbol.second->word == tokens[2]->word;
+                                                return sym.second->word == tokens[2]->word;
                                         }
                                 );
 
-                                if (label == assembler.symbols.end()) {
+                                if (symbol == assembler.symbols.end()) {
                                         std::static_pointer_cast<Label>(tokens[2])->not_found();
                                         return -1;
                                 }
 
-                                fill = label->second->address;
+                                fill = symbol->second->address;
                         } else {
                                 do_fill = false;
                         }

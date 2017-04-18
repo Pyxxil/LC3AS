@@ -6,6 +6,7 @@
 class Add : public Instruction
 {
 public:
+        Add();
         Add(std::string &oper, int line_number = 0);
 
         virtual Token::token_type type() const override;

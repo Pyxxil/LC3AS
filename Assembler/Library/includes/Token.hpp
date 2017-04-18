@@ -60,6 +60,10 @@ public:
                 TRAP_PUTSP,
                 TRAP_HALT,
                 _STRING,
+#ifdef INCLUDE_ADDONS
+                ADDON_NEG,
+                ADDON_SUB,
+#endif
         };
 
         virtual Token::token_type type() const
@@ -71,7 +75,7 @@ public:
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                std::cerr << "Expected " << expects << ". Found " << word << "' instead\n";
+                std::cerr << "Expected " << expects << ". Found '" << word << "' instead\n";
 
                 is_error = true;
 
@@ -102,8 +106,8 @@ public:
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                std::cerr << word << "expects " << expected << " argument" << (expected == 1 ? "" : "'s")
-                          << ", but %ld argument%s provided.\n";
+                std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s")
+                          << ", but "<< provided << " argument" << (expected == 1 ? "" : "'s") << " provided.\n";
 
                 is_error = true;
         }

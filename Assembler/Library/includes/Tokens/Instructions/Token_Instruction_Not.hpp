@@ -6,6 +6,7 @@
 class Not : public Instruction
 {
 public:
+        Not();
         Not(std::string &oper, int line_number = 0);
 
         virtual Token::token_type type() const override;

@@ -4,6 +4,12 @@
 #include "Tokens/Token_Immediate.hpp"
 #include <Assembler.hpp>
 
+Add::Add()
+        : Instruction()
+{
+
+}
+
 Add::Add(std::string &oper, int line_number)
         : Instruction(oper, line_number)
 {}
@@ -67,7 +73,6 @@ std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
 
         return 1;
 }
-
 Token::token_type Add::type() const
 {
         return Token::token_type::OP_ADD;

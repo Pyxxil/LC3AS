@@ -41,11 +41,11 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        const auto symbol = std::find_if(assembler.symbols.begin(), assembler.symbols.end(),
-                                         [&tokens](auto sym) -> bool
-                                         {
-                                                 return sym.second->word == tokens[2]->word;
-                                         }
+        const auto &&symbol = std::find_if(assembler.symbols.cbegin(), assembler.symbols.cend(),
+                                           [&tokens](const auto &sym) -> bool
+                                           {
+                                                   return sym.second->word == tokens[2]->word;
+                                           }
         );
 
         if (symbol == assembler.symbols.end()) {

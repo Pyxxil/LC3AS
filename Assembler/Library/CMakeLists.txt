@@ -84,13 +84,34 @@ set ( ASSEMBLER_HEADER_FILES
       includes/Tokens/Instructions/Token_Instruction_Br.hpp
       includes/Tokens/Instructions/Token_Instruction_Ld.hpp
       includes/Tokens/Instructions/Token_Instruction_St.hpp
+      source/Tokens/Additional/Token_Addon_Neg.cpp
       )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ -Wno-error=sign-conversion -Wno-error=conversion )
 
+option ( USE_ADDONS "Build with additional instructions" OFF )
+
+if ( USE_ADDONS )
+        set ( ASSEMBLER_SOURCE_FILES
+              "${ASSEMBLER_SOURCE_FILES}"
+              source/Tokens/Additional/Token_Addon_Neg.cpp
+              source/Tokens/Additional/Token_Addon_Sub.cpp
+              )
+
+        set ( ASSEMBLER_HEADER_FILES
+              "${ASSEMBLER_HEADER_FILES}"
+              includes/Tokens/Additional/Token_Addon_Neg.hpp
+               includes/Tokens/Additional/Token_Addon_Sub.hpp
+              )
+endif()
+
 add_library ( ${PROJECT_NAME} STATIC ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
 
 target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
 target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )
+
+if ( USE_ADDONS )
+        target_compile_definitions ( ${PROJECT_NAME} PUBLIC INCLUDE_ADDONS )
+endif ()

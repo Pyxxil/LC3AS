@@ -3,6 +3,10 @@
 #include <Assembler.hpp>
 #include <Tokens/Token_Register.hpp>
 
+Not::Not()
+        : Instruction()
+{}
+
 Not::Not(std::string &oper, int line_number)
         : Instruction(oper, line_number)
 {}

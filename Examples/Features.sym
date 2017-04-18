@@ -5,7 +5,8 @@
 //	cheat                3020
 //	oct                  3028
 //	BEGIN_TEST           3029
-//	addr                 302F
-//	b                    3030
-//	bin                  3031
-//	hex                  3032
+//	EXTRA_FEATURES       302D
+//	addr                 3036
+//	b                    3037
+//	bin                  3038
+//	hex                  3039

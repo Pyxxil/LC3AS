@@ -142,7 +142,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 
         std::string current;
 
-        std::vector<std::shared_ptr<Token>> tokenenized_line;
+        std::vector<std::shared_ptr<Token>> tokenized_line;
 
         for (std::size_t index = 0; index < line.length();) {
                 character = line.at(index);
@@ -154,11 +154,14 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         }
 
                         // However, it does mean we want to check what we just got.
-                        addToken(current, tokenenized_line, line_number);
+                        addToken(current, tokenized_line, line_number);
                 }
 
                 if (character == ';') {
                         // We've hit a comment, so skip to the end of the line.
+                        break;
+                } else if (character == '\r') {
+                        // getline doesn't consume '\r' (at least on OSX)
                         break;
                 } else if (character == '/') {
                         // '//' is a comment as well.
@@ -173,27 +176,26 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         }
                         break;
                 } else if (character == ',' || character == ':') {
-                        addToken(current, tokenenized_line, line_number);
-                } else if (character == '\r') {
-                        // getline won't consume '\r' (at least on OSX)
-                        break;
+                        addToken(current, tokenized_line, line_number);
                 } else if (character == '"') {
-                        addToken(current, tokenenized_line, line_number);
+                        addToken(current, tokenized_line, line_number);
 
                         char last_character = 0;
                         while (index + 1 < line.length()) {
                                 last_character = line.at(++index);
-                                if (last_character == '"') {
+                                if (last_character == '\\' && line.length() > index + 1 && line.at(index + 1) == '"') {
+                                        last_character = line.at(++index);
+                                } else if (last_character == '"') {
                                         break;
                                 }
                                 current += last_character;
                         }
 
                         if (index == line.length() && last_character != '"') {
-                                tokenenized_line.push_back(std::make_shared<String>(current, line_number));
-                                tokenenized_line.back()->expected("to find closing '\"'");
+                                tokenized_line.push_back(std::make_shared<String>(current, line_number));
+                                tokenized_line.back()->expected("to find closing '\"'");
                         } else {
-                                tokenenized_line.push_back(std::make_shared<String>(current, line_number));
+                                tokenized_line.push_back(std::make_shared<String>(current, line_number));
                         }
 
                         current.erase();
@@ -203,22 +205,22 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                 ++index;
         }
 
-        addToken(current, tokenenized_line, line_number);
+        addToken(current, tokenized_line, line_number);
 
-        return tokenenized_line;
+        return tokenized_line;
 }
 
 /**
  * Add a token to the current line's tokens.
  *
  * @param token The string containing the token.
- * @param toks The current tokens in the line.
+ * @param t_tokens The current tokens in the line.
  * @param line_number The line number (only relevant for working with files).
  */
-void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &toks, int line_number)
+void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number)
 {
         if (!token.empty()) {
-                toks.push_back(tokenize(token, line_number));
+                t_tokens.push_back(tokenize(token, line_number));
                 token.erase();
         }
 }
@@ -381,6 +383,12 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 return std::make_shared<Blkw>(word, line_number);
         case hash(".STRINGZ", 8):
                 return std::make_shared<Stringz>(word, line_number);
+#ifdef INCLUDE_ADDONS
+        case hash("NEG", 3):
+                return std::make_shared<Neg>(word, line_number);
+        case hash("SUB", 3):
+                return std::make_shared<Sub>(word, line_number);
+#endif
         default:
                 // Of course, if it doesn't match the above, then we'll treat it as a label.
                 return std::make_shared<Label>(word, line_number);
@@ -438,10 +446,14 @@ void Assembler::do_first_pass()
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
 
-                case Token::DIR_END:            // FALLTHROUGH
+                case Token::DIR_STRINGZ:        // FALLTHROUGH
                 case Token::DIR_BLKW:           // FALLTHROUGH
                 case Token::DIR_FILL:           // FALLTHROUGH
-                case Token::DIR_STRINGZ:        // FALLTHROUGH
+                case Token::DIR_END:            // FALLTHROUGH
+#ifdef INCLUDE_ADDONS
+                case Token::ADDON_NEG:          // FALLTHROUGH
+                case Token::ADDON_SUB:          // FALLTHROUGH
+#endif
                         memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
                         if (memory_required < 0) {
                                 error_count += static_cast<std::size_t>(-memory_required);
@@ -557,7 +569,8 @@ void Assembler::write(std::string &prefix)
                         [](const auto &a, const auto &b) -> bool
                         {
                                 return a.second->word.length() < b.second->word.length();
-                        })->second->word.length()), 20
+                        }
+                )->second->word.length()), 20
         );
 
         const auto write_list = [&lst_file, length](
@@ -567,20 +580,20 @@ void Assembler::write(std::string &prefix)
         {
                 // Address
                 lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4)
-                         << std::hex << program_counter << ") ";
+                         << std::hex << program_counter << ')';
                 // Hexadecimal representation
-                lst_file << std::uppercase << std::setfill('0') << std::setw(4)
+                lst_file << ' ' << std::uppercase << std::setfill('0') << std::setw(4)
                          << std::hex << std::right << instruction;
                 // Binary representation
-                lst_file << ' ' << std::bitset<16>(instruction);
+                lst_file << ' ' << std::bitset<16>(instruction) << ' ';
                 // Line number
-                lst_file << " (" << std::setfill(' ') << std::right << std::setw(4)
-                         << std::dec << line_number << ") ";
+                lst_file << '(' << std::setfill(' ') << std::right << std::setw(4)
+                         << std::dec << line_number << ')';
                 // Label (if any)
-                lst_file << std::setfill(' ') << std::setw(length) << std::left
-                         << label;
+                lst_file << ' ' << std::setfill(' ') << std::setw(length)
+                         << std::left << label;
                 // Disassembled instruction
-                lst_file << disassembled << '\n';
+                lst_file << ' ' << disassembled << '\n';
         };
 
         std::size_t   line = 1;
@@ -595,8 +608,8 @@ void Assembler::write(std::string &prefix)
                     << "//\t" << std::setw(length) << std::setfill('-') << '-' << " ------------\n";
 
         std::stringstream ss;
-        ss << " .ORIG 0x" << std::hex << *instruction;
-        write_list(*instruction, pc, line, " ", ss.str());
+        ss << ".ORIG 0x" << std::hex << *instruction;
+        write_list(*instruction, pc, line, ' ', ss.str());
 
         object_file.put(static_cast<char>((*instruction >> 8) & 0xFF));
         object_file.put(static_cast<char>(*instruction & 0xFF));
@@ -622,16 +635,16 @@ void Assembler::write(std::string &prefix)
                         write_list(*instruction, pc, line, symbol->second->word, disassemble(*instruction, pc));
 
                         symbol_file << "//\t" << std::left << std::setw(length) << std::setfill(' ')
-                                    << symbol->second->word << " " << std::uppercase << std::hex
+                                    << symbol->second->word << ' ' << std::uppercase << std::hex
                                     << symbol->first << '\n';
 
                         ++symbol;
                 } else {
-                        write_list(*instruction, pc, line, " ", disassemble(*instruction, pc));
+                        write_list(*instruction, pc, line, ' ', disassemble(*instruction, pc));
                 }
         }
 
-        write_list(0ull, 0u, line, " ", " .END");
+        write_list(0u, 0u, line, ' ', ".END");
 }
 
 /**
@@ -645,226 +658,183 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
 {
         std::stringstream stream;
 
+        const auto &&find_symbol = [this, instruction, pc](const std::uint8_t shift)
+        {
+                return std::find_if(
+                        symbols.cbegin(), symbols.cend(),
+                        [instruction, pc, shift](const auto &sym) -> bool
+                        {
+                                const std::int16_t offset = static_cast<std::int16_t>(instruction << shift) >> shift;
+                                return sym.first == (offset + pc + 1);
+                        }
+                );
+        };
+
+        std::map<std::uint16_t, std::shared_ptr<Label>>::const_iterator symbol;
+
         switch (instruction & 0xF000) {
         case 0xF000:
                 if (instruction & 0x0F00) {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 } else {
                         switch (instruction & 0xFF) {
                         case 0x20:
-                                stream << " GETC";
+                                stream << "GETC";
                                 break;
                         case 0x21:
-                                stream << " OUT";
+                                stream << "OUT";
                                 break;
                         case 0x22:
-                                stream << " PUTS";
+                                stream << "PUTS";
                                 break;
                         case 0x23:
-                                stream << " IN";
+                                stream << "IN";
                                 break;
                         case 0x24:
-                                stream << " PUTSP";
+                                stream << "PUTSP";
                                 break;
                         case 0x25:
-                                stream << " HALT";
+                                stream << "HALT";
                                 break;
                         default:
-                                stream << " TRAP 0x" << std::uppercase << std::setw(2)
+                                stream << "TRAP 0x" << std::uppercase << std::setw(2)
                                        << std::setfill('0') << std::hex << (instruction & 0xFF);
                                 break;
                         }
                 }
                 break;
         case 0xE000:
-                if (symbols.count(static_cast<std::uint16_t>(
-                                          static_cast<std::int16_t>(
-                                                  (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                          + pc + 1))) {
-                        stream << " LEA R" << ((instruction & 0x0E00) >> 9)
-                               << ", "
-                               << symbols.at(
-                                       static_cast<std::uint16_t>(
-                                               static_cast<std::int16_t>(
-                                                       (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                               + pc + 1))->word;
+                if ((symbol = find_symbol(7)) != symbols.cend()) {
+                        stream << "LEA R" << ((instruction & 0x0E00) >> 9)
+                               << ", " << symbol->second->word;
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0xD000:
-                stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                stream << ".FILL 0x" << std::uppercase << std::setw(4)
                        << std::setfill('0') << std::hex << instruction;
                 break;
         case 0xC000:
                 if (instruction == 0xC1C0) {
-                        stream << " RET";
-                } else if (!(instruction & 0x0E00) && !(instruction & 0x003F)) {
-                        stream << " JMP R" << ((instruction & 0x01C0) >> 6);
+                        stream << "RET";
+                } else if (!(instruction & 0x0E3F)) {
+                        stream << "JMP R" << ((instruction & 0x01C0) >> 6);
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0xB000:
-                if (symbols.count(static_cast<std::uint16_t>(
-                                          static_cast<std::int16_t>(
-                                                  (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                          + pc + 1))) {
-                        stream << " STI R" << ((instruction & 0x0E00) >> 9)
-                               << ", "
-                               << symbols.at(
-                                       static_cast<std::uint16_t>(
-                                               static_cast<std::int16_t>(
-                                                       (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                               + pc + 1))->word;
+                if ((symbol = find_symbol(7)) != symbols.cend()) {
+                        stream << "STI R" << ((instruction & 0x0E00) >> 9)
+                               << ", " << symbol->second->word;
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0xA000:
-                if (symbols.count(static_cast<std::uint16_t>(
-                                          static_cast<std::int16_t>(
-                                                  (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                          + pc + 1))) {
-                        stream << " LDI R" << ((instruction & 0x0E00) >> 9)
-                               << ", "
-                               << symbols.at(
-                                       static_cast<std::uint16_t>(
-                                               static_cast<std::int16_t>(
-                                                       (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                               + pc + 1))->word;
+                if ((symbol = find_symbol(7)) != symbols.cend()) {
+                        stream << "LDI R" << ((instruction & 0x0E00) >> 9)
+                               << ", " << symbol->second->word;
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0x9000:
                 if ((instruction & 0x003F) != 0x003F) {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 } else {
-                        stream << " NOT R" << ((instruction & 0x0E00) >> 9) << ", R"
+                        stream << "NOT R" << ((instruction & 0x0E00) >> 9) << ", R"
                                << ((instruction & 0x01C0) >> 6);
                 }
                 break;
         case 0x8000:
-                stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                stream << ".FILL 0x" << std::uppercase << std::setw(4)
                        << std::setfill('0') << std::hex << instruction;
                 break;
         case 0x7000:
-                stream << " STR R" << ((instruction & 0x0E00) >> 9) << ", R"
+                stream << "STR R" << ((instruction & 0x0E00) >> 9) << ", R"
                        << ((instruction & 0x01C0) >> 6) << ", #"
-                       << static_cast<std::int16_t>(
-                               (static_cast<std::int16_t>(instruction << 10) >> 10));
+                       << (static_cast<std::int16_t>(instruction << 10) >> 10);
                 break;
         case 0x6000:
-                stream << " LDR R" << ((instruction & 0x0E00) >> 9) << ", R"
-                       << ((instruction & 0x01C0) >> 6) << ", #"
-                       << static_cast<std::int16_t>(
-                               (static_cast<std::int16_t>(instruction << 10) >> 10));
+                stream << "LDR R" << ((instruction & 0x0E00) >> 9) << ", R"
+                       << ((instruction & 0x01C0) >> 6) << ", #" << std::dec
+                       << (static_cast<std::int16_t>(instruction << 10) >> 10);
                 break;
         case 0x5000:
-                stream << " AND R" << ((instruction & 0x0E00) >> 9) << ", R"
+                stream << "AND R" << ((instruction & 0x0E00) >> 9) << ", R"
                        << ((instruction & 0x01C0) >> 6);
                 if (instruction & 0x20) {
                         stream << ", #" << std::dec
-                               << static_cast<std::int16_t>(
-                                       (static_cast<std::int16_t>(instruction << 11) >> 11));
+                               << (static_cast<std::int16_t>(instruction << 11) >> 11);
                 } else {
                         stream << ", R" << (instruction & 0x7);
                 }
                 break;
         case 0x4000:
-                if (!(instruction & 0x0800)) {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
-                               << std::setfill('0') << std::hex << instruction;
-                } else if (symbols.count(static_cast<std::uint16_t>(
-                                                 static_cast<std::int16_t>(
-                                                         (static_cast<std::int16_t>(instruction << 5) >> 5))
-                                                 + pc + 1))) {
-                        stream << " JSR "
-                               << symbols.at(
-                                       static_cast<std::uint16_t>(
-                                               static_cast<std::int16_t>(
-                                                       (static_cast<std::int16_t>(instruction << 5) >> 5))
-                                               + pc + 1))->word;
+                if ((instruction & 0x0800) && (symbol = find_symbol(5)) != symbols.cend()) {
+                        stream << "JSR " << symbol->second->word;
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0x3000:
-                if (symbols.count(static_cast<std::uint16_t>(
-                                          static_cast<std::int16_t>(
-                                                  (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                          + pc + 1))) {
-                        stream << " ST R" << ((instruction & 0x0E00) >> 9)
-                               << ", "
-                               << symbols.at(
-                                       static_cast<std::uint16_t>(
-                                               static_cast<std::int16_t>(
-                                                       (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                               + pc + 1))->word;
+                if ((symbol = find_symbol(7)) != symbols.cend()) {
+                        stream << "ST R" << ((instruction & 0x0E00) >> 9)
+                               << ", " << symbol->second->word;
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0x2000:
-                if (symbols.count(static_cast<std::uint16_t>(
-                                          static_cast<std::int16_t>(
-                                                  (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                          + pc + 1))) {
-                        stream << " LD R" << ((instruction & 0x0E00) >> 9)
-                               << ", "
-                               << symbols.at(
-                                       static_cast<std::uint16_t>(
-                                               static_cast<std::int16_t>(
-                                                       (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                               + pc + 1))->word;
+                if ((symbol = find_symbol(7)) != symbols.cend()) {
+                        stream << "LD R" << ((instruction & 0x0E00) >> 9)
+                               << ", " << symbol->second->word;
                 } else {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
                                << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         case 0x1000:
-                stream << " ADD R" << ((instruction & 0x0E00) >> 9) << ", R"
+                stream << "ADD R" << ((instruction & 0x0E00) >> 9) << ", R"
                        << ((instruction & 0x01C0) >> 6);
                 if (instruction & 0x20) {
                         stream << ", #" << std::dec
-                               << static_cast<std::int16_t>(
-                                       (static_cast<std::int16_t>(instruction << 11) >> 11));
+                               << (static_cast<std::int16_t>(instruction << 11) >> 11);
                 } else {
                         stream << ", R" << (instruction & 0x7);
                 }
                 break;
         case 0x0000:
         default:
-                if (!(instruction & 0x0E00)) {
-                        stream << " .FILL 0x" << std::uppercase << std::setw(4)
-                               << std::setfill('0') << std::hex << instruction;
-                } else {
-                        if (symbols.count(static_cast<std::uint16_t>(
-                                                  static_cast<std::int16_t>(
-                                                          (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                                  + pc + 1))) {
-                                stream << " BR" << (instruction & 0x0800 ? "n" : "")
-                                       << (instruction & 0x0400 ? "z" : "")
-                                       << (instruction & 0x0200 ? "p" : "")
-                                       << " "
-                                       << symbols.at(
-                                               static_cast<std::uint16_t>(
-                                                       static_cast<std::int16_t>(
-                                                               (static_cast<std::int16_t>(instruction << 7) >> 7))
-                                                       + pc + 1))->word;
-                        } else {
-                                stream << " .FILL 0x" << std::uppercase << std::setw(4)
-                                       << std::setfill('0') << std::hex << instruction;
+                if ((instruction & 0x0E00) && (symbol = find_symbol(7)) != symbols.cend()) {
+                        stream << "BR";
+
+                        if (instruction & 0x0800) {
+                                stream << 'n';
                         }
+
+                        if (instruction & 0x0400) {
+                                stream << 'z';
+                        }
+
+                        if (instruction & 0x0200) {
+                                stream << 'p';
+                        }
+
+                        stream << ' ' << symbol->second->word;
+                } else {
+                        stream << ".FILL 0x" << std::uppercase << std::setw(4)
+                               << std::setfill('0') << std::hex << instruction;
                 }
                 break;
         }

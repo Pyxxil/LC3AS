@@ -40,4 +40,9 @@
 #include "Tokens/Instructions/Token_Instruction_Ld.hpp"
 #include "Tokens/Instructions/Token_Instruction_St.hpp"
 
+#ifdef INCLUDE_ADDONS
+#include "Tokens/Additional/Token_Addon_Neg.hpp"
+#include "Tokens/Additional/Token_Addon_Sub.hpp"
+#endif
+
 #endif // PROJECT_ALL_TOKENS_HPP

@@ -83,7 +83,7 @@ oct .FILL \700          ; Octal values are also acceptable
 
 ; This is a label
 BEGIN_TEST:
-        AND R5, R5, #-10; Comments can be as close to the instruction as you'd
+        ADD R5, R5, #-10; Comments can be as close to the instruction as you'd
                         ; like
         ADD R1, R2, #1  // Comments can also be like so ('/' will is treated as
                         // a comment, but provides a warning)
@@ -93,6 +93,11 @@ BEGIN_TEST:
                         ; an infinite loop, unless any of the instructions
                         ; before this change the value at the address of label
                         ; 'addr' or at the address of label 'cheat'
+EXTRA_FEATURES:         ; Some additional features not actually present in the
+                        ; LC3 (besides adding octal literals)
+        NEG R1          ; Negation
+        SUB R5, R1      ; Subtraction
+
         RET
 
 BRnzp BEGIN_TEST
