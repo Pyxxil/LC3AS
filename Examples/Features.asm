@@ -97,6 +97,8 @@ EXTRA_FEATURES:         ; Some additional features not actually present in the
                         ; LC3 (besides adding octal literals)
         NEG R1          ; Negation
         SUB R5, R1      ; Subtraction
+        SUB R5, R5      ; This is the exact same as AND R5, R5, #0 (it generates
+                        ; that exact instruction)
 
         RET
 

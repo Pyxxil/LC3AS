@@ -1,7 +1,10 @@
 #include "Tokens/Additional/Token_Addon_Sub.hpp"
 
 #include "Tokens/Instructions/Token_Instruction_Add.hpp"
+#include "Tokens/Instructions/Token_Instruction_And.hpp"
+#include "Tokens/Immediate/Token_Immediate_Decimal.hpp"
 #include "Tokens/Additional/Token_Addon_Neg.hpp"
+#include "Tokens/Token_Register.hpp"
 #include "Assembler.hpp"
 
 Sub::Sub()
@@ -16,7 +19,7 @@ Sub::Sub(std::string &word, int line_number)
 
 }
 
-// TODO: Change this so you can have it like ADD R1, R2, R3 or ADD R1, R2, #2
+// TODO: Change this so you can have it similar to ADD R1, R2, R3
 std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (assembled.size()) {
@@ -54,25 +57,38 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
 
         std::int32_t ret = 0;
 
-        std::shared_ptr<Token> neg1 = std::make_shared<Neg>();
-        std::vector<std::shared_ptr<Token>> vec = {neg1, tokens[2]};
-        ret += neg1->assemble(vec, assembler);
+        if (std::static_pointer_cast<Register>(tokens[1])->reg == std::static_pointer_cast<Register>(tokens[2])->reg) {
+                std::shared_ptr<Token> set_zero = std::make_shared<And>();
+                std::shared_ptr<Token> decimal_zero = std::make_shared<Decimal>("#0");
 
-        std::shared_ptr<Token> add = std::make_shared<Add>();
-        vec = {add, tokens[1], tokens[1], tokens[2]};
-        ret += add->assemble(vec, assembler);
+                std::vector<std::shared_ptr<Token>> vec = {set_zero, tokens[1], tokens[2], decimal_zero};
 
-        assembled.swap(neg1->assembled);
-        for (const auto &as_assembled : add->assembled) {
-                assembled.push_back(as_assembled);
-        }
+                set_zero->assemble(vec, assembler);
+                assembled.swap(set_zero->assembled);
 
-        std::shared_ptr<Token> neg2 = std::make_shared<Neg>();
-        vec = {neg2, tokens[2]};
-        ret += neg2->assemble(vec, assembler);
+                ret = 1;
+        } else {
+                std::shared_ptr<Token> neg1 = std::make_shared<Neg>();
+                std::shared_ptr<Token> neg2 = std::make_shared<Neg>();
 
-        for (const auto &as_assembled : neg2->assembled) {
-                assembled.push_back(as_assembled);
+                std::vector<std::shared_ptr<Token>> vec  = {neg1, tokens[2]};
+                ret += neg1->assemble(vec, assembler);
+
+                std::shared_ptr<Token> add = std::make_shared<Add>();
+                vec = {add, tokens[1], tokens[1], tokens[2]};
+                ret += add->assemble(vec, assembler);
+
+                assembled.swap(neg1->assembled);
+                for (const auto &as_assembled : add->assembled) {
+                        assembled.push_back(as_assembled);
+                }
+
+                vec = {neg2, tokens[2]};
+                ret += neg2->assemble(vec, assembler);
+
+                for (const auto &as_assembled : neg2->assembled) {
+                        assembled.push_back(as_assembled);
+                }
         }
 
         return ret;

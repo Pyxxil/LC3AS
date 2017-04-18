@@ -4,6 +4,12 @@
 #include "Tokens/Token_Register.hpp"
 #include <Assembler.hpp>
 
+And::And()
+        : Instruction()
+{
+
+}
+
 And::And(std::string &oper, int line_number)
         : Instruction(oper, line_number)
 {}
