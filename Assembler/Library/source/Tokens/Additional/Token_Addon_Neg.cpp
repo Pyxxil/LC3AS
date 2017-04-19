@@ -59,7 +59,7 @@ std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         add->assemble(vec, assembler);
 
         assembled.swap(neg->assembled);
-        for (auto &&as_assembled : add->assembled) {
+        for (const auto &as_assembled : add->assembled) {
                 assembled.emplace_back(as_assembled);
         }
 

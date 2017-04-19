@@ -79,14 +79,14 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 ret += add->assemble(vec, assembler);
 
                 assembled.swap(neg1->assembled);
-                for (auto &&as_assembled : add->assembled) {
+                for (const auto &as_assembled : add->assembled) {
                         assembled.emplace_back(as_assembled);
                 }
 
                 vec = {neg2, tokens[2]};
                 ret += neg2->assemble(vec, assembler);
 
-                for (auto &&as_assembled : neg2->assembled) {
+                for (const auto &as_assembled : neg2->assembled) {
                         assembled.emplace_back(as_assembled);
                 }
         }
