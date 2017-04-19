@@ -38,14 +38,14 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         if (tokens[1]->type() == Token::IMMEDIATE) {
-                assembled.push_back(
+                assembled.emplace_back(
                         static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate)
                 );
         } else if (tokens[1]->type() == Token::LABEL) {
                 if (!first_time) {
                         const auto &&symbol = std::find_if(
                                 assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                [&tokens](const auto &sym) -> bool
+                                [&tokens](auto &&sym) -> bool
                                 {
                                         return sym.second->word == tokens[1]->word;
                                 }
@@ -55,7 +55,7 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                                 std::static_pointer_cast<Label>(tokens[1])->not_found();
                                 return -1;
                         } else {
-                                assembled.push_back(symbol->second->address);
+                                assembled.emplace_back(symbol->second->address);
                         }
                 }
         } else {

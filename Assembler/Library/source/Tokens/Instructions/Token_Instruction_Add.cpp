@@ -56,7 +56,7 @@ std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 }
         }
 
-        assembled.push_back(
+        assembled.emplace_back(
                 static_cast<std::uint16_t>(0x1000 |
                                            ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
                                            ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6

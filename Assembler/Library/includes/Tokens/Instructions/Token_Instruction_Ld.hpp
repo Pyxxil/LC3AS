@@ -12,7 +12,7 @@ public:
 
         std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler) override;
 
-        std::vector<uint16_t> as_assembled() override;
+        const std::vector<uint16_t> as_assembled() const override;
 };
 
 #endif //PROJECT_TOKEN_OPERATOR_LD_HPP

@@ -58,7 +58,7 @@ static std::size_t hash(std::string &string)
 
         std::size_t first_char_on_directive = string.length() > 1 ? static_cast<std::size_t>(string.at(1)) : 0;
 
-        for (const auto &character : string) {
+        for (auto &&character : string) {
                 if (string.at(0) == '.') {
                         if (character == '.') {
                                 _hash = (_hash * hashed_letters[first_char_on_directive - 0x41u]) ^
@@ -116,7 +116,7 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
 
                 std::vector<std::shared_ptr<Token>> tokenized_line = tokenizeLine(line, line_number);
                 if (!tokenized_line.empty()) {
-                        tokens.push_back(tokenized_line);
+                        tokens.emplace_back(tokenized_line);
                 }
         }
 
@@ -152,7 +152,6 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         while (line.length() > index + 1 && std::isspace(character)) {
                                 character = line.at(++index);
                         }
-
                         // However, it does mean we want to check what we just got.
                         addToken(current, tokenized_line, line_number);
                 }
@@ -192,10 +191,10 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         }
 
                         if (index == line.length() && last_character != '"') {
-                                tokenized_line.push_back(std::make_shared<String>(current, line_number));
+                                tokenized_line.emplace_back(std::make_shared<String>(current, line_number));
                                 tokenized_line.back()->expected("to find closing '\"'");
                         } else {
-                                tokenized_line.push_back(std::make_shared<String>(current, line_number));
+                                tokenized_line.emplace_back(std::make_shared<String>(current, line_number));
                         }
 
                         current.erase();
@@ -205,7 +204,9 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                 ++index;
         }
 
-        addToken(current, tokenized_line, line_number);
+        if (!std::all_of(current.cbegin(), current.cend(), ::isspace)) {
+                addToken(current, tokenized_line, line_number);
+        }
 
         return tokenized_line;
 }
@@ -220,7 +221,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number)
 {
         if (!token.empty()) {
-                t_tokens.push_back(tokenize(token, line_number));
+                t_tokens.emplace_back(tokenize(token, line_number));
                 token.erase();
         }
 }
@@ -427,7 +428,7 @@ void Assembler::do_first_pass()
                                           << symbols.at(internal_program_counter)->at_line
                                           << '\n';
                         } else {
-                                for (const auto &symbol : symbols) {
+                                for (auto &&symbol : symbols) {
                                         if (symbol.second->word == tokenized_line.front()->word) {
                                                 std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
                                                           << ": Multiple definitions of label '"
@@ -441,11 +442,15 @@ void Assembler::do_first_pass()
                                 }
                         }
 
-                        symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
+                        symbols.emplace(std::make_pair(
                                 internal_program_counter,
                                 std::static_pointer_cast<Label>(tokenized_line.front()))
                         );
 
+                        if (tokenized_line.size() > 1) {
+                                internal_program_counter++;
+                        }
+                        break;
                 case Token::DIR_STRINGZ:        // FALLTHROUGH
                 case Token::DIR_BLKW:           // FALLTHROUGH
                 case Token::DIR_FILL:           // FALLTHROUGH
@@ -468,7 +473,7 @@ void Assembler::do_first_pass()
         }
 
         if (!end_seen) {
-                std::cerr << "Reached the end of the file, and found no .END directive\n";
+                std::cerr << "WARNING: Reached the end of the file, and found no .END directive\n";
         }
 
         std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
@@ -483,7 +488,7 @@ void Assembler::do_second_pass()
 
         puts("Starting second pass");
 
-        for (auto &tokenized_line : tokens) {
+        for (auto &&tokenized_line : tokens) {
                 memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
                 if (memory_required < 0) {
@@ -530,9 +535,9 @@ std::vector<std::uint16_t> &Assembler::generate_machine_code()
                 return as_assembled;
         }
 
-        for (const auto &tokenized_line : tokens) {
-                for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
-                        as_assembled.push_back(assembled_line);
+        for (auto &&tokenized_line : tokens) {
+                for (auto &&assembled_line : tokenized_line.front()->as_assembled()) {
+                        as_assembled.emplace_back(assembled_line);
                 }
         }
 
@@ -575,7 +580,7 @@ void Assembler::write(std::string &prefix)
 
         const auto write_list = [&lst_file, length](
                 const std::uint16_t instruction, const std::uint16_t program_counter,
-                const std::size_t line_number, const auto &label, const auto &disassembled
+                const std::size_t line_number, auto &&label, auto &&disassembled
         )
         {
                 // Address
@@ -662,7 +667,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         {
                 return std::find_if(
                         symbols.cbegin(), symbols.cend(),
-                        [instruction, pc, shift](const auto &sym) -> bool
+                        [instruction, pc, shift](auto &&sym) -> bool
                         {
                                 const std::int16_t offset = static_cast<std::int16_t>(instruction << shift) >> shift;
                                 return sym.first == (offset + pc + 1);

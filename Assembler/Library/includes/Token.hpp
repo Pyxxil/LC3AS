@@ -93,7 +93,7 @@ public:
                 return -1;
         }
 
-        virtual std::vector<std::uint16_t> as_assembled()
+        virtual const std::vector<uint16_t, std::allocator<uint16_t>> as_assembled() const
         {
                 return assembled;
         }
@@ -107,7 +107,7 @@ public:
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
                 std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s")
-                          << ", but "<< provided << " argument" << (expected == 1 ? "" : "'s") << " provided.\n";
+                          << ", but " << provided << " argument" << (expected == 1 ? "" : "'s") << " provided.\n";
 
                 is_error = true;
         }

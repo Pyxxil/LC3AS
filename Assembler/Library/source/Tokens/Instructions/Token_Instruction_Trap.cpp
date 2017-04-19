@@ -48,7 +48,7 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                           << ", which is possibly an illegal trap vector";
         }
 
-        assembled.push_back(
+        assembled.emplace_back(
                 static_cast<std::uint16_t>(
                         0xF000 |
                         (std::static_pointer_cast<Immediate>(tokens[1])->immediate & 0xFF)

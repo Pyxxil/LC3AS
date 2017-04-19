@@ -21,7 +21,7 @@ int32_t In::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &ass
                 return 0;
         }
 
-        assembled.push_back(static_cast<std::uint16_t>(0xF023));
+        assembled.emplace_back(static_cast<std::uint16_t>(0xF023));
 
         return 1;
 }

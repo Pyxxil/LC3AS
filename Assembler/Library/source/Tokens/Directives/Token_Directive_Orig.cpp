@@ -40,7 +40,7 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate);
-        assembled.push_back(origin);
+        assembled.emplace_back(origin);
 
         assembler.origin_seen = true;
         return origin;

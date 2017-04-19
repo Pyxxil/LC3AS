@@ -62,7 +62,7 @@ int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &as
                 return -1;
         }
 
-        assembled.push_back(
+        assembled.emplace_back(
                 static_cast<std::uint16_t >(
                         0xB000 |
                         ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |

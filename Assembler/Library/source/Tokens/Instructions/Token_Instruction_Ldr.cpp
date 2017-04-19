@@ -48,7 +48,7 @@ std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.push_back(
+        assembled.emplace_back(
                 static_cast<std::uint16_t>(
                         0x6000 |
                         ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |

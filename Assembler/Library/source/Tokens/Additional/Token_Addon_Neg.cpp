@@ -50,7 +50,7 @@ std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return 0;
         }
 
-        std::shared_ptr<Token> neg = std::make_shared<Not>();
+        std::shared_ptr<Token>              neg = std::make_shared<Not>();
         std::vector<std::shared_ptr<Token>> vec = {neg, tokens[1], tokens[1]};
         neg->assemble(vec, assembler);
 
@@ -59,8 +59,8 @@ std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         add->assemble(vec, assembler);
 
         assembled.swap(neg->assembled);
-        for (const auto &as_assembled : add->assembled) {
-                assembled.push_back(as_assembled);
+        for (auto &&as_assembled : add->assembled) {
+                assembled.emplace_back(as_assembled);
         }
 
         return 2;

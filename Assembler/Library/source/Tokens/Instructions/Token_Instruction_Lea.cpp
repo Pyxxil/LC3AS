@@ -62,7 +62,7 @@ std::int32_t Lea::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.push_back(
+        assembled.emplace_back(
                 static_cast<std::uint16_t >(
                         0xE000 |
                         ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
@@ -78,7 +78,7 @@ Token::token_type Lea::type() const
         return Token::token_type::OP_LEA;
 }
 
-std::vector<std::uint16_t> Lea::as_assembled()
+const std::vector<std::uint16_t> Lea::as_assembled() const
 {
         return Token::as_assembled();
 }

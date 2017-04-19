@@ -58,7 +58,7 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         std::int32_t ret = 0;
 
         if (std::static_pointer_cast<Register>(tokens[1])->reg == std::static_pointer_cast<Register>(tokens[2])->reg) {
-                std::shared_ptr<Token> set_zero = std::make_shared<And>();
+                std::shared_ptr<Token> set_zero     = std::make_shared<And>();
                 std::shared_ptr<Token> decimal_zero = std::make_shared<Decimal>("#0");
 
                 std::vector<std::shared_ptr<Token>> vec = {set_zero, tokens[1], tokens[2], decimal_zero};
@@ -71,7 +71,7 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 std::shared_ptr<Token> neg1 = std::make_shared<Neg>();
                 std::shared_ptr<Token> neg2 = std::make_shared<Neg>();
 
-                std::vector<std::shared_ptr<Token>> vec  = {neg1, tokens[2]};
+                std::vector<std::shared_ptr<Token>> vec = {neg1, tokens[2]};
                 ret += neg1->assemble(vec, assembler);
 
                 std::shared_ptr<Token> add = std::make_shared<Add>();
@@ -79,15 +79,15 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 ret += add->assemble(vec, assembler);
 
                 assembled.swap(neg1->assembled);
-                for (const auto &as_assembled : add->assembled) {
-                        assembled.push_back(as_assembled);
+                for (auto &&as_assembled : add->assembled) {
+                        assembled.emplace_back(as_assembled);
                 }
 
                 vec = {neg2, tokens[2]};
                 ret += neg2->assemble(vec, assembler);
 
-                for (const auto &as_assembled : neg2->assembled) {
-                        assembled.push_back(as_assembled);
+                for (auto &&as_assembled : neg2->assembled) {
+                        assembled.emplace_back(as_assembled);
                 }
         }
 

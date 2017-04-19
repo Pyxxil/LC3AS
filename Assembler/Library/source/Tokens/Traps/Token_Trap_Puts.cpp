@@ -25,7 +25,7 @@ std::int32_t Puts::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 return 0;
         }
 
-        assembled.push_back(static_cast<std::uint16_t>(0xF022));
+        assembled.emplace_back(static_cast<std::uint16_t>(0xF022));
 
         return 1;
 }

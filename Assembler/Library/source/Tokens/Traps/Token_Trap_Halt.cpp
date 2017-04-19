@@ -30,7 +30,7 @@ std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 return 0;
         }
 
-        assembled.push_back(static_cast<std::uint16_t>(0xF025));
+        assembled.emplace_back(static_cast<std::uint16_t>(0xF025));
 
         return 1;
 }

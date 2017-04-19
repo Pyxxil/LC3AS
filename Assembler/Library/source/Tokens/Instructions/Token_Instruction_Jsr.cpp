@@ -54,7 +54,7 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.push_back(
+        assembled.emplace_back(
                 static_cast<std::uint16_t>(0x4800 | (offset & 0x7FF))
         );
 
@@ -66,7 +66,7 @@ Token::token_type Jsr::type() const
         return Token::token_type::OP_JSR;
 }
 
-std::vector<std::uint16_t> Jsr::as_assembled()
+const std::vector<std::uint16_t> Jsr::as_assembled() const
 {
         return Token::as_assembled();
 }

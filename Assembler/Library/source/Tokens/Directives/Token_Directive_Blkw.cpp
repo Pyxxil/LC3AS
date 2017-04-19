@@ -53,7 +53,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                         if (!first_time) {
                                 const auto &&symbol = std::find_if(
                                         assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                        [&tokens](const auto &sym) -> bool
+                                        [&tokens](auto &&sym) -> bool
                                         {
                                                 return sym.second->word == tokens[2]->word;
                                         }
@@ -77,7 +77,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         if (do_fill) {
                 for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens[1])->immediate;
                      ++block) {
-                        assembled.push_back(fill);
+                        assembled.emplace_back(fill);
                 }
         }
 

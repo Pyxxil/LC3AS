@@ -84,7 +84,6 @@ set ( ASSEMBLER_HEADER_FILES
       includes/Tokens/Instructions/Token_Instruction_Br.hpp
       includes/Tokens/Instructions/Token_Instruction_Ld.hpp
       includes/Tokens/Instructions/Token_Instruction_St.hpp
-      source/Tokens/Additional/Token_Addon_Neg.cpp
       )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
@@ -103,9 +102,9 @@ if ( USE_ADDONS )
         set ( ASSEMBLER_HEADER_FILES
               "${ASSEMBLER_HEADER_FILES}"
               includes/Tokens/Additional/Token_Addon_Neg.hpp
-               includes/Tokens/Additional/Token_Addon_Sub.hpp
+              includes/Tokens/Additional/Token_Addon_Sub.hpp
               )
-endif()
+endif ()
 
 add_library ( ${PROJECT_NAME} STATIC ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
 
