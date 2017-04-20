@@ -29,7 +29,7 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         }
 
         const int offset = static_cast<int>(symbol->second->address) -
-                (static_cast<int>(assembler.internal_program_counter) + 1);
+                           (static_cast<int>(assembler.internal_program_counter) + 1);
 
         if (offset > 1023 || offset < -1024) {
                 // TODO: Change this to actually tell the user what's wrong (difference wise).

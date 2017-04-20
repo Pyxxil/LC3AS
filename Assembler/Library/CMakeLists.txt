@@ -119,7 +119,7 @@ if ( USE_ADDONS )
                 target_compile_options ( ${PROJECT_NAME} PUBLIC "${DEBUG_FLAGS}" )
                 set ( CMAKE_VERBOSE_MAKEFILE ON )
         else ()
-                target_compile_options( ${PROJECT_NAME} PUBLIC "${RELEASE_FLAGS}" )
+                target_compile_options ( ${PROJECT_NAME} PUBLIC "${RELEASE_FLAGS}" )
         endif ()
 
         target_compile_definitions ( ${PROJECT_NAME} PUBLIC INCLUDE_ADDONS )

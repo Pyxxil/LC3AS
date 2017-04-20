@@ -34,14 +34,10 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                         }
 
                         fill = symbol->second->address;
-                } else {
-                        tokens.at(2)->expected("either an immediate value or label");
-                        return -1;
                 }
         }
 
-        for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
-                     ++block) {
+        for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens.at(1))->immediate; ++block) {
                 assembled.emplace_back(fill);
         }
 

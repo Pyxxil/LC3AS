@@ -16,3 +16,9 @@ This program calculates the nth fibonacci number, where n is an integer between
 This program is the same as the previous, however it calculates the fibonacci
 number using recursion.
 
+## Features.asm
+This file is mostly a display of what the Assembler can do.
+
+## Multi_Word_Addition.asm
+This program adds two 30 bit numbers together. As the LC3 uses 16 bit words, this
+requires two words to complete.

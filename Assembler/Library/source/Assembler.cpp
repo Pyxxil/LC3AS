@@ -440,7 +440,7 @@ void Assembler::do_first_pass()
         for (auto &tokenized_line : tokens) {
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
-                        origin_seen = true;
+                        origin_seen     = true;
                         memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
                         if (memory_required > -1) {
                                 internal_program_counter += memory_required;
@@ -451,7 +451,21 @@ void Assembler::do_first_pass()
                 case Token::LABEL:
                         memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
                         if (memory_required > -1) {
-                                std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
+                                std::static_pointer_cast<Label>(tokenized_line.front())->address =
+                                        internal_program_counter;
+
+                                for (const auto &symbol : symbols) {
+                                        if (symbol.second->word == tokenized_line.front()->word) {
+                                                std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
+                                                          << ": Multiple definitions of label '"
+                                                          << tokenized_line.front()->word
+                                                          << "'\nNOTE: \tLabel was first defined on line "
+                                                          << symbol.second->at_line
+                                                          << '\n';
+                                                ++error_count;
+                                                break;
+                                        }
+                                }
 
                                 if (symbols.count(internal_program_counter)) {
                                         std::cerr << "WARNING: Multiple labels found for address 0x"
@@ -461,19 +475,6 @@ void Assembler::do_first_pass()
                                                   << "' found on line " << std::dec
                                                   << symbols.at(internal_program_counter)->at_line
                                                   << '\n';
-                                } else {
-                                        for (const auto &symbol : symbols) {
-                                                if (symbol.second->word == tokenized_line.front()->word) {
-                                                        std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
-                                                                  << ": Multiple definitions of label '"
-                                                                  << tokenized_line.front()->word
-                                                                  << "'\nNOTE: \tLabel was first defined on line "
-                                                                  << symbol.second->at_line
-                                                                  << '\n';
-                                                        ++error_count;
-                                                        break;
-                                                }
-                                        }
                                 }
 
                                 symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
@@ -611,26 +612,26 @@ void Assembler::write(std::string &prefix)
                 // Address
                 lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4)
                          << std::hex << program_counter << ')'
-                // Hexadecimal representation
+                         // Hexadecimal representation
                          << ' ' << std::uppercase << std::setfill('0') << std::setw(4)
                          << std::hex << std::right << instruction
-                // Binary representation
+                         // Binary representation
                          << ' ' << std::bitset<16>(instruction) << ' '
-                // Line number
+                         // Line number
                          << '(' << std::setfill(' ') << std::right << std::setw(4)
                          << std::dec << line_number << ')'
-                // Label (if any)
+                         // Label (if any)
                          << ' ' << std::setfill(' ')
                          << std::setw(static_cast<int>(longest_symbol_length)) << std::left << label
-                // Disassembled instruction
+                         // Disassembled instruction
                          << ' ' << disassembled << '\n';
         };
 
         std::size_t   line = 1;
         std::uint16_t pc   = 0;
 
-        auto &&symbol      = symbols.cbegin();
-        std::size_t instruction_index = 0;
+        auto        &&symbol              = symbols.cbegin();
+        std::size_t instruction_index     = 0;
         std::size_t instruction_end_index = as_assembled.size();
 
         symbol_file << "// Symbol table\n"
@@ -649,7 +650,8 @@ void Assembler::write(std::string &prefix)
 
         binary_file << std::bitset<16>(as_assembled.at(instruction_index)).to_string() << '\n';
 
-        hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << as_assembled.at(instruction_index) << '\n';
+        hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex
+                 << as_assembled.at(instruction_index) << '\n';
 
         pc = as_assembled.at(instruction_index);
 
