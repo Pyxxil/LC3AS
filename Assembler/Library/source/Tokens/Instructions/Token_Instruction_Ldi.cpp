@@ -12,33 +12,8 @@ Ldi::Ldi(std::string &oper, int line_number)
 
 std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (tokens.size() != 3) {
-                invalid_argument_count(tokens.size(), 2);
-                return -1;
-        }
-
-        if (!assembler.origin_seen) {
-                expected(".ORIG directive");
-                return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "LDI after .END directive. It will be ignored.\n";
+        if (!is_valid) {
                 return 0;
-        }
-
-        if (tokens[1]->type() != Token::REGISTER) {
-                tokens[1]->expected("register");
-                return -1;
-        } else if (tokens[2]->type() != Token::LABEL) {
-                tokens[2]->expected("label");
-                return -1;
-        }
-
-        if (tokens[1]->is_error || tokens[2]->is_error) {
-                return -1;
         }
 
         const auto &&symbol = std::find_if(assembler.symbols.cbegin(), assembler.symbols.cend(),
@@ -71,6 +46,34 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         );
 
         return 1;
+}
+
+bool Ldi::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() != 3) {
+                invalid_argument_count(tokens.size(), 2);
+                return (is_valid = false);
+        }
+
+        if (tokens[1]->type() != Token::REGISTER) {
+                tokens[1]->expected("register");
+                return (is_valid = false);
+        } else if (tokens[2]->type() != Token::LABEL) {
+                tokens[2]->expected("label");
+                return (is_valid = false);
+        }
+
+        if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid)) {
+                return (is_valid = false);
+        }
+
+        return is_valid;
+}
+
+std::int32_t Ldi::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        (void) tokens;
+        return static_cast<std::int32_t>(is_valid);
 }
 
 Token::token_type Ldi::type() const

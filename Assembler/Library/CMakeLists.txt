@@ -1,8 +1,6 @@
 cmake_minimum_required ( VERSION 3.6 )
 project ( LC3Assembler )
 
-include_directories ( includes )
-
 set ( ASSEMBLER_SOURCE_FILES
       source/Assembler.cpp
       source/Tokens/Token_Label.cpp
@@ -104,13 +102,25 @@ if ( USE_ADDONS )
               includes/Tokens/Additional/Token_Addon_Neg.hpp
               includes/Tokens/Additional/Token_Addon_Sub.hpp
               )
+
+        if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+                set ( CMAKE_VERBOSE_MAKEFILE ON )
+        endif ()
 endif ()
 
 add_library ( ${PROJECT_NAME} STATIC ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADER_FILES} )
 
 target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
 target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )
+target_include_directories ( ${PROJECT_NAME} PRIVATE includes )
 
 if ( USE_ADDONS )
+        if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Addons_Debug" )
+                target_compile_options ( ${PROJECT_NAME} PUBLIC "${DEBUG_FLAGS}" )
+                set ( CMAKE_VERBOSE_MAKEFILE ON )
+        else ()
+                target_compile_options( ${PROJECT_NAME} PUBLIC "${RELEASE_FLAGS}" )
+        endif ()
+
         target_compile_definitions ( ${PROJECT_NAME} PUBLIC INCLUDE_ADDONS )
 endif ()

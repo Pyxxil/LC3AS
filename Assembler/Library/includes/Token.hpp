@@ -13,17 +13,17 @@ class Token
 public:
         Token() = default;
         Token(std::string &token, int line = 0)
-                : at_line(line), word(token), assembled()
+                : word(token), assembled(), at_line(line), is_valid(true)
         {}
 
         virtual ~Token() = default;
 
-        bool is_error = false;
-        int  at_line  = 0;
-
         std::string word;
 
         std::vector<std::uint16_t> assembled;
+
+        int  at_line  = 0;
+        bool is_valid = true;
 
         enum token_type
         {
@@ -69,17 +69,13 @@ public:
         virtual Token::token_type type() const
         { return Token::NONE; }
 
-        virtual Token &expected(const char *const expects)
+        virtual void expected(const char *const expects) const
         {
                 std::cerr << "ERROR: ";
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
                 std::cerr << "Expected " << expects << ". Found '" << word << "' instead\n";
-
-                is_error = true;
-
-                return *this;
         }
 
         virtual void note(std::string)
@@ -93,12 +89,12 @@ public:
                 return -1;
         }
 
-        virtual const std::vector<uint16_t, std::allocator<uint16_t>> as_assembled() const
+        virtual const std::vector<uint16_t> as_assembled() const
         {
                 return assembled;
         }
 
-        virtual void invalid_argument_count(std::size_t provided, std::size_t expected)
+        virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const
         {
                 provided -= 1;  // This is not the best idea, but because tokens.size() returns
                 // the number of arguments + the token itself, it's a little easier to do here.
@@ -108,8 +104,20 @@ public:
                 }
                 std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s")
                           << ", but " << provided << " argument" << (expected == 1 ? "" : "'s") << " provided.\n";
+        }
 
-                is_error = true;
+        virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+        {
+                std::cerr << tokens.front()->word << ".valid_arguments() not implemented\n";
+                return false;
+        }
+
+        virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+        {
+                std::cerr << tokens.front()->word << ".guess_memory_size() not implemented\n";
+
+                (void) tokens;
+                return 0;
         }
 };
 

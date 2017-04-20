@@ -9,43 +9,10 @@ Trap::Trap(std::string &token, int line_number)
 
 std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (tokens.size() != 2) {
-                invalid_argument_count(tokens.size(), 1);
-                return -1;
-        }
+        (void) assembler;
 
-        if (!assembler.origin_seen) {
-                expected(".ORIG directive");
+        if (!is_valid) {
                 return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "TRAP after .END directive. It will be ignored.\n";
-                return 0;
-        }
-
-        if (tokens[1]->type() != Token::IMMEDIATE) {
-                tokens[1]->expected("immediate value");
-                return -1;
-        } else if (tokens[1]->is_error) {
-                return -1;
-        }
-
-        if (std::static_pointer_cast<Immediate>(tokens[1])->immediate > 0xFF) {
-                tokens[1]->expected("8 bit trap vector");
-                return -1;
-        }
-
-        if (std::static_pointer_cast<Immediate>(tokens[1])->immediate > 0x25 ||
-            std::static_pointer_cast<Immediate>(tokens[1])->immediate < 0x20) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "TRAP supplied " << std::static_pointer_cast<Immediate>(tokens[1])->immediate
-                          << ", which is possibly an illegal trap vector";
         }
 
         assembled.emplace_back(
@@ -56,6 +23,46 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         );
 
         return 1;
+}
+
+bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() != 2) {
+                invalid_argument_count(tokens.size(), 1);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::IMMEDIATE) {
+                tokens.at(1)->expected("immediate value");
+                return (is_valid = false);
+        }
+
+        if (!tokens.at(1)->is_valid) {
+                return (is_valid = false);
+        }
+
+        if (std::static_pointer_cast<Immediate>(tokens.at(1))->immediate > 0xFF) {
+                tokens.at(1)->expected("8 bit trap vector");
+                return (is_valid = false);
+        }
+
+        if (std::static_pointer_cast<Immediate>(tokens.at(1))->immediate > 0x25 ||
+            std::static_pointer_cast<Immediate>(tokens.at(1))->immediate < 0x20) {
+                std::cerr << "WARNING: ";
+                if (at_line) {
+                        std::cerr << "Line " << std::dec << at_line << ": ";
+                }
+                std::cerr << "TRAP supplied " << std::static_pointer_cast<Immediate>(tokens[1])->immediate
+                          << ", which is possibly an illegal trap vector.\n";
+        }
+
+        return is_valid;
+}
+
+std::int32_t Trap::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        (void) tokens;
+        return static_cast<std::int32_t>(is_valid);
 }
 
 Token::token_type Trap::type() const

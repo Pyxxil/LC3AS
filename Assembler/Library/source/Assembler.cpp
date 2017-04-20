@@ -171,8 +171,8 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                                 if (line_number) {
                                         std::cerr << "Line " << std::dec << line_number << ": ";
                                 }
-                                std::cerr
-                                        << "Expected '//', but found '/'. Treating it as if it's '//' (i.e. comment)\n";
+                                std::cerr << "Expected '//', but found '/'. "
+                                          << "Treating it as if it's '//' (i.e. comment)\n";
                         }
                         break;
                 } else if (character == ',' || character == ':') {
@@ -194,6 +194,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         if (index == line.length() && last_character != '"') {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
                                 tokenized_line.back()->expected("to find closing '\"'");
+                                tokenized_line.back()->is_valid = false;
                         } else {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
                         }
@@ -205,7 +206,15 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                 ++index;
         }
 
-        if (!std::all_of(current.cbegin(), current.cend(), ::isspace)) {
+        const bool any_non_space_characters = std::any_of(
+                current.cbegin(), current.cend(),
+                [](unsigned char character) -> bool
+                {
+                        return !std::isspace(character);
+                }
+        );
+
+        if (any_non_space_characters) {
                 addToken(current, tokenized_line, line_number);
         }
 
@@ -406,65 +415,93 @@ void Assembler::do_first_pass()
 
         puts("Starting first pass");
 
+        const auto memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
+        {
+                if (!origin_seen) {
+                        token->expected(".ORIG statement");
+                        return -1;
+                } else if (end_seen) {
+                        std::cerr << "WARNING: ";
+                        if (token->at_line) {
+                                std::cerr << "Line " << std::dec
+                                          << token->at_line
+                                          << ":\n";
+                        }
+                        std::cerr << token->word
+                                  << " after .END directive, it will be ignored.";
+                        return 0;
+                } else if (token->valid_arguments(t_tokens)) {
+                        return token->guess_memory_size(t_tokens);
+                } else {
+                        return -1;
+                }
+        };
+
         for (auto &tokenized_line : tokens) {
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
-                        memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
-                        if (memory_required < 0) {
-                                ++error_count;
+                        origin_seen = true;
+                        memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
+                        if (memory_required > -1) {
+                                internal_program_counter += memory_required;
                         } else {
-                                internal_program_counter = file_memory_origin_address =
-                                        static_cast<std::uint16_t>(memory_required);
+                                error_count += static_cast<std::size_t>(-memory_required);
                         }
                         break;
                 case Token::LABEL:
-                        std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
+                        memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
+                        if (memory_required > -1) {
+                                std::static_pointer_cast<Label>(tokenized_line.front())->address = internal_program_counter;
 
-                        if (symbols.count(internal_program_counter)) {
-                                std::cerr << "WARNING: Multiple labels found for address 0x"
-                                          << std::hex << internal_program_counter;
-                                std::cerr << "\nNOTE: \tPrevious label '"
-                                          << symbols.at(internal_program_counter)->word
-                                          << "' found on line " << std::dec
-                                          << symbols.at(internal_program_counter)->at_line
-                                          << '\n';
-                        } else {
-                                for (const auto &symbol : symbols) {
-                                        if (symbol.second->word == tokenized_line.front()->word) {
-                                                std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
-                                                          << ": Multiple definitions of label '"
-                                                          << tokenized_line.front()->word
-                                                          << "'\nNOTE: \tLabel was first defined on line "
-                                                          << symbol.second->at_line
-                                                          << '\n';
-                                                ++error_count;
-                                                break;
+                                if (symbols.count(internal_program_counter)) {
+                                        std::cerr << "WARNING: Multiple labels found for address 0x"
+                                                  << std::hex << internal_program_counter;
+                                        std::cerr << "\nNOTE: \tPrevious label '"
+                                                  << symbols.at(internal_program_counter)->word
+                                                  << "' found on line " << std::dec
+                                                  << symbols.at(internal_program_counter)->at_line
+                                                  << '\n';
+                                } else {
+                                        for (const auto &symbol : symbols) {
+                                                if (symbol.second->word == tokenized_line.front()->word) {
+                                                        std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
+                                                                  << ": Multiple definitions of label '"
+                                                                  << tokenized_line.front()->word
+                                                                  << "'\nNOTE: \tLabel was first defined on line "
+                                                                  << symbol.second->at_line
+                                                                  << '\n';
+                                                        ++error_count;
+                                                        break;
+                                                }
                                         }
                                 }
-                        }
 
-                        symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
-                                internal_program_counter,
-                                std::static_pointer_cast<Label>(tokenized_line.front()))
-                        );
+                                symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
+                                        internal_program_counter,
+                                        std::static_pointer_cast<Label>(tokenized_line.front()))
+                                );
 
-                case Token::DIR_STRINGZ:        // FALLTHROUGH
-                case Token::DIR_BLKW:           // FALLTHROUGH
-                case Token::DIR_FILL:           // FALLTHROUGH
-                case Token::DIR_END:            // FALLTHROUGH
-#ifdef INCLUDE_ADDONS
-                case Token::ADDON_NEG:          // FALLTHROUGH
-                case Token::ADDON_SUB:          // FALLTHROUGH
-#endif
-                        memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
-                        if (memory_required < 0) {
-                                error_count += static_cast<std::size_t>(-memory_required);
+                                longest_symbol_length = std::max(longest_symbol_length,
+                                                                 tokenized_line.front()->word.length());
+
+                                internal_program_counter += memory_required;
                         } else {
-                                internal_program_counter += static_cast<std::uint16_t>(memory_required);
+                                error_count += static_cast<std::size_t>(-memory_required);
+                        }
+                        break;
+                case Token::DIR_END:
+                        end_seen = true;
+                        if (!tokenized_line.front()->valid_arguments(tokenized_line)) {
+                                ++error_count;
                         }
                         break;
                 default:
-                        ++internal_program_counter;
+                        memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
+                        if (memory_required > -1) {
+                                internal_program_counter += memory_required;
+                        } else {
+                                error_count += static_cast<std::size_t>(-memory_required);
+                        }
                         break;
                 }
         }
@@ -510,8 +547,9 @@ void Assembler::assemble()
                 return;
         }
 
-        end_seen                 = false;
-        origin_seen              = false;
+        end_seen    = false;
+        origin_seen = false;
+
         internal_program_counter = file_memory_origin_address;
 
         do_second_pass();
@@ -565,84 +603,81 @@ void Assembler::write(std::string &prefix)
         std::ofstream lst_file(prefix + ".lst");
         std::ofstream symbol_file(prefix + ".sym");
 
-        int length = std::max(
-                static_cast<int>(std::max_element(
-                        symbols.begin(), symbols.end(),
-                        [](const auto &a, const auto &b) -> bool
-                        {
-                                return a.second->word.length() < b.second->word.length();
-                        }
-                )->second->word.length()), 20
-        );
-
-        const auto write_list = [&lst_file, length](
+        const auto write_list = [&lst_file, this](
                 const std::uint16_t instruction, const std::uint16_t program_counter,
                 const std::size_t line_number, const auto &label, const auto &disassembled
         )
         {
                 // Address
                 lst_file << '(' << std::uppercase << std::setfill('0') << std::setw(4)
-                         << std::hex << program_counter << ')';
+                         << std::hex << program_counter << ')'
                 // Hexadecimal representation
-                lst_file << ' ' << std::uppercase << std::setfill('0') << std::setw(4)
-                         << std::hex << std::right << instruction;
+                         << ' ' << std::uppercase << std::setfill('0') << std::setw(4)
+                         << std::hex << std::right << instruction
                 // Binary representation
-                lst_file << ' ' << std::bitset<16>(instruction) << ' ';
+                         << ' ' << std::bitset<16>(instruction) << ' '
                 // Line number
-                lst_file << '(' << std::setfill(' ') << std::right << std::setw(4)
-                         << std::dec << line_number << ')';
+                         << '(' << std::setfill(' ') << std::right << std::setw(4)
+                         << std::dec << line_number << ')'
                 // Label (if any)
-                lst_file << ' ' << std::setfill(' ') << std::setw(length)
-                         << std::left << label;
+                         << ' ' << std::setfill(' ')
+                         << std::setw(static_cast<int>(longest_symbol_length)) << std::left << label
                 // Disassembled instruction
-                lst_file << ' ' << disassembled << '\n';
+                         << ' ' << disassembled << '\n';
         };
 
         std::size_t   line = 1;
         std::uint16_t pc   = 0;
 
         auto &&symbol      = symbols.cbegin();
-        auto &&instruction = as_assembled.cbegin();
+        std::size_t instruction_index = 0;
+        std::size_t instruction_end_index = as_assembled.size();
 
         symbol_file << "// Symbol table\n"
                     << "// Scope Level 0:\n"
-                    << "//\t" << std::left << std::setw(length) << "Symbol Name" << " Page Address\n"
-                    << "//\t" << std::setw(length) << std::setfill('-') << '-' << " ------------\n";
+                    << "//\t" << std::left << std::setw(static_cast<int>(longest_symbol_length))
+                    << "Symbol Name" << " Page Address\n//\t"
+                    << std::setw(static_cast<int>(longest_symbol_length))
+                    << std::setfill('-') << '-' << " ------------\n";
 
         std::stringstream ss;
-        ss << ".ORIG 0x" << std::hex << *instruction;
-        write_list(*instruction, pc, line, ' ', ss.str());
+        ss << ".ORIG 0x" << std::hex << as_assembled.at(instruction_index);
+        write_list(as_assembled.at(instruction_index), pc, line, ' ', ss.str());
 
-        object_file.put(static_cast<char>((*instruction >> 8) & 0xFF));
-        object_file.put(static_cast<char>(*instruction & 0xFF));
+        object_file.put(static_cast<char>((as_assembled.at(instruction_index) >> 8) & 0xFF));
+        object_file.put(static_cast<char>(as_assembled.at(instruction_index) & 0xFF));
 
-        binary_file << std::bitset<16>(*instruction).to_string() << '\n';
+        binary_file << std::bitset<16>(as_assembled.at(instruction_index)).to_string() << '\n';
 
-        hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << *instruction << '\n';
+        hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << as_assembled.at(instruction_index) << '\n';
 
-        pc = *instruction;
+        pc = as_assembled.at(instruction_index);
 
         // TODO: Is it worth it to figure out if there's a .BLKW over using a lot of .FILL's?
-        for (++instruction, ++line; instruction != as_assembled.cend() || symbol != symbols.cend();
-             ++instruction, ++pc, ++line) {
+        for (++instruction_index, ++line; instruction_index < instruction_end_index || symbol != symbols.cend();
+             ++instruction_index, ++pc, ++line) {
 
-                object_file.put(static_cast<char>((*instruction >> 8) & 0xFF));
-                object_file.put(static_cast<char>(*instruction & 0xFF));
+                object_file.put(static_cast<char>((as_assembled.at(instruction_index) >> 8) & 0xFF));
+                object_file.put(static_cast<char>(as_assembled.at(instruction_index) & 0xFF));
 
-                binary_file << std::bitset<16>(*instruction).to_string() << '\n';
+                binary_file << std::bitset<16>(as_assembled.at(instruction_index)).to_string() << '\n';
 
-                hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex << *instruction << '\n';
+                hex_file << std::setfill('0') << std::setw(4) << std::uppercase << std::hex
+                         << as_assembled.at(instruction_index) << '\n';
 
                 if (symbol != symbols.cend() && symbol->first == pc) {
-                        write_list(*instruction, pc, line, symbol->second->word, disassemble(*instruction, pc));
+                        write_list(as_assembled.at(instruction_index), pc, line, symbol->second->word,
+                                   disassemble(as_assembled.at(instruction_index), pc));
 
-                        symbol_file << "//\t" << std::left << std::setw(length) << std::setfill(' ')
-                                    << symbol->second->word << ' ' << std::uppercase << std::hex
-                                    << symbol->first << '\n';
+                        symbol_file << "//\t" << std::left
+                                    << std::setw(static_cast<int>(longest_symbol_length))
+                                    << std::setfill(' ') << symbol->second->word << ' ' << std::uppercase
+                                    << std::hex << symbol->first << '\n';
 
                         ++symbol;
                 } else {
-                        write_list(*instruction, pc, line, ' ', disassemble(*instruction, pc));
+                        write_list(as_assembled.at(instruction_index), pc, line, ' ',
+                                   disassemble(as_assembled.at(instruction_index), pc));
                 }
         }
 

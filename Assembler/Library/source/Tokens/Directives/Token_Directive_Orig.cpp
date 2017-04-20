@@ -7,36 +7,8 @@ Orig::Orig(std::string &token, int line_number)
 
 std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (assembled.size()) {
-                assembler.origin_seen = true;
-                return 0;
-        }
-
-        if (tokens.size() != 2) {
-                invalid_argument_count(tokens.size(), 1);
+        if (!is_valid) {
                 return -1;
-        }
-
-        if (assembler.origin_seen) {
-                std::cerr << "ERROR: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "Multiple .ORIG statements\n";
-
-                is_error = true;
-                return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << ".ORIG after .END directive. It will be ignored.\n";
-                return 0;
-        }
-
-        if (tokens[1]->type() != Token::IMMEDIATE) {
-                tokens[1]->expected("immediate value");
         }
 
         origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate);
@@ -44,6 +16,32 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
 
         assembler.origin_seen = true;
         return origin;
+}
+
+bool Orig::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() != 2) {
+                invalid_argument_count(tokens.size(), 1);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::IMMEDIATE) {
+                tokens.at(1)->expected("immediate value");
+                return (is_valid = false);
+        } else if (!tokens.at(1)->is_valid) {
+                return (is_valid = false);
+        }
+
+        return is_valid;
+}
+
+std::int32_t Orig::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        if (is_valid) {
+                return static_cast<std::int32_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->immediate);
+        } else {
+                return -1;
+        }
 }
 
 Token::token_type Orig::type() const

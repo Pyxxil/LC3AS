@@ -6,12 +6,12 @@ Label::Label(std::string &name, int line_number)
 
 std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (tokens.size() == 1) {
-                return 0;
+        if (!is_valid) {
+                return -1;
         }
 
-        if (tokens[1]->assembled.size()) {
-                return static_cast<std::int32_t>(tokens[1]->assembled.size());
+        if (tokens.size() == 1) {
+                return 0;
         }
 
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
@@ -22,6 +22,26 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemb
         return ret;
 }
 
+bool Label::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() > 1) {
+                std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
+                return vec.front()->valid_arguments(vec);
+        } else {
+                return true;
+        }
+}
+
+std::int32_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        if (tokens.size() > 1) {
+                std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
+                return vec.front()->guess_memory_size(vec);
+        } else {
+                return 0;
+        }
+}
+
 void Label::not_found()
 {
         std::cerr << "ERROR: ";
@@ -29,8 +49,6 @@ void Label::not_found()
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
         std::cerr << "No such label '" << label << "'\n";
-
-        is_error = true;
 }
 
 Token::token_type Label::type() const

@@ -12,6 +12,8 @@ public:
         std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler) override;
         virtual Token::token_type type() const override;
         void not_found();
+        virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
+        virtual int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
 
         std::string label;
 

@@ -12,40 +12,16 @@ St::St(std::string &oper, int line_number)
 
 std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (tokens.size() != 3) {
-                invalid_argument_count(tokens.size(), 2);
+        if (!is_valid) {
                 return -1;
         }
 
-        if (!assembler.origin_seen) {
-                expected(".ORIG directive");
-                return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
+        const auto &&symbol = std::find_if(
+                assembler.symbols.cbegin(), assembler.symbols.cend(),
+                [&tokens](const auto &sym) -> bool
+                {
+                        return sym.second->word == tokens[2]->word;
                 }
-                std::cerr << "ST after .END directive. It will be ignored.\n";
-                return 0;
-        }
-
-        if (tokens[1]->type() != Token::REGISTER) {
-                tokens[1]->expected("register");
-                return -1;
-        } else if (tokens[2]->type() != Token::LABEL) {
-                tokens[2]->expected("label");
-                return -1;
-        }
-
-        if (tokens[1]->is_error || tokens[2]->is_error) {
-                return -1;
-        }
-
-        const auto &&symbol = std::find_if(assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                           [&tokens](const auto &sym) -> bool
-                                           {
-                                                   return sym.second->word == tokens[2]->word;
-                                           }
         );
 
         if (symbol == assembler.symbols.end()) {
@@ -71,6 +47,34 @@ std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
         );
 
         return 1;
+}
+
+bool St::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() != 3) {
+                invalid_argument_count(tokens.size(), 2);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::REGISTER) {
+                tokens.at(1)->expected("register");
+                return (is_valid = false);
+        } else if (tokens.at(2)->type() != Token::LABEL) {
+                tokens.at(2)->expected("label");
+                return (is_valid = false);
+        }
+
+        if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid)) {
+                return (is_valid = false);
+        }
+
+        return is_valid;
+}
+
+std::int32_t St::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        (void) tokens;
+        return static_cast<std::int32_t>(is_valid);
 }
 
 Token::token_type St::type() const

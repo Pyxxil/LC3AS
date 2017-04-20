@@ -22,36 +22,9 @@ Sub::Sub(std::string &word, int line_number)
 // TODO: Change this so you can have it similar to ADD R1, R2, R3
 std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (assembled.size()) {
-                return static_cast<std::int32_t>(assembled.size());
-        }
+        (void) assembler;
 
-        if (tokens.size() != 3) {
-                invalid_argument_count(tokens.size(), 2);
-                return -1;
-        }
-
-        if (!assembler.origin_seen) {
-                expected(".ORIG directive");
-                return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "NOT after .END directive. It will be ignored.\n";
-                return 0;
-        }
-
-        if (tokens[1]->type() != Token::REGISTER) {
-                tokens[1]->expected("register");
-                return -1;
-        } else if (tokens[2]->type() != Token::REGISTER) {
-                tokens[2]->expected("register");
-                return -1;
-        }
-
-        if (tokens[1]->is_error || tokens[2]->is_error) {
+        if (!is_valid) {
                 return 0;
         }
 
@@ -92,6 +65,38 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         }
 
         return ret;
+}
+
+bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() != 3) {
+                invalid_argument_count(tokens.size(), 2);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::REGISTER) {
+                tokens.at(1)->expected("register");
+                return (is_valid = false);
+        } else if (tokens.at(2)->type() != Token::REGISTER) {
+                tokens.at(2)->expected("register");
+                return (is_valid = false);
+        }
+
+        return (is_valid = tokens.at(1)->is_valid && tokens.at(2)->is_valid);
+}
+
+std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        if (is_valid) {
+                if (std::static_pointer_cast<Register>(tokens.at(1))->reg ==
+                    std::static_pointer_cast<Register>(tokens.at(2))->reg) {
+                        return 1;
+                } else {
+                        return 5;
+                }
+        } else {
+                return -1;
+        }
 }
 
 Token::token_type Sub::type() const

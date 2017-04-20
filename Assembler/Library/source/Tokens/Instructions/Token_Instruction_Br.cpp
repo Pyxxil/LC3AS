@@ -8,33 +8,10 @@ Br::Br(std::string &oper, int line_number, bool n, bool z, bool p)
         : Instruction(oper, line_number), N(n), Z(z), P(p)
 {}
 
-Token::token_type Br::type() const
-{
-        return Token::OP_BR;
-}
-
 std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (tokens.size() != 2) {
-                invalid_argument_count(tokens.size(), 1);
-                return -1;
-        }
-
-        if (!assembler.origin_seen) {
-                expected(".ORIG directive");
-                return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "BR after .END directive. It will be ignored.\n";
+        if (!is_valid) {
                 return 0;
-        }
-
-        if (tokens[1]->type() != Token::LABEL) {
-                tokens[1]->expected("label");
-                return -1;
         }
 
         const auto &&symbol = std::find_if(assembler.symbols.cbegin(), assembler.symbols.cend(),
@@ -63,4 +40,33 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
         );
 
         return 1;
+}
+
+bool Br::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+
+        if (tokens.size() != 2) {
+                invalid_argument_count(tokens.size(), 1);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::LABEL) {
+                tokens.at(1)->expected("label");
+                return (is_valid = false);
+        } else if (!tokens.at(1)->is_valid) {
+                return (is_valid = false);
+        }
+
+        return is_valid;
+}
+
+std::int32_t Br::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        (void) tokens;
+        return static_cast<int32_t>(is_valid);
+}
+
+Token::token_type Br::type() const
+{
+        return Token::OP_BR;
 }

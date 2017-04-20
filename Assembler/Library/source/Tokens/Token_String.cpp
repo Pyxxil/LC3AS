@@ -36,15 +36,11 @@ Token::token_type String::type() const
         return Token::_STRING;
 }
 
-Token &String::expected(const char *const expects)
+void String::expected(const char *const expects) const
 {
         std::cerr << "ERROR: ";
         if (at_line) {
                 std::cerr << "Line " << at_line << ": ";
         }
         std::cerr << "Expected " << expects << ". Found '" << word << "' instead.\n";
-
-        is_error = true;
-
-        return *this;
 }

@@ -44,6 +44,8 @@ public:
         std::string disassemble(std::uint16_t instruction, std::uint16_t pc);
 
 private:
+        std::size_t longest_symbol_length = 20;
+
         std::vector<std::uint16_t> as_assembled;
 
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;

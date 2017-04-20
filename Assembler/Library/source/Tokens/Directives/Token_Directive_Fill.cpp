@@ -7,64 +7,60 @@
 #include "Assembler.hpp"
 
 Fill::Fill(std::string &token, int line_number)
-        : Directive(token, line_number), first_time(true)
+        : Directive(token, line_number)
 {}
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        if (assembled.size()) {
-                return 1;
-        }
-
-        if (tokens.size() != 2) {
-                invalid_argument_count(tokens.size(), 1);
-                return -1;
-        }
-
-        if (!assembler.origin_seen) {
-                expected(".ORIG directive");
-                return -1;
-        } else if (assembler.end_seen) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << ".FILL after .END directive. It will be ignored.\n";
+        if (!is_valid) {
                 return 0;
         }
 
-        if (tokens[1]->is_error) {
-                return -1;
-        }
-
-        if (tokens[1]->type() == Token::IMMEDIATE) {
+        if (tokens.at(1)->type() == Token::IMMEDIATE) {
                 assembled.emplace_back(
-                        static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->immediate)
+                        static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->immediate)
                 );
-        } else if (tokens[1]->type() == Token::LABEL) {
-                if (!first_time) {
-                        const auto &&symbol = std::find_if(
-                                assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                [&tokens](auto &&sym) -> bool
-                                {
-                                        return sym.second->word == tokens[1]->word;
-                                }
-                        );
-
-                        if (symbol == assembler.symbols.end()) {
-                                std::static_pointer_cast<Label>(tokens[1])->not_found();
-                                return -1;
-                        } else {
-                                assembled.emplace_back(symbol->second->address);
+        } else if (tokens.at(1)->type() == Token::LABEL) {
+                const auto &&symbol = std::find_if(
+                        assembler.symbols.cbegin(), assembler.symbols.cend(),
+                        [&tokens](auto &&sym) -> bool
+                        {
+                                return sym.second->word == tokens.at(1)->word;
                         }
+                );
+
+                if (symbol == assembler.symbols.end()) {
+                        std::static_pointer_cast<Label>(tokens.at(1))->not_found();
+                        return -1;
+                } else {
+                        assembled.emplace_back(symbol->second->address);
                 }
-        } else {
-                tokens[1]->expected("valid immediate value or label");
-                return -1;
         }
 
-        first_time = false;
         return 1;
+}
+
+bool Fill::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() < 2) {
+                invalid_argument_count(tokens.size(), 1);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::IMMEDIATE && tokens.at(1)->type() != Token::LABEL) {
+                tokens.at(1)->expected("register or label");
+                return (is_valid = false);
+        } else if (!tokens.at(1)->is_valid) {
+                return (is_valid = false);
+        }
+
+        return is_valid;
+}
+
+std::int32_t Fill::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        (void) tokens;
+        return static_cast<std::int32_t>(is_valid);
 }
 
 Token::token_type Fill::type() const
