@@ -191,12 +191,33 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                                 current += last_character;
                         }
 
-                        if (index == line.length() && last_character != '"') {
+                        if (last_character != '"') {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
-                                tokenized_line.back()->expected("to find closing '\"'");
-                                tokenized_line.back()->is_valid = false;
+                                std::static_pointer_cast<String>(tokenized_line.back())->unterminated();
                         } else {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
+                        }
+
+                        current.erase();
+                } else if (character == '\'') {
+                        addToken(current, tokenized_line, line_number);
+
+                        char last_character = 0;
+                        while (index + 1 < line.length()) {
+                                last_character = line.at(++index);
+                                if (last_character == '\\' && line.length() > index + 1 && line.at(index + 1) == '\'') {
+                                        last_character = line.at(++index);
+                                } else if (last_character == '\'') {
+                                        break;
+                                }
+                                current += last_character;
+                        }
+
+                        if (last_character != '\'') {
+                                tokenized_line.push_back(std::make_shared<Character>(current, line_number));
+                                std::static_pointer_cast<Character>(tokenized_line.back())->unterminated();
+                        } else {
+                                tokenized_line.push_back(std::make_shared<Character>(current, line_number));
                         }
 
                         current.erase();
@@ -282,9 +303,26 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 // What else could it be?
                 return std::make_shared<Token>(word, line_number);
         case '#':  // FALLTHROUGH
-        case '-':
-                return std::make_shared<Decimal>(copy, line_number);
-        case 'B':
+                return std::make_shared<Decimal>(word, line_number);
+        case '-': {
+                const auto prefix_position = std::find_if(
+                        copy.cbegin(), copy.cend(),
+                        [](const auto &character) -> bool
+                        {
+                                return character == 'X' || character == 'B';
+                        }
+                );
+
+                if (prefix_position != copy.cend()) {
+                        if (*prefix_position == 'B') {
+                                return std::make_shared<Binary>(word, line_number);
+                        } else {
+                                return std::make_shared<Hexadecimal>(word, line_number);
+                        }
+                } else {
+                        return std::make_shared<Decimal>(word, line_number);
+                }
+        } case 'B':
                 if (copy.length() > 1 && (copy.at(1) == '0' || copy.at(1) == '1')) {
                         copy = word.substr(1);
                         return std::make_shared<Binary>(copy, line_number);
@@ -301,7 +339,7 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 }
                 if (std::isdigit(copy.at(1))) {
                         if (copy.length() < 3 || std::isspace(copy.at(2)) || copy.at(2) == ',') {
-                                return std::make_shared<Register>(word);
+                                return std::make_shared<Register>(word, line_number);
                         }
                 } else if (hashed == hash("RET", 3)) {
                         return std::make_shared<Ret>(word, line_number);
@@ -395,9 +433,9 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         case hash(".STRINGZ", 8):
                 return std::make_shared<Stringz>(word, line_number);
 #ifdef INCLUDE_ADDONS
-        case hash("NEG", 3):
+        case hash(".NEG", 4):
                 return std::make_shared<Neg>(word, line_number);
-        case hash("SUB", 3):
+        case hash(".SUB", 4):
                 return std::make_shared<Sub>(word, line_number);
 #endif
         default:
@@ -412,8 +450,6 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
 void Assembler::do_first_pass()
 {
         std::int32_t memory_required = 0;
-
-        puts("Starting first pass");
 
         const auto memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
         {
@@ -469,8 +505,8 @@ void Assembler::do_first_pass()
 
                                 if (symbols.count(internal_program_counter)) {
                                         std::cerr << "WARNING: Multiple labels found for address 0x"
-                                                  << std::hex << internal_program_counter;
-                                        std::cerr << "\nNOTE: \tPrevious label '"
+                                                  << std::hex << internal_program_counter
+                                                  << "\nNOTE: \tPrevious label '"
                                                   << symbols.at(internal_program_counter)->word
                                                   << "' found on line " << std::dec
                                                   << symbols.at(internal_program_counter)->at_line
@@ -510,8 +546,6 @@ void Assembler::do_first_pass()
         if (!end_seen) {
                 std::cerr << "Reached the end of the file, and found no .END directive\n";
         }
-
-        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
 }
 
 /**
@@ -536,36 +570,12 @@ void Assembler::do_second_pass()
         std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
 }
 
-void Assembler::assemble()
-{
-        if (tokens.empty()) {
-                return;
-        }
-
-        do_first_pass();
-
-        if (error_count) {
-                return;
-        }
-
-        end_seen    = false;
-        origin_seen = false;
-
-        internal_program_counter = file_memory_origin_address;
-
-        do_second_pass();
-
-        if (!error_count) {
-                generate_machine_code();
-        }
-}
-
 /**
  * Generate the machine code for the file.
  *
  * @return The machine code gathered into a vector.
  */
-std::vector<std::uint16_t> &Assembler::generate_machine_code()
+std::vector<std::uint16_t> Assembler::generate_machine_code()
 {
         if (as_assembled.size()) {
                 return as_assembled;
@@ -578,6 +588,32 @@ std::vector<std::uint16_t> &Assembler::generate_machine_code()
         }
 
         return as_assembled;
+}
+
+bool Assembler::assemble(std::string &fileName)
+{
+        puts("Starting first pass");
+
+        tokenizeFile(fileName);
+
+        do_first_pass();
+
+        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
+
+        if (error_count || tokens.empty()) {
+                return false;
+        }
+
+        internal_program_counter = file_memory_origin_address;
+
+        do_second_pass();
+
+        if (!error_count) {
+                generate_machine_code();
+                write(fileName.substr(0, fileName.find_first_of('.')));
+        }
+
+        return error_count == 0;
 }
 
 /**
@@ -598,11 +634,11 @@ void Assembler::write(std::string &prefix)
                 return;
         }
 
-        std::ofstream binary_file(prefix + ".bin");
-        std::ofstream hex_file(prefix + ".hex");
         std::ofstream object_file(prefix + ".obj", std::ofstream::binary);
-        std::ofstream lst_file(prefix + ".lst");
+        std::ofstream binary_file(prefix + ".bin");
         std::ofstream symbol_file(prefix + ".sym");
+        std::ofstream hex_file(prefix + ".hex");
+        std::ofstream lst_file(prefix + ".lst");
 
         const auto write_list = [&lst_file, this](
                 const std::uint16_t instruction, const std::uint16_t program_counter,

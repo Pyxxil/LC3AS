@@ -10,7 +10,7 @@ public:
 
         virtual Token::token_type type() const override;
 
-        void expected(const char *const expects) const override;
+        void unterminated();
 };
 
 #endif //PROJECT_TOKEN_STRING_HPP

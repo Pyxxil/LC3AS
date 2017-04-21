@@ -9,14 +9,9 @@ int main(int argc, char **argv)
                 return 1;
         }
 
-        std::string fileName = argv[1];
-        std::string prefix   = fileName.substr(0, fileName.find_first_of('.'));
-
         Assembler as;
 
-        as.tokenizeFile(fileName);
-        as.assemble();
-        as.write(prefix);
+        as.assemble(argv[1]);
 
         return 0;
 }

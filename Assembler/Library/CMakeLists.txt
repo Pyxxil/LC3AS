@@ -95,12 +95,14 @@ if ( USE_ADDONS )
               "${ASSEMBLER_SOURCE_FILES}"
               source/Tokens/Additional/Token_Addon_Neg.cpp
               source/Tokens/Additional/Token_Addon_Sub.cpp
+              source/Tokens/Additional/Token_Addon_Char.cpp
               )
 
         set ( ASSEMBLER_HEADER_FILES
               "${ASSEMBLER_HEADER_FILES}"
               includes/Tokens/Additional/Token_Addon_Neg.hpp
               includes/Tokens/Additional/Token_Addon_Sub.hpp
+              includes/Tokens/Additional/Token_Addon_Char.hpp
               )
 
         if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )

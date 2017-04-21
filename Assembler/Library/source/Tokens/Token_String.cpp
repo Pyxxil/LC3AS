@@ -36,11 +36,12 @@ Token::token_type String::type() const
         return Token::_STRING;
 }
 
-void String::expected(const char *const expects) const
+void String::unterminated()
 {
+        is_valid = false;
         std::cerr << "ERROR: ";
         if (at_line) {
-                std::cerr << "Line " << at_line << ": ";
+                std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << "Expected " << expects << ". Found '" << word << "' instead.\n";
+        std::cerr << "Unterminated string.\n";
 }

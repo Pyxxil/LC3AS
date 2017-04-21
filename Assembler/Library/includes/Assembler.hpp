@@ -23,9 +23,14 @@ public:
         std::vector<std::shared_ptr<Token>> tokenizeLine(std::string &line, int line_number = 0);
 
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
-        std::vector<uint16_t> &generate_machine_code();
+        std::vector<std::uint16_t> generate_machine_code();
 
-        void assemble();
+        bool assemble(std::string &fileName);
+        bool assemble(std::string &&fileName)
+        {
+                return assemble(fileName);
+        }
+
         void write(std::string &prefix);
         void write(std::string &&prefix)
         {
