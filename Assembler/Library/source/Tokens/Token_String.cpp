@@ -35,13 +35,3 @@ Token::token_type String::type() const
 {
         return Token::_STRING;
 }
-
-void String::unterminated()
-{
-        is_valid = false;
-        std::cerr << "ERROR: ";
-        if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
-        }
-        std::cerr << "Unterminated string.\n";
-}

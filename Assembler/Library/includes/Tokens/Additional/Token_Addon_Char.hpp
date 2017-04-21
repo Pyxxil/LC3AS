@@ -8,7 +8,6 @@ class Character : public Immediate
 public:
         Character();
         Character(std::string &word, int line_number = 0);
-        void unterminated();
 };
 
 #endif //PROJECT_TOKEN_ADDON_CHAR_HPP

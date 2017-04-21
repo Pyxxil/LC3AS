@@ -9,8 +9,6 @@ public:
         String(std::string &string, int line_number = 0);
 
         virtual Token::token_type type() const override;
-
-        void unterminated();
 };
 
 #endif //PROJECT_TOKEN_STRING_HPP

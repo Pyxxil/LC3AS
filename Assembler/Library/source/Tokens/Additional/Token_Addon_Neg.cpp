@@ -12,8 +12,8 @@ Neg::Neg()
 
 }
 
-Neg::Neg(std::string &word, int line_number)
-        : Token(word, line_number)
+Neg::Neg(std::string &directive, int line_number)
+        : Token(directive, line_number)
 {
 
 }

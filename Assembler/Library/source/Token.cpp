@@ -1,0 +1,130 @@
+#include "Token.hpp"
+
+Token::Token()
+        : word(), assembled()
+{
+
+}
+
+Token::Token(std::string &token, int line)
+        : word(token), assembled(), at_line(line), is_valid(true)
+{
+
+}
+
+Token::token_type Token::type() const
+{
+        return Token::NONE;
+}
+
+std::string Token::deduce_type() const
+{
+        switch (type()) {
+        case OP_BR:
+        case OP_ST:
+        case OP_LD:
+        case OP_LDR:
+        case OP_LEA:
+        case OP_LDI:
+        case OP_NOT:
+        case OP_RTI:
+        case OP_STI:
+        case OP_STR:
+        case OP_ADD:
+        case OP_AND:
+        case OP_JSR:
+        case OP_RET:
+        case OP_JMP:
+        case OP_JSRR:
+        case OP_TRAP:
+                return std::string("Instruction");
+        case DIR_END:
+        case DIR_FILL:
+        case DIR_BLKW:
+        case DIR_ORIG:
+        case DIR_STRINGZ:
+#ifdef INCLUDE_ADDONS
+        case ADDON_NEG:
+        case ADDON_SUB:
+#endif
+                return std::string("Directive");
+        case TRAP_IN:
+        case TRAP_OUT:
+        case TRAP_PUTS:
+        case TRAP_GETC:
+        case TRAP_HALT:
+        case TRAP_PUTSP:
+                return std::string("Trap Routine");
+        case REGISTER:
+                return std::string("Register");
+        case LABEL:
+                return std::string("Label");
+        case IMMEDIATE:
+                return std::string("Immediate Value");
+        case _STRING:
+                return std::string("String Literal");
+        default:
+                return std::string("NoneType");
+        }
+}
+
+void Token::expected(const char *const expects) const
+{
+        std::cerr << "ERROR: ";
+        if (at_line) {
+                std::cerr << "Line " << std::dec << at_line << ": ";
+        }
+        std::cerr << "Expected " << expects << ". Found '" << word << "' ( Type: " << deduce_type() << " ) instead.\n";
+}
+
+std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+{
+        std::cerr << word << ".assemble() not implemented\n";
+        (void) tokens;
+        (void) assembler;
+        return -1;
+}
+
+const std::vector<uint16_t> Token::as_assembled() const
+{
+        return assembled;
+}
+
+void Token::invalid_argument_count(std::size_t provided, std::size_t expected) const
+{
+        provided -= 1;  // This is not the best idea, but because tokens.size() returns
+        // the number of arguments + the token itself, it's a little easier to do here.
+        std::cerr << "ERROR: ";
+        if (at_line) {
+                std::cerr << "Line " << std::dec << at_line << ": ";
+        }
+        std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s")
+                  << ", but " << (provided < expected ? "only " : "") << provided << " argument"
+                  << (provided == 1 ? " was" : "'s were") << " provided.\n";
+}
+
+bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        (void) tokens;
+        expected("one of: instruction, label, or directive");
+        return false;
+}
+std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+{
+        std::cerr << tokens.front()->word << ".guess_memory_size() not implemented\n";
+
+        (void) tokens;
+        return 0;
+}
+
+void Token::unterminated(std::string &&t_type)
+{
+        is_valid = false;
+        std::cerr << "ERROR: ";
+        if (at_line) {
+                std::cerr << "Line " << std::dec << at_line << ": ";
+        }
+        std::cerr << "Unterminated " << t_type << " literal.\n";
+
+        word = "Non-terminated " + t_type;
+}

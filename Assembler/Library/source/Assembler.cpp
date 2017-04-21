@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <regex>
 
 #include "Tokens/All_Tokens.hpp"
 
@@ -83,6 +84,9 @@ Assembler::Assembler()
           , internal_program_counter(0)
           , origin_seen(false)
           , end_seen(false)
+          , symbols()
+          , as_assembled()
+          , tokens()
 {
 }
 
@@ -105,22 +109,35 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
 
         std::string line;
 
-        int line_number = 0;
+        std::vector<std::shared_ptr<Token>> tokenized_line;
 
-        while (std::getline(file, line)) {
-                line_number++;
-
+        for (int line_number = 1; std::getline(file, line); line_number++) {
                 if (line.empty()) {
                         continue;
                 }
 
-                std::vector<std::shared_ptr<Token>> tokenized_line = tokenizeLine(line, line_number);
+                tokenized_line = tokenizeLine(line, line_number);
                 if (!tokenized_line.empty()) {
                         tokens.push_back(tokenized_line);
                 }
         }
 
         return tokens;
+}
+
+/**
+ * Add a token to the current line's tokens.
+ *
+ * @param token The string containing the token.
+ * @param t_tokens The current tokens in the line.
+ * @param line_number The line number (only relevant for working with files).
+ */
+void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number)
+{
+        if (!token.empty()) {
+                t_tokens.push_back(tokenize(token, line_number));
+                token.erase();
+        }
 }
 
 /**
@@ -138,14 +155,12 @@ std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::s
  */
 std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, int line_number)
 {
-        char character;
-
         std::string current;
 
         std::vector<std::shared_ptr<Token>> tokenized_line;
 
         for (std::size_t index = 0; index < line.length();) {
-                character = line.at(index);
+                char character = line.at(index);
 
                 if (std::isspace(character)) {
                         // We don't care about space characters.
@@ -177,47 +192,40 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         break;
                 } else if (character == ',' || character == ':') {
                         addToken(current, tokenized_line, line_number);
-                } else if (character == '"') {
+                } else if (character == '"'
+#ifdef INCLUDE_ADDONS
+                           || character == '\''
+#endif
+                        ) {
                         addToken(current, tokenized_line, line_number);
 
-                        char last_character = 0;
+                        char terminator = character;
                         while (index + 1 < line.length()) {
-                                last_character = line.at(++index);
-                                if (last_character == '\\' && line.length() > index + 1 && line.at(index + 1) == '"') {
-                                        last_character = line.at(++index);
-                                } else if (last_character == '"') {
+                                character = line.at(++index);
+                                if (character == '\\' && line.length() > index + 1 &&
+                                    line.at(index + 1) == terminator) {
+                                        character = line.at(++index);
+                                } else if (character == terminator) {
                                         break;
                                 }
-                                current += last_character;
+                                current += character;
                         }
 
-                        if (last_character != '"') {
+                        if (character != terminator) {
+                                tokenized_line.push_back(std::make_shared<Token>(current, line_number));
+                                tokenized_line.back()->unterminated(
+#ifdef INCLUDE_ADDONS
+                                        terminator == '\'' ? "character" :
+#endif
+                                        "string"
+                                );
+                                ++error_count;
+                        } else if (terminator == '"') {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
-                                std::static_pointer_cast<String>(tokenized_line.back())->unterminated();
-                        } else {
-                                tokenized_line.push_back(std::make_shared<String>(current, line_number));
-                        }
-
-                        current.erase();
-                } else if (character == '\'') {
-                        addToken(current, tokenized_line, line_number);
-
-                        char last_character = 0;
-                        while (index + 1 < line.length()) {
-                                last_character = line.at(++index);
-                                if (last_character == '\\' && line.length() > index + 1 && line.at(index + 1) == '\'') {
-                                        last_character = line.at(++index);
-                                } else if (last_character == '\'') {
-                                        break;
-                                }
-                                current += last_character;
-                        }
-
-                        if (last_character != '\'') {
-                                tokenized_line.push_back(std::make_shared<Character>(current, line_number));
-                                std::static_pointer_cast<Character>(tokenized_line.back())->unterminated();
+#ifdef INCLUDE_ADDONS
                         } else {
                                 tokenized_line.push_back(std::make_shared<Character>(current, line_number));
+#endif
                         }
 
                         current.erase();
@@ -229,9 +237,9 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 
         const bool any_non_space_characters = std::any_of(
                 current.cbegin(), current.cend(),
-                [](unsigned char character) -> bool
+                [](unsigned char chr) -> bool
                 {
-                        return !std::isspace(character);
+                        return !std::isspace(chr);
                 }
         );
 
@@ -240,21 +248,6 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
         }
 
         return tokenized_line;
-}
-
-/**
- * Add a token to the current line's tokens.
- *
- * @param token The string containing the token.
- * @param t_tokens The current tokens in the line.
- * @param line_number The line number (only relevant for working with files).
- */
-void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number)
-{
-        if (!token.empty()) {
-                t_tokens.push_back(tokenize(token, line_number));
-                token.erase();
-        }
 }
 
 /**
@@ -282,73 +275,6 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         // measure.
         std::size_t hashed = hash(copy);
 
-        if (std::isdigit(word.at(0))) {
-                if (std::all_of(word.begin(), word.end(), ::isdigit)) {
-                        return std::make_shared<Decimal>(word, line_number);
-                }
-        }
-
-        switch (copy.at(0)) {
-        case '0':
-                if (copy.at(1) == 'X') {
-                        return std::make_shared<Hexadecimal>(word, line_number);
-                } else if (copy.at(1) == 'B') {
-                        return std::make_shared<Binary>(word, line_number);
-                }
-                break;
-        case '\\':
-                if (copy.length() > 1 && std::isdigit(copy.at(1))) {
-                        return std::make_shared<Octal>(word, line_number);
-                }
-                // What else could it be?
-                return std::make_shared<Token>(word, line_number);
-        case '#':  // FALLTHROUGH
-                return std::make_shared<Decimal>(word, line_number);
-        case '-': {
-                const auto prefix_position = std::find_if(
-                        copy.cbegin(), copy.cend(),
-                        [](const auto &character) -> bool
-                        {
-                                return character == 'X' || character == 'B';
-                        }
-                );
-
-                if (prefix_position != copy.cend()) {
-                        if (*prefix_position == 'B') {
-                                return std::make_shared<Binary>(word, line_number);
-                        } else {
-                                return std::make_shared<Hexadecimal>(word, line_number);
-                        }
-                } else {
-                        return std::make_shared<Decimal>(word, line_number);
-                }
-        } case 'B':
-                if (copy.length() > 1 && (copy.at(1) == '0' || copy.at(1) == '1')) {
-                        copy = word.substr(1);
-                        return std::make_shared<Binary>(copy, line_number);
-                }
-                break;
-        case 'X':
-                if (copy.length() > 1 && std::isxdigit(copy.at(1))) {
-                        return std::make_shared<Hexadecimal>(word, line_number);
-                }
-                return std::make_shared<Label>(word, line_number);
-        case 'R':
-                if (copy.length() < 2) {
-                        return std::make_shared<Label>(word, line_number);
-                }
-                if (std::isdigit(copy.at(1))) {
-                        if (copy.length() < 3 || std::isspace(copy.at(2)) || copy.at(2) == ',') {
-                                return std::make_shared<Register>(word, line_number);
-                        }
-                } else if (hashed == hash("RET", 3)) {
-                        return std::make_shared<Ret>(word, line_number);
-                }
-                return std::make_shared<Label>(word, line_number);
-        default:
-                break;
-        }
-
         switch (hashed) {
         case hash("ADD", 3):
                 return std::make_shared<Add>(word, line_number);
@@ -362,6 +288,8 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 return std::make_shared<Jsrr>(word, line_number);
         case hash("JMP", 3):
                 return std::make_shared<Jmp>(word, line_number);
+        case hash("RET", 3):
+                return std::make_shared<Ret>(word, line_number);
         case hash("ST", 2):
                 return std::make_shared<St>(word, line_number);
         case hash("STR", 3):
@@ -440,7 +368,39 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
 #endif
         default:
                 // Of course, if it doesn't match the above, then we'll treat it as a label.
+                break;
+        }
+
+        const std::regex decimal("#?-?\\d+");
+        const std::regex binary("-?0?[bB][0-1]+");
+        const std::regex hexadecimal("0?[xX][0-9a-fA-F]+");
+        const std::regex octal("\\\\[0-7]+");
+        const std::regex _register("[rR]\\d");
+        const std::regex label("[a-zA-Z0-9_]+");
+
+        if (std::regex_match(word, decimal)) {
+                return std::make_shared<Decimal>(word, line_number);
+        } else if (std::regex_match(word, binary)) {
+                return std::make_shared<Binary>(word, line_number);
+        } else if (std::regex_match(word, hexadecimal)) {
+                return std::make_shared<Hexadecimal>(word, line_number);
+        } else if (std::regex_match(word, octal)) {
+                return std::make_shared<Octal>(word, line_number);
+        } else if (std::regex_match(word, _register)) {
+                return std::make_shared<Register>(word, line_number);
+        } else if (std::regex_match(word, label)) {
                 return std::make_shared<Label>(word, line_number);
+        } else {
+                const std::shared_ptr<Token> token = std::make_shared<Token>(word, line_number);
+                token->is_valid = false;
+                std::cerr << "ERROR: ";
+                if (line_number) {
+                        std::cerr << "Line " << std::dec << line_number << ": ";
+                }
+                std::cerr << "Expected one of: label, instruction, or immediate value. Found '"
+                          << word << "' instead.\n";
+                ++error_count;
+                return token;
         }
 }
 
@@ -739,7 +699,8 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                         symbols.cbegin(), symbols.cend(),
                         [instruction, pc, shift](const auto &sym) -> bool
                         {
-                                const std::int16_t offset = static_cast<std::int16_t>(instruction << shift) >> shift;
+                                const std::int16_t offset = static_cast<std::int16_t>(
+                                        static_cast<std::int16_t>(instruction << shift) >> shift);
                                 return sym.first == (offset + pc + 1);
                         }
                 );

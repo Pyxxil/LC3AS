@@ -3,6 +3,7 @@ project ( LC3Assembler )
 
 set ( ASSEMBLER_SOURCE_FILES
       source/Assembler.cpp
+      source/Token.cpp
       source/Tokens/Token_Label.cpp
       source/Tokens/Token_String.cpp
       source/Tokens/Token_Register.cpp
@@ -114,7 +115,7 @@ add_library ( ${PROJECT_NAME} STATIC ${ASSEMBLER_SOURCE_FILES} ${ASSEMBLER_HEADE
 
 target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
 target_compile_options ( ${PROJECT_NAME} PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )
-target_include_directories ( ${PROJECT_NAME} PRIVATE includes )
+target_include_directories ( ${PROJECT_NAME} PRIVATE includes/ )
 
 if ( USE_ADDONS )
         if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Addons_Debug" )

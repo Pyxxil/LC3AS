@@ -2,11 +2,11 @@
 // Scope Level 0:
 //	Symbol Name          Page Address
 //	-------------------- ------------
-//	cheat                3020
-//	oct                  3028
-//	BEGIN_TEST           3029
-//	EXTRA_FEATURES       302D
-//	addr                 3037
-//	b                    3038
-//	bin                  3039
-//	hex                  303A
+//	BEGIN_TEST           3017
+//	EXTRA_FEATURES       301B
+//	oct                  3023
+//	cheat                3036
+//	addr                 3039
+//	b                    303A
+//	bin                  303B
+//	hex                  303C

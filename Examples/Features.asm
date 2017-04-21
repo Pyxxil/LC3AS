@@ -23,6 +23,10 @@
 ; stringz = \w*\.STRINGZ\w+string\w*comment?
 ; end     = \w*\.END\w*comment?
 ;
+; Additional Directives:
+; sub     = \w*\.SUB\w+register\w*,?\w*register\w*comment?
+; neg     = \w*\.NEG\w+register\w*,?\w*register\w*comment?
+;
 ; directive = orig|fill|blkw|stringz|end
 ;
 ; Instructions:
@@ -105,47 +109,49 @@ oct     .FILL \700      ; Octal values are also acceptable
 cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
         RET
 
-ERROR_THROWS:           ; These should all throw error's.
-        .STRINGZ 0x0
-        .STRINGZ addr
-        .STRINGZ R0
-        .STRINGZ "Non-terminated string
-        .FILL "Hello"
-        .FILL 'a
-        .FILL R0
-        .BLKW R0
-        .BLKW #1 R0
-
-        .BLKW -0x0
-        .FILL -b01
-        .FILL #A
-        .FILL #-b0
-        .FILL 0Ab
-
-        ADD R0, R0, addr
-        ADD R0, addr, R0
-        ADD addr, R0, R0
-        ADD R0          ; This should only be an error for now, I'd like to
-                        ; implement this at some time.
-        ADD R0, R0      ; As with above
-        ADD #0
-        ADD R0, #0      ; As with above
-        ADD R0, R0, R0, R0
-
-        AND R0, R0, addr
-        AND R0, addr, R0
-        AND addr, R0, R0
-        AND R0          ; As with above
-        AND R0, R0      ; As with above
-        AND #0
-        AND R0, #0      ; As with above
-        AND R0, R0, R0, R0
-
-        BR R0
-        BR addr
-        BR "Hello"
-        BR add
-        BR #1
+; Uncomment the following for testing
+;       Current Error Count = 37
+;ERROR_THROWS:           ; These should all throw error's.
+;        .STRINGZ 0x0
+;        .STRINGZ addr
+;        .STRINGZ R0
+;        .STRINGZ "Non-terminated string
+;        .FILL "Hello"
+;        .FILL 'a
+;        .FILL R0
+;        .BLKW R0
+;        .BLKW #1 R0
+;
+;        .BLKW -0x0
+;        .FILL -b01
+;        .FILL #A
+;        .FILL #-b0
+;        .FILL 0Ab
+;
+;        ADD R0, R0, addr
+;        ADD R0, addr, R0
+;        ADD addr, R0, R0
+;        ADD R0          ; This should only be an error for now, I'd like to
+;                        ; implement this at some time.
+;        ADD R0, R0      ; As with above
+;        ADD #0
+;        ADD R0, #0      ; As with above
+;        ADD R0, R0, R0, R0
+;
+;        AND R0, R0, addr
+;        AND R0, addr, R0
+;        AND addr, R0, R0
+;        AND R0          ; As with above
+;        AND R0, R0      ; As with above
+;        AND #0
+;        AND R0, #0      ; As with above
+;        AND R0, R0, R0, R0
+;
+;        BR R0
+;        BR addr
+;        BR "Hello"
+;        BR add
+;        BR #1
 
 BRnzp BEGIN_TEST
 

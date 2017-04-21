@@ -13,8 +13,8 @@ Sub::Sub()
 
 }
 
-Sub::Sub(std::string &word, int line_number)
-        : Token(word, line_number)
+Sub::Sub(std::string &directive, int line_number)
+        : Token(directive, line_number)
 {
 
 }

@@ -6,12 +6,12 @@ Character::Character()
 
 }
 
-Character::Character(std::string &word, int line_number)
-        : Immediate(word, line_number)
+Character::Character(std::string &character, int line_number)
+        : Immediate(character, line_number)
 {
-        if (word.length() > 1) {
-                if (word.length() == 2 && word.at(0) == '\\') {
-                        switch (word.at(1)) {
+        if (character.length() > 1) {
+                if (character.length() == 2 && character.at(0) == '\\') {
+                        switch (character.at(1)) {
                         case '\\':
                                 immediate = '\\';
                                 return;
@@ -32,20 +32,9 @@ Character::Character(std::string &word, int line_number)
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
                 std::cerr << "Invalid character literal: '" << word << "'.\n";
-        } else if (!word.length()) {
+        } else if (!character.length()) {
                 immediate = 0;
         } else {
-                immediate = static_cast<std::int16_t>(word.at(0));
+                immediate = static_cast<std::int16_t>(character.at(0));
         }
 }
-
-void Character::unterminated()
-{
-        is_valid = false;
-        std::cerr << "ERROR: ";
-        if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
-        }
-        std::cerr << "Unterminated character literal.\n";
-}
-
