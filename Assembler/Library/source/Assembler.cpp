@@ -88,6 +88,13 @@ Assembler::Assembler()
           , as_assembled()
           , tokens()
 {
+
+}
+
+Assembler::Assembler(std::string &arguments)
+        : Assembler()
+{
+
 }
 
 /**
@@ -159,6 +166,8 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 
         std::vector<std::shared_ptr<Token>> tokenized_line;
 
+        char terminated_by = 0;
+
         for (std::size_t index = 0; index < line.length();) {
                 char character = line.at(index);
 
@@ -170,6 +179,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 
                         // However, it does mean we want to check what we just got.
                         addToken(current, tokenized_line, line_number);
+                        terminated_by = 0;
                 }
 
                 if (character == ';') {
@@ -182,21 +192,27 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         // '//' is a comment as well.
                         if (index + 1 > line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
-                                std::cerr << "WARNING: ";
-                                if (line_number) {
-                                        std::cerr << "Line " << std::dec << line_number << ": ";
-                                }
-                                std::cerr << "Expected '//', but found '/'. "
-                                          << "Treating it as if it's '//' (i.e. comment)\n";
+                                WARN(SYNTAX, line_number, "Expected '//', but found '/'. "
+                                        "Treating it as if it's '//' (i.e. comment)");
                         }
                         break;
-                } else if (character == ',' || character == ':') {
+                } else if (character == ',') {
+                        if (!tokenized_line.size() || terminated_by) {
+                                WARN(SYNTAX, line_number, "Extraneous comma");
+                        }
                         addToken(current, tokenized_line, line_number);
-                } else if (character == '"'
+                        terminated_by = ',';
+                } else if (character == ':') {
+                        if (tokenized_line.size() > 1 || !current.size() || terminated_by) {
+                                WARN(SYNTAX, line_number, "Extraneous colon");
+                        }
+                        addToken(current, tokenized_line, line_number);
+                        terminated_by = ':';
 #ifdef INCLUDE_ADDONS
-                           || character == '\''
+                } else if (character == '"' || character == '\'') {
+#else
+                } else if (character == '"') {
 #endif
-                        ) {
                         addToken(current, tokenized_line, line_number);
 
                         char terminator = character;
@@ -213,13 +229,14 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 
                         if (character != terminator) {
                                 tokenized_line.push_back(std::make_shared<Token>(current, line_number));
-                                tokenized_line.back()->unterminated(
 #ifdef INCLUDE_ADDONS
-                                        terminator == '\'' ? "character" :
+                                tokenized_line.back()->unterminated(terminator == '\'' ? "character" : "string");
+#else
+                                tokenize_line.back()->unterminated("string");
 #endif
-                                        "string"
-                                );
                                 ++error_count;
+                                tokenized_line.clear();
+                                return tokenized_line;
                         } else if (terminator == '"') {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
 #ifdef INCLUDE_ADDONS
@@ -235,15 +252,15 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                 ++index;
         }
 
-        const bool any_non_space_characters = std::any_of(
+        const bool any_valid_characters = std::any_of(
                 current.cbegin(), current.cend(),
                 [](unsigned char chr) -> bool
                 {
-                        return !std::isspace(chr);
+                        return !(std::isspace(chr) || chr == ',' || chr == ':');
                 }
         );
 
-        if (any_non_space_characters) {
+        if (any_valid_characters) {
                 addToken(current, tokenized_line, line_number);
         }
 
@@ -393,13 +410,10 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         } else {
                 const std::shared_ptr<Token> token = std::make_shared<Token>(word, line_number);
                 token->is_valid = false;
-                std::cerr << "ERROR: ";
-                if (line_number) {
-                        std::cerr << "Line " << std::dec << line_number << ": ";
-                }
-                std::cerr << "Expected one of: label, instruction, or immediate value. Found '"
-                          << word << "' instead.\n";
-                ++error_count;
+                std::stringstream stream;
+                stream << "Expected one of: label, instruction, or immediate value. Found '"
+                       << word << "' instead";
+                ERR(line_number, stream.str());
                 return token;
         }
 }
@@ -417,14 +431,9 @@ void Assembler::do_first_pass()
                         token->expected(".ORIG statement");
                         return -1;
                 } else if (end_seen) {
-                        std::cerr << "WARNING: ";
-                        if (token->at_line) {
-                                std::cerr << "Line " << std::dec
-                                          << token->at_line
-                                          << ":\n";
-                        }
-                        std::cerr << token->word
-                                  << " after .END directive, it will be ignored.";
+                        std::stringstream stream;
+                        stream << token->word << " after .END directive, it will be ignored";
+                        WARN(IGNORE, token->at_line, stream.str());
                         return 0;
                 } else if (token->valid_arguments(t_tokens)) {
                         return token->guess_memory_size(t_tokens);
@@ -452,25 +461,25 @@ void Assembler::do_first_pass()
 
                                 for (const auto &symbol : symbols) {
                                         if (symbol.second->word == tokenized_line.front()->word) {
-                                                std::cerr << "ERROR: Line " << tokenized_line.front()->at_line
-                                                          << ": Multiple definitions of label '"
-                                                          << tokenized_line.front()->word
-                                                          << "'\nNOTE: \tLabel was first defined on line "
-                                                          << symbol.second->at_line
-                                                          << '\n';
-                                                ++error_count;
+                                                std::stringstream stream;
+                                                stream << "Multiple definitions of label '"
+                                                       << tokenized_line.front()->word
+                                                       << "'\nNOTE: \tLabel was first defined on line "
+                                                       << symbol.second->at_line;
+                                                ERR(tokenized_line.front()->at_line, stream.str());
                                                 break;
                                         }
                                 }
 
                                 if (symbols.count(internal_program_counter)) {
-                                        std::cerr << "WARNING: Multiple labels found for address 0x"
-                                                  << std::hex << internal_program_counter
-                                                  << "\nNOTE: \tPrevious label '"
-                                                  << symbols.at(internal_program_counter)->word
-                                                  << "' found on line " << std::dec
-                                                  << symbols.at(internal_program_counter)->at_line
-                                                  << '\n';
+                                        std::stringstream stream;
+                                        stream << "Multiple labels found for address 0x"
+                                               << std::hex << internal_program_counter
+                                               << "\nNOTE: \tPrevious label '"
+                                               << symbols.at(internal_program_counter)->word
+                                               << "' found on line " << std::dec
+                                               << symbols.at(internal_program_counter)->at_line;
+                                        WARN(MULTIPLE_DEFINITIONS, tokenized_line.front()->at_line, stream.str());
                                 }
 
                                 symbols.insert(std::pair<std::uint16_t, std::shared_ptr<Label>>(
@@ -876,4 +885,26 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         }
 
         return stream.str();
+}
+
+void Assembler::WARN(WARNING_LEVEL level, int line_number, std::string &&warning)
+{
+        if (warning_level & level) {
+                std::cerr << "WARNING: ";
+                if (line_number) {
+                        std::cerr << "Line " << line_number << ": ";
+                }
+                std::cerr << warning << ".\n";
+        }
+}
+
+void Assembler::ERR(int line_number, std::string &&error)
+{
+        std::cerr << "ERROR: ";
+        if (line_number) {
+                std::cerr << "Line " << line_number << ": ";
+        }
+        std::cerr << error << ".\n";
+
+        ++error_count;
 }

@@ -81,7 +81,7 @@
 
 
 ; This is a label
-BEGIN_TEST:
+BEGIN_TEST::
         ADD R5, R5, #-10; Comments can be as close to the instruction as you'd
                         ; like
         ADD R1, R2, #1  // Comments can also be like so ('/' will is treated as

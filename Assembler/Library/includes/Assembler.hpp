@@ -12,6 +12,7 @@ class Assembler
 {
 public:
         Assembler();
+        Assembler(std::string &arguments);
         ~Assembler() = default;
 
         std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &fileName);
@@ -37,7 +38,8 @@ public:
                 write(prefix);
         }
 
-        std::size_t   error_count                = 0;
+        std::size_t error_count = 0;
+
         std::uint16_t internal_program_counter   = 0;
         std::uint16_t file_memory_origin_address = 0;
 
@@ -47,6 +49,15 @@ public:
         std::map<std::uint16_t, std::shared_ptr<Label>> symbols;
 
         std::string disassemble(std::uint16_t instruction, std::uint16_t pc);
+
+        enum WARNING_LEVEL
+        {
+                NONE                 = 0,
+                SYNTAX               = 1 << 0,
+                IGNORE               = 1 << 1,
+                MULTIPLE_DEFINITIONS = 1 << 2,
+                ALL                  = MULTIPLE_DEFINITIONS | SYNTAX | IGNORE,
+        };
 
 private:
         std::size_t longest_symbol_length = 20;
@@ -58,6 +69,11 @@ private:
 
         void do_first_pass();
         void do_second_pass();
+
+        void WARN(WARNING_LEVEL level, int line_number, std::string &&warning);
+        void ERR(int line_number, std::string &&error);
+
+        WARNING_LEVEL warning_level = ALL;
 };
 
 #endif // LC3_SIMULATOR_ASSEMBLER_HPP
