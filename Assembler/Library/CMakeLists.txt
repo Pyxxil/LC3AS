@@ -83,7 +83,7 @@ set ( ASSEMBLER_HEADER_FILES
       includes/Tokens/Instructions/Token_Instruction_Br.hpp
       includes/Tokens/Instructions/Token_Instruction_Ld.hpp
       includes/Tokens/Instructions/Token_Instruction_St.hpp
-      )
+      ../../cxxopts.hpp )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )

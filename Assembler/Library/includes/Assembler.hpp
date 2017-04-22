@@ -12,7 +12,9 @@ class Assembler
 {
 public:
         Assembler();
-        Assembler(std::string &arguments);
+        Assembler(int argument_count, char **arguments);
+        Assembler(std::string &file);
+        Assembler(std::string &&file);
         ~Assembler() = default;
 
         std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &fileName);
@@ -26,6 +28,7 @@ public:
         std::shared_ptr<Token> tokenize(std::string &word, int line_number);
         std::vector<std::uint16_t> generate_machine_code();
 
+        bool assemble();
         bool assemble(std::string &fileName);
         bool assemble(std::string &&fileName)
         {
@@ -60,6 +63,8 @@ public:
         };
 
 private:
+        std::vector<std::string> files_to_assemble;
+
         std::size_t longest_symbol_length = 20;
 
         std::vector<std::uint16_t> as_assembled;
@@ -69,11 +74,13 @@ private:
 
         void do_first_pass();
         void do_second_pass();
+        void reset();
 
         void WARN(WARNING_LEVEL level, int line_number, std::string &&warning);
         void ERR(int line_number, std::string &&error);
 
-        WARNING_LEVEL warning_level = ALL;
+        int warning_level = ALL;
+        void change_warning_level(std::string &warning);
 };
 
 #endif // LC3_SIMULATOR_ASSEMBLER_HPP

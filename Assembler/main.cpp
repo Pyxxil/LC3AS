@@ -4,14 +4,9 @@
 
 int main(int argc, char **argv)
 {
-        if (argc != 2) {
-                std::cout << "No input files" << std::endl;
-                return 1;
-        }
+        Assembler as(argc, argv);
 
-        Assembler as;
-
-        as.assemble(argv[1]);
+        as.assemble();
 
         return 0;
 }

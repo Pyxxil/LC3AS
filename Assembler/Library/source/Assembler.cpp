@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <regex>
 
+#include "../../../cxxopts.hpp"
 #include "Tokens/All_Tokens.hpp"
 
 static constexpr std::size_t hashed_letters[26] = {
@@ -27,23 +28,10 @@ static constexpr std::size_t hash(const char *const string, std::size_t length)
 {
         std::size_t _hash = 37;
 
-        std::size_t first_char_on_directive = length > 1 ? static_cast<std::size_t>(*(string + 1)) : 0;
-
         for (std::size_t index = 0; index < length; ++index) {
-                if (*string == '.') {
-                        if (*(string + index) == '.') {
-                                _hash = (_hash * hashed_letters[first_char_on_directive - 0x41u]) ^
-                                        (first_char_on_directive * hashed_letters[first_char_on_directive - 0x41u]);
-                        } else {
-                                _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
-                                        (first_char_on_directive *
-                                         hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
-                        }
-                } else {
-                        _hash = (_hash * hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]) ^
-                                (static_cast<std::size_t>(*string) *
-                                 hashed_letters[static_cast<std::size_t>(*(string + index)) - 0x41u]);
-                }
+                _hash = (_hash * hashed_letters[(static_cast<std::size_t>(string[index]) - 0x41u) % 26]) ^
+                        (static_cast<std::size_t>(*string) *
+                         hashed_letters[(static_cast<std::size_t>(string[index]) - 0x41u) % 26]);
         }
 
         return _hash;
@@ -51,29 +39,17 @@ static constexpr std::size_t hash(const char *const string, std::size_t length)
 
 static std::size_t hash(std::string &string)
 {
+        // Basically, we don't really want
         if (string.at(0) != '.' && !std::isalpha(string.at(0))) {
                 return 0;
         }
 
         std::size_t _hash = 37;
 
-        std::size_t first_char_on_directive = string.length() > 1 ? static_cast<std::size_t>(string.at(1)) : 0;
-
         for (const auto &character : string) {
-                if (string.at(0) == '.') {
-                        if (character == '.') {
-                                _hash = (_hash * hashed_letters[first_char_on_directive - 0x41u]) ^
-                                        (first_char_on_directive * hashed_letters[first_char_on_directive - 0x41u]);
-                        } else {
-                                _hash = (_hash * hashed_letters[static_cast<std::size_t>(character) - 0x41u]) ^
-                                        (first_char_on_directive * hashed_letters[
-                                                static_cast<std::size_t>(character) - 0x41u]);
-                        }
-                } else {
-                        _hash = (_hash * hashed_letters[static_cast<std::size_t>(character) - 0x41u]) ^
-                                (static_cast<std::size_t>(string.at(0)) *
-                                 hashed_letters[static_cast<std::size_t>(character) - 0x41u]);
-                }
+                _hash = (_hash * hashed_letters[(static_cast<std::size_t>(character) - 0x41u) % 26]) ^
+                        (static_cast<std::size_t>(string.at(0)) *
+                         hashed_letters[(static_cast<std::size_t>(character) - 0x41u) % 26]);
         }
 
         return _hash;
@@ -85,16 +61,80 @@ Assembler::Assembler()
           , origin_seen(false)
           , end_seen(false)
           , symbols()
+          , files_to_assemble()
           , as_assembled()
           , tokens()
 {
 
 }
 
-Assembler::Assembler(std::string &arguments)
+Assembler::Assembler(int argument_count, char **arguments)
         : Assembler()
 {
+        cxxopts::Options parser(arguments[0], " An LC3 Assembler");
+        parser.add_options()
+                      ("w,warn", "Warning level", cxxopts::value<std::string>()->default_value("none"))
+                ;
 
+        try {
+                parser.parse(argument_count, arguments);
+        } catch (const cxxopts::OptionException &e) {
+                std::cout << parser.help() << '\n';
+                exit(1);
+        }
+
+        if (parser.count("help")) {
+                std::cout << parser.help() << '\n';
+                exit(0);
+        }
+
+        if (parser.count("warn")) {
+                std::string warning_value = parser["warn"].as<std::string>();
+                size_t pos = 0;
+                std::string token;
+                while ((pos = warning_value.find(',')) != std::string::npos) {
+                        token = warning_value.substr(0, pos);
+                        std::transform(token.begin(), token.end(), token.begin(), ::tolower);
+
+                        change_warning_level(token);
+
+                        warning_value.erase(0, pos + 1);
+                }
+
+                change_warning_level(warning_value);
+        }
+
+        for (int i = 1; i < argument_count; ++i) {
+                files_to_assemble.push_back(std::string(arguments[i]));
+        }
+}
+
+Assembler::Assembler(std::string &file)
+        : Assembler()
+{
+        files_to_assemble.push_back(file);
+}
+
+Assembler::Assembler(std::string &&file)
+        : Assembler(file)
+{
+
+}
+
+void Assembler::reset()
+{
+        longest_symbol_length = 20;
+        error_count = 0;
+
+        origin_seen = false;
+        end_seen = false;
+
+        file_memory_origin_address = 0;
+        internal_program_counter = 0;
+
+        as_assembled.clear();
+        symbols.clear();
+        tokens.clear();
 }
 
 /**
@@ -559,30 +599,77 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
         return as_assembled;
 }
 
-bool Assembler::assemble(std::string &fileName)
+bool Assembler::assemble()
 {
-        puts("Starting first pass");
-
-        tokenizeFile(fileName);
-
-        do_first_pass();
-
-        std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
-
-        if (error_count || tokens.empty()) {
+        if (files_to_assemble.empty()) {
+                std::cout << "No files to assemble\n";
                 return false;
         }
 
-        internal_program_counter = file_memory_origin_address;
+        if (files_to_assemble.size() == 1) {
+                puts("Starting first pass");
 
-        do_second_pass();
+                tokenizeFile(files_to_assemble.at(0));
 
-        if (!error_count) {
-                generate_machine_code();
-                write(fileName.substr(0, fileName.find_first_of('.')));
+                do_first_pass();
+
+                std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
+
+                if (error_count || tokens.empty()) {
+                        return false;
+                }
+
+                internal_program_counter = file_memory_origin_address;
+
+                do_second_pass();
+
+                if (!error_count) {
+                        generate_machine_code();
+
+                        write(files_to_assemble.at(0).substr(
+                                0,files_to_assemble.at(0).find_first_of('.'))
+                        );
+                }
+
+                return true;
+        }
+
+        for (auto &file : files_to_assemble) {
+                std::cout << "\n --- Assembling " << file << " ---\n\n";
+
+                puts("Starting first pass");
+
+                tokenizeFile(file);
+
+                do_first_pass();
+
+                std::cout << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
+
+                if (error_count || tokens.empty()) {
+                        return false;
+                }
+
+                internal_program_counter = file_memory_origin_address;
+
+                do_second_pass();
+
+                if (!error_count) {
+                        generate_machine_code();
+                        write(file.substr(0, file.find_first_of('.')));
+                }
+
+                reset();
         }
 
         return error_count == 0;
+}
+
+bool Assembler::assemble(std::string &fileName)
+{
+        files_to_assemble.clear();
+        files_to_assemble.push_back(fileName);
+
+        return assemble();
 }
 
 /**
@@ -885,6 +972,29 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         }
 
         return stream.str();
+}
+
+void Assembler::change_warning_level(std::string &warning)
+{
+        if (warning == "none") {
+                warning_level = WARNING_LEVEL::NONE;
+        } else if (warning == "syntax") {
+                warning_level |= WARNING_LEVEL::SYNTAX;
+        } else if (warning == "ignore") {
+                warning_level |= WARNING_LEVEL::IGNORE;
+        } else if (warning == "multiple") {
+                warning_level |= WARNING_LEVEL::MULTIPLE_DEFINITIONS;
+        } else if (warning == "all") {
+                warning_level = ALL;
+        } else {
+                std::cout << "Argument --warn expects one (or more) of the following:" << '\n';
+                std::cout << "\t- none" << '\n';
+                std::cout << "\t- syntax" << '\n';
+                std::cout << "\t- ignore" << '\n';
+                std::cout << "\t- multiple" << '\n';
+                std::cout << "\t- all" << '\n';
+                exit(0);
+        }
 }
 
 void Assembler::WARN(WARNING_LEVEL level, int line_number, std::string &&warning)
