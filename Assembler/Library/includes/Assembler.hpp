@@ -57,15 +57,21 @@ public:
         {
                 NONE                 = 0,
                 SYNTAX               = 1 << 0,
-                IGNORE               = 1 << 1,
+                IGNORED              = 1 << 1,
                 MULTIPLE_DEFINITIONS = 1 << 2,
-                ALL                  = MULTIPLE_DEFINITIONS | SYNTAX | IGNORE,
+                ALL                  = MULTIPLE_DEFINITIONS | SYNTAX | IGNORED,
+        };
+
+        enum LOGGING_TYPE {
+                MESSAGE     = 0,
+                ERROR       = 1,
+                WARNING     = 2,
         };
 
 private:
         std::vector<std::string> files_to_assemble;
 
-        std::size_t longest_symbol_length = 20;
+        int longest_symbol_length = 20;
 
         std::vector<std::uint16_t> as_assembled;
 
@@ -76,10 +82,14 @@ private:
         void do_second_pass();
         void reset();
 
+        bool quiet = false;
+        bool we_should_be_quiet() { return quiet; }
+
+        void LOG(LOGGING_TYPE level, std::string &&message);
         void WARN(WARNING_LEVEL level, int line_number, std::string &&warning);
         void ERR(int line_number, std::string &&error);
 
-        int warning_level = ALL;
+        int warning_level = NONE;
         void change_warning_level(std::string &warning);
 };
 

@@ -16,13 +16,10 @@ std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.emplace_back(
-                static_cast<std::uint16_t>(
-                        0x6000 |
-                        ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
-                        ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
-                        (std::static_pointer_cast<Immediate>(tokens[3])->immediate & 0x3F)
-                )
+        assembled.emplace_back(static_cast<std::uint16_t>(0x6000 |
+                ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+                ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
+                (std::static_pointer_cast<Immediate>(tokens[3])->immediate & 0x3F))
         );
 
         return 1;

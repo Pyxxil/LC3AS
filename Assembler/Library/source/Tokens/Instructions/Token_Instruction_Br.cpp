@@ -14,11 +14,13 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                 return 0;
         }
 
-        const auto &&symbol = std::find_if(assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                           [&tokens](auto &&sym) -> bool
-                                           {
-                                                   return sym.second->word == tokens[1]->word;
-                                           }
+        const auto &&symbol = std::find_if(
+                assembler.symbols.cbegin(),
+                assembler.symbols.cend(),
+                [&tokens](auto &&sym) -> bool
+                {
+                        return sym.second->word == tokens[1]->word;
+                }
         );
 
         if (symbol == assembler.symbols.end()) {
@@ -35,9 +37,7 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                 return -1;
         }
 
-        assembled.emplace_back(
-                static_cast<std::uint16_t>(0x0000 | N << 11 | Z << 10 | P << 9 | (offset & 0x1FF))
-        );
+        assembled.emplace_back(static_cast<std::uint16_t>(0x0000 | N << 11 | Z << 10 | P << 9 | (offset & 0x1FF)));
 
         return 1;
 }

@@ -20,13 +20,12 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->immediate);
                 } else if (tokens.at(2)->type() == Token::LABEL) {
-                        const auto &&symbol = std::find_if(
-                                assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                [&tokens](auto &&sym) -> bool
-                                {
-                                        return sym.second->word == tokens.at(2)->word;
-                                }
-                        );
+                        const auto &&symbol = std::find_if(assembler.symbols.cbegin(),
+                                                           assembler.symbols.cend(),
+                                                           [&tokens](auto &&sym) -> bool
+                                                           {
+                                                                   return sym.second->word == tokens.at(2)->word;
+                                                           });
 
                         if (symbol == assembler.symbols.end()) {
                                 std::static_pointer_cast<Label>(tokens.at(2))->not_found();
@@ -87,8 +86,8 @@ void Blkw::invalid_argument_count(std::size_t provided, std::size_t expected) co
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided
-                  << " argument" << (provided == 1 ? "" : "'s") << " provided.\n";
+        std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided << " argument" << (provided == 1 ? "" : "'s")
+                  << " provided.\n";
 }
 
 Token::token_type Blkw::type() const

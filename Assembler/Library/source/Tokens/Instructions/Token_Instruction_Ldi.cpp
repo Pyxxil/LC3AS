@@ -16,11 +16,12 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return 0;
         }
 
-        const auto &&symbol = std::find_if(assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                           [&tokens](const auto &sym) -> bool
-                                           {
-                                                   return sym.second->word == tokens[2]->word;
-                                           }
+        const auto &&symbol = std::find_if(
+                assembler.symbols.cbegin(), assembler.symbols.cend(),
+                [&tokens](const auto &sym) -> bool
+                {
+                        return sym.second->word == tokens[2]->word;
+                }
         );
 
         if (symbol == assembler.symbols.end()) {
@@ -37,12 +38,9 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        assembled.emplace_back(
-                static_cast<std::uint16_t >(
-                        0xA000 |
-                        ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                        (offset & 0x1FF)
-                )
+        assembled.emplace_back(static_cast<std::uint16_t >(0xA000 |
+                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+                (offset & 0x1FF))
         );
 
         return 1;

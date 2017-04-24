@@ -17,17 +17,15 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         if (tokens.at(1)->type() == Token::IMMEDIATE) {
-                assembled.emplace_back(
-                        static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->immediate)
-                );
+                assembled.emplace_back(static_cast<std::uint16_t>(std::static_pointer_cast<
+                        Immediate>(tokens.at(1))->immediate));
         } else if (tokens.at(1)->type() == Token::LABEL) {
-                const auto &&symbol = std::find_if(
-                        assembler.symbols.cbegin(), assembler.symbols.cend(),
-                        [&tokens](auto &&sym) -> bool
-                        {
-                                return sym.second->word == tokens.at(1)->word;
-                        }
-                );
+                const auto &&symbol = std::find_if(assembler.symbols.cbegin(),
+                                                   assembler.symbols.cend(),
+                                                   [&tokens](auto &&sym) -> bool
+                                                   {
+                                                           return sym.second->word == tokens.at(1)->word;
+                                                   });
 
                 if (symbol == assembler.symbols.end()) {
                         std::static_pointer_cast<Label>(tokens.at(1))->not_found();

@@ -12,7 +12,7 @@ set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -pg -Werror -pedantic -Wshadow -Wnon-v
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ )
 
-set ( RELEASE_FLAGS ${COMPILE_FLAGS} -O3 -flto -mtune=native )
+set ( RELEASE_FLAGS ${COMPILE_FLAGS} -Os -flto -mtune=native )
 
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Assembler" )  # Builds the assembler
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Simulator" )  # Builds the simulator

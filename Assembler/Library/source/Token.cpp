@@ -44,8 +44,8 @@ std::string Token::deduce_type() const
         case DIR_ORIG:
         case DIR_STRINGZ:
 #ifdef INCLUDE_ADDONS
-        case ADDON_NEG:
-        case ADDON_SUB:
+                case ADDON_NEG:
+                case ADDON_SUB:
 #endif
                 return std::string("Directive");
         case TRAP_IN:
@@ -98,8 +98,8 @@ void Token::invalid_argument_count(std::size_t provided, std::size_t expected) c
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s")
-                  << ", but " << (provided < expected ? "only " : "") << provided << " argument"
+        std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s") << ", but "
+                  << (provided < expected ? "only " : "") << provided << " argument"
                   << (provided == 1 ? " was" : "'s were") << " provided.\n";
 }
 
