@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"
@@ -13,33 +14,39 @@ St::St(std::string &oper, int line_number)
 std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
         if (!is_valid) {
-                return -1;
+                return 0;
         }
 
-        const auto &&symbol = std::find_if(
-                assembler.symbols.cbegin(), assembler.symbols.cend(),
-                [&tokens](const auto &sym) -> bool
-                {
-                        return sym.second->word == tokens[2]->word;
+        int offset = 0;
+
+        if (tokens.at(2)->type() == Token::LABEL) {
+                const auto &&symbol = std::find_if(
+                        assembler.symbols.cbegin(),
+                        assembler.symbols.cend(),
+                        [&tokens](auto &&sym) -> bool
+                        {
+                                return sym.second->word == tokens.at(2)->word;
+                        }
+                );
+
+                if (symbol == assembler.symbols.end()) {
+                        std::static_pointer_cast<Label>(tokens.at(2))->not_found();
+                        return -1;
                 }
-        );
 
-        if (symbol == assembler.symbols.end()) {
-                std::static_pointer_cast<Label>(tokens[2])->not_found();
-                return -1;
+                offset = static_cast<int>(symbol->second->address) -
+                         (static_cast<int>(assembler.internal_program_counter) + 1);
+        } else {
+                offset = std::static_pointer_cast<Immediate>(tokens.at(2))->immediate;
         }
-
-        const int offset = static_cast<int>(symbol->second->address) -
-                           (static_cast<int>(assembler.internal_program_counter) + 1);
 
         if (offset > 255 || offset < -256) {
-                // TODO: Change this to actually tell the user what's wrong (difference wise).
-                tokens[2]->expected("9 bit immediate value");
+                tokens.at(2)->expected("9 bit offset");
                 return -1;
         }
 
         assembled.emplace_back(static_cast<std::uint16_t >(0x3000 |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+                ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
                 (offset & 0x1FF))
         );
 
@@ -56,8 +63,8 @@ bool St::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(2)->type() != Token::LABEL) {
-                tokens.at(2)->expected("label");
+        } else if (tokens.at(2)->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
+                tokens.at(2)->expected("label or immediate value");
                 return (is_valid = false);
         }
 

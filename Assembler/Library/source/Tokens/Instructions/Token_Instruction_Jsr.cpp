@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"
 
@@ -15,29 +16,35 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 return -1;
         }
 
-        const auto &&symbol = std::find_if(
-                assembler.symbols.cbegin(), assembler.symbols.cend(),
-                [&tokens](const auto &sym) -> bool
-                {
-                        return sym.second->word == tokens[1]->word;
+        int offset = 0;
+
+        if (tokens.at(1)->type() == Token::LABEL) {
+                const auto &&symbol = std::find_if(
+                        assembler.symbols.cbegin(), assembler.symbols.cend(),
+                        [&tokens](const auto &sym) -> bool
+                        {
+                                return sym.second->word == tokens[1]->word;
+                        }
+                );
+
+                if (symbol == assembler.symbols.end()) {
+                        tokens.at(1)->expected("valid label");
+                        return -1;
                 }
-        );
 
-        if (symbol == assembler.symbols.end()) {
-                tokens[1]->expected("valid label");
-                return -1;
+                offset = static_cast<int>(symbol->second->address) -
+                                   (static_cast<int>(assembler.internal_program_counter) + 1);
+        } else {
+                offset = std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
         }
-
-        const int offset = static_cast<int>(symbol->second->address) -
-                           (static_cast<int>(assembler.internal_program_counter) + 1);
 
         if (offset > 1023 || offset < -1024) {
                 // TODO: Change this to actually tell the user what's wrong (difference wise).
-                tokens.at(1)->expected("11 bit immediate value");
+                tokens.at(1)->expected("11 bit offset");
                 return -1;
         }
 
-        assembled.emplace_back(static_cast<std::uint16_t>(0x4800 | (offset & 0x7FF)));
+        assembled.emplace_back(0x4800 | static_cast<std::uint16_t>(offset & 0x7FF));
 
         return 1;
 }
@@ -49,8 +56,8 @@ bool Jsr::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 return (is_valid = false);
         }
 
-        if (tokens.at(1)->type() != Token::LABEL) {
-                tokens.at(1)->expected("label");
+        if (tokens.at(1)->type() != Token::LABEL && tokens.at(1)->type() != Token::IMMEDIATE) {
+                tokens.at(1)->expected("label or immediate value");
                 return (is_valid = false);
         }
 
