@@ -3,12 +3,10 @@
 //	Symbol Name          Page Address
 //	-------------------- ------------
 //	BEGIN_TEST           3017
-//	BEGIN_TEST           3017
-//	EXTRA_FEATURES       301b
-//	EXTRA_FEATURES       301b
+//	EXTRA_FEATURES       301B
 //	oct                  3023
 //	cheat                3036
-//	addr                 303e
-//	b                    303f
+//	addr                 303E
+//	b                    303F
 //	bin                  3040
 //	hex                  3041

@@ -97,8 +97,9 @@ std::string And::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " AND " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase
-                << " #" << std::dec << std::static_pointer_cast<Immediate>(tokens.at(3))->immediate << '\n';
+                << " AND " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase << " #" << std::dec
+                << (static_cast<std::int16_t>(std::static_pointer_cast<Immediate>(tokens.at(3))->immediate << 11) >> 11)
+                << '\n';
 
         ++program_counter;
 

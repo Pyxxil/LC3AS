@@ -731,6 +731,12 @@ void Assembler::write(std::string &prefix)
                     << std::setw(longest_symbol_length) << "Symbol Name" << " Page Address\n//\t"
                     << std::setfill('-') << std::setw(longest_symbol_length) << '-' << " ------------\n";
 
+        for (const auto &symbol : symbols) {
+                symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
+                            << symbol.second->word << ' ' << std::uppercase << std::hex <<std::setfill('0')
+                            << std::setw(4) << symbol.first << '\n';
+        }
+
         const auto &symbol_at = [this](const std::uint16_t address) {
                 return std::find_if(
                         symbols.cbegin(), symbols.cend(),
@@ -749,11 +755,6 @@ void Assembler::write(std::string &prefix)
 
         for (auto &tokenized_line : tokens) {
                 symbol = symbol_at(pc);
-                if (symbol != symbols.cend()) {
-                        symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
-                                    << symbol->second->word << ' ' << std::hex <<std::setfill('0')
-                                    << std::setw(4) << symbol->first << '\n';
-                }
 
                 lst_file << tokenized_line.front()->disassemble(
                         tokenized_line, pc, symbol == symbols.cend() ? empty : symbol->second->word, *this
