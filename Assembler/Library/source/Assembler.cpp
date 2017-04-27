@@ -69,11 +69,14 @@ Assembler::Assembler(int argument_count, char **arguments)
         parser.add_options()
                       ("h,help", "Print this help message")
                       ("q,quiet", "Don't print anything (other than errors)")
-                      ("w,warn", "Warning level, One of the following:                            - all"
+                      ("w,warn", "Warning level. One of the following:                            - all"
                                "                                                       - syntax"
                                "                                                    - ignore"
                                "                                                    - multiple"
-                               "                                                  - none",
+                               "                                                  - none"
+                               "                                                  These "
+                               " can be provided together seperated by a comma, e.g."
+                               " --warn multiple,syntax                                 ",
                        cxxopts::value<std::string>()->default_value("none"))
                       ("n,nowarn", "Turn off all warnings");
 
@@ -124,7 +127,7 @@ Assembler::Assembler(int argument_count, char **arguments)
 Assembler::Assembler(std::string &file)
         : Assembler()
 {
-        files_to_assemble.push_back(file);
+        files_to_assemble.emplace_back(file);
 }
 
 Assembler::Assembler(std::string &&file)
@@ -280,7 +283,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         }
 
                         if (character != terminator) {
-                                tokenized_line.push_back(std::make_shared<Token>(current, line_number));
+                                tokenized_line.push_back(std::make_shared<Token>(current, current, line_number));
 #ifdef INCLUDE_ADDONS
                                 tokenized_line.back()->unterminated(terminator == '\'' ? "character" : "string");
 #else
@@ -291,7 +294,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                                 return tokenized_line;
 #ifdef INCLUDE_ADDONS
                         } else if (terminator == '\'') {
-                                tokenized_line.push_back(std::make_shared<Character>(current, line_number));
+                                tokenized_line.push_back(std::make_shared<Character>(current, current, line_number));
 #endif
                         } else {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
@@ -344,47 +347,47 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         if (hashed) {
                 switch (hashed) {
                 case hash("ADD", 3):
-                        return std::make_shared<Add>(word, line_number);
+                        return std::make_shared<Add>(word, copy, line_number);
                 case hash("AND", 3):
-                        return std::make_shared<And>(word, line_number);
+                        return std::make_shared<And>(word, copy, line_number);
                 case hash("NOT", 3):
-                        return std::make_shared<Not>(word, line_number);
+                        return std::make_shared<Not>(word, copy, line_number);
                 case hash("JSR", 3):
-                        return std::make_shared<Jsr>(word, line_number);
+                        return std::make_shared<Jsr>(word, copy, line_number);
                 case hash("JSRR", 4):
-                        return std::make_shared<Jsrr>(word, line_number);
+                        return std::make_shared<Jsrr>(word, copy, line_number);
                 case hash("JMP", 3):
-                        return std::make_shared<Jmp>(word, line_number);
+                        return std::make_shared<Jmp>(word, copy, line_number);
                 case hash("RET", 3):
-                        return std::make_shared<Ret>(word, line_number);
+                        return std::make_shared<Ret>(word, copy, line_number);
                 case hash("ST", 2):
-                        return std::make_shared<St>(word, line_number);
+                        return std::make_shared<St>(word, copy, line_number);
                 case hash("STR", 3):
-                        return std::make_shared<Str>(word, line_number);
+                        return std::make_shared<Str>(word, copy, line_number);
                 case hash("STI", 3):
-                        return std::make_shared<Sti>(word, line_number);
+                        return std::make_shared<Sti>(word, copy, line_number);
                 case hash("LD", 2):
-                        return std::make_shared<Ld>(word, line_number);
+                        return std::make_shared<Ld>(word, copy, line_number);
                 case hash("LEA", 3):
-                        return std::make_shared<Lea>(word, line_number);
+                        return std::make_shared<Lea>(word, copy, line_number);
                 case hash("LDI", 3):
-                        return std::make_shared<Ldi>(word, line_number);
+                        return std::make_shared<Ldi>(word, copy, line_number);
                 case hash("LDR", 3):
-                        return std::make_shared<Ldr>(word, line_number);
+                        return std::make_shared<Ldr>(word, copy, line_number);
                 case hash("PUTS", 4):
-                        return std::make_shared<Puts>(word, line_number);
+                        return std::make_shared<Puts>(word, copy, line_number);
                 case hash("PUTSP", 5):
-                        return std::make_shared<Putsp>(word, line_number);
+                        return std::make_shared<Putsp>(word, copy, line_number);
                 case hash("HALT", 4):
-                        return std::make_shared<Halt>(word, line_number);
+                        return std::make_shared<Halt>(word, copy, line_number);
                 case hash("TRAP", 4):
-                        return std::make_shared<Trap>(word, line_number);
+                        return std::make_shared<Trap>(word, copy, line_number);
                 case hash("GETC", 4):
-                        return std::make_shared<Getc>(word, line_number);
+                        return std::make_shared<Getc>(word, copy, line_number);
                 case hash("OUT", 3):
-                        return std::make_shared<Out>(word, line_number);
+                        return std::make_shared<Out>(word, copy, line_number);
                 case hash("IN", 2):
-                        return std::make_shared<In>(word, line_number);
+                        return std::make_shared<In>(word, copy, line_number);
                 case hash("BR", 2):
                         // FALLTHROUGH
                 case hash("BRNZP", 5):
@@ -398,40 +401,42 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 case hash("BRPNZ", 5):
                         // FALLTHROUGH
                 case hash("BRPZN", 5):
-                        return std::make_shared<Br>(word, line_number, true, true, true);
+                        return std::make_shared<Br>(word, copy, line_number, true, true, true);
                 case hash("BRN", 3):
-                        return std::make_shared<Br>(word, line_number, true, false, false);
+                        return std::make_shared<Br>(word, copy, line_number, true, false, false);
                 case hash("BRZ", 3):
-                        return std::make_shared<Br>(word, line_number, false, true, false);
+                        return std::make_shared<Br>(word, copy, line_number, false, true, false);
                 case hash("BRP", 3):
-                        return std::make_shared<Br>(word, line_number, false, false, true);
+                        return std::make_shared<Br>(word, copy, line_number, false, false, true);
                 case hash("BRNZ", 4):
                         // FALLTHROUGH
                 case hash("BRZN", 4):
-                        return std::make_shared<Br>(word, line_number, true, true, false);
+                        return std::make_shared<Br>(word, copy, line_number, true, true, false);
                 case hash("BRNP", 4):
                         // FALLTHROUGH
                 case hash("BRPN", 4):
-                        return std::make_shared<Br>(word, line_number, true, false, true);
+                        return std::make_shared<Br>(word, copy, line_number, true, false, true);
                 case hash("BRZP", 4):
                         // FALLTHROUGH
                 case hash("BRPZ", 4):
-                        return std::make_shared<Br>(word, line_number, false, true, true);
+                        return std::make_shared<Br>(word, copy, line_number, false, true, true);
                 case hash(".ORIG", 5):
-                        return std::make_shared<Orig>(word, line_number);
+                        return std::make_shared<Orig>(word, copy, line_number);
                 case hash(".END", 4):
-                        return std::make_shared<End>(word, line_number);
+                        return std::make_shared<End>(word, copy, line_number);
                 case hash(".FILL", 5):
-                        return std::make_shared<Fill>(word, line_number);
+                        return std::make_shared<Fill>(word, copy, line_number);
                 case hash(".BLKW", 5):
-                        return std::make_shared<Blkw>(word, line_number);
+                        return std::make_shared<Blkw>(word, copy, line_number);
                 case hash(".STRINGZ", 8):
-                        return std::make_shared<Stringz>(word, line_number);
+                        return std::make_shared<Stringz>(word, copy, line_number);
 #ifdef INCLUDE_ADDONS
                 case hash(".NEG", 4):
-                        return std::make_shared<Neg>(word, line_number);
+                        return std::make_shared<Neg>(word, copy, line_number);
                 case hash(".SUB", 4):
-                        return std::make_shared<Sub>(word, line_number);
+                        return std::make_shared<Sub>(word, copy, line_number);
+                case hash(".SET", 4):
+                        return std::make_shared<Set>(word, copy, line_number);
 #endif
                 default:
                         break;
@@ -448,17 +453,17 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         if (std::regex_match(word, decimal)) {
                 return std::make_shared<Decimal>(word, line_number);
         } else if (std::regex_match(word, binary)) {
-                return std::make_shared<Binary>(word, line_number);
+                return std::make_shared<Binary>(word, copy, line_number);
         } else if (std::regex_match(word, hexadecimal)) {
-                return std::make_shared<Hexadecimal>(word, line_number);
+                return std::make_shared<Hexadecimal>(word, copy, line_number);
         } else if (std::regex_match(word, octal)) {
                 return std::make_shared<Octal>(word, line_number);
         } else if (std::regex_match(word, _register)) {
-                return std::make_shared<Register>(word, line_number);
+                return std::make_shared<Register>(word, copy, line_number);
         } else if (std::regex_match(word, label)) {
                 return std::make_shared<Label>(word, line_number);
         } else {
-                const std::shared_ptr<Token> token = std::make_shared<Token>(word, line_number);
+                const std::shared_ptr<Token> token = std::make_shared<Token>(word, copy, line_number);
                 token->is_valid = false;
                 std::stringstream stream;
                 stream << "Expected one of: label, instruction, or immediate value. Found '" << word << "' instead";
@@ -613,7 +618,7 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
 bool Assembler::assemble()
 {
         if (files_to_assemble.empty()) {
-                std::cout << "No files to assemble\n";
+                std::cerr << "No files to assemble\n";
                 return false;
         }
 
@@ -712,78 +717,52 @@ void Assembler::write(std::string &prefix)
         std::ofstream hex_file(prefix + ".hex");
         std::ofstream lst_file(prefix + ".lst");
 
-        const auto write_list = [&lst_file, this](const std::uint16_t instruction, const std::uint16_t program_counter,
-                                                  const std::size_t line_number, const auto &label,
-                                                  const auto &disassembled)
-        {
-                lst_file
-                         // Address
-                         << '(' << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << program_counter
-                         << ") "
-                         // Hexadecimal representation
-                         << std::uppercase << std::hex << std::right << std::setfill('0') << std::setw(4) << instruction
-                         // Binary representation
-                         << ' ' << std::bitset<16>(instruction) << ' '
-                         // Line number
-                         << '(' << std::setfill(' ') << std::right << std::dec << std::setw(4) << line_number << ')'
-                         // Label (if any)
-                         << ' ' << std::setfill(' ') << std::setw(longest_symbol_length) << std::left << label
-                         // Disassembled instruction
-                         << ' ' << disassembled << '\n';
-        };
+        for (const auto instruction : as_assembled) {
+                object_file.put(static_cast<char>((instruction >> 8) & 0xFF));
+                object_file.put(static_cast<char>(instruction & 0xFF));
 
-        std::size_t   line = 1;
-        std::uint16_t pc   = 0;
+                binary_file << std::bitset<16>(instruction).to_string() << '\n';
 
-        auto        &&symbol              = symbols.cbegin();
-        std::size_t instruction_index     = 0;
-        std::size_t instruction_end_index = as_assembled.size();
+                hex_file << std::setfill('0') << std::uppercase << std::hex << std::setw(4)
+                         << instruction << '\n';
+        }
 
         symbol_file << "// Symbol table\n" << "// Scope Level 0:\n" << "//\t" << std::left << std::setfill(' ')
                     << std::setw(longest_symbol_length) << "Symbol Name" << " Page Address\n//\t"
                     << std::setfill('-') << std::setw(longest_symbol_length) << '-' << " ------------\n";
 
-        std::stringstream ss;
-        ss << ".ORIG 0x" << std::hex << as_assembled.at(instruction_index);
-        write_list(as_assembled.at(instruction_index), pc, line, ' ', ss.str());
+        const auto &symbol_at = [this](const std::uint16_t address) {
+                return std::find_if(
+                        symbols.cbegin(), symbols.cend(),
+                        [address](const auto &sym) -> bool
+                        {
+                                return sym.first == address;
+                        }
+                );
+        };
 
-        object_file.put(static_cast<char>((as_assembled.at(instruction_index) >> 8) & 0xFF));
-        object_file.put(static_cast<char>(as_assembled.at(instruction_index) & 0xFF));
+        std::uint16_t pc   = 0;
 
-        binary_file << std::bitset<16>(as_assembled.at(instruction_index)).to_string() << '\n';
+        std::map<std::uint16_t, std::shared_ptr<Label>>::const_iterator symbol;
 
-        hex_file << std::setfill('0') << std::uppercase << std::hex << std::setw(4)
-                 << as_assembled.at(instruction_index) << '\n';
+        const std::string empty = " ";
 
-        pc = as_assembled.at(instruction_index);
+        for (auto &tokenized_line : tokens) {
+                symbol = symbol_at(pc);
+                if (symbol != symbols.cend()) {
+                        symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
+                                    << symbol->second->word << ' ' << std::hex <<std::setfill('0')
+                                    << std::setw(4) << symbol->first << '\n';
+                }
 
-        // TODO: Is it worth it to figure out if there's a .BLKW over using a lot of .FILL's?
-        for (++instruction_index, ++line; instruction_index < instruction_end_index || symbol != symbols.cend();
-             ++instruction_index, ++pc, ++line) {
+                lst_file << tokenized_line.front()->disassemble(
+                        tokenized_line, pc, symbol == symbols.cend() ? empty : symbol->second->word, *this
+                );
 
-                object_file.put(static_cast<char>((as_assembled.at(instruction_index) >> 8) & 0xFF));
-                object_file.put(static_cast<char>(as_assembled.at(instruction_index) & 0xFF));
-
-                binary_file << std::bitset<16>(as_assembled.at(instruction_index)).to_string() << '\n';
-
-                hex_file << std::setfill('0') << std::uppercase << std::hex << std::setw(4)
-                         << as_assembled.at(instruction_index) << '\n';
-
-                if (symbol != symbols.cend() && symbol->first == pc) {
-                        write_list(as_assembled.at(instruction_index), pc, line,
-                                   symbol->second->word, disassemble(as_assembled.at(instruction_index), pc));
-
-                        symbol_file << "//\t" << std::left << std::setfill(' ') << std::setw(longest_symbol_length)
-                                    << symbol->second->word << ' ' << std::uppercase << std::hex << symbol->first << '\n';
-
-                        ++symbol;
-                } else {
-                        write_list(as_assembled.at(instruction_index), pc, line,
-                                   ' ', disassemble(as_assembled.at(instruction_index), pc));
+                if (tokenized_line.front()->type() == Token::DIR_END) {
+                        break;
                 }
         }
-
-        write_list(0u, 0u, line, ' ', ".END");
 }
 
 /**
@@ -842,11 +821,13 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 }
                 break;
         case 0xE000:
+                stream << "LEA R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << "LEA R" << ((instruction & 0x0E00) >> 9) << ", " << symbol->second->word;
+                        stream << symbol->second->word;
+                } else if (instruction & 0x100) {
+                        stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
-                        stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
-                               << instruction;
+                        stream << '#' << std::dec << (instruction & 0xFF);
                 }
                 break;
         case 0xD000:
@@ -863,19 +844,23 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 }
                 break;
         case 0xB000:
+                stream << "STI R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << "STI R" << ((instruction & 0x0E00) >> 9) << ", " << symbol->second->word;
+                        stream << symbol->second->word;
+                } else if (instruction & 0x100) {
+                        stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
-                        stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
-                               << instruction;
+                        stream << '#' << std::dec << (instruction & 0xFF);
                 }
                 break;
         case 0xA000:
+                stream << "LDI R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << "LDI R" << ((instruction & 0x0E00) >> 9) << ", " << symbol->second->word;
+                        stream << symbol->second->word;
+                } else if (instruction & 0x100) {
+                        stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
-                        stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
-                               << instruction;
+                        stream << '#' << std::dec << (instruction & 0xFF);
                 }
                 break;
         case 0x9000:
@@ -906,27 +891,38 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 }
                 break;
         case 0x4000:
-                if ((instruction & 0x0800) && (symbol = find_symbol(5)) != symbols.cend()) {
-                        stream << "JSR " << symbol->second->word;
+                if (instruction & 0x0800) {
+                        stream << "JSR ";
+                        if ((symbol = find_symbol(5)) != symbols.cend()) {
+                                stream << symbol->second->word;
+                        } else if (instruction & 0x700) {
+                                stream << "#-" << std::dec << (-instruction & 0x3FF);
+                        } else {
+                                stream << '#' << std::dec << (instruction & 0x3FF);
+                        }
                 } else {
                         stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
                                << instruction;
                 }
                 break;
         case 0x3000:
+                stream << "ST R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << "ST R" << ((instruction & 0x0E00) >> 9) << ", " << symbol->second->word;
+                        stream << symbol->second->word;
+                } else if (instruction & 0x100) {
+                        stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
-                        stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
-                               << instruction;
+                        stream << '#' << std::dec << (instruction & 0xFF);
                 }
                 break;
         case 0x2000:
+                stream << "LD R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << "LD R" << ((instruction & 0x0E00) >> 9) << ", " << symbol->second->word;
+                        stream << symbol->second->word;
+                } else if (instruction & 0x100) {
+                        stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
-                        stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
-                               << instruction;
+                        stream << '#' << std::dec << (instruction & 0xFF);
                 }
                 break;
         case 0x1000:
@@ -939,7 +935,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 break;
         case 0x0000:
         default:
-                if ((instruction & 0x0E00) && (symbol = find_symbol(7)) != symbols.cend()) {
+                if (instruction & 0x0E00) {
                         stream << "BR";
 
                         if (instruction & 0x0800) {
@@ -954,7 +950,15 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                                 stream << 'p';
                         }
 
-                        stream << ' ' << symbol->second->word;
+                        stream << ' ';
+
+                        if ((symbol = find_symbol(7)) != symbols.cend()) {
+                                stream << symbol->second->word;
+                        } else if (instruction & 0x100) {
+                                stream << "#-" << std::dec << (instruction & 0xFF);
+                        } else {
+                                stream << '#' << std::dec << (instruction & 0xFF);
+                        }
                 } else {
                         stream << ".FILL 0x" << std::uppercase << std::setw(4) << std::setfill('0') << std::hex
                                << instruction;
@@ -978,8 +982,12 @@ void Assembler::change_warning_level(std::string &warning)
         } else if (warning == "all") {
                 warning_level = ALL;
         } else {
-                std::cerr << "Argument --warn expects one (or more) of the following:" << '\n' << "\t- none" << '\n'
-                          << "\t- syntax" << '\n' << "\t- ignore" << '\n' << "\t- multiple" << '\n' << "\t- all" << '\n'
+                std::cerr << "Argument --warn expects one (or more) of the following:" << '\n'
+                          << "\t- all" << '\n'
+                          << "\t- syntax" << '\n'
+                          << "\t- ignore" << '\n'
+                          << "\t- multiple" << '\n'
+                          << "\t- none" << '\n'
                           << "Got '" << warning << "'\n";
                 exit(EXIT_FAILURE);
         }

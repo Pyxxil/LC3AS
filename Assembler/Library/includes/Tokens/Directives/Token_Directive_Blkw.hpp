@@ -7,7 +7,7 @@
 class Blkw : public Directive
 {
 public:
-        Blkw(std::string &word, int line_number = 0);
+        Blkw(std::string &word, std::string &token_uppercase, int line_number = 0);
 
         virtual Token::token_type type() const override;
 
@@ -15,6 +15,10 @@ public:
         virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const override;
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
         virtual int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
+        virtual std::string disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                                        std::uint16_t &program_counter,
+                                        const std::string &symbol,
+                                        const Assembler &assembler) const override;
 };
 
 #endif //PROJECT_TOKEN_DIRECTIVE_BLKW_HPP

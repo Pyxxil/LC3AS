@@ -1,7 +1,7 @@
 #include "Tokens/Immediate/Token_Immediate_Decimal.hpp"
 
 Decimal::Decimal(std::string &value, int line_number)
-        : Immediate(value, line_number)
+        : Immediate(value, value, line_number)
 {
         if (value.length() > 7) {
                 Token::expected("decimal value up to 16 bits in length");

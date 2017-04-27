@@ -14,6 +14,10 @@ public:
         void not_found();
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
         virtual int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
+        virtual std::string disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                                        std::uint16_t &program_counter,
+                                        const std::string &symbol,
+                                        const Assembler &assembler) const override;
 
         std::string label;
 

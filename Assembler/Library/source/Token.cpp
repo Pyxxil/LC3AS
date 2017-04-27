@@ -1,13 +1,13 @@
 #include "Token.hpp"
 
 Token::Token()
-        : word(), assembled()
+        : word(), word_as_uppercase(), assembled()
 {
 
 }
 
-Token::Token(std::string &token, int line)
-        : word(token), assembled(), at_line(line), is_valid(true)
+Token::Token(std::string &token, std::string &uppercased, int line)
+        : word(token), word_as_uppercase(uppercased), assembled(), at_line(line), is_valid(true)
 {
 
 }
@@ -44,8 +44,9 @@ std::string Token::deduce_type() const
         case DIR_ORIG:
         case DIR_STRINGZ:
 #ifdef INCLUDE_ADDONS
-                case ADDON_NEG:
-                case ADDON_SUB:
+        case ADDON_NEG:
+        case ADDON_SUB:
+        case ADDON_SET:
 #endif
                 return std::string("Directive");
         case TRAP_IN:
@@ -112,9 +113,7 @@ bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
         std::cerr << tokens.front()->word << ".guess_memory_size() not implemented\n";
-
-        (void) tokens;
-        return 0;
+        return -1;
 }
 
 void Token::unterminated(std::string &&t_type)
@@ -127,4 +126,16 @@ void Token::unterminated(std::string &&t_type)
         std::cerr << "Unterminated " << t_type << " literal.\n";
 
         word = "Non-terminated " + t_type;
+}
+
+std::string Token::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                               std::uint16_t &program_counter,
+                               const std::string &symbol,
+                               const Assembler &assembler) const
+{
+        (void) tokens;
+        (void) assembler;
+        (void) program_counter;
+        (void) symbol;
+        return word + " has no disassemble (" + deduce_type() + ")\n";
 }

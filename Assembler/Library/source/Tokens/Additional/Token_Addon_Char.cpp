@@ -6,8 +6,8 @@ Character::Character()
 
 }
 
-Character::Character(std::string &character, int line_number)
-        : Immediate(character, line_number)
+Character::Character(std::string &character, std::string &token_uppercase, int line_number)
+        : Immediate(character, token_uppercase, line_number)
 {
         if (character.length() > 1) {
                 if (character.length() == 2 && character.at(0) == '\\') {

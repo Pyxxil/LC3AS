@@ -9,8 +9,8 @@ public:
         Directive()
                 : Token()
         {}
-        Directive(std::string &token, int line_number = 0)
-                : Token(token, line_number)
+        Directive(std::string &token, std::string &token_as_uppercase, int line_number = 0)
+                : Token(token, token_as_uppercase, line_number)
         {}
 };
 

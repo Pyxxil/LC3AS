@@ -1,7 +1,7 @@
 #include "Tokens/Immediate/Token_Immediate_Hexadecimal.hpp"
 
-Hexadecimal::Hexadecimal(std::string &value, int line_number)
-        : Immediate(value, line_number)
+Hexadecimal::Hexadecimal(std::string &value, std::string &value_uppercase, int line_number)
+        : Immediate(value, value_uppercase, line_number)
 {
         if (value.length() > 6 || value.length() == 1 || (value.length() == 2 && std::toupper(value.at(1)) == 'X')) {
                 Token::expected("hexadecimal value up to 16 bits in length");

@@ -1,15 +1,22 @@
 #include "Tokens/Instructions/Token_Instruction_Not.hpp"
 
-#include <Assembler.hpp>
-#include <Tokens/Token_Register.hpp>
+#include <iomanip>
+#include <sstream>
+
+#include "Tokens/Token_Register.hpp"
+#include "Assembler.hpp"
 
 Not::Not()
         : Instruction()
-{}
+{
 
-Not::Not(std::string &oper, int line_number)
-        : Instruction(oper, line_number)
-{}
+}
+
+Not::Not(std::string &oper, std::string &token_uppercase, int line_number)
+        : Instruction(oper, token_uppercase, line_number)
+{
+
+}
 
 std::int32_t Not::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -20,8 +27,8 @@ std::int32_t Not::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         }
 
         assembled.emplace_back(static_cast<std::uint16_t>(0x903F |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
-                ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6))
+                ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
+                ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6))
         );
 
         return 1;
@@ -53,6 +60,31 @@ std::int32_t Not::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
 {
         (void) tokens;
         return static_cast<std::int32_t>(is_valid);
+}
+
+std::string Not::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             std::uint16_t &program_counter,
+                             const std::string &symbol,
+                             const Assembler &assembler) const
+{
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                // Hexadecimal representation of instruction
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+                // Binary representation of instruction
+                << ' ' << std::bitset<16>(assembled.front())
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                // Instruction itself
+                << " NOT " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase << '\n';
+
+        ++program_counter;
+
+        return stream.str();
 }
 
 Token::token_type Not::type() const

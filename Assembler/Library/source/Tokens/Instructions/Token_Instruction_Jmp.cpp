@@ -1,11 +1,16 @@
 #include "Tokens/Instructions/Token_Instruction_Jmp.hpp"
-#include "Tokens/Token_Register.hpp"
 
+#include <iomanip>
+#include <sstream>
+
+#include "Tokens/Token_Register.hpp"
 #include "Assembler.hpp"
 
-Jmp::Jmp(std::string &oper, int line_number)
-        : Instruction(oper, line_number)
-{}
+Jmp::Jmp(std::string &oper, std::string &token_uppercase, int line_number)
+        : Instruction(oper, token_uppercase, line_number)
+{
+
+}
 
 std::int32_t Jmp::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -43,6 +48,31 @@ std::int32_t Jmp::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
 {
         (void) tokens;
         return static_cast<std::int32_t>(is_valid);
+}
+
+std::string Jmp::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             std::uint16_t &program_counter,
+                             const std::string &symbol,
+                             const Assembler &assembler) const
+{
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                // Hexadecimal representation of instruction
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+                // Binary representation of instruction
+                << ' ' << std::bitset<16>(assembled.front())
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                // Instruction itself
+                << " JMP " << tokens.at(1)->word_as_uppercase << '\n';
+
+        ++program_counter;
+
+        return stream.str();
 }
 
 Token::token_type Jmp::type() const

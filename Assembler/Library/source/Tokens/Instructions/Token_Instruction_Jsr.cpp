@@ -1,13 +1,15 @@
 #include "Tokens/Instructions/Token_Instruction_Jsr.hpp"
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"
 
-Jsr::Jsr(std::string &oper, int line_number)
-        : Instruction(oper, line_number)
+Jsr::Jsr(std::string &oper, std::string &token_uppercase, int line_number)
+        : Instruction(oper, token_uppercase, line_number)
 {}
 
 std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -70,12 +72,39 @@ std::int32_t Jsr::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid);
 }
 
+std::string Jsr::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             std::uint16_t &program_counter,
+                             const std::string &symbol,
+                             const Assembler &assembler) const
+{
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                // Hexadecimal representation of instruction
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+                // Binary representation of instruction
+                << ' ' << std::bitset<16>(assembled.front())
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                // Instruction itself
+                << " JSR ";
+
+        ++program_counter;
+
+        if (tokens.at(1)->type() == Token::LABEL) {
+                stream << tokens.at(1)->word << '\n';
+        } else {
+                const auto offset = std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
+                stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter) << '\n';
+        }
+
+        return stream.str();
+}
+
 Token::token_type Jsr::type() const
 {
         return Token::token_type::OP_JSR;
-}
-
-const std::vector<std::uint16_t> Jsr::as_assembled() const
-{
-        return Token::as_assembled();
 }

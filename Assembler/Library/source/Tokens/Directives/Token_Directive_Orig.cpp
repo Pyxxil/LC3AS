@@ -1,8 +1,13 @@
-#include <Assembler.hpp>
 #include "Tokens/Directives/Token_Directive_Orig.hpp"
 
-Orig::Orig(std::string &token, int line_number)
-        : Directive(token, line_number)
+#include <sstream>
+#include <algorithm>
+#include <iomanip>
+
+#include "Assembler.hpp"
+
+Orig::Orig(std::string &token, std::string &upper_case_word, int line_number)
+        : Directive(token, upper_case_word, line_number)
 {}
 
 std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -42,6 +47,35 @@ std::int32_t Orig::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
         } else {
                 return -1;
         }
+}
+
+std::string Orig::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                              std::uint16_t &program_counter,
+                              const std::string &symbol,
+                              const Assembler &assembler) const
+{
+        // You can't have a symbol here...
+        (void) symbol;
+
+        const auto &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
+        program_counter = static_cast<std::uint16_t>(immediate->immediate);
+
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << "(0000) " << std::uppercase
+                // Hexadecimal representation of instruction
+                << std::hex << std::setfill('0') << std::setw(4) << immediate->immediate
+                // Binary representation of instruction
+                << ' ' << std::bitset<16>(static_cast<unsigned long long>(immediate->immediate))
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << ' '
+                // Instruction itself
+                << ' ' << word_as_uppercase << " 0x" << std::hex << std::setfill('0') << std::setw(4)
+                << immediate->immediate << '\n';
+        return stream.str();
 }
 
 Token::token_type Orig::type() const

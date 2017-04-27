@@ -6,7 +6,7 @@
 class Trap : public Instruction
 {
 public:
-        Trap(std::string &word, int line_number = 0);
+        Trap(std::string &word, std::string &token_uppercase, int line_number = 0);
 
         virtual Token::token_type type() const override;
         virtual int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler) override;

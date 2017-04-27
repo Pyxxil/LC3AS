@@ -44,6 +44,7 @@
 #include "Tokens/Additional/Token_Addon_Char.hpp"
 #include "Tokens/Additional/Token_Addon_Neg.hpp"
 #include "Tokens/Additional/Token_Addon_Sub.hpp"
+#include "Tokens/Additional/Token_Addon_Set.hpp"
 #endif
 
 #endif // PROJECT_ALL_TOKENS_HPP

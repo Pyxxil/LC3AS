@@ -6,7 +6,7 @@
 class Register : public Token
 {
 public:
-        Register(std::string which, int line_number = 0);
+        Register(std::string &which, std::string &which_uppercase, int line_number = 0);
 
         char reg;
 

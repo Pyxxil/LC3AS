@@ -3,8 +3,8 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Assembler.hpp"
 
-Trap::Trap(std::string &token, int line_number)
-        : Instruction(token, line_number)
+Trap::Trap(std::string &token, std::string &token_uppercase, int line_number)
+        : Instruction(token, token_uppercase, line_number)
 {}
 
 std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

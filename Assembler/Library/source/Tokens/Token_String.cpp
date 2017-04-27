@@ -1,7 +1,7 @@
 #include <Tokens/All_Tokens.hpp>
 
 String::String(std::string &string, int line_number)
-        : Token(string, line_number)
+        : Token(string, string, line_number)
 {
         for (std::size_t index = 0; index < string.size(); ++index) {
                 if (string.at(index) == '\\') {

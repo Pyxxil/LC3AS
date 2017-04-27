@@ -1,22 +1,33 @@
 #include "Tokens/Additional/Token_Addon_Sub.hpp"
 
-#include "Tokens/Instructions/Token_Instruction_Add.hpp"
-#include "Tokens/Instructions/Token_Instruction_And.hpp"
-#include "Tokens/Immediate/Token_Immediate_Decimal.hpp"
-#include "Tokens/Additional/Token_Addon_Neg.hpp"
+#include <iomanip>
+#include <sstream>
+
 #include "Tokens/Token_Register.hpp"
 #include "Assembler.hpp"
 
 Sub::Sub()
-        : Token()
+        : Directive()
 {
-
+        set_zero     = std::make_shared<And>();
+        decimal_zero = std::make_shared<Decimal>("#0");
+        neg1 = std::make_shared<Neg>();
+        neg2 = std::make_shared<Neg>();
+        add = std::make_shared<Add>();
 }
 
-Sub::Sub(std::string &directive, int line_number)
-        : Token(directive, line_number)
+Sub::Sub(std::string &directive, std::string &token_uppercase, int line_number)
+        : Directive(directive, token_uppercase, line_number)
 {
+        std::string neg = "NEG";
 
+        set_zero     = std::make_shared<And>();
+        decimal_zero = std::make_shared<Decimal>("#0");
+        neg1 = std::make_shared<Neg>(neg, neg, line_number);
+        neg2 = std::make_shared<Neg>(neg, neg, line_number);
+        add = std::make_shared<Add>();
+
+        add->at_line = set_zero->at_line = decimal_zero->at_line = line_number;
 }
 
 // TODO: Change this so you can have it similar to ADD R1, R2, R3
@@ -31,32 +42,25 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         std::int32_t ret = 0;
 
         if (std::static_pointer_cast<Register>(tokens[1])->reg == std::static_pointer_cast<Register>(tokens[2])->reg) {
-                std::shared_ptr<Token> set_zero     = std::make_shared<And>();
-                std::shared_ptr<Token> decimal_zero = std::make_shared<Decimal>("#0");
-
-                std::vector<std::shared_ptr<Token>> vec = {set_zero, tokens[1], tokens[2], decimal_zero};
+                std::vector<std::shared_ptr<Token>> vec = {set_zero, tokens.at(1), tokens.at(2), decimal_zero};
 
                 set_zero->assemble(vec, assembler);
-                assembled.swap(set_zero->assembled);
+                assembled = set_zero->assembled;
 
                 ret = 1;
         } else {
-                std::shared_ptr<Token> neg1 = std::make_shared<Neg>();
-                std::shared_ptr<Token> neg2 = std::make_shared<Neg>();
-
-                std::vector<std::shared_ptr<Token>> vec = {neg1, tokens[2]};
+                std::vector<std::shared_ptr<Token>> vec = {neg1, tokens.at(2)};
                 ret += neg1->assemble(vec, assembler);
 
-                std::shared_ptr<Token> add = std::make_shared<Add>();
-                vec = {add, tokens[1], tokens[1], tokens[2]};
+                vec = {add, tokens.at(1), tokens.at(1), tokens.at(2)};
                 ret += add->assemble(vec, assembler);
 
-                assembled.swap(neg1->assembled);
+                assembled = neg1->assembled;
                 for (const auto &as_assembled : add->assembled) {
                         assembled.emplace_back(as_assembled);
                 }
 
-                vec = {neg2, tokens[2]};
+                vec = {neg2, tokens.at(2)};
                 ret += neg2->assemble(vec, assembler);
 
                 for (const auto &as_assembled : neg2->assembled) {
@@ -97,6 +101,30 @@ std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         } else {
                 return -1;
         }
+}
+
+std::string Sub::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             std::uint16_t &program_counter,
+                             const std::string &symbol,
+                             const Assembler &assembler) const
+{
+        std::stringstream stream;
+
+        if (std::static_pointer_cast<Register>(tokens[1])->reg == std::static_pointer_cast<Register>(tokens[2])->reg) {
+                std::vector<std::shared_ptr<Token>> vec = {set_zero, tokens.at(1), tokens.at(2), decimal_zero};
+                stream << set_zero->disassemble(vec, program_counter, symbol, assembler);
+        } else {
+                std::vector<std::shared_ptr<Token>> vec = {neg1, tokens.at(2)};
+                stream << neg1->disassemble(vec, program_counter, symbol, assembler);
+
+                vec = {add, tokens.at(1), tokens.at(1), tokens.at(2)};
+                stream << add->disassemble(vec, program_counter, " ", assembler);
+
+                vec = {neg2, tokens.at(2)};
+                stream << neg2->disassemble(vec, program_counter, " ", assembler);
+        }
+
+        return stream.str();
 }
 
 Token::token_type Sub::type() const

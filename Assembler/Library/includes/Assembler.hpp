@@ -68,10 +68,10 @@ public:
                 WARNING     = 2,
         };
 
-private:
-        std::vector<std::string> files_to_assemble;
-
         int longest_symbol_length = 20;
+private:
+
+        std::vector<std::string> files_to_assemble;
 
         std::vector<std::uint16_t> as_assembled;
 

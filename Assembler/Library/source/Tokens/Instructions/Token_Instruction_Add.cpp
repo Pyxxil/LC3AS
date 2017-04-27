@@ -1,8 +1,11 @@
 #include "Tokens/Instructions/Token_Instruction_Add.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Immediate.hpp"
-#include <Assembler.hpp>
+#include "Assembler.hpp"
 
 Add::Add()
         : Instruction()
@@ -10,8 +13,8 @@ Add::Add()
 
 }
 
-Add::Add(std::string &oper, int line_number)
-        : Instruction(oper, line_number)
+Add::Add(std::string &oper, std::string &token_uppercase, int line_number)
+        : Instruction(oper, token_uppercase, line_number)
 {}
 
 std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -74,6 +77,32 @@ std::int32_t Add::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
 {
         (void) tokens;
         return static_cast<std::int32_t>(is_valid);
+}
+
+std::string Add::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             std::uint16_t &program_counter,
+                             const std::string &symbol,
+                             const Assembler &assembler) const
+{
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                // Hexadecimal representation of instruction
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+                // Binary representation of instruction
+                << ' ' << std::bitset<16>(assembled.front())
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                // Instruction itself
+                << " ADD " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase
+                << " #" << std::dec << std::static_pointer_cast<Immediate>(tokens.at(3))->immediate << '\n';
+
+        ++program_counter;
+
+        return stream.str();
 }
 
 Token::token_type Add::type() const

@@ -1,9 +1,12 @@
 #include "Tokens/Traps/Token_Trap_In.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 #include "Assembler.hpp"
 
-In::In(std::string &oper, int line_number)
-        : Instruction(oper, line_number)
+In::In(std::string &oper, std::string &token_uppercase, int line_number)
+        : Instruction(oper, token_uppercase, line_number)
 {}
 
 int32_t In::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
@@ -34,6 +37,33 @@ std::int32_t In::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) 
 {
         (void) tokens;
         return static_cast<std::int32_t>(is_valid);
+}
+
+std::string In::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                            std::uint16_t &program_counter,
+                            const std::string &symbol,
+                            const Assembler &assembler) const
+{
+        (void) tokens;
+
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                // Hexadecimal representation of instruction
+                << " F023"
+                // Binary representation of instruction
+                << " 1111000000100011"
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::left<< std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                // Instruction itself
+                << " IN\n";
+
+        ++program_counter;
+
+        return stream.str();
 }
 
 Token::token_type In::type() const

@@ -4,8 +4,8 @@ Immediate::Immediate()
         : Token()
 {}
 
-Immediate::Immediate(std::string &token, int line_number)
-        : Token(token, line_number)
+Immediate::Immediate(std::string &token, std::string &token_uppercase, int line_number)
+        : Token(token, token_uppercase, line_number)
 {}
 
 std::int32_t Immediate::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)

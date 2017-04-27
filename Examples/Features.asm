@@ -1,69 +1,3 @@
-;
-; These are, generally, the way that everything is handled. The assembler does
-; not currently 100% satisfy the following, but it's being worked on.
-;
-; Immediate values:
-; comment = (;|\/\/).*
-; register = [rR][0-7]
-; hexadecimal = 0?[xX]?[0-9a-fA-F]{0,4}
-; decimal = #?-?\d+
-; binary = 0?[bB]?[01]{0,16}
-; octal = \[0-7]{1,7}
-; string = ".*"
-; label = In general, this is whatever isn't matched by anything else
-; immediate = hexadecimal|decimal|octal|binary
-;
-; Note: For the following, all directives/instructions/trap routines are in
-;       upper case, however they can be mixed case.
-;
-; Directives:
-; orig    = \w*\.ORIG\w+immediate\w*comment?
-; fill    = \w*\.FILL\w+(immediate|label)\w*comment?
-; blkw    = \w*\.BLKW\w+immediate\w+(immediate|label)?\w*comment?
-; stringz = \w*\.STRINGZ\w+string\w*comment?
-; end     = \w*\.END\w*comment?
-;
-; Additional Directives:
-; sub     = \w*\.SUB\w+register\w*,?\w*register\w*comment?
-; neg     = \w*\.NEG\w+register\w*,?\w*register\w*comment?
-;
-; directive = orig|fill|blkw|stringz|end
-;
-; Instructions:
-; add  = \w*ADD\w+register\w*,?\w*register\w*,?\w*(register|immediate)\w*comment?
-; and  = \w*AND\w+register\w*,?\w*register\w*,?\w*(register|immediate)\w*comment?
-; br   = \w*BR[nN]?[zZ]?[pP]?\w+label\w*comment?  -- Do note that nzp can be in any order
-; jmp  = \w*JMP\w+register\w*comment?
-; jsr  = \w*JSR\w+label\w*comment
-; jsrr = \w*JSRR\w+register\w*comment?
-; ld   = \w*LD\w+register\w*,?\w*label\w*comment?
-; ldi  = \w*LDI\w+register\w*,?\w*label\w*comment?
-; ldr  = \w*LDR\w+register\w*,?\w*register\w*,?\w*immediate\w*comment?
-; lea  = \w*LEA\w+register\w*,?\w*label\w*comment?
-; not  = \w*NOT\w+register\w*,?\w*register\w*comment?
-; ret  = \w*RET\w*comment?
-; st   = \w*ST\w+register\w*,?\w*label\w*comment?
-; sti  = \w*STI\w+register\w*,?\w*label\w*comment?
-; str  = \w*STR\w+register\w*,?\w*register\w*,?\w*immediate\w*comment?
-; trap = \w*TRAP\w+immediate\w*comment?
-;
-; instruction = add|and|br|jmp|jsr|jsrr|ld|ldi|ldr|lea|not|ret|st|sti|str|trap
-;
-; Trap routines:
-; getc  = \w*GETC\w*comment?
-; out   = \w*OUT\w*comment?
-; puts  = \w*PUTS\w*comment?
-; putsp =\w*PUTSP\w*comment?
-; in    = \w*IN\w*comment?
-; halt  = \w*HALT\w*comment?
-;
-; traproutine = getc|out|puts|putsp|in|halt
-;
-; This means that a valid line (one that isn't empty/just contains a comment is
-; as such:
-; (label:?)?(instruction|directive|traproutine)
-;
-
 
 .ORIG 0b0011000000000000; Each program needs to start with a .ORIG directive,
                         ; supplying it with an immediate value so that the
@@ -81,7 +15,7 @@
 
 
 ; This is a label
-BEGIN_TEST::
+BEGIN_TEST:
         ADD R5, R5, #-10; Comments can be as close to the instruction as you'd
                         ; like
         ADD R1, R2, #1  // Comments can also be like so ('/' will is treated as
@@ -107,6 +41,9 @@ oct     .FILL \700      ; Octal values are also acceptable
 
         .BLKW 0x10 0xFF ; Create 0x10 blocks of memory, initialised to 0xFF
 cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
+
+        .SET R2, #10    ; This sets the register to the value on the right.
+        .SET R3, 0x3000 ; As above
         RET
 
 ; Uncomment the following for testing

@@ -1,34 +1,37 @@
 #include "Tokens/Additional/Token_Addon_Neg.hpp"
 
-#include "Tokens/Instructions/Token_Instruction_Not.hpp"
-#include "Tokens/Instructions/Token_Instruction_Add.hpp"
+#include <iomanip>
+#include <sstream>
+
 #include "Tokens/Immediate/Token_Immediate_Decimal.hpp"
 #include "Tokens/Token_Register.hpp"
 #include "Assembler.hpp"
 
 Neg::Neg()
-        : Token()
+        : Directive()
 {
-
+        neg = std::make_shared<Not>();
+        add = std::make_shared<Add>();
 }
 
-Neg::Neg(std::string &directive, int line_number)
-        : Token(directive, line_number)
+Neg::Neg(std::string &directive, std::string &token_uppercase, int line_number)
+        : Directive(directive, token_uppercase, line_number)
 {
+        neg = std::make_shared<Not>();
+        add = std::make_shared<Add>();
 
+        neg->at_line = add->at_line = line_number;
 }
 
 std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        std::shared_ptr<Token>              neg = std::make_shared<Not>();
-        std::vector<std::shared_ptr<Token>> vec = {neg, tokens[1], tokens[1]};
-        neg->assemble(vec, assembler);
+        std::vector<std::shared_ptr<Token>> vec = {neg, tokens.at(1), tokens.at(1)};
 
-        std::shared_ptr<Token> add = std::make_shared<Add>();
-        vec = {add, tokens[1], tokens[1], std::make_shared<Decimal>("#1")};
+        neg->assemble(vec, assembler);
+        vec = {add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1")};
         add->assemble(vec, assembler);
 
-        assembled.swap(neg->assembled);
+        assembled = neg->assembled;
         for (const auto &as_assembled : add->assembled) {
                 assembled.emplace_back(as_assembled);
         }
@@ -55,6 +58,22 @@ std::int32_t Neg::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
 {
         (void) tokens;
         return static_cast<std::int32_t>(is_valid) * 2;
+}
+
+std::string Neg::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             std::uint16_t &program_counter,
+                             const std::string &symbol,
+                             const Assembler &assembler) const
+{
+        std::stringstream stream;
+
+        std::vector<std::shared_ptr<Token>> vec = {neg, tokens.at(1), tokens.at(1)};
+        stream << neg->disassemble(vec, program_counter, symbol, assembler);
+
+        vec = {add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1")};
+        stream << add->disassemble(vec, program_counter, " ", assembler);
+
+        return stream.str();
 }
 
 Token::token_type Neg::type() const

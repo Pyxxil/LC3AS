@@ -7,7 +7,7 @@ class Immediate : public Token
 {
 public:
         Immediate();
-        Immediate(std::string &word, int line_number = 0);
+        Immediate(std::string &word, std::string &token_uppercase, int line_number = 0);
 
         std::int16_t immediate = 0;
 

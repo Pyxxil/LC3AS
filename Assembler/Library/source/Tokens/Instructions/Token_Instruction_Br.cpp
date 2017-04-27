@@ -1,13 +1,23 @@
 #include "Tokens/Instructions/Token_Instruction_Br.hpp"
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Assembler.hpp"
 
-Br::Br(std::string &oper, int line_number, bool n, bool z, bool p)
-        : Instruction(oper, line_number), N(n), Z(z), P(p)
-{}
+Br::Br(std::string &oper, std::string &token_uppercase, int line_number, bool n, bool z, bool p)
+        : Instruction(oper, token_uppercase, line_number), N(n), Z(z), P(p)
+{
+
+}
+
+Br::Br(bool n, bool z, bool p)
+        : Instruction(), N(n), Z(z), P(p)
+{
+
+}
 
 std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -70,6 +80,38 @@ std::int32_t Br::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) 
 {
         (void) tokens;
         return static_cast<int32_t>(is_valid);
+}
+
+std::string Br::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
+                            std::uint16_t &program_counter,
+                            const std::string &symbol,
+                            const Assembler &assembler) const
+{
+        std::stringstream stream;
+        stream
+                // Address in memory
+                << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                // Hexadecimal representation of instruction
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+                // Binary representation of instruction
+                << ' ' << std::bitset<16>(assembled.front())
+                // Line the instruction is on
+                << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+                // Label at the current address (if any)
+                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                // Instruction itself
+                << " BR" << (N ? "n" : " ") << (Z ? "z" : " ") << (P ? "p" : " ") << ' ';
+
+        ++program_counter;
+
+        if (tokens.at(1)->type() == Token::LABEL) {
+                stream << tokens.at(1)->word << '\n';
+        } else {
+                const auto offset = std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
+                stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter) << '\n';
+        }
+
+        return stream.str();
 }
 
 Token::token_type Br::type() const
