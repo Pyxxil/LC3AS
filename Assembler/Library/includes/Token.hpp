@@ -6,22 +6,18 @@
 #include <memory>
 #include <iostream>
 
-
-// TODO: Fix the fact that parameter names aren't consistent across all token files.
-// TODO: Also fix the positioning of method declarations.
-
 class Assembler;
 
 class Token
 {
 public:
         Token();
-        Token(std::string &token, std::string &uppercased, int line);
+        Token(std::string &t_token, std::string &t_token_uppercase, int line);
 
         virtual ~Token() = default;
 
-        std::string word;
-        std::string word_as_uppercase;
+        std::string token;
+        std::string token_uppercase;
 
         std::vector<std::uint16_t> assembled;
 

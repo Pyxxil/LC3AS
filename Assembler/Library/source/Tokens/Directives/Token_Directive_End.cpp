@@ -2,12 +2,15 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Assembler.hpp"
 
-End::End(std::string &token, std::string &token_uppercase, int line_number)
-        : Directive(token, token_uppercase, line_number)
-{}
+End::End(std::string &directive, std::string &directive_uppercase, int line_number)
+        : Directive(directive, directive_uppercase, line_number)
+{
+
+}
 
 std::int32_t End::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {

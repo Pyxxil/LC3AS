@@ -14,8 +14,8 @@ Neg::Neg()
         add = std::make_shared<Add>();
 }
 
-Neg::Neg(std::string &directive, std::string &token_uppercase, int line_number)
-        : Directive(directive, token_uppercase, line_number)
+Neg::Neg(std::string &directive, std::string &directive_uppercase, int line_number)
+        : Directive(directive, directive_uppercase, line_number)
 {
         neg = std::make_shared<Not>();
         add = std::make_shared<Add>();

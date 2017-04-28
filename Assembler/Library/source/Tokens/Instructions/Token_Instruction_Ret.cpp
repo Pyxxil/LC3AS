@@ -2,12 +2,15 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Assembler.hpp"
 
-Ret::Ret(std::string &token, std::string &token_uppercase, int line_number)
-        : Instruction(token, token_uppercase, line_number)
-{}
+Ret::Ret(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
+{
+
+}
 
 std::int32_t Ret::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {

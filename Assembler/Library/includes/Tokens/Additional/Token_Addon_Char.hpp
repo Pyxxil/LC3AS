@@ -7,7 +7,7 @@ class Character : public Immediate
 {
 public:
         Character();
-        Character(std::string &word, std::string &token_uppercase, int line_number = 0);
+        Character(std::string &character, int line_number = 0);
 };
 
 #endif //PROJECT_TOKEN_ADDON_CHAR_HPP

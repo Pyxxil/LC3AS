@@ -33,6 +33,10 @@ EXTRA_FEATURES:         ; Some additional features not actually present in the
         .SUB R5, R1     ; Subtraction
         .SUB R5, R5     ; This is the exact same as AND R5, R5, #0 (it generates
                         ; that exact instruction)
+        .SUB R1, R1, R2
+        .SUB R1, R2, R2
+        .SUB R1, R2, R1
+        .SUB R1, R2, R3
 oct     .FILL \700      ; Octal values are also acceptable
         ;oct .FILL \600 ; This should throw an error about multiple definitions
                         ; of a label.

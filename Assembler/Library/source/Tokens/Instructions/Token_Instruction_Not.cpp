@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Register.hpp"
 #include "Assembler.hpp"
@@ -12,8 +13,8 @@ Not::Not()
 
 }
 
-Not::Not(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
+Not::Not(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
 {
 
 }
@@ -80,7 +81,7 @@ std::string Not::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " NOT " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase << '\n';
+                << " NOT " << tokens.at(1)->token_uppercase << ' ' << tokens.at(2)->token_uppercase << '\n';
 
         ++program_counter;
 

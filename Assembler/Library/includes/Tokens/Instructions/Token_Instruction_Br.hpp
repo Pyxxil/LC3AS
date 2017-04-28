@@ -6,11 +6,13 @@
 class Br : public Instruction
 {
 public:
-        Br(std::string &oper, std::string &token_uppercase, int line_number = 0, bool n = false, bool z = false, bool p = false);
+        Br(std::string &instruction, std::string &instruction_uppercase, int line_number = 0,
+           bool n = false, bool z = false, bool p = false);
         Br(bool n, bool z, bool p);
+
         virtual Token::token_type type() const override;
 
-        std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler) override;
+        virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler) override;
         virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
 
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;

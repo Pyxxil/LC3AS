@@ -13,6 +13,7 @@ set ( ASSEMBLER_SOURCE_FILES
       source/Tokens/Immediate/Token_Immediate_Decimal.cpp
       source/Tokens/Immediate/Token_Immediate_Binary.cpp
       source/Tokens/Immediate/Token_Immediate_Octal.cpp
+      source/Tokens/Token_Directive.cpp
       source/Tokens/Directives/Token_Directive_Stringz.cpp
       source/Tokens/Directives/Token_Directive_Orig.cpp
       source/Tokens/Directives/Token_Directive_Fill.cpp
@@ -83,7 +84,8 @@ set ( ASSEMBLER_HEADER_FILES
       includes/Tokens/Instructions/Token_Instruction_Br.hpp
       includes/Tokens/Instructions/Token_Instruction_Ld.hpp
       includes/Tokens/Instructions/Token_Instruction_St.hpp
-      ../../cxxopts.hpp )
+      ../../cxxopts.hpp
+      )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
@@ -108,7 +110,7 @@ if ( USE_ADDONS )
               includes/Tokens/Additional/Token_Addon_Set.hpp
               )
 
-        if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+        if ( CMAKE_BUILD_TYPE STREQUAL "Addons_Debug" )
                 set ( CMAKE_VERBOSE_MAKEFILE ON )
         endif ()
 endif ()

@@ -6,20 +6,20 @@ Character::Character()
 
 }
 
-Character::Character(std::string &character, std::string &token_uppercase, int line_number)
-        : Immediate(character, token_uppercase, line_number)
+Character::Character(std::string &character, int line_number)
+        : Immediate(character, character, line_number)
 {
         if (character.length() > 1) {
                 if (character.length() == 2 && character.at(0) == '\\') {
                         switch (character.at(1)) {
                         case '\\':
-                                immediate = '\\';
+                                value = '\\';
                                 return;
                         case 'n':
-                                immediate = '\n';
+                                value = '\n';
                                 return;
                         case 't':
-                                immediate = '\t';
+                                value = '\t';
                                 return;
                         default:
                                 break;
@@ -31,10 +31,10 @@ Character::Character(std::string &character, std::string &token_uppercase, int l
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                std::cerr << "Invalid character literal: '" << word << "'.\n";
+                std::cerr << "Invalid character literal: '" << token << "'.\n";
         } else if (!character.length()) {
-                immediate = 0;
+                value = 0;
         } else {
-                immediate = static_cast<std::int16_t>(character.at(0));
+                value = static_cast<std::int16_t>(character.at(0));
         }
 }

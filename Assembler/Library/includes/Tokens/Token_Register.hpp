@@ -8,9 +8,9 @@ class Register : public Token
 public:
         Register(std::string &which, std::string &which_uppercase, int line_number = 0);
 
-        char reg;
-
         virtual Token::token_type type() const override;
+
+        char reg;
 };
 
 #endif //PROJECT_TOKEN_REGISTER_HPP

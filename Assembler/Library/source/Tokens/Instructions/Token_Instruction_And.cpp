@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
@@ -13,9 +14,11 @@ And::And()
 
 }
 
-And::And(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
-{}
+And::And(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
+{
+
+}
 
 std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -26,15 +29,15 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         }
 
         assembled.emplace_back(static_cast<std::uint16_t>(0x5000 |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-                ((std::static_pointer_cast<Register>(tokens[2])->reg) & 0x7) << 6)
+                ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
+                ((std::static_pointer_cast<Register>(tokens.at(2))->reg) & 0x7) << 6)
         );
 
-        if (tokens[3]->type() == Token::REGISTER) {
-                assembled.front() |= (std::static_pointer_cast<Register>(tokens[3])->reg & 0x7);
+        if (tokens.at(3)->type() == Token::REGISTER) {
+                assembled.front() |= (std::static_pointer_cast<Register>(tokens.at(3))->reg & 0x7);
         } else {
                 assembled.front() |= 0x20 | static_cast<std::uint16_t>(
-                        std::static_pointer_cast<Immediate>(tokens[3])->immediate & 0x1F);
+                        std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x1F);
         }
 
         return 1;
@@ -54,14 +57,14 @@ bool And::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 tokens.at(2)->expected("register");
                 return (is_valid = false);
         } else if (tokens.at(3)->type() != Token::REGISTER && tokens.at(3)->type() != Token::IMMEDIATE) {
-                tokens.at(3)->expected("register or immediate value");
+                tokens.at(3)->expected("register or value value");
                 return (is_valid = false);
         }
 
         if (tokens.at(3)->type() == Token::IMMEDIATE) {
-                if (std::static_pointer_cast<Immediate>(tokens.at(3))->immediate > 15 ||
-                    std::static_pointer_cast<Immediate>(tokens.at(3))->immediate < -16) {
-                        tokens.at(3)->expected("5 bit immediate value");
+                if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 15 ||
+                    std::static_pointer_cast<Immediate>(tokens.at(3))->value < -16) {
+                        tokens.at(3)->expected("5 bit value value");
                         return (is_valid = false);
                 }
         }
@@ -97,9 +100,13 @@ std::string And::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " AND " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase << " #" << std::dec
-                << (static_cast<std::int16_t>(std::static_pointer_cast<Immediate>(tokens.at(3))->immediate << 11) >> 11)
-                << '\n';
+                << " AND " << tokens.at(1)->token_uppercase << ' ' << tokens.at(2)->token_uppercase<< ' ';
+
+        if (tokens.at(3)->type() == Token::IMMEDIATE) {
+                stream << '#' << std::dec << std::static_pointer_cast<Immediate>(tokens.at(3))->value << '\n';
+        } else {
+                stream << tokens.at(3)->token_uppercase << '\n';
+        }
 
         ++program_counter;
 

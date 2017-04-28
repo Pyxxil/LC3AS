@@ -6,9 +6,9 @@
 class Decimal : public Immediate
 {
 public:
-        Decimal(std::string &value, int line_number = 0);
-        Decimal(std::string &&value, int line_number = 0)
-                : Decimal(value, line_number)
+        Decimal(std::string &immediate, int line_number = 0);
+        Decimal(std::string &&immediate, int line_number = 0)
+                : Decimal(immediate, line_number)
         {}
 };
 

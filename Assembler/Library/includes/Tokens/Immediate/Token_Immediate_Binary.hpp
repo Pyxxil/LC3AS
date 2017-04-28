@@ -8,7 +8,7 @@
 class Binary : public Immediate
 {
 public:
-        Binary(std::string &value, std::string &value_uppercase, int line_number = 0);
+        Binary(std::string &immediate, std::string &immediate_uppercase, int line_number = 0);
 };
 
 #endif // PROJECT_TOKEN_IMMEDIATE_BINARY_HPP

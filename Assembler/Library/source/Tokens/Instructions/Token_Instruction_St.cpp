@@ -3,15 +3,18 @@
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"
 
-St::St(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
-{}
+St::St(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
+{
+
+}
 
 std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -27,7 +30,7 @@ std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                         assembler.symbols.cend(),
                         [&tokens](auto &&sym) -> bool
                         {
-                                return sym.second->word == tokens.at(2)->word;
+                                return sym.second->token == tokens.at(2)->token;
                         }
                 );
 
@@ -39,7 +42,7 @@ std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                 offset = static_cast<int>(symbol->second->address) -
                          (static_cast<int>(assembler.internal_program_counter) + 1);
         } else {
-                offset = std::static_pointer_cast<Immediate>(tokens.at(2))->immediate;
+                offset = std::static_pointer_cast<Immediate>(tokens.at(2))->value;
         }
 
         if (offset > 255 || offset < -256) {
@@ -66,7 +69,7 @@ bool St::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
         } else if (tokens.at(2)->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
-                tokens.at(2)->expected("label or immediate value");
+                tokens.at(2)->expected("label or value value");
                 return (is_valid = false);
         }
 
@@ -101,14 +104,14 @@ std::string St::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " ST " << tokens.at(1)->word_as_uppercase << ' ';
+                << " ST " << tokens.at(1)->token_uppercase << ' ';
 
         ++program_counter;
 
         if (tokens.at(2)->type() == Token::LABEL) {
-                stream << tokens.at(2)->word << '\n';
+                stream << tokens.at(2)->token << '\n';
         } else {
-                const auto offset = std::static_pointer_cast<Immediate>(tokens.at(2))->immediate;
+                const auto offset = std::static_pointer_cast<Immediate>(tokens.at(2))->value;
                 stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter) << '\n';
         }
 

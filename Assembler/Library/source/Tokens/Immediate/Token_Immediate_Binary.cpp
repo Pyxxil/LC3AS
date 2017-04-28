@@ -1,29 +1,29 @@
 #include "Tokens/Immediate/Token_Immediate_Binary.hpp"
 
-Binary::Binary(std::string &value, std::string &value_uppercase, int line_number)
-        : Immediate(value, value_uppercase, line_number)
+Binary::Binary(std::string &immediate, std::string &immediate_uppercase, int line_number)
+        : Immediate(immediate, immediate_uppercase, line_number)
 {
         std::int16_t sign = 1;
 
-        if (value.at(0) == '-') {
+        if (immediate.at(0) == '-') {
                 sign = -1;
-                value.erase(0, 1);
+                immediate.erase(0, 1);
         }
 
-        if (value.length() > 2 && std::toupper(value.at(1)) == 'B') {
-                value.erase(0, 2);
-        } else if (std::toupper(value.at(0)) == 'B') {
-                value.erase(0, 1);
+        if (immediate.length() > 2 && std::toupper(immediate.at(1)) == 'B') {
+                immediate.erase(0, 2);
+        } else if (std::toupper(immediate.at(0)) == 'B') {
+                immediate.erase(0, 1);
         }
 
-        if (value.length() > 16) {
+        if (immediate.length() > 16) {
                 Token::expected("binary value up to 16 bits");
                 is_valid = false;
                 return;
         }
 
         try {
-                immediate = static_cast<std::int16_t>(std::bitset<16>(value).to_ulong());
+                value = static_cast<std::int16_t>(std::bitset<16>(immediate).to_ulong());
         } catch (const std::invalid_argument &e) {
                 Token::expected("valid binary value");
                 is_valid = false;
@@ -36,6 +36,6 @@ Binary::Binary(std::string &value, std::string &value_uppercase, int line_number
                 }
                 std::cerr << "Invalid literal for base 2: '" << value << "'.\n";
         } else {
-                immediate *= sign;
+                value *= sign;
         }
 }

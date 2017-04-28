@@ -6,7 +6,7 @@
 class Octal : public Immediate
 {
 public:
-        Octal(std::string &string, int line_number = 0);
+        Octal(std::string &immediate, int line_number = 0);
 };
 
 #endif // PROJECT_OCTAL_HPP

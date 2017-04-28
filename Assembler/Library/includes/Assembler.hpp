@@ -15,6 +15,7 @@ public:
         Assembler(int argument_count, char **arguments);
         Assembler(std::string &file);
         Assembler(std::string &&file);
+
         ~Assembler() = default;
 
         std::vector<std::vector<std::shared_ptr<Token>>> &tokenizeFile(std::string &fileName);
@@ -62,15 +63,16 @@ public:
                 ALL                  = MULTIPLE_DEFINITIONS | SYNTAX | IGNORED,
         };
 
-        enum LOGGING_TYPE {
-                MESSAGE     = 0,
-                ERROR       = 1,
-                WARNING     = 2,
+        enum LOGGING_TYPE
+        {
+                MESSAGE = 0,
+                ERROR   = 1,
+                WARNING = 2,
         };
 
         int longest_symbol_length = 20;
-private:
 
+private:
         std::vector<std::string> files_to_assemble;
 
         std::vector<std::uint16_t> as_assembled;
@@ -83,7 +85,10 @@ private:
         void reset();
 
         bool quiet = false;
-        bool we_should_be_quiet() { return quiet; }
+        bool we_should_be_quiet()
+        {
+                return quiet;
+        }
 
         void LOG(LOGGING_TYPE level, std::string &&message);
         void WARN(WARNING_LEVEL level, int line_number, std::string &&warning);

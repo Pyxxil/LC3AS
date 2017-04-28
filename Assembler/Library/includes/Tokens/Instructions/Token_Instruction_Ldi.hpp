@@ -6,7 +6,7 @@
 class Ldi : public Instruction
 {
 public:
-        Ldi(std::string &oper, std::string &token_uppercase, int line_number = 0);
+        Ldi(std::string &instruction, std::string &instruction_uppercase, int line_number = 0);
 
         virtual Token::token_type type() const override;
 

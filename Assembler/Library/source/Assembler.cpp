@@ -160,11 +160,9 @@ void Assembler::reset()
  */
 std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::string &fileName)
 {
-        error_count = 0;  // TODO: Is this the right choice? What if we want to keep them?
-
         std::ifstream file(fileName);
 
-        if (!file.is_open()) {
+        if (file.fail()) {
                 perror(fileName.c_str());
                 exit(EXIT_FAILURE);
         }
@@ -266,7 +264,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
 #ifdef INCLUDE_ADDONS
                 } else if (character == '"' || character == '\'') {
 #else
-                } else if (character == '"') {
+                        } else if (character == '"') {
 #endif
                         addToken(current, tokenized_line, line_number);
 
@@ -294,7 +292,7 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                                 return tokenized_line;
 #ifdef INCLUDE_ADDONS
                         } else if (terminator == '\'') {
-                                tokenized_line.push_back(std::make_shared<Character>(current, current, line_number));
+                                tokenized_line.push_back(std::make_shared<Character>(current, line_number));
 #endif
                         } else {
                                 tokenized_line.push_back(std::make_shared<String>(current, line_number));
@@ -486,7 +484,7 @@ void Assembler::do_first_pass()
                         return -1;
                 } else if (end_seen) {
                         std::stringstream stream;
-                        stream << token->word << " after .END directive, it will be ignored";
+                        stream << token->token << " after .END directive, it will be ignored";
                         this->WARN(IGNORED, token->at_line, stream.str());
                         return 0;
                 } else if (token->valid_arguments(t_tokens)) {
@@ -514,10 +512,10 @@ void Assembler::do_first_pass()
                                         internal_program_counter;
 
                                 for (const auto &symbol : symbols) {
-                                        if (symbol.second->word == tokenized_line.front()->word) {
+                                        if (symbol.second->token == tokenized_line.front()->token) {
                                                 std::stringstream stream;
                                                 stream << "Multiple definitions of label '"
-                                                       << tokenized_line.front()->word
+                                                       << tokenized_line.front()->token
                                                        << "'\nNOTE: \tLabel was first defined on line "
                                                        << symbol.second->at_line;
                                                 ERR(tokenized_line.front()->at_line, stream.str());
@@ -529,7 +527,7 @@ void Assembler::do_first_pass()
                                         std::stringstream stream;
                                         stream << "Multiple labels found for address 0x" << std::hex
                                                << internal_program_counter << "\nNOTE: \tPrevious label '"
-                                               << symbols.at(internal_program_counter)->word << "' found on line "
+                                               << symbols.at(internal_program_counter)->token << "' found on line "
                                                << std::dec << symbols.at(internal_program_counter)->at_line;
                                         WARN(MULTIPLE_DEFINITIONS, tokenized_line.front()->at_line, stream.str());
                                 }
@@ -541,7 +539,7 @@ void Assembler::do_first_pass()
 
                                 longest_symbol_length = std::max(
                                         longest_symbol_length,
-                                        static_cast<int>(tokenized_line.front()->word.length())
+                                        static_cast<int>(tokenized_line.front()->token.length())
                                 );
 
                                 internal_program_counter += memory_required;
@@ -733,11 +731,12 @@ void Assembler::write(std::string &prefix)
 
         for (const auto &symbol : symbols) {
                 symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
-                            << symbol.second->word << ' ' << std::uppercase << std::hex <<std::setfill('0')
+                            << symbol.second->token << ' ' << std::uppercase << std::hex << std::setfill('0')
                             << std::setw(4) << symbol.first << '\n';
         }
 
-        const auto &symbol_at = [this](const std::uint16_t address) {
+        const auto &symbol_at = [this](const std::uint16_t address)
+        {
                 return std::find_if(
                         symbols.cbegin(), symbols.cend(),
                         [address](const auto &sym) -> bool
@@ -747,7 +746,7 @@ void Assembler::write(std::string &prefix)
                 );
         };
 
-        std::uint16_t pc   = 0;
+        std::uint16_t pc = 0;
 
         std::map<std::uint16_t, std::shared_ptr<Label>>::const_iterator symbol;
 
@@ -757,7 +756,7 @@ void Assembler::write(std::string &prefix)
                 symbol = symbol_at(pc);
 
                 lst_file << tokenized_line.front()->disassemble(
-                        tokenized_line, pc, symbol == symbols.cend() ? empty : symbol->second->word, *this
+                        tokenized_line, pc, symbol == symbols.cend() ? empty : symbol->second->token, *this
                 );
 
                 if (tokenized_line.front()->type() == Token::DIR_END) {
@@ -824,7 +823,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0xE000:
                 stream << "LEA R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->word;
+                        stream << symbol->second->token;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -847,7 +846,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0xB000:
                 stream << "STI R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->word;
+                        stream << symbol->second->token;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -857,7 +856,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0xA000:
                 stream << "LDI R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->word;
+                        stream << symbol->second->token;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -895,7 +894,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 if (instruction & 0x0800) {
                         stream << "JSR ";
                         if ((symbol = find_symbol(5)) != symbols.cend()) {
-                                stream << symbol->second->word;
+                                stream << symbol->second->token;
                         } else if (instruction & 0x700) {
                                 stream << "#-" << std::dec << (-instruction & 0x3FF);
                         } else {
@@ -909,7 +908,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0x3000:
                 stream << "ST R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->word;
+                        stream << symbol->second->token;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -919,7 +918,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0x2000:
                 stream << "LD R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->word;
+                        stream << symbol->second->token;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -954,7 +953,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                         stream << ' ';
 
                         if ((symbol = find_symbol(7)) != symbols.cend()) {
-                                stream << symbol->second->word;
+                                stream << symbol->second->token;
                         } else if (instruction & 0x100) {
                                 stream << "#-" << std::dec << (instruction & 0xFF);
                         } else {
@@ -1015,7 +1014,7 @@ void Assembler::WARN(WARNING_LEVEL level, int line_number, std::string &&warning
 
         std::stringstream stream;
 
-        stream <<  "WARNING: ";
+        stream << "WARNING: ";
 
         if (line_number) {
                 stream << "Line " << line_number << ": ";

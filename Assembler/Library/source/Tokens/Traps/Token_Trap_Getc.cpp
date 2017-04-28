@@ -2,12 +2,15 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Assembler.hpp"
 
-Getc::Getc(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
-{}
+Getc::Getc(std::string &trap, std::string &trap_uppercase, int line_number)
+        : Instruction(trap, trap_uppercase, line_number)
+{
+
+}
 
 std::int32_t Getc::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {

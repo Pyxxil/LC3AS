@@ -1,13 +1,13 @@
 #include "Token.hpp"
 
 Token::Token()
-        : word(), word_as_uppercase(), assembled()
+        : token(), token_uppercase(), assembled()
 {
 
 }
 
-Token::Token(std::string &token, std::string &uppercased, int line)
-        : word(token), word_as_uppercase(uppercased), assembled(), at_line(line), is_valid(true)
+Token::Token(std::string &t_token, std::string &t_token_uppercase, int line)
+        : token(t_token), token_uppercase(t_token_uppercase), assembled(), at_line(line), is_valid(true)
 {
 
 }
@@ -75,14 +75,14 @@ void Token::expected(const char *const expects) const
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << "Expected " << expects << ". Found '" << word << "' ( Type: " << deduce_type() << " ) instead.\n";
+        std::cerr << "Expected " << expects << ". Found '" << token << "' ( Type: " << deduce_type() << " ) instead.\n";
 }
 
 std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
-        std::cerr << word << ".assemble() not implemented\n";
         (void) tokens;
         (void) assembler;
+        expected("one of: instruction, label, or directive");
         return -1;
 }
 
@@ -99,7 +99,7 @@ void Token::invalid_argument_count(std::size_t provided, std::size_t expected) c
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << word << " expects " << expected << " argument" << (expected == 1 ? "" : "'s") << ", but "
+        std::cerr << token << " expects " << expected << " argument" << (expected == 1 ? "" : "'s") << ", but "
                   << (provided < expected ? "only " : "") << provided << " argument"
                   << (provided == 1 ? " was" : "'s were") << " provided.\n";
 }
@@ -112,7 +112,7 @@ bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 }
 std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-        std::cerr << tokens.front()->word << ".guess_memory_size() not implemented\n";
+        std::cerr << tokens.front()->token << ".guess_memory_size() not implemented\n";
         return -1;
 }
 
@@ -125,7 +125,7 @@ void Token::unterminated(std::string &&t_type)
         }
         std::cerr << "Unterminated " << t_type << " literal.\n";
 
-        word = "Non-terminated " + t_type;
+        token = "Non-terminated " + t_type;
 }
 
 std::string Token::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
@@ -137,5 +137,5 @@ std::string Token::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         (void) assembler;
         (void) program_counter;
         (void) symbol;
-        return word + " has no disassemble (" + deduce_type() + ")\n";
+        return token + " has no disassemble (" + deduce_type() + ")\n";
 }

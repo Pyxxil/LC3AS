@@ -3,12 +3,15 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 
 #include "Assembler.hpp"
 
-Blkw::Blkw(std::string &token, std::string &token_uppercase, int line_number)
-        : Directive(token, token_uppercase, line_number)
-{}
+Blkw::Blkw(std::string &directive, std::string &directive_uppercase, int line_number)
+        : Directive(directive, directive_uppercase, line_number)
+{
+
+}
 
 std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -20,14 +23,14 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
 
         if (tokens.size() == 3) {
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
-                        fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->immediate);
+                        fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
                 } else if (tokens.at(2)->type() == Token::LABEL) {
                         const auto &&symbol = std::find_if(
                                 assembler.symbols.cbegin(),
                                 assembler.symbols.cend(),
                                 [&tokens](auto &&sym) -> bool
                                 {
-                                        return sym.second->word == tokens.at(2)->word;
+                                        return sym.second->token == tokens.at(2)->token;
                                 }
                         );
 
@@ -40,11 +43,11 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 }
         }
 
-        for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens.at(1))->immediate; ++block) {
+        for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens.at(1))->value; ++block) {
                 assembled.emplace_back(fill);
         }
 
-        return std::static_pointer_cast<Immediate>(tokens[1])->immediate;
+        return std::static_pointer_cast<Immediate>(tokens[1])->value;
 }
 
 bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
@@ -55,7 +58,7 @@ bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("immediate value");
+                tokens.at(1)->expected("value value");
                 return (is_valid = false);
         } else if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
@@ -63,7 +66,7 @@ bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
         if (tokens.size() == 3) {
                 if (tokens.at(2)->type() != Token::IMMEDIATE && tokens.at(2)->type() != Token::LABEL) {
-                        tokens.at(2)->expected("label or immediate value");
+                        tokens.at(2)->expected("label or value value");
                         return (is_valid = false);
                 }
 
@@ -77,7 +80,7 @@ bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
 std::int32_t Blkw::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-        return static_cast<std::int32_t>(is_valid) * std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
+        return static_cast<std::int32_t>(is_valid) * std::static_pointer_cast<Immediate>(tokens.at(1))->value;
 }
 
 void Blkw::invalid_argument_count(std::size_t provided, std::size_t expected) const
@@ -87,11 +90,12 @@ void Blkw::invalid_argument_count(std::size_t provided, std::size_t expected) co
         provided -= 1;
 
         std::cerr << "ERROR: ";
+
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided << " argument" << (provided == 1 ? "" : "'s")
-                  << " provided.\n";
+
+        std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided << " arguments were provided.\n";
 }
 
 std::string Blkw::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
@@ -99,20 +103,20 @@ std::string Blkw::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                               const std::string &symbol,
                               const Assembler &assembler) const
 {
-        const auto &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
+        const auto        &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
         std::stringstream stream;
 
         std::uint16_t fill = 0;
 
         if (tokens.size() > 2) {
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
-                        fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->immediate);
+                        fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
                 } else {
                         const auto &&sym = std::find_if(
                                 assembler.symbols.cbegin(), assembler.symbols.cend(),
                                 [&tokens](auto &&_sym) -> bool
                                 {
-                                        return _sym.second->word == tokens.at(2)->word;
+                                        return _sym.second->token == tokens.at(2)->token;
                                 }
                         );
 
@@ -136,10 +140,11 @@ std::string Blkw::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         ++program_counter;
 
-        for (int block = 1; block < immediate->immediate; ++block, ++program_counter) {
+        for (int block = 1; block < immediate->value; ++block, ++program_counter) {
                 stream
                         // Address in memory
-                        << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                        << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter
+                        << ')'
                         // Hexadecimal representation of instruction
                         << ' ' << std::hex << std::setfill('0') << std::setw(4) << fill
                         // Binary representation of instruction

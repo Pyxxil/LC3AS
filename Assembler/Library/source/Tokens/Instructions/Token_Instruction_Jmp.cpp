@@ -2,12 +2,13 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Register.hpp"
 #include "Assembler.hpp"
 
-Jmp::Jmp(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
+Jmp::Jmp(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
 {
 
 }
@@ -68,7 +69,7 @@ std::string Jmp::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " JMP " << tokens.at(1)->word_as_uppercase << '\n';
+                << " JMP " << tokens.at(1)->token_uppercase << '\n';
 
         ++program_counter;
 

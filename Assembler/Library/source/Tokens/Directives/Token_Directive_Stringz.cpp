@@ -2,12 +2,15 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Assembler.hpp"
 
-Stringz::Stringz(std::string &token, std::string &token_uppercase, int line_number)
-        : Directive(token, token_uppercase, line_number)
-{}
+Stringz::Stringz(std::string &directive, std::string &directive_uppercase, int line_number)
+        : Directive(directive, directive_uppercase, line_number)
+{
+
+}
 
 std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -70,7 +73,8 @@ std::string Stringz::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         for (std::size_t index = 1; index != assembled.size(); ++index) {
                 stream
                         // Address in memory
-                        << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+                        << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter
+                        << ')'
                         // Hexadecimal representation of instruction
                         << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.at(index)
                         // Binary representation of instruction

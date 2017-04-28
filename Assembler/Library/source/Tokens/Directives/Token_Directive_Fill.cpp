@@ -3,14 +3,17 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 #include "Assembler.hpp"
 
-Fill::Fill(std::string &token, std::string &token_uppercase, int line_number)
-        : Directive(token, token_uppercase, line_number)
-{}
+Fill::Fill(std::string &directive, std::string &directive_uppercase, int line_number)
+        : Directive(directive, directive_uppercase, line_number)
+{
+
+}
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -20,13 +23,13 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
 
         if (tokens.at(1)->type() == Token::IMMEDIATE) {
                 assembled.emplace_back(static_cast<std::uint16_t>(std::static_pointer_cast<
-                        Immediate>(tokens.at(1))->immediate));
+                        Immediate>(tokens.at(1))->value));
         } else if (tokens.at(1)->type() == Token::LABEL) {
                 const auto &&symbol = std::find_if(
                         assembler.symbols.cbegin(), assembler.symbols.cend(),
                         [&tokens](auto &&sym) -> bool
                         {
-                                return sym.second->word == tokens.at(1)->word;
+                                return sym.second->token == tokens.at(1)->token;
                         }
                 );
 
@@ -69,19 +72,19 @@ std::string Fill::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                               const std::string &symbol,
                               const Assembler &assembler) const
 {
-        const auto &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
+        const auto        &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
         std::stringstream stream;
 
         std::uint16_t fill = 0;
 
         if (tokens.at(1)->type() == Token::IMMEDIATE) {
-                fill = static_cast<std::uint16_t>(immediate->immediate);
+                fill = static_cast<std::uint16_t>(immediate->value);
         } else {
                 const auto &&sym = std::find_if(
                         assembler.symbols.cbegin(), assembler.symbols.cend(),
                         [&tokens](auto &&_sym) -> bool
                         {
-                                return _sym.second->word == tokens.at(1)->word;
+                                return _sym.second->token == tokens.at(1)->token;
                         }
                 );
 

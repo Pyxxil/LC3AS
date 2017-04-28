@@ -2,12 +2,15 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Assembler.hpp"
 
-In::In(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
-{}
+In::In(std::string &trap, std::string &trap_uppercase, int line_number)
+        : Instruction(trap, trap_uppercase, line_number)
+{
+
+}
 
 int32_t In::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -57,7 +60,7 @@ std::string In::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::left<< std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
                 << " IN\n";
 

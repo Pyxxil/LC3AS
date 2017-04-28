@@ -14,7 +14,7 @@ class Set : public Directive
 {
 public:
         Set();
-        Set(std::string &word, std::string &token_uppercase, int line_number = 0);
+        Set(std::string &directive, std::string &directive_uppercase, int line_number = 0);
 
         virtual token_type type() const override;
 
@@ -29,12 +29,12 @@ public:
                                         const Assembler &assembler) const override;
 
 private:
-        std::shared_ptr<And> _and;
-        std::shared_ptr<Add> add;
-        std::shared_ptr<Br> br;
-        std::shared_ptr<Ld> ld;
-        std::shared_ptr<Fill> fill;
-        std::shared_ptr<Token> decimal_zero;
+        std::shared_ptr<And>     _and;
+        std::shared_ptr<Add>     add;
+        std::shared_ptr<Br>      br;
+        std::shared_ptr<Ld>      ld;
+        std::shared_ptr<Fill>    fill;
+        std::shared_ptr<Token>   decimal_zero;
         std::shared_ptr<Decimal> decimal_one;
         std::shared_ptr<Decimal> decimal_negative_two;
 };

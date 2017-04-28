@@ -1,8 +1,10 @@
 #include "Tokens/Token_Label.hpp"
 
 Label::Label(std::string &name, int line_number)
-        : Token(name, name, line_number), label(name)
-{}
+        : Token(name, name, line_number)
+{
+
+}
 
 std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -48,7 +50,7 @@ void Label::not_found()
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << "No such label '" << label << "'\n";
+        std::cerr << "No such label '" << token << "'\n";
 }
 
 std::string Label::disassemble(std::vector<std::shared_ptr<Token>> &tokens,

@@ -6,12 +6,8 @@
 class Directive : public Token
 {
 public:
-        Directive()
-                : Token()
-        {}
-        Directive(std::string &token, std::string &token_as_uppercase, int line_number = 0)
-                : Token(token, token_as_uppercase, line_number)
-        {}
+        Directive();
+        Directive(std::string &directive, std::string &directive_uppercase, int line_number = 0);
 };
 
 #endif //PROJECT_TOKEN_DIRECTIVE_HPP

@@ -2,14 +2,17 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Immediate.hpp"
 #include "Assembler.hpp"
 
-Str::Str(std::string &oper, std::string &token_uppercase, int line_number)
-        : Instruction(oper, token_uppercase, line_number)
-{}
+Str::Str(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
+{
+
+}
 
 std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -22,7 +25,7 @@ std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
         assembled.emplace_back(static_cast<std::uint16_t>(0x7000 |
                 ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
                 ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
-                (std::static_pointer_cast<Immediate>(tokens[3])->immediate & 0x3F))
+                (std::static_pointer_cast<Immediate>(tokens[3])->value & 0x3F))
         );
 
         return 1;
@@ -42,7 +45,7 @@ bool Str::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 tokens.at(2)->expected("register");
                 return (is_valid = false);
         } else if (tokens.at(3)->type() != Token::IMMEDIATE) {
-                tokens.at(3)->expected("immediate value");
+                tokens.at(3)->expected("value value");
                 return (is_valid = false);
         }
 
@@ -50,8 +53,8 @@ bool Str::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 return (is_valid = false);
         }
 
-        if (std::static_pointer_cast<Immediate>(tokens.at(3))->immediate > 31 ||
-            std::static_pointer_cast<Immediate>(tokens.at(3))->immediate < -32) {
+        if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 31 ||
+            std::static_pointer_cast<Immediate>(tokens.at(3))->value < -32) {
                 tokens.at(3)->expected("6 bit offset");
                 return (is_valid = false);
         }
@@ -83,8 +86,8 @@ std::string Str::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " STR " << tokens.at(1)->word_as_uppercase << ' ' << tokens.at(2)->word_as_uppercase << " #" << std::dec
-                << (static_cast<std::int16_t>(std::static_pointer_cast<Immediate>(tokens.at(3))->immediate << 10) >> 10)
+                << " STR " << tokens.at(1)->token_uppercase << ' ' << tokens.at(2)->token_uppercase << " #" << std::dec
+                << (static_cast<std::int16_t>(std::static_pointer_cast<Immediate>(tokens.at(3))->value << 10) >> 10)
                 << '\n';
 
         ++program_counter;

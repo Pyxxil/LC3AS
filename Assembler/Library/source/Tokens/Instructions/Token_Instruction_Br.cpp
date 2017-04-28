@@ -3,12 +3,13 @@
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Assembler.hpp"
 
-Br::Br(std::string &oper, std::string &token_uppercase, int line_number, bool n, bool z, bool p)
-        : Instruction(oper, token_uppercase, line_number), N(n), Z(z), P(p)
+Br::Br(std::string &instruction, std::string &instruction_uppercase, int line_number, bool n, bool z, bool p)
+        : Instruction(instruction, instruction_uppercase, line_number), N(n), Z(z), P(p)
 {
 
 }
@@ -33,7 +34,7 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                         assembler.symbols.cend(),
                         [&tokens](auto &&sym) -> bool
                         {
-                                return sym.second->word == tokens[1]->word;
+                                return sym.second->token == tokens[1]->token;
                         }
                 );
 
@@ -43,9 +44,9 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                 }
 
                 offset = static_cast<int>(symbol->second->address) -
-                        (static_cast<int>(assembler.internal_program_counter) + 1);
+                         (static_cast<int>(assembler.internal_program_counter) + 1);
         } else {
-                offset = std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
+                offset = std::static_pointer_cast<Immediate>(tokens.at(1))->value;
         }
 
         if (offset > 255 || offset < -256) {
@@ -67,7 +68,7 @@ bool Br::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::LABEL && tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("label or immediate value");
+                tokens.at(1)->expected("label or value value");
                 return (is_valid = false);
         } else if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
@@ -105,9 +106,9 @@ std::string Br::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         ++program_counter;
 
         if (tokens.at(1)->type() == Token::LABEL) {
-                stream << tokens.at(1)->word << '\n';
+                stream << tokens.at(1)->token << '\n';
         } else {
-                const auto offset = std::static_pointer_cast<Immediate>(tokens.at(1))->immediate;
+                const auto offset = std::static_pointer_cast<Immediate>(tokens.at(1))->value;
                 stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter) << '\n';
         }
 

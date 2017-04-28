@@ -2,13 +2,16 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Assembler.hpp"
 
-Trap::Trap(std::string &token, std::string &token_uppercase, int line_number)
-        : Instruction(token, token_uppercase, line_number)
-{}
+Trap::Trap(std::string &instruction, std::string &instruction_uppercase, int line_number)
+        : Instruction(instruction, instruction_uppercase, line_number)
+{
+
+}
 
 std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
 {
@@ -19,7 +22,7 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         }
 
         assembled.emplace_back(static_cast<std::uint16_t>(0xF000 |
-                (std::static_pointer_cast<Immediate>(tokens[1])->immediate & 0xFF))
+                (std::static_pointer_cast<Immediate>(tokens[1])->value & 0xFF))
         );
 
         return 1;
@@ -33,7 +36,7 @@ bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("immediate value");
+                tokens.at(1)->expected("value value");
                 return (is_valid = false);
         }
 
@@ -41,18 +44,18 @@ bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 return (is_valid = false);
         }
 
-        if (std::static_pointer_cast<Immediate>(tokens.at(1))->immediate > 0xFF) {
+        if (std::static_pointer_cast<Immediate>(tokens.at(1))->value > 0xFF) {
                 tokens.at(1)->expected("8 bit trap vector");
                 return (is_valid = false);
         }
 
-        if (std::static_pointer_cast<Immediate>(tokens.at(1))->immediate > 0x25 ||
-            std::static_pointer_cast<Immediate>(tokens.at(1))->immediate < 0x20) {
+        if (std::static_pointer_cast<Immediate>(tokens.at(1))->value > 0x25 ||
+            std::static_pointer_cast<Immediate>(tokens.at(1))->value < 0x20) {
                 std::cerr << "WARNING: ";
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                std::cerr << "TRAP supplied " << std::static_pointer_cast<Immediate>(tokens[1])->immediate
+                std::cerr << "TRAP supplied " << std::static_pointer_cast<Immediate>(tokens[1])->value
                           << ", which is possibly an illegal trap vector.\n";
         }
 
@@ -83,8 +86,8 @@ std::string Trap::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
                 // Instruction itself
-                << " TRAP " << " 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(2)
-                << std::static_pointer_cast<Immediate>(tokens.at(1))->immediate << '\n';
+                << " TRAP " << " 0x" << std::right << std::hex << std::uppercase << std::setfill('0') << std::setw(2)
+                << std::static_pointer_cast<Immediate>(tokens.at(1))->value << '\n';
 
         ++program_counter;
 
