@@ -16,7 +16,7 @@ public:
 
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 
-        void not_found();
+        void not_found(const std::string &match_candidate);
 
         virtual std::string disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                                         std::uint16_t &program_counter,

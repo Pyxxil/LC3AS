@@ -33,7 +33,8 @@ std::int32_t Lea::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assemble
                 );
 
                 if (symbol == assembler.symbols.end()) {
-                        std::static_pointer_cast<Label>(tokens.at(2))->not_found();
+                        const std::string possible_match = assembler.check_for_symbol_match(tokens.at(2)->token);
+                        std::static_pointer_cast<Label>(tokens.at(2))->not_found(possible_match);
                         return -1;
                 }
 

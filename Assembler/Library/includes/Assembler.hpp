@@ -36,6 +36,9 @@ public:
                 return assemble(fileName);
         }
 
+        std::size_t levenshtein_distance(const std::string &string, const std::string &target);
+        std::string check_for_symbol_match(const std::string &symbol);
+
         void write(std::string &prefix);
         void write(std::string &&prefix)
         {
@@ -54,13 +57,14 @@ public:
 
         std::string disassemble(std::uint16_t instruction, std::uint16_t pc);
 
-        enum WARNING_LEVEL
+        enum WARNING_TYPE
         {
                 NONE                 = 0,
                 SYNTAX               = 1 << 0,
                 IGNORED              = 1 << 1,
                 MULTIPLE_DEFINITIONS = 1 << 2,
-                ALL                  = MULTIPLE_DEFINITIONS | SYNTAX | IGNORED,
+                LOGIC                = 1 << 3,
+                ALL                  = SYNTAX | IGNORED | MULTIPLE_DEFINITIONS | LOGIC,
         };
 
         enum LOGGING_TYPE
@@ -91,7 +95,7 @@ private:
         }
 
         void LOG(LOGGING_TYPE level, std::string &&message);
-        void WARN(WARNING_LEVEL level, int line_number, std::string &&warning);
+        void WARN(WARNING_TYPE level, int line_number, std::string &&warning);
         void ERR(int line_number, std::string &&error);
 
         int warning_level = NONE;

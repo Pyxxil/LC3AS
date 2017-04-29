@@ -44,13 +44,19 @@ std::int32_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &token
         }
 }
 
-void Label::not_found()
+void Label::not_found(const std::string &match_candidate)
 {
         std::cerr << "ERROR: ";
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
-        std::cerr << "No such label '" << token << "'\n";
+        std::cerr << "No such label '" << token << '\'';
+
+        if (!match_candidate.empty()) {
+                std::cerr << "; Did you mean '" << match_candidate << "'?\n";
+        } else {
+                std::cerr << ".\n";
+        }
 }
 
 std::string Label::disassemble(std::vector<std::shared_ptr<Token>> &tokens,

@@ -74,11 +74,12 @@ Assembler::Assembler(int argument_count, char **arguments)
                                "                                                    - ignore"
                                "                                                    - multiple"
                                "                                                  - none"
-                               "                                                  These "
+                               "                                                      - logic"
+                               "                                                 These"
                                " can be provided together seperated by a comma, e.g."
-                               " --warn multiple,syntax                                 ",
+                               " --warn multiple,syntax                                  ",
                        cxxopts::value<std::string>()->default_value("none"))
-                      ("n,nowarn", "Turn off all warnings");
+                      ("n,no-warn", "Turn off all warnings");
 
         try {
                 parser.parse(argument_count, arguments);
@@ -115,7 +116,7 @@ Assembler::Assembler(int argument_count, char **arguments)
                 quiet = true;
         }
 
-        if (parser.count("nowarn")) {
+        if (parser.count("no-warn")) {
                 warning_level = NONE;
         }
 
@@ -246,18 +247,18 @@ std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, i
                         if (index + 1 > line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
                                 WARN(SYNTAX, line_number, "Expected '//', but found '/'. "
-                                        "Treating it as if it's '//' (i.e. comment)");
+                                        "Treating it as if it's '//' (i.e. comment).");
                         }
                         break;
                 } else if (character == ',') {
                         if (!tokenized_line.size() || terminated_by) {
-                                WARN(SYNTAX, line_number, "Extraneous comma");
+                                WARN(SYNTAX, line_number, "Extraneous comma.");
                         }
                         addToken(current, tokenized_line, line_number);
                         terminated_by = ',';
                 } else if (character == ':') {
                         if (tokenized_line.size() > 1 || !current.size() || terminated_by) {
-                                WARN(SYNTAX, line_number, "Extraneous colon");
+                                WARN(SYNTAX, line_number, "Extraneous colon.");
                         }
                         addToken(current, tokenized_line, line_number);
                         terminated_by = ':';
@@ -464,7 +465,7 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                 const std::shared_ptr<Token> token = std::make_shared<Token>(word, copy, line_number);
                 token->is_valid = false;
                 std::stringstream stream;
-                stream << "Expected one of: label, instruction, or immediate value. Found '" << word << "' instead";
+                stream << "Expected one of: label, instruction, or immediate value. Found '" << word << "' instead.";
                 ERR(line_number, stream.str());
                 return token;
         }
@@ -484,7 +485,7 @@ void Assembler::do_first_pass()
                         return -1;
                 } else if (end_seen) {
                         std::stringstream stream;
-                        stream << token->token << " after .END directive, it will be ignored";
+                        stream << token->token << " after .END directive, it will be ignored.";
                         this->WARN(IGNORED, token->at_line, stream.str());
                         return 0;
                 } else if (token->valid_arguments(t_tokens)) {
@@ -517,7 +518,7 @@ void Assembler::do_first_pass()
                                                 stream << "Multiple definitions of label '"
                                                        << tokenized_line.front()->token
                                                        << "'\nNOTE: \tLabel was first defined on line "
-                                                       << symbol.second->at_line;
+                                                       << symbol.second->at_line << '.';
                                                 ERR(tokenized_line.front()->at_line, stream.str());
                                                 break;
                                         }
@@ -528,7 +529,7 @@ void Assembler::do_first_pass()
                                         stream << "Multiple labels found for address 0x" << std::hex
                                                << internal_program_counter << "\nNOTE: \tPrevious label '"
                                                << symbols.at(internal_program_counter)->token << "' found on line "
-                                               << std::dec << symbols.at(internal_program_counter)->at_line;
+                                               << std::dec << symbols.at(internal_program_counter)->at_line << '.';
                                         WARN(MULTIPLE_DEFINITIONS, tokenized_line.front()->at_line, stream.str());
                                 }
 
@@ -606,6 +607,31 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
 
         for (const auto &tokenized_line : tokens) {
                 for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
+                        if (tokenized_line.front()->type() == Token::OP_BR) {
+                                if ((assembled_line & 0xFE00) == (as_assembled.back() & 0xFE00)) {
+                                        WARN(LOGIC, tokenized_line.front()->at_line,
+                                             "Statement before this one checks for the same condition code."
+                                                     " This might mean this one will never execute."
+                                        );
+                                } else if (!(assembled_line & 0xFF)) {
+                                        WARN(LOGIC, tokenized_line.front()->at_line,
+                                             "BR with an offset of 0 will probably do nothing.");
+                                } else if ((assembled_line & 0x1FF) == 0x1FF) {
+                                        WARN(LOGIC, tokenized_line.front()->at_line,
+                                             "BR with an offset of -1 will probably cause an infinite loop.");
+                                }
+                        } else if (tokenized_line.front()->type() == Token::OP_JSR) {
+                                if (!(assembled_line & 0x7FF)) {
+                                        // Technically, this isn't true. It could just be a way to get the
+                                        // current value of the PC into R7, but whatever.
+                                        WARN(LOGIC, tokenized_line.front()->at_line,
+                                             "JSR with an offset of 0 will probably do nothing.");
+                                } else if ((assembled_line & 0x7FF) == 0x7FF) {
+                                        WARN(LOGIC, tokenized_line.front()->at_line,
+                                             "JSR with an offset of -1 will probably cause an infinite loop.");
+                                }
+                        }
+
                         as_assembled.push_back(assembled_line);
                 }
         }
@@ -972,22 +998,25 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
 void Assembler::change_warning_level(std::string &warning)
 {
         if (warning == "none") {
-                warning_level = WARNING_LEVEL::NONE;
+                warning_level = WARNING_TYPE::NONE;
         } else if (warning == "syntax") {
-                warning_level |= WARNING_LEVEL::SYNTAX;
+                warning_level |= WARNING_TYPE::SYNTAX;
         } else if (warning == "ignore") {
-                warning_level |= WARNING_LEVEL::IGNORED;
+                warning_level |= WARNING_TYPE::IGNORED;
         } else if (warning == "multiple") {
-                warning_level |= WARNING_LEVEL::MULTIPLE_DEFINITIONS;
+                warning_level |= WARNING_TYPE::MULTIPLE_DEFINITIONS;
+        } else if (warning == "logic") {
+                warning_level |= WARNING_TYPE::LOGIC;
         } else if (warning == "all") {
                 warning_level = ALL;
         } else {
                 std::cerr << "Argument --warn expects one (or more) of the following:" << '\n'
-                          << "\t- all" << '\n'
-                          << "\t- syntax" << '\n'
-                          << "\t- ignore" << '\n'
-                          << "\t- multiple" << '\n'
-                          << "\t- none" << '\n'
+                          << "\t- all\n"
+                          << "\t- syntax\n"
+                          << "\t- ignore\n"
+                          << "\t- multiple\n"
+                          << "\t- logic\n"
+                          << "\t- none\n"
                           << "Got '" << warning << "'\n";
                 exit(EXIT_FAILURE);
         }
@@ -1006,7 +1035,7 @@ void Assembler::LOG(Assembler::LOGGING_TYPE level, std::string &&message)
         }
 }
 
-void Assembler::WARN(WARNING_LEVEL level, int line_number, std::string &&warning)
+void Assembler::WARN(WARNING_TYPE level, int line_number, std::string &&warning)
 {
         if (!(warning_level & level)) {
                 return;
@@ -1020,7 +1049,7 @@ void Assembler::WARN(WARNING_LEVEL level, int line_number, std::string &&warning
                 stream << "Line " << line_number << ": ";
         }
 
-        stream << warning << ".\n";
+        stream << warning << "\n";
 
         LOG(WARNING, stream.str());
 }
@@ -1035,9 +1064,77 @@ void Assembler::ERR(int line_number, std::string &&error)
                 stream << "Line " << line_number << ": ";
         }
 
-        stream << error << ".\n";
+        stream << error << "\n";
 
         ++error_count;
 
         LOG(ERROR, stream.str());
+}
+
+std::string Assembler::check_for_symbol_match(const std::string &symbol)
+{
+        std::pair<long, std::string> best_match { LONG_MAX, "" };
+
+        for (const auto &sym : symbols) {
+                const int length_difference = std::abs(static_cast<int>(sym.second->token.length() - symbol.length()));
+                if (length_difference >= best_match.first) {
+                        continue;
+                }
+
+                const int cutoff = static_cast<int>(std::max(symbol.length(), sym.second->token.length())) / 2;
+                if (length_difference > cutoff) {
+                        continue;
+                }
+
+                const int distance = static_cast<int>(levenshtein_distance(symbol, sym.second->token));
+                if (distance < best_match.first) {
+                        best_match = {distance, sym.second->token};
+                }
+        }
+
+        // Don't bother with something that's likely half misspelled.
+        if (best_match.first > static_cast<long>(symbol.length() / 2)) {
+                return std::string();
+        }
+
+        return best_match.second;
+}
+
+std::size_t Assembler::levenshtein_distance(const std::string &string, const std::string &target)
+{
+        const std::size_t string_length = string.length();
+        const std::size_t target_length = target.length();
+
+        if (string_length == 0) {
+                return target_length;
+        } else if (target_length == 0) {
+                return string_length;
+        }
+
+        std::vector<std::size_t> matrix0(string_length + 1);
+        std::vector<std::size_t> matrix1(string_length + 1);
+
+        for (std::size_t i = 0; i < string_length + 1; ++i) {
+                matrix0[0] = i;
+        }
+
+        for (std::size_t i = 0; i < target_length; ++i) {
+                matrix1[0] = i + 1;
+
+                for (std::size_t j = 0; j < string_length; j++) {
+                        const std::size_t cost = (string[j] == target[i] ? 0 : 1);
+                        const std::size_t deletion     = matrix1[j] + 1;
+                        const std::size_t insertion    = matrix0[j + 1] + 1;
+                        const std::size_t substitution = matrix0[j] + cost;
+                        std::size_t cheapest = std::min(deletion, insertion);
+                        cheapest = std::min(cheapest, substitution);
+                        matrix1[j + 1] = cheapest;
+                }
+
+                for (std::size_t j = 0; j < string_length + 1; j++) {
+                        matrix0[j] = matrix1[j];
+                }
+        }
+
+        return matrix1[string_length];
 }

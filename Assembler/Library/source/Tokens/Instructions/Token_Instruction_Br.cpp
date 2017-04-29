@@ -34,12 +34,13 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
                         assembler.symbols.cend(),
                         [&tokens](auto &&sym) -> bool
                         {
-                                return sym.second->token == tokens[1]->token;
+                                return sym.second->token == tokens.at(1)->token;
                         }
                 );
 
                 if (symbol == assembler.symbols.end()) {
-                        std::static_pointer_cast<Label>(tokens[1])->not_found();
+                        const std::string possible_match = assembler.check_for_symbol_match(tokens.at(1)->token);
+                        std::static_pointer_cast<Label>(tokens.at(1))->not_found(possible_match);
                         return -1;
                 }
 

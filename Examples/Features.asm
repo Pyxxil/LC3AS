@@ -37,6 +37,7 @@ EXTRA_FEATURES:         ; Some additional features not actually present in the
         .SUB R1, R2, R2
         .SUB R1, R2, R1
         .SUB R1, R2, R3
+
 oct     .FILL \700      ; Octal values are also acceptable
         ;oct .FILL \600 ; This should throw an error about multiple definitions
                         ; of a label.
@@ -48,6 +49,16 @@ cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
 
         .SET R2, #10    ; This sets the register to the value on the right.
         .SET R3, 0x3000 ; As above
+
+WARNING_THROWS:         ; All of the following should throw warnings with
+                        ; --warn all
+        JSR WARNING_THROWS ; Complains about an infinite loop
+        JSR #0          ; Statement has no effect
+        BRp #0          ; Statement has no effect
+        BRn #-1         ; Complains about infinite loop
+        BRn WARNING_THROWS ; Complains about same condition code as line before
+
+; End of warnings
         RET
 
 ; Uncomment the following for testing
