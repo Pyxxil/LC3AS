@@ -96,6 +96,7 @@ option ( USE_ADDONS "Build with additional instructions" OFF )
 if ( USE_ADDONS )
         set ( ASSEMBLER_SOURCE_FILES
               "${ASSEMBLER_SOURCE_FILES}"
+              source/Tokens/Additional/Token_Addon_Lshift.cpp
               source/Tokens/Additional/Token_Addon_Char.cpp
               source/Tokens/Additional/Token_Addon_Neg.cpp
               source/Tokens/Additional/Token_Addon_Sub.cpp
@@ -104,6 +105,7 @@ if ( USE_ADDONS )
 
         set ( ASSEMBLER_HEADER_FILES
               "${ASSEMBLER_HEADER_FILES}"
+              includes/Tokens/Additional/Token_Addon_Lshift.hpp
               includes/Tokens/Additional/Token_Addon_Char.hpp
               includes/Tokens/Additional/Token_Addon_Neg.hpp
               includes/Tokens/Additional/Token_Addon_Sub.hpp

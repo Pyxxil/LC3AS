@@ -38,7 +38,7 @@ int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembl
         }
 
         if (offset > 255 || offset < -256) {
-                tokens.at(2)->expected("9 bit offset");
+                tokens.at(2)->out_of_range(9);
                 return -1;
         }
 

@@ -10,6 +10,7 @@ public:
         Immediate(std::string &immediate, std::string &immediate_uppercase, int line_number = 0);
 
         virtual Token::token_type type() const override;
+        virtual void out_of_range(int bits) override;
 
         std::int16_t value = 0;
 };

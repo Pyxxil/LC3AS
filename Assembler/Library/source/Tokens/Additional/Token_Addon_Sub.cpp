@@ -70,11 +70,14 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
                         assembled.emplace_back(as_assembled);
                 }
 
-                vec = {neg2, tokens.at(second_register_index)};
-                ret += neg2->assemble(vec, assembler);
+                if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
+                    std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
+                        vec = {neg2, tokens.at(second_register_index)};
+                        ret += neg2->assemble(vec, assembler);
 
-                for (const auto &as_assembled : neg2->assembled) {
-                        assembled.emplace_back(as_assembled);
+                        for (const auto &as_assembled : neg2->assembled) {
+                                assembled.emplace_back(as_assembled);
+                        }
                 }
         }
 
@@ -111,11 +114,24 @@ bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
         if (is_valid) {
-                if (std::static_pointer_cast<Register>(tokens.at(1))->reg ==
-                    std::static_pointer_cast<Register>(tokens.at(2))->reg) {
+                std::size_t first_register_index  = 1;
+                std::size_t second_register_index = 2;
+
+                if (tokens.size() == 4) {
+                        ++first_register_index;
+                        ++second_register_index;
+                }
+
+                if (std::static_pointer_cast<Register>(tokens.at(first_register_index))->reg ==
+                    std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
                         return 1;
                 } else {
-                        return 5;
+                        if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
+                        std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
+                                return 5;
+                        } else {
+                                return 3;
+                        }
                 }
         } else {
                 return -1;

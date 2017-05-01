@@ -56,8 +56,7 @@ static std::size_t hash(std::string &string)
 }
 
 Assembler::Assembler()
-        : error_count(0), internal_program_counter(0), origin_seen(false), end_seen(false), symbols()
-          , files_to_assemble(), as_assembled(), tokens()
+        : symbols(), files_to_assemble(), as_assembled(), tokens()
 {
 
 }
@@ -78,7 +77,7 @@ Assembler::Assembler(int argument_count, char **arguments)
                                "                                                 These"
                                " can be provided together seperated by a comma, e.g."
                                " --warn multiple,syntax                                  ",
-                       cxxopts::value<std::string>()->default_value("none"))
+                       cxxopts::value<std::string>()->default_value("all"))
                       ("n,no-warn", "Turn off all warnings");
 
         try {
@@ -436,6 +435,8 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
                         return std::make_shared<Sub>(word, copy, line_number);
                 case hash(".SET", 4):
                         return std::make_shared<Set>(word, copy, line_number);
+                case hash(".LSHIFT", 7):
+                        return std::make_shared<Lshift>(word, copy, line_number);
 #endif
                 default:
                         break;
@@ -464,9 +465,6 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
         } else {
                 const std::shared_ptr<Token> token = std::make_shared<Token>(word, copy, line_number);
                 token->is_valid = false;
-                std::stringstream stream;
-                stream << "Expected one of: label, instruction, or immediate value. Found '" << word << "' instead.";
-                ERR(line_number, stream.str());
                 return token;
         }
 }
@@ -476,6 +474,10 @@ std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
  */
 void Assembler::do_first_pass()
 {
+        // TODO: As it is, if there is no .ORIG directive as the first instruction in the file,
+        // TODO: we still look at the rest of the file. Is it smarter to stop if we don't see it
+        // TODO: first? Or should we just default to setting the memory address to 0x3000?
+
         std::int32_t memory_required = 0;
 
         const auto memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
@@ -498,6 +500,10 @@ void Assembler::do_first_pass()
         for (auto &tokenized_line : tokens) {
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
+                        if (origin_seen) {
+                                ERR(tokenized_line.front()->at_line, "Redefinition of Origin memory address.");
+                                break;
+                        }
                         origin_seen     = true;
                         memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
                         if (memory_required > -1) {
@@ -567,8 +573,10 @@ void Assembler::do_first_pass()
                 }
         }
 
-        if (!end_seen) {
-                std::cerr << "Reached the end of the file, and found no .END directive\n";
+        if (!origin_seen) {
+                ERR(0, "No .ORIG directive. (Is the file empty?)");
+        } else if (!end_seen) {
+                ERR(0, "Reached the end of the file, and found no .END directive.");
         }
 }
 
@@ -630,7 +638,7 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
                         } else if (tokenized_line.front()->type() == Token::OP_JSR) {
                                 if (!(assembled_line & 0x7FF)) {
                                         // Technically, this isn't true. It could just be a way to get the
-                                        // current value of the PC into R7, but whatever.
+                                        // current value of the PC into R7, but it's still worth a warning.
                                         WARN(LOGIC, tokenized_line.front()->at_line,
                                              "JSR with an offset of 0 will probably do nothing.");
                                 } else if ((assembled_line & 0x7FF) == 0x7FF) {

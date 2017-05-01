@@ -96,9 +96,11 @@ void Token::invalid_argument_count(std::size_t provided, std::size_t expected) c
         provided -= 1;  // This is not the best idea, but because tokens.size() returns
         // the number of arguments + the token itself, it's a little easier to do here.
         std::cerr << "ERROR: ";
+
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
+
         std::cerr << token << " expects " << expected << " argument" << (expected == 1 ? "" : "'s") << ", but "
                   << (provided < expected ? "only " : "") << provided << " argument"
                   << (provided == 1 ? " was" : "'s were") << " provided.\n";
@@ -110,6 +112,7 @@ bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         expected("one of: instruction, label, or directive");
         return false;
 }
+
 std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
         std::cerr << tokens.front()->token << ".guess_memory_size() not implemented\n";
@@ -119,6 +122,7 @@ std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &token
 void Token::unterminated(std::string &&t_type)
 {
         is_valid = false;
+
         std::cerr << "ERROR: ";
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
@@ -138,4 +142,15 @@ std::string Token::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         (void) program_counter;
         (void) symbol;
         return token + " has no disassemble (" + deduce_type() + ")\n";
+}
+
+void Token::out_of_range(int bits)
+{
+        is_valid = false;
+        (void) bits;
+
+        std::cerr << "ERROR: ";
+        if (at_line) {
+                std::cerr << "Line " << std::dec << at_line << ": ";
+        }
 }

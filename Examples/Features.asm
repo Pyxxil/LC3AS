@@ -50,6 +50,8 @@ cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
         .SET R2, #10    ; This sets the register to the value on the right.
         .SET R3, 0x3000 ; As above
 
+        .LSHIFT R2, #2
+
 WARNING_THROWS:         ; All of the following should throw warnings with
                         ; --warn all
         JSR WARNING_THROWS ; Complains about an infinite loop
@@ -62,7 +64,7 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         RET
 
 ; Uncomment the following for testing
-;       Current Error Count = 37
+;       Current Error Count = 38
 ;ERROR_THROWS:           ; These should all throw error's.
 ;        .STRINGZ 0x0
 ;        .STRINGZ addr
@@ -103,7 +105,7 @@ WARNING_THROWS:         ; All of the following should throw warnings with
 ;        BR addr
 ;        BR "Hello"
 ;        BR add
-;        BR #1
+;        BRz #-2000     ; Immediate value not representable in signed 9 bits
 
 BRnzp BEGIN_TEST
 
@@ -120,6 +122,6 @@ hex     .FILL x0000     ; Hexadecimal too.
 .END                    ; Each program needs to terminate with a .END directive.
                         ; If it's not found, then it just throws a warning.
 ;ADD R0, R0, R1         ; This should throw a warning.
-SOMETHING_THAT_WILL_BE_IGNORED
-        ADD R1, R2, R3
+;SOMETHING_THAT_WILL_BE_IGNORED
+;        ADD R1, R2, R3
 

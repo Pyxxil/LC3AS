@@ -38,7 +38,7 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
         }
 
         if (offset > 255 || offset < -256) {
-                tokens.at(2)->expected("9 bit offset");
+                tokens.at(2)->out_of_range(9);
                 return -1;
         }
 

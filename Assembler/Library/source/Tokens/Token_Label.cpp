@@ -73,6 +73,13 @@ std::string Label::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 }
 
+void Label::out_of_range(int bits)
+{
+        Token::out_of_range(bits);
+
+        std::cerr << "Address of '" << token << "' has an address not able to be represented in a " << bits << " bit signed PC offset.\n";
+}
+
 Token::token_type Label::type() const
 {
         return Token::token_type::LABEL;

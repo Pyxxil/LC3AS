@@ -45,13 +45,11 @@ public:
                 write(prefix);
         }
 
-        std::size_t error_count = 0;
-
         std::uint16_t internal_program_counter   = 0;
         std::uint16_t file_memory_origin_address = 0;
 
-        bool origin_seen;
-        bool end_seen;
+        bool origin_seen = false;
+        bool end_seen = false;
 
         std::map<std::string, std::shared_ptr<Label>> symbols;
 
@@ -81,6 +79,8 @@ private:
 
         std::vector<std::uint16_t> as_assembled;
 
+        std::size_t error_count = 0;
+
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
         void addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number);
 
@@ -98,8 +98,7 @@ private:
         void WARN(WARNING_TYPE level, int line_number, std::string &&warning);
         void ERR(int line_number, std::string &&error);
 
-        // TODO: Should this default to all warnings?
-        int warning_level = NONE;
+        int warning_level = ALL;
         void change_warning_level(std::string &warning);
 };
 

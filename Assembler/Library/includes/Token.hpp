@@ -76,6 +76,7 @@ public:
 
         virtual void expected(const char *const expects) const;
         virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const;
+        virtual void out_of_range(int bits);
 
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler);
         virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const;

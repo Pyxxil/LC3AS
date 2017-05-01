@@ -37,8 +37,7 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
         }
 
         if (offset > 1023 || offset < -1024) {
-                // TODO: Change this to actually tell the user what's wrong (difference wise).
-                tokens.at(1)->expected("11 bit offset");
+                tokens.at(1)->out_of_range(11);
                 return -1;
         }
 
@@ -55,7 +54,7 @@ bool Jsr::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::LABEL && tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("label or value value");
+                tokens.at(1)->expected("label or value");
                 return (is_valid = false);
         }
 
