@@ -14,7 +14,7 @@ Str::Str(std::string &instruction, std::string &instruction_uppercase, int line_
 
 }
 
-std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) assembler;
 

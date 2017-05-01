@@ -23,7 +23,7 @@ Neg::Neg(std::string &directive, std::string &directive_uppercase, int line_numb
         neg->at_line = add->at_line = line_number;
 }
 
-std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         std::vector<std::shared_ptr<Token>> vec = {neg, tokens.at(1), tokens.at(1)};
 

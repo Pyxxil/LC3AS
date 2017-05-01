@@ -13,8 +13,10 @@ Orig::Orig(std::string &directive, std::string &directive_uppercase, int line_nu
 
 }
 
-std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
+        (void) assembler;
+
         if (!is_valid) {
                 return -1;
         }
@@ -22,7 +24,6 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
         origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->value);
         assembled.emplace_back(origin);
 
-        assembler.origin_seen = true;
         return origin;
 }
 

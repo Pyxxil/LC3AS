@@ -6,7 +6,7 @@ Label::Label(std::string &name, int line_number)
 
 }
 
-std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         if (!is_valid) {
                 return -1;

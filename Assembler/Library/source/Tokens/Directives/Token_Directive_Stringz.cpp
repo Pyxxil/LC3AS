@@ -12,7 +12,7 @@ Stringz::Stringz(std::string &directive, std::string &directive_uppercase, int l
 
 }
 
-std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) assembler;
         if (!is_valid) {

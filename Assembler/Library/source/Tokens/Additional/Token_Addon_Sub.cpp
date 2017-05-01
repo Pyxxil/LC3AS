@@ -30,7 +30,7 @@ Sub::Sub(std::string &directive, std::string &directive_uppercase, int line_numb
         add->at_line = set_zero->at_line = decimal_zero->at_line = line_number;
 }
 
-std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) assembler;
 

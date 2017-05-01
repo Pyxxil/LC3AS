@@ -16,7 +16,7 @@ Ld::Ld(std::string &instruction, std::string &instruction_uppercase, int line_nu
 
 }
 
-std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         if (!is_valid) {
                 return 0;
@@ -25,22 +25,13 @@ std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler
         int offset = 0;
 
         if (tokens.at(2)->type() == Token::LABEL) {
-                const auto &&symbol = std::find_if(
-                        assembler.symbols.cbegin(),
-                        assembler.symbols.cend(),
-                        [&tokens](auto &&sym) -> bool
-                        {
-                                return sym.second->token == tokens.at(2)->token;
-                        }
-                );
-
-                if (symbol == assembler.symbols.end()) {
+                if (!assembler.symbols.count(tokens.at(2)->token)) {
                         const std::string possible_match = assembler.check_for_symbol_match(tokens.at(2)->token);
                         std::static_pointer_cast<Label>(tokens.at(2))->not_found(possible_match);
                         return -1;
                 }
 
-                offset = static_cast<int>(symbol->second->address) -
+                offset = static_cast<int>(assembler.symbols.find(tokens.at(2)->token)->second->address) -
                          (static_cast<int>(assembler.internal_program_counter) + 1);
         } else {
                 offset = std::static_pointer_cast<Immediate>(tokens.at(2))->value;

@@ -15,7 +15,7 @@ Fill::Fill(std::string &directive, std::string &directive_uppercase, int line_nu
 
 }
 
-std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         if (!is_valid) {
                 return 0;
@@ -25,21 +25,13 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 assembled.emplace_back(static_cast<std::uint16_t>(std::static_pointer_cast<
                         Immediate>(tokens.at(1))->value));
         } else if (tokens.at(1)->type() == Token::LABEL) {
-                const auto &&symbol = std::find_if(
-                        assembler.symbols.cbegin(), assembler.symbols.cend(),
-                        [&tokens](auto &&sym) -> bool
-                        {
-                                return sym.second->token == tokens.at(1)->token;
-                        }
-                );
-
-                if (symbol == assembler.symbols.end()) {
+                if (!assembler.symbols.count(tokens.at(1)->token)) {
                         const std::string possible_match = assembler.check_for_symbol_match(tokens.at(1)->token);
                         std::static_pointer_cast<Label>(tokens.at(1))->not_found(possible_match);
                         return -1;
-                } else {
-                        assembled.emplace_back(symbol->second->address);
                 }
+
+                assembled.emplace_back(assembler.symbols.find(tokens.at(1)->token)->second->address);
         }
 
         return 1;
@@ -81,15 +73,7 @@ std::string Fill::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         if (tokens.at(1)->type() == Token::IMMEDIATE) {
                 fill = static_cast<std::uint16_t>(immediate->value);
         } else {
-                const auto &&sym = std::find_if(
-                        assembler.symbols.cbegin(), assembler.symbols.cend(),
-                        [&tokens](auto &&_sym) -> bool
-                        {
-                                return _sym.second->token == tokens.at(1)->token;
-                        }
-                );
-
-                fill = sym->first;
+                fill = assembler.symbols.find(tokens.at(1)->token)->second->address;
         }
 
         stream

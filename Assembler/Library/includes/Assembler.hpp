@@ -36,8 +36,8 @@ public:
                 return assemble(fileName);
         }
 
-        std::size_t levenshtein_distance(const std::string &string, const std::string &target);
-        std::string check_for_symbol_match(const std::string &symbol);
+        std::size_t levenshtein_distance(const std::string &string, const std::string &target) const;
+        std::string check_for_symbol_match(const std::string &symbol) const;
 
         void write(std::string &prefix);
         void write(std::string &&prefix)
@@ -53,7 +53,7 @@ public:
         bool origin_seen;
         bool end_seen;
 
-        std::map<std::uint16_t, std::shared_ptr<Label>> symbols;
+        std::map<std::string, std::shared_ptr<Label>> symbols;
 
         std::string disassemble(std::uint16_t instruction, std::uint16_t pc);
 
@@ -98,6 +98,7 @@ private:
         void WARN(WARNING_TYPE level, int line_number, std::string &&warning);
         void ERR(int line_number, std::string &&error);
 
+        // TODO: Should this default to all warnings?
         int warning_level = NONE;
         void change_warning_level(std::string &warning);
 };

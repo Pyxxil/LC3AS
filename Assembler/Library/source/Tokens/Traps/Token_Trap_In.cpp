@@ -12,7 +12,7 @@ In::In(std::string &trap, std::string &trap_uppercase, int line_number)
 
 }
 
-int32_t In::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+int32_t In::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) tokens;
         (void) assembler;

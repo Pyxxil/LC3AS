@@ -78,7 +78,7 @@ void Token::expected(const char *const expects) const
         std::cerr << "Expected " << expects << ". Found '" << token << "' ( Type: " << deduce_type() << " ) instead.\n";
 }
 
-std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) tokens;
         (void) assembler;

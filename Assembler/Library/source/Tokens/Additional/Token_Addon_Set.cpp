@@ -35,7 +35,7 @@ Set::Set(std::string &directive, std::string &directive_uppercase, int line_numb
         decimal_one->at_line = decimal_negative_two->at_line = line_number;
 }
 
-std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         if (!is_valid) {
                 return -1;

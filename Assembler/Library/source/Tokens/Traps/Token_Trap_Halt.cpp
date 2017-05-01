@@ -12,7 +12,7 @@ Halt::Halt(std::string &trap, std::string &trap_uppercase, int line_number)
 
 }
 
-std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) tokens;
         (void) assembler;

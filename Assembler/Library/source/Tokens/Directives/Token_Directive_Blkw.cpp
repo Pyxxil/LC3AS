@@ -13,7 +13,7 @@ Blkw::Blkw(std::string &directive, std::string &directive_uppercase, int line_nu
 
 }
 
-std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         if (!is_valid) {
                 return 0;
@@ -25,22 +25,13 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
                 } else if (tokens.at(2)->type() == Token::LABEL) {
-                        const auto &&symbol = std::find_if(
-                                assembler.symbols.cbegin(),
-                                assembler.symbols.cend(),
-                                [&tokens](auto &&sym) -> bool
-                                {
-                                        return sym.second->token == tokens.at(2)->token;
-                                }
-                        );
-
-                        if (symbol == assembler.symbols.end()) {
+                        if (!assembler.symbols.count(tokens.at(2)->token)) {
                                 const std::string possible_match = assembler.check_for_symbol_match(tokens.at(2)->token);
                                 std::static_pointer_cast<Label>(tokens.at(2))->not_found(possible_match);
                                 return -1;
                         }
 
-                        fill = symbol->second->address;
+                        fill = assembler.symbols.find(tokens.at(2)->token)->second->address;
                 }
         }
 
@@ -48,7 +39,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembl
                 assembled.emplace_back(fill);
         }
 
-        return std::static_pointer_cast<Immediate>(tokens[1])->value;
+        return static_cast<std::int32_t>(assembled.size());
 }
 
 bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
@@ -113,15 +104,7 @@ std::string Blkw::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
                 } else {
-                        const auto &&sym = std::find_if(
-                                assembler.symbols.cbegin(), assembler.symbols.cend(),
-                                [&tokens](auto &&_sym) -> bool
-                                {
-                                        return _sym.second->token == tokens.at(2)->token;
-                                }
-                        );
-
-                        fill = sym->first;
+                        fill = assembler.symbols.find(tokens.at(2)->token)->second->address;
                 }
         }
 

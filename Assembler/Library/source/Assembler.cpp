@@ -513,30 +513,32 @@ void Assembler::do_first_pass()
                                         internal_program_counter;
 
                                 for (const auto &symbol : symbols) {
-                                        if (symbol.second->token == tokenized_line.front()->token) {
-                                                std::stringstream stream;
-                                                stream << "Multiple definitions of label '"
-                                                       << tokenized_line.front()->token
-                                                       << "'\nNOTE: \tLabel was first defined on line "
-                                                       << symbol.second->at_line << '.';
-                                                ERR(tokenized_line.front()->at_line, stream.str());
+                                        std::stringstream stream;
+                                        if (symbol.second->address == internal_program_counter) {
+                                                stream << "Multiple labels found for address 0x" << std::hex
+                                                       << internal_program_counter << "\nNOTE: \tPrevious label '"
+                                                       << symbol.second->token << "' found on line "
+                                                       << std::dec << symbol.second->at_line << '.';
+                                                WARN(MULTIPLE_DEFINITIONS,
+                                                     tokenized_line.front()->at_line,
+                                                     stream.str());
                                                 break;
                                         }
                                 }
 
-                                if (symbols.count(internal_program_counter)) {
+                                if (symbols.count(tokenized_line.front()->token)) {
                                         std::stringstream stream;
-                                        stream << "Multiple labels found for address 0x" << std::hex
-                                               << internal_program_counter << "\nNOTE: \tPrevious label '"
-                                               << symbols.at(internal_program_counter)->token << "' found on line "
-                                               << std::dec << symbols.at(internal_program_counter)->at_line << '.';
-                                        WARN(MULTIPLE_DEFINITIONS, tokenized_line.front()->at_line, stream.str());
+                                        stream << "Multiple definitions of label '"
+                                               << tokenized_line.front()->token
+                                               << "'\nNOTE: \tLabel was first defined on line "
+                                               << symbols[tokenized_line.front()->token]->at_line << '.';
+                                        ERR(tokenized_line.front()->at_line, stream.str());
                                 }
 
-                                symbols.insert(std::pair<std::uint16_t,
-                                                         std::shared_ptr<Label>>(internal_program_counter,
-                                                                                 std::static_pointer_cast<Label>(
-                                                                                         tokenized_line.front())));
+                                symbols.insert(std::pair<std::string, std::shared_ptr<Label>>(
+                                        tokenized_line.front()->token,
+                                        std::static_pointer_cast<Label>(tokenized_line.front()))
+                                );
 
                                 longest_symbol_length = std::max(
                                         longest_symbol_length,
@@ -580,6 +582,11 @@ void Assembler::do_second_pass()
         LOG(MESSAGE, "Starting second pass\n");
 
         for (auto &tokenized_line : tokens) {
+                if (tokenized_line.front()->type() == Token::DIR_END) {
+                        end_seen = true;
+                        break;
+                }
+
                 memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
 
                 if (memory_required < 0) {
@@ -757,8 +764,8 @@ void Assembler::write(std::string &prefix)
 
         for (const auto &symbol : symbols) {
                 symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
-                            << symbol.second->token << ' ' << std::uppercase << std::hex << std::setfill('0')
-                            << std::setw(4) << symbol.first << '\n';
+                            << symbol.first << ' ' << std::uppercase << std::hex << std::setfill('0')
+                            << std::setw(4) << symbol.second->address << '\n';
         }
 
         const auto &symbol_at = [this](const std::uint16_t address)
@@ -767,14 +774,14 @@ void Assembler::write(std::string &prefix)
                         symbols.cbegin(), symbols.cend(),
                         [address](const auto &sym) -> bool
                         {
-                                return sym.first == address;
+                                return sym.second->address == address;
                         }
                 );
         };
 
         std::uint16_t pc = 0;
 
-        std::map<std::uint16_t, std::shared_ptr<Label>>::const_iterator symbol;
+        std::map<std::string, std::shared_ptr<Label>>::const_iterator symbol;
 
         const std::string empty = " ";
 
@@ -808,11 +815,11 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 {
                         const std::int16_t offset = static_cast<std::int16_t>(
                                 static_cast<std::int16_t>(instruction << shift) >> shift);
-                        return sym.first == (offset + pc + 1);
+                        return sym.second->address == (offset + pc + 1);
                 });
         };
 
-        std::map<std::uint16_t, std::shared_ptr<Label>>::const_iterator symbol;
+        std::map<std::string, std::shared_ptr<Label>>::const_iterator symbol;
 
         switch (instruction & 0xF000) {
         case 0xF000:
@@ -1071,24 +1078,24 @@ void Assembler::ERR(int line_number, std::string &&error)
         LOG(ERROR, stream.str());
 }
 
-std::string Assembler::check_for_symbol_match(const std::string &symbol)
+std::string Assembler::check_for_symbol_match(const std::string &symbol) const
 {
         std::pair<long, std::string> best_match { LONG_MAX, "" };
 
         for (const auto &sym : symbols) {
-                const int length_difference = std::abs(static_cast<int>(sym.second->token.length() - symbol.length()));
+                const int length_difference = std::abs(static_cast<int>(sym.first.length() - symbol.length()));
                 if (length_difference >= best_match.first) {
                         continue;
                 }
 
-                const int cutoff = static_cast<int>(std::max(symbol.length(), sym.second->token.length())) / 2;
+                const int cutoff = static_cast<int>(std::max(symbol.length(), sym.first.length())) / 2;
                 if (length_difference > cutoff) {
                         continue;
                 }
 
-                const int distance = static_cast<int>(levenshtein_distance(symbol, sym.second->token));
+                const int distance = static_cast<int>(levenshtein_distance(symbol, sym.first));
                 if (distance < best_match.first) {
-                        best_match = {distance, sym.second->token};
+                        best_match = {distance, sym.first};
                 }
         }
 
@@ -1100,7 +1107,7 @@ std::string Assembler::check_for_symbol_match(const std::string &symbol)
         return best_match.second;
 }
 
-std::size_t Assembler::levenshtein_distance(const std::string &string, const std::string &target)
+std::size_t Assembler::levenshtein_distance(const std::string &string, const std::string &target) const
 {
         const std::size_t string_length = string.length();
         const std::size_t target_length = target.length();

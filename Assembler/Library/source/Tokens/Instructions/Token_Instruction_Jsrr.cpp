@@ -13,7 +13,7 @@ Jsrr::Jsrr(std::string &instruction, std::string &instruction_uppercase, int lin
 
 }
 
-std::int32_t Jsrr::assemble(std::vector<std::shared_ptr<Token>> &tokens, Assembler &assembler)
+std::int32_t Jsrr::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
 {
         (void) assembler;
 
