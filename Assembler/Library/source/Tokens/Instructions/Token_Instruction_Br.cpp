@@ -42,7 +42,7 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Ass
         }
 
         if (offset > 255 || offset < -256) {
-                tokens.at(1)->out_of_range(9);
+                tokens.at(1)->requires_too_many_bits(9);
                 return -1;
         }
 

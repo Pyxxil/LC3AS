@@ -12,11 +12,12 @@ Immediate::Immediate(std::string &immediate, std::string &immediate_uppercase, i
 
 }
 
-void Immediate::out_of_range(int bits)
+void Immediate::requires_too_many_bits(int allowed_bits, bool is_signed)
 {
-        Token::out_of_range(bits);
+        Token::requires_too_many_bits(allowed_bits, false);
 
-        std::cerr << "Immediate value " << value << " can not be represented as a " << bits << " bit signed PC offset.\n";
+        std::cerr << "Immediate value " << value << " can not be represented as a " << allowed_bits
+                  << " bit " << (is_signed ? "signed" : "unsigned") << " PC offset.\n";
 }
 
 Token::token_type Immediate::type() const

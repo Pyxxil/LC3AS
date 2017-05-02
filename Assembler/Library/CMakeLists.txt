@@ -3,6 +3,7 @@ project ( LC3Assembler )
 
 set ( ASSEMBLER_SOURCE_FILES
       source/Assembler.cpp
+      source/String_Matcher.cpp
       source/Token.cpp
       source/Tokens/Token_Label.cpp
       source/Tokens/Token_String.cpp
@@ -45,6 +46,7 @@ set ( ASSEMBLER_SOURCE_FILES
 
 set ( ASSEMBLER_HEADER_FILES
       includes/Assembler.hpp
+      includes/String_Matcher.hpp
       includes/Token.hpp
       includes/Tokens/Token_Immediate.hpp
       includes/Tokens/Token_Register.hpp

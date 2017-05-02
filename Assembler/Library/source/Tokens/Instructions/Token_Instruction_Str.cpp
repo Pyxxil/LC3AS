@@ -23,9 +23,9 @@ std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
         }
 
         assembled.emplace_back(static_cast<std::uint16_t>(0x7000 |
-                ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
-                ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
-                (std::static_pointer_cast<Immediate>(tokens[3])->value & 0x3F))
+                ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
+                ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6) |
+                (std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x3F))
         );
 
         return 1;
@@ -55,7 +55,7 @@ bool Str::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
         if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 31 ||
             std::static_pointer_cast<Immediate>(tokens.at(3))->value < -32) {
-                tokens.at(3)->expected("6 bit offset");
+                tokens.at(3)->requires_too_many_bits(6);
                 return (is_valid = false);
         }
 

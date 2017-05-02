@@ -144,10 +144,11 @@ std::string Token::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
         return token + " has no disassemble (" + deduce_type() + ")\n";
 }
 
-void Token::out_of_range(int bits)
+void Token::requires_too_many_bits(int allowed_bits, bool is_signed)
 {
         is_valid = false;
-        (void) bits;
+        (void) allowed_bits;
+        (void) is_signed;
 
         std::cerr << "ERROR: ";
         if (at_line) {

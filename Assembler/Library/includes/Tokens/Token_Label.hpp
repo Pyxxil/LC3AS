@@ -16,7 +16,7 @@ public:
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 
         void not_found(const std::string &match_candidate);
-        virtual void out_of_range(int bits) override;
+        virtual void requires_too_many_bits(int allowed_bits, bool is_signed = true) override;
 
         virtual std::string disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                                         std::uint16_t &program_counter,

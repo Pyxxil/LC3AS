@@ -59,6 +59,8 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         BRp #0          ; Statement has no effect
         BRn #-1         ; Complains about infinite loop
         BRn WARNING_THROWS ; Complains about same condition code as line before
+        TRAP 0xFF       ; Possible illegal trap vector
+        BR oc
 
 ; End of warnings
         RET

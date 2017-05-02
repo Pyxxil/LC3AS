@@ -21,7 +21,7 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, const A
                 return -1;
         }
 
-        origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens[1])->value);
+        origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->value);
         assembled.emplace_back(origin);
 
         return origin;

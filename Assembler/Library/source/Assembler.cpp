@@ -9,6 +9,7 @@
 
 #include "../../../cxxopts.hpp"
 #include "Tokens/All_Tokens.hpp"
+#include "String_Matcher.hpp"
 
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957, 50262, 48407, 51151, 41047, 39371
@@ -645,6 +646,13 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
                                         WARN(LOGIC, tokenized_line.front()->at_line,
                                              "JSR with an offset of -1 will probably cause an infinite loop.");
                                 }
+                        } else if (tokenized_line.front()->type() == Token::OP_TRAP) {
+                                if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
+                                        std::stringstream stream;
+                                        stream << "TRAP was supplied a trap vector of " << (assembled_line & 0x00FF)
+                                               << ", which is possibly an illegal trap vector.\n";
+                                        WARN(LOGIC, tokenized_line.front()->at_line, stream.str());
+                                }
                         }
 
                         as_assembled.push_back(assembled_line);
@@ -1088,68 +1096,11 @@ void Assembler::ERR(int line_number, std::string &&error)
 
 std::string Assembler::check_for_symbol_match(const std::string &symbol) const
 {
-        std::pair<long, std::string> best_match { LONG_MAX, "" };
+        String_Matcher matcher(symbol);
 
-        for (const auto &sym : symbols) {
-                const int length_difference = std::abs(static_cast<int>(sym.first.length() - symbol.length()));
-                if (length_difference >= best_match.first) {
-                        continue;
-                }
-
-                const int cutoff = static_cast<int>(std::max(symbol.length(), sym.first.length())) / 2;
-                if (length_difference > cutoff) {
-                        continue;
-                }
-
-                const int distance = static_cast<int>(levenshtein_distance(symbol, sym.first));
-                if (distance < best_match.first) {
-                        best_match = {distance, sym.first};
-                }
+        for (const auto &_symbol : symbols) {
+                matcher.consider(_symbol.first);
         }
 
-        // Don't bother with something that's likely half misspelled.
-        if (best_match.first > static_cast<long>(symbol.length() / 2)) {
-                return std::string();
-        }
-
-        return best_match.second;
-}
-
-std::size_t Assembler::levenshtein_distance(const std::string &string, const std::string &target) const
-{
-        const std::size_t string_length = string.length();
-        const std::size_t target_length = target.length();
-
-        if (string_length == 0) {
-                return target_length;
-        } else if (target_length == 0) {
-                return string_length;
-        }
-
-        std::vector<std::size_t> matrix0(string_length + 1);
-        std::vector<std::size_t> matrix1(string_length + 1);
-
-        for (std::size_t i = 0; i < string_length + 1; ++i) {
-                matrix0[0] = i;
-        }
-
-        for (std::size_t i = 0; i < target_length; ++i) {
-                matrix1[0] = i + 1;
-
-                for (std::size_t j = 0; j < string_length; j++) {
-                        const std::size_t cost = (string[j] == target[i] ? 0 : 1);
-                        const std::size_t deletion     = matrix1[j] + 1;
-                        const std::size_t insertion    = matrix0[j + 1] + 1;
-                        const std::size_t substitution = matrix0[j] + cost;
-                        std::size_t cheapest = std::min(deletion, insertion);
-                        cheapest = std::min(cheapest, substitution);
-                        matrix1[j + 1] = cheapest;
-                }
-
-                for (std::size_t j = 0; j < string_length + 1; j++) {
-                        matrix0[j] = matrix1[j];
-                }
-        }
-
-        return matrix1[string_length];
+        return matcher.best_match();
 }

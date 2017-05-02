@@ -38,7 +38,7 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
         }
 
         if (offset > 255 || offset < -256) {
-                tokens.at(2)->out_of_range(9);
+                tokens.at(2)->requires_too_many_bits(9);
                 return -1;
         }
 
@@ -57,11 +57,11 @@ bool Ldi::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 return (is_valid = false);
         }
 
-        if (tokens[1]->type() != Token::REGISTER) {
-                tokens[1]->expected("register");
+        if (tokens.at(1)->type() != Token::REGISTER) {
+                tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens[2]->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
-                tokens[2]->expected("label or value value");
+        } else if (tokens.at(2)->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
+                tokens.at(2)->expected("label or value value");
                 return (is_valid = false);
         }
 

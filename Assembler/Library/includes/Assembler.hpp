@@ -36,7 +36,6 @@ public:
                 return assemble(fileName);
         }
 
-        std::size_t levenshtein_distance(const std::string &string, const std::string &target) const;
         std::string check_for_symbol_match(const std::string &symbol) const;
 
         void write(std::string &prefix);

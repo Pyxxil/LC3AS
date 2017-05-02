@@ -37,7 +37,7 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
         }
 
         if (offset > 1023 || offset < -1024) {
-                tokens.at(1)->out_of_range(11);
+                tokens.at(1)->requires_too_many_bits(11);
                 return -1;
         }
 

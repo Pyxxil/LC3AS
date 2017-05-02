@@ -22,7 +22,7 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens, const A
         }
 
         assembled.emplace_back(static_cast<std::uint16_t>(0xF000 |
-                (std::static_pointer_cast<Immediate>(tokens[1])->value & 0xFF))
+                (std::static_pointer_cast<Immediate>(tokens.at(1))->value & 0xFF))
         );
 
         return 1;
@@ -45,18 +45,8 @@ bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (std::static_pointer_cast<Immediate>(tokens.at(1))->value > 0xFF) {
-                tokens.at(1)->expected("8 bit trap vector");
+                tokens.at(1)->requires_too_many_bits(8, false);
                 return (is_valid = false);
-        }
-
-        if (std::static_pointer_cast<Immediate>(tokens.at(1))->value > 0x25 ||
-            std::static_pointer_cast<Immediate>(tokens.at(1))->value < 0x20) {
-                std::cerr << "WARNING: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "TRAP supplied " << std::static_pointer_cast<Immediate>(tokens[1])->value
-                          << ", which is possibly an illegal trap vector.\n";
         }
 
         return is_valid;

@@ -64,7 +64,7 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(3)->type() == Token::IMMEDIATE) {
                 if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 15 ||
                     std::static_pointer_cast<Immediate>(tokens.at(3))->value < -16) {
-                        tokens.at(3)->out_of_range(5);
+                        tokens.at(3)->requires_too_many_bits(5);
                         return (is_valid = false);
                 }
         }
