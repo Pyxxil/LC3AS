@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_ADDON_NEG_HPP
-#define PROJECT_TOKEN_ADDON_NEG_HPP
+#ifndef TOKEN_ADDON_NEG_HPP
+#define TOKEN_ADDON_NEG_HPP
 
 #include "Tokens/Token_Directive.hpp"
 #include "Tokens/Instructions/Token_Instruction_Not.hpp"
@@ -28,4 +28,4 @@ private:
         std::shared_ptr<Add> add;
 };
 
-#endif //PROJECT_TOKEN_ADDON_NEG_HPP
+#endif // TOKEN_ADDON_NEG_HPP

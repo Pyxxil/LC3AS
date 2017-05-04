@@ -5,59 +5,15 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
-#include <regex>
 
 #include "../../../cxxopts.hpp"
-#include "Tokens/All_Tokens.hpp"
 #include "String_Matcher.hpp"
+#include "Lexer.hpp"
 
-static constexpr std::size_t hashed_letters[26] = {
-        100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957, 50262, 48407, 51151, 41047, 39371
-        , 35401, 37039, 28697, 27791, 20201, 21523, 6449, 4813, 16333, 13337,
-};
-
-/**
- * Where would we be without constexpr...
- *
- * Create a hash of a c-string.
- *
- * @param string The c-string to hash.
- * @param length The length of the c-string.
- * @return The hash.
- */
-static constexpr std::size_t hash(const char *const string, std::size_t length)
-{
-        std::size_t _hash = 37;
-
-        for (std::size_t index = 0; index < length; ++index) {
-                _hash = (_hash * hashed_letters[(static_cast<std::size_t>(string[index]) - 0x41u) % 26]) ^
-                        (static_cast<std::size_t>(*string) *
-                         hashed_letters[(static_cast<std::size_t>(string[index]) - 0x41u) % 26]);
-        }
-
-        return _hash;
-}
-
-static std::size_t hash(std::string &string)
-{
-        // Basically, we don't really want something that's likely to be a number, or a label
-        if (string.at(0) != '.' && !std::isprint(string.at(0))) {
-                return 0;
-        }
-
-        std::size_t _hash = 37;
-
-        for (const auto &character : string) {
-                _hash = (_hash * hashed_letters[(static_cast<std::size_t>(character) - 0x41u) % 26]) ^
-                        (static_cast<std::size_t>(string.at(0)) *
-                         hashed_letters[(static_cast<std::size_t>(character) - 0x41u) % 26]);
-        }
-
-        return _hash;
-}
+// TODO: Move all file parsing into a Lexer class.
 
 Assembler::Assembler()
-        : symbols(), files_to_assemble(), as_assembled(), tokens()
+        : symbols(), files_to_assemble(), as_assembled(), m_logger(), tokens()
 {
 
 }
@@ -110,14 +66,17 @@ Assembler::Assembler(int argument_count, char **arguments)
                 }
 
                 change_warning_level(warning_value);
+                m_logger.set_warning_level(warning_level);
         }
 
         if (parser.count("quiet")) {
                 quiet = true;
+                m_logger.set_quietness(quiet);
         }
 
         if (parser.count("no-warn")) {
-                warning_level = NONE;
+                warning_level = Logger::WARNING_TYPE::NONE;
+                m_logger.set_warning_level(warning_level);
         }
 
         for (int i = 1; i < argument_count; ++i) {
@@ -154,323 +113,6 @@ void Assembler::reset()
 }
 
 /**
- * Given a file name, open the file, then tokenize it line by line.
- *
- * @param fileName The name of the file to read.
- * @return A 2D std::vector containing each tokenized line.
- */
-std::vector<std::vector<std::shared_ptr<Token>>> &Assembler::tokenizeFile(std::string &fileName)
-{
-        std::ifstream file(fileName);
-
-        if (file.fail()) {
-                perror(fileName.c_str());
-                exit(EXIT_FAILURE);
-        }
-
-        std::string line;
-
-        std::vector<std::shared_ptr<Token>> tokenized_line;
-
-        for (int line_number = 1; std::getline(file, line); line_number++) {
-                if (line.empty()) {
-                        continue;
-                }
-
-                tokenized_line = tokenizeLine(line, line_number);
-                if (!tokenized_line.empty()) {
-                        tokens.push_back(tokenized_line);
-                }
-        }
-
-        return tokens;
-}
-
-/**
- * Add a token to the current line's tokens.
- *
- * @param token The string containing the token.
- * @param t_tokens The current tokens in the line.
- * @param line_number The line number (only relevant for working with files).
- */
-void Assembler::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &t_tokens, int line_number)
-{
-        if (!token.empty()) {
-                t_tokens.push_back(tokenize(token, line_number));
-                token.erase();
-        }
-}
-
-/**
- * Go through each string (terminated by ',', space character (as defined by std::isspace),
- * or a comment (denoted by ';', "//"), and tokenize it, adding it to a vector until the end
- * of the line is reached.
- * The end of a line is determined when either a comment is hit, or the end of the line is
- * reached (that is, when the current index into the string is >= to the length of the string).
- *
- * @param line The line to tokenize
- * @param line_number The current line number. This is only relevant when dealing with files,
- *                    so defaults to 0.
- *
- * @return A std::vector<Token> which contains the tokens that were found in the line.
- */
-std::vector<std::shared_ptr<Token>> Assembler::tokenizeLine(std::string &line, int line_number)
-{
-        std::string current;
-
-        std::vector<std::shared_ptr<Token>> tokenized_line;
-
-        char terminated_by = 0;
-
-        for (std::size_t index = 0; index < line.length();) {
-                char character = line.at(index);
-
-                if (std::isspace(character)) {
-                        // We don't care about space characters.
-                        while (line.length() > index + 1 && std::isspace(character)) {
-                                character = line.at(++index);
-                        }
-
-                        // However, it does mean we want to check what we just got.
-                        addToken(current, tokenized_line, line_number);
-                        terminated_by = 0;
-                }
-
-                if (character == ';') {
-                        // We've hit a comment, so skip to the end of the line.
-                        break;
-                } else if (character == '\r') {
-                        // getline doesn't consume '\r' (at least on OSX)
-                        break;
-                } else if (character == '/') {
-                        // '//' is a comment as well.
-                        if (index + 1 > line.length() || line.at(index + 1) != '/') {
-                                // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
-                                WARN(SYNTAX, line_number, "Expected '//', but found '/'. "
-                                        "Treating it as if it's '//' (i.e. comment).");
-                        }
-                        break;
-                } else if (character == ',') {
-                        if (!tokenized_line.size() || terminated_by) {
-                                WARN(SYNTAX, line_number, "Extraneous comma.");
-                        }
-                        addToken(current, tokenized_line, line_number);
-                        terminated_by = ',';
-                } else if (character == ':') {
-                        if (tokenized_line.size() > 1 || !current.size() || terminated_by) {
-                                WARN(SYNTAX, line_number, "Extraneous colon.");
-                        }
-                        addToken(current, tokenized_line, line_number);
-                        terminated_by = ':';
-#ifdef INCLUDE_ADDONS
-                } else if (character == '"' || character == '\'') {
-#else
-                        } else if (character == '"') {
-#endif
-                        addToken(current, tokenized_line, line_number);
-
-                        char terminator = character;
-                        while (index + 1 < line.length()) {
-                                character = line.at(++index);
-                                if (character == '\\' && line.length() > index + 1 &&
-                                    line.at(index + 1) == terminator) {
-                                        character = line.at(++index);
-                                } else if (character == terminator) {
-                                        break;
-                                }
-                                current += character;
-                        }
-
-                        if (character != terminator) {
-                                tokenized_line.push_back(std::make_shared<Token>(current, current, line_number));
-#ifdef INCLUDE_ADDONS
-                                tokenized_line.back()->unterminated(terminator == '\'' ? "character" : "string");
-#else
-                                tokenized_line.back()->unterminated("string");
-#endif
-                                ++error_count;
-                                tokenized_line.clear();
-                                return tokenized_line;
-#ifdef INCLUDE_ADDONS
-                        } else if (terminator == '\'') {
-                                tokenized_line.push_back(std::make_shared<Character>(current, line_number));
-#endif
-                        } else {
-                                tokenized_line.push_back(std::make_shared<String>(current, line_number));
-                        }
-
-                        current.erase();
-                } else {
-                        current += character;
-                }
-                ++index;
-        }
-
-        const bool any_valid_characters = std::any_of(current.cbegin(), current.cend(), [](unsigned char chr) -> bool
-        {
-                return !(std::isspace(chr) || chr == ',' || chr == ':');
-        });
-
-        if (any_valid_characters) {
-                addToken(current, tokenized_line, line_number);
-        }
-
-        return tokenized_line;
-}
-
-/**
- * Using a hashed string, compare this to pre-computed (constexpr) hashes to determine what Token
- * the string represents.
- *
- * If the string begins with '#' or '-', then it is determined to be a Decimal Token. Likewise if
- * it begins with 'x' or 'X', it is a Hexadecimal number, and 'b' or 'B' it is a Binary number. If
- * it begins with '0', it could be any of the above, and this is determined by the second character
- * in the string, or is a simple Decimal 0 if it's the only character in the string.
- *
- * A string beginning with 'R' or 'r' is quite possibly a Register.
- *
- * @param word The string to tokenize
- * @param line_number The current line number. This is only relevant when assembling a file.
- * @return The Token that the string corresponds to.
- */
-std::shared_ptr<Token> Assembler::tokenize(std::string &word, int line_number)
-{
-        std::string copy = word;
-        std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
-
-        // While this makes it a bit more efficient, is it worth double checking that
-        // the strings are the same after comparing the hash's? Just as a precautionary
-        // measure.
-        std::size_t hashed = hash(copy);
-
-        if (hashed) {
-                switch (hashed) {
-                case hash("ADD", 3):
-                        return std::make_shared<Add>(word, copy, line_number);
-                case hash("AND", 3):
-                        return std::make_shared<And>(word, copy, line_number);
-                case hash("NOT", 3):
-                        return std::make_shared<Not>(word, copy, line_number);
-                case hash("JSR", 3):
-                        return std::make_shared<Jsr>(word, copy, line_number);
-                case hash("JSRR", 4):
-                        return std::make_shared<Jsrr>(word, copy, line_number);
-                case hash("JMP", 3):
-                        return std::make_shared<Jmp>(word, copy, line_number);
-                case hash("RET", 3):
-                        return std::make_shared<Ret>(word, copy, line_number);
-                case hash("ST", 2):
-                        return std::make_shared<St>(word, copy, line_number);
-                case hash("STR", 3):
-                        return std::make_shared<Str>(word, copy, line_number);
-                case hash("STI", 3):
-                        return std::make_shared<Sti>(word, copy, line_number);
-                case hash("LD", 2):
-                        return std::make_shared<Ld>(word, copy, line_number);
-                case hash("LEA", 3):
-                        return std::make_shared<Lea>(word, copy, line_number);
-                case hash("LDI", 3):
-                        return std::make_shared<Ldi>(word, copy, line_number);
-                case hash("LDR", 3):
-                        return std::make_shared<Ldr>(word, copy, line_number);
-                case hash("PUTS", 4):
-                        return std::make_shared<Puts>(word, copy, line_number);
-                case hash("PUTSP", 5):
-                        return std::make_shared<Putsp>(word, copy, line_number);
-                case hash("HALT", 4):
-                        return std::make_shared<Halt>(word, copy, line_number);
-                case hash("TRAP", 4):
-                        return std::make_shared<Trap>(word, copy, line_number);
-                case hash("GETC", 4):
-                        return std::make_shared<Getc>(word, copy, line_number);
-                case hash("OUT", 3):
-                        return std::make_shared<Out>(word, copy, line_number);
-                case hash("IN", 2):
-                        return std::make_shared<In>(word, copy, line_number);
-                case hash("BR", 2):
-                        // FALLTHROUGH
-                case hash("BRNZP", 5):
-                        // FALLTHROUGH
-                case hash("BRNPZ", 5):
-                        // FALLTHROUGH
-                case hash("BRZNP", 5):
-                        // FALLTHROUGH
-                case hash("BRZPN", 5):
-                        // FALLTHROUGH
-                case hash("BRPNZ", 5):
-                        // FALLTHROUGH
-                case hash("BRPZN", 5):
-                        return std::make_shared<Br>(word, copy, line_number, true, true, true);
-                case hash("BRN", 3):
-                        return std::make_shared<Br>(word, copy, line_number, true, false, false);
-                case hash("BRZ", 3):
-                        return std::make_shared<Br>(word, copy, line_number, false, true, false);
-                case hash("BRP", 3):
-                        return std::make_shared<Br>(word, copy, line_number, false, false, true);
-                case hash("BRNZ", 4):
-                        // FALLTHROUGH
-                case hash("BRZN", 4):
-                        return std::make_shared<Br>(word, copy, line_number, true, true, false);
-                case hash("BRNP", 4):
-                        // FALLTHROUGH
-                case hash("BRPN", 4):
-                        return std::make_shared<Br>(word, copy, line_number, true, false, true);
-                case hash("BRZP", 4):
-                        // FALLTHROUGH
-                case hash("BRPZ", 4):
-                        return std::make_shared<Br>(word, copy, line_number, false, true, true);
-                case hash(".ORIG", 5):
-                        return std::make_shared<Orig>(word, copy, line_number);
-                case hash(".END", 4):
-                        return std::make_shared<End>(word, copy, line_number);
-                case hash(".FILL", 5):
-                        return std::make_shared<Fill>(word, copy, line_number);
-                case hash(".BLKW", 5):
-                        return std::make_shared<Blkw>(word, copy, line_number);
-                case hash(".STRINGZ", 8):
-                        return std::make_shared<Stringz>(word, copy, line_number);
-#ifdef INCLUDE_ADDONS
-                case hash(".NEG", 4):
-                        return std::make_shared<Neg>(word, copy, line_number);
-                case hash(".SUB", 4):
-                        return std::make_shared<Sub>(word, copy, line_number);
-                case hash(".SET", 4):
-                        return std::make_shared<Set>(word, copy, line_number);
-                case hash(".LSHIFT", 7):
-                        return std::make_shared<Lshift>(word, copy, line_number);
-#endif
-                default:
-                        break;
-                }
-        }
-
-        static const std::regex decimal("#?-?\\d+");
-        static const std::regex binary("-?0?[bB][0-1]+");
-        static const std::regex hexadecimal("0?[xX][0-9a-fA-F]+");
-        static const std::regex octal("\\\\[0-7]+");
-        static const std::regex _register("[rR]\\d");
-        static const std::regex label("[a-zA-Z0-9_]+");
-
-        if (std::regex_match(word, decimal)) {
-                return std::make_shared<Decimal>(word, line_number);
-        } else if (std::regex_match(word, binary)) {
-                return std::make_shared<Binary>(word, copy, line_number);
-        } else if (std::regex_match(word, hexadecimal)) {
-                return std::make_shared<Hexadecimal>(word, copy, line_number);
-        } else if (std::regex_match(word, octal)) {
-                return std::make_shared<Octal>(word, line_number);
-        } else if (std::regex_match(word, _register)) {
-                return std::make_shared<Register>(word, copy, line_number);
-        } else if (std::regex_match(word, label)) {
-                return std::make_shared<Label>(word, line_number);
-        } else {
-                const std::shared_ptr<Token> token = std::make_shared<Token>(word, copy, line_number);
-                token->is_valid = false;
-                return token;
-        }
-}
-
-/**
  * The first pass of the assembler generates the symbol table.
  */
 void Assembler::do_first_pass()
@@ -489,7 +131,7 @@ void Assembler::do_first_pass()
                 } else if (end_seen) {
                         std::stringstream stream;
                         stream << token->token << " after .END directive, it will be ignored.";
-                        this->WARN(IGNORED, token->at_line, stream.str());
+                        m_logger.LOG(Logger::WARNING, token->at_line, stream.str(), Logger::WARNING_TYPE::IGNORED);
                         return 0;
                 } else if (token->valid_arguments(t_tokens)) {
                         return token->guess_memory_size(t_tokens);
@@ -502,7 +144,9 @@ void Assembler::do_first_pass()
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
                         if (origin_seen) {
-                                ERR(tokenized_line.front()->at_line, "Redefinition of Origin memory address.");
+                                m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line,
+                                             "Redefinition of Origin memory address.");
+                                ++error_count;
                                 break;
                         }
                         origin_seen     = true;
@@ -526,9 +170,9 @@ void Assembler::do_first_pass()
                                                        << internal_program_counter << "\nNOTE: \tPrevious label '"
                                                        << symbol.second->token << "' found on line "
                                                        << std::dec << symbol.second->at_line << '.';
-                                                WARN(MULTIPLE_DEFINITIONS,
+                                                m_logger.LOG(Logger::WARNING,
                                                      tokenized_line.front()->at_line,
-                                                     stream.str());
+                                                     stream.str(), Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                                 break;
                                         }
                                 }
@@ -539,7 +183,8 @@ void Assembler::do_first_pass()
                                                << tokenized_line.front()->token
                                                << "'\nNOTE: \tLabel was first defined on line "
                                                << symbols[tokenized_line.front()->token]->at_line << '.';
-                                        ERR(tokenized_line.front()->at_line, stream.str());
+                                        m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line, stream.str());
+                                        ++error_count;
                                 }
 
                                 symbols.insert(std::pair<std::string, std::shared_ptr<Label>>(
@@ -575,9 +220,11 @@ void Assembler::do_first_pass()
         }
 
         if (!origin_seen) {
-                ERR(0, "No .ORIG directive. (Is the file empty?)");
+                m_logger.LOG(Logger::ERROR, 0, "No .ORIG directive. (Is the file empty?)");
+                ++error_count;
         } else if (!end_seen) {
-                ERR(0, "Reached the end of the file, and found no .END directive.");
+                m_logger.LOG(Logger::ERROR, 0, "Reached the end of the file, and found no .END directive.");
+                ++error_count;
         }
 }
 
@@ -588,7 +235,7 @@ void Assembler::do_second_pass()
 {
         std::int32_t memory_required = 0;
 
-        LOG(MESSAGE, "Starting second pass\n");
+        m_logger.LOG(Logger::MESSAGE, 0, "Starting second pass\n");
 
         for (auto &tokenized_line : tokens) {
                 if (tokenized_line.front()->type() == Token::DIR_END) {
@@ -607,7 +254,7 @@ void Assembler::do_second_pass()
 
         std::stringstream stream;
         stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
-        LOG(MESSAGE, stream.str());
+        m_logger.LOG(Logger::MESSAGE, 0, stream.str());
 }
 
 /**
@@ -625,33 +272,44 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
                 for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
                         if (tokenized_line.front()->type() == Token::OP_BR) {
                                 if ((assembled_line & 0xFE00) == (as_assembled.back() & 0xFE00)) {
-                                        WARN(LOGIC, tokenized_line.front()->at_line,
-                                             "Statement before this one checks for the same condition code."
-                                                     " This might mean this one will never execute."
+                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                                     "Statement before this one checks for the same condition code."
+                                                     " This might mean this one will never execute.",
+                                                     Logger::WARNING_TYPE::LOGIC
                                         );
                                 } else if (!(assembled_line & 0xFF)) {
-                                        WARN(LOGIC, tokenized_line.front()->at_line,
-                                             "BR with an offset of 0 will probably do nothing.");
+                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                                     "BR with an offset of 0 will probably do nothing.",
+                                                     Logger::WARNING_TYPE::LOGIC
+                                        );
                                 } else if ((assembled_line & 0x1FF) == 0x1FF) {
-                                        WARN(LOGIC, tokenized_line.front()->at_line,
-                                             "BR with an offset of -1 will probably cause an infinite loop.");
+                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                                     "BR with an offset of -1 will probably cause an infinite loop.",
+                                                     Logger::WARNING_TYPE::LOGIC
+                                        );
                                 }
                         } else if (tokenized_line.front()->type() == Token::OP_JSR) {
                                 if (!(assembled_line & 0x7FF)) {
                                         // Technically, this isn't true. It could just be a way to get the
                                         // current value of the PC into R7, but it's still worth a warning.
-                                        WARN(LOGIC, tokenized_line.front()->at_line,
-                                             "JSR with an offset of 0 will probably do nothing.");
+                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                                     "JSR with an offset of 0 will probably do nothing.",
+                                                     Logger::WARNING_TYPE::LOGIC
+                                        );
                                 } else if ((assembled_line & 0x7FF) == 0x7FF) {
-                                        WARN(LOGIC, tokenized_line.front()->at_line,
-                                             "JSR with an offset of -1 will probably cause an infinite loop.");
+                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                                     "JSR with an offset of -1 will probably cause an infinite loop.",
+                                                     Logger::WARNING_TYPE::LOGIC
+                                        );
                                 }
                         } else if (tokenized_line.front()->type() == Token::OP_TRAP) {
                                 if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
                                         std::stringstream stream;
                                         stream << "TRAP was supplied a trap vector of " << (assembled_line & 0x00FF)
                                                << ", which is possibly an illegal trap vector.\n";
-                                        WARN(LOGIC, tokenized_line.front()->at_line, stream.str());
+                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line, stream.str(),
+                                                     Logger::WARNING_TYPE::LOGIC
+                                        );
                                 }
                         }
 
@@ -672,14 +330,17 @@ bool Assembler::assemble()
         std::stringstream stream;
 
         if (files_to_assemble.size() == 1) {
-                LOG(MESSAGE, "Starting first pass\n");
+                m_logger.LOG(Logger::MESSAGE, 0, "Starting first pass\n");
 
-                tokenizeFile(files_to_assemble.at(0));
+                //tokenizeFile(files_to_assemble.at(0));
+
+                Lexer lexer(files_to_assemble.at(0));
+                error_count = lexer.parse_into(tokens);
 
                 do_first_pass();
 
                 stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
-                LOG(MESSAGE, stream.str());
+                m_logger.LOG(Logger::MESSAGE, 0, stream.str());
 
                 if (error_count || tokens.empty()) {
                         return false;
@@ -701,17 +362,18 @@ bool Assembler::assemble()
         for (auto &file : files_to_assemble) {
                 stream.str(std::string());
                 stream << "\n --- Assembling " << file << " ---\n\n";
-                LOG(MESSAGE, stream.str());
+                m_logger.LOG(Logger::MESSAGE, 0, stream.str());
 
-                LOG(MESSAGE, "Starting first pass\n");
+                m_logger.LOG(Logger::MESSAGE, 0, "Starting first pass\n");
 
-                tokenizeFile(file);
+                Lexer lexer(file);
+                error_count = lexer.parse_into(tokens);
 
                 do_first_pass();
 
                 stream.str(std::string());
                 stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
-                LOG(MESSAGE, stream.str());
+                m_logger.LOG(Logger::MESSAGE, 0, stream.str());
 
                 if (error_count || tokens.empty()) {
                         return false;
@@ -1021,17 +683,17 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
 void Assembler::change_warning_level(std::string &warning)
 {
         if (warning == "none") {
-                warning_level = WARNING_TYPE::NONE;
+                warning_level = Logger::WARNING_TYPE::NONE;
         } else if (warning == "syntax") {
-                warning_level |= WARNING_TYPE::SYNTAX;
+                warning_level |= Logger::WARNING_TYPE::SYNTAX;
         } else if (warning == "ignore") {
-                warning_level |= WARNING_TYPE::IGNORED;
+                warning_level |= Logger::WARNING_TYPE::IGNORED;
         } else if (warning == "multiple") {
-                warning_level |= WARNING_TYPE::MULTIPLE_DEFINITIONS;
+                warning_level |= Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS;
         } else if (warning == "logic") {
-                warning_level |= WARNING_TYPE::LOGIC;
+                warning_level |= Logger::WARNING_TYPE::LOGIC;
         } else if (warning == "all") {
-                warning_level = ALL;
+                warning_level = Logger::WARNING_TYPE::ALL;
         } else {
                 std::cerr << "Argument --warn expects one (or more) of the following:" << '\n'
                           << "\t- all\n"
@@ -1043,55 +705,6 @@ void Assembler::change_warning_level(std::string &warning)
                           << "Got '" << warning << "'\n";
                 exit(EXIT_FAILURE);
         }
-}
-
-void Assembler::LOG(Assembler::LOGGING_TYPE level, std::string &&message)
-{
-        if (we_should_be_quiet()) {
-                return;
-        }
-
-        if (level == ERROR || level == WARNING) {
-                std::cerr << message;
-        } else {
-                std::cout << message;
-        }
-}
-
-void Assembler::WARN(WARNING_TYPE level, int line_number, std::string &&warning)
-{
-        if (!(warning_level & level)) {
-                return;
-        }
-
-        std::stringstream stream;
-
-        stream << "WARNING: ";
-
-        if (line_number) {
-                stream << "Line " << line_number << ": ";
-        }
-
-        stream << warning << "\n";
-
-        LOG(WARNING, stream.str());
-}
-
-void Assembler::ERR(int line_number, std::string &&error)
-{
-        std::stringstream stream;
-
-        stream << "ERROR: ";
-
-        if (line_number) {
-                stream << "Line " << line_number << ": ";
-        }
-
-        stream << error << "\n";
-
-        ++error_count;
-
-        LOG(ERROR, stream.str());
 }
 
 std::string Assembler::check_for_symbol_match(const std::string &symbol) const

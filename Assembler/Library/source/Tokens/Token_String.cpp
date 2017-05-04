@@ -1,4 +1,4 @@
-#include <Tokens/All_Tokens.hpp>
+#include <Tokens/Tokens.hpp>
 
 String::String(std::string &string, int line_number)
         : Token(string, string, line_number)

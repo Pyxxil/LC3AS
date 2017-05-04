@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_INSTRUCTION_HPP
-#define PROJECT_TOKEN_INSTRUCTION_HPP
+#ifndef TOKEN_INSTRUCTION_HPP
+#define TOKEN_INSTRUCTION_HPP
 
 #include "Token.hpp"
 
@@ -10,4 +10,4 @@ public:
         Instruction(std::string &instruction, std::string &instruction_uppercase, int line_number = 0);
 };
 
-#endif // PROJECT_TOKEN_INSTRUCTION_HPP
+#endif // TOKEN_INSTRUCTION_HPP

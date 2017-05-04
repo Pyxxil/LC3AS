@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_DIRECTIVE_ORIG_HPP
-#define PROJECT_TOKEN_DIRECTIVE_ORIG_HPP
+#ifndef TOKEN_DIRECTIVE_ORIG_HPP
+#define TOKEN_DIRECTIVE_ORIG_HPP
 
 #include "Tokens/Token_Directive.hpp"
 #include "Tokens/Token_Immediate.hpp"
@@ -25,4 +25,4 @@ private:
         std::uint16_t origin = 0x3000;
 };
 
-#endif //PROJECT_TOKEN_DIRECTIVE_ORIG_HPP
+#endif // TOKEN_DIRECTIVE_ORIG_HPP

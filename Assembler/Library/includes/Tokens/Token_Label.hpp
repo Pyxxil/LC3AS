@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_LABEL_HPP
-#define PROJECT_TOKEN_LABEL_HPP
+#ifndef TOKEN_LABEL_HPP
+#define TOKEN_LABEL_HPP
 
 #include "../Token.hpp"
 
@@ -26,4 +26,4 @@ public:
         std::uint16_t address = 0;
 };
 
-#endif //PROJECT_TOKEN_LABEL_HPP
+#endif // TOKEN_LABEL_HPP

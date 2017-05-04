@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_DIRECTIVE_HPP
-#define PROJECT_TOKEN_DIRECTIVE_HPP
+#ifndef TOKEN_DIRECTIVE_HPP
+#define TOKEN_DIRECTIVE_HPP
 
 #include "Token.hpp"
 
@@ -10,4 +10,4 @@ public:
         Directive(std::string &directive, std::string &directive_uppercase, int line_number = 0);
 };
 
-#endif //PROJECT_TOKEN_DIRECTIVE_HPP
+#endif // TOKEN_DIRECTIVE_HPP

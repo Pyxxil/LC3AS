@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_OPERATOR_ADD_HPP
-#define PROJECT_TOKEN_OPERATOR_ADD_HPP
+#ifndef TOKEN_OPERATOR_ADD_HPP
+#define TOKEN_OPERATOR_ADD_HPP
 
 #include "Tokens/Token_Instruction.hpp"
 
@@ -22,4 +22,4 @@ public:
                                         const Assembler &assembler) const override;
 };
 
-#endif //PROJECT_TOKEN_OPERATOR_ADD_HPP
+#endif // TOKEN_OPERATOR_ADD_HPP

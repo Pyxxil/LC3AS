@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_DIRECTIVE_BLKW_HPP
-#define PROJECT_TOKEN_DIRECTIVE_BLKW_HPP
+#ifndef TOKEN_DIRECTIVE_BLKW_HPP
+#define TOKEN_DIRECTIVE_BLKW_HPP
 
 #include "Tokens/Token_Directive.hpp"
 #include "Tokens/Token_Immediate.hpp"
@@ -24,4 +24,4 @@ public:
                                         const Assembler &assembler) const override;
 };
 
-#endif //PROJECT_TOKEN_DIRECTIVE_BLKW_HPP
+#endif // TOKEN_DIRECTIVE_BLKW_HPP

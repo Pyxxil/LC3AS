@@ -1,5 +1,5 @@
-#ifndef LC3_SIMULATOR_TOKEN_HPP
-#define LC3_SIMULATOR_TOKEN_HPP
+#ifndef TOKEN_HPP
+#define TOKEN_HPP
 
 #include <string>
 #include <vector>
@@ -88,4 +88,4 @@ public:
         void unterminated(std::string &&t_type);
 };
 
-#endif // LC3_SIMULATOR_TOKEN_HPP
+#endif // TOKEN_HPP

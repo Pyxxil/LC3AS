@@ -60,7 +60,6 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         BRn #-1         ; Complains about infinite loop
         BRn WARNING_THROWS ; Complains about same condition code as line before
         TRAP 0xFF       ; Possible illegal trap vector
-        BR oc
 
 ; End of warnings
         RET
@@ -104,10 +103,10 @@ WARNING_THROWS:         ; All of the following should throw warnings with
 ;        AND R0, R0, R0, R0
 ;
 ;        BR R0
-;        BR addr
 ;        BR "Hello"
 ;        BR add
-;        BRz #-2000     ; Immediate value not representable in signed 9 bits
+;        BRz #-2000      ; Immediate value not representable in signed 9 bits
+;        BR oc           ; Invalid label
 
 BRnzp BEGIN_TEST
 

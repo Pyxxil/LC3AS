@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_ADDON_CHAR_HPP
-#define PROJECT_TOKEN_ADDON_CHAR_HPP
+#ifndef TOKEN_ADDON_CHAR_HPP
+#define TOKEN_ADDON_CHAR_HPP
 
 #include "Tokens/Token_Immediate.hpp"
 
@@ -10,4 +10,4 @@ public:
         Character(std::string &character, int line_number = 0);
 };
 
-#endif //PROJECT_TOKEN_ADDON_CHAR_HPP
+#endif // TOKEN_ADDON_CHAR_HPP

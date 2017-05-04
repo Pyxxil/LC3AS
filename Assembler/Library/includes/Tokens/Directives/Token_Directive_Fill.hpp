@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_DIRECTIVE_FILL_HPP
-#define PROJECT_TOKEN_DIRECTIVE_FILL_HPP
+#ifndef TOKEN_DIRECTIVE_FILL_HPP
+#define TOKEN_DIRECTIVE_FILL_HPP
 
 #include "Tokens/Token_Directive.hpp"
 
@@ -24,4 +24,4 @@ public:
                                         const Assembler &assembler) const override;
 };
 
-#endif //PROJECT_TOKEN_DIRECTIVE_FILL_HPP
+#endif // TOKEN_DIRECTIVE_FILL_HPP

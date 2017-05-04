@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_ADDON_SET_HPP
-#define PROJECT_TOKEN_ADDON_SET_HPP
+#ifndef TOKEN_ADDON_SET_HPP
+#define TOKEN_ADDON_SET_HPP
 
 #include "Tokens/Token_Directive.hpp"
 
@@ -39,4 +39,4 @@ private:
         std::shared_ptr<Decimal> decimal_negative_two;
 };
 
-#endif //PROJECT_TOKEN_ADDON_SET_HPP
+#endif // TOKEN_ADDON_SET_HPP

@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_TRAP_PUTSP_HPP
-#define PROJECT_TOKEN_TRAP_PUTSP_HPP
+#ifndef TOKEN_TRAP_PUTSP_HPP
+#define TOKEN_TRAP_PUTSP_HPP
 
 #include "Tokens/Token_Instruction.hpp"
 
@@ -21,4 +21,4 @@ public:
                                         const Assembler &assembler) const override;
 };
 
-#endif //PROJECT_TOKEN_TRAP_PUTSP_HPP
+#endif // TOKEN_TRAP_PUTSP_HPP

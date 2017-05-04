@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_OPERATOR_LDR_HPP
-#define PROJECT_TOKEN_OPERATOR_LDR_HPP
+#ifndef TOKEN_OPERATOR_LDR_HPP
+#define TOKEN_OPERATOR_LDR_HPP
 
 #include "Tokens/Token_Instruction.hpp"
 

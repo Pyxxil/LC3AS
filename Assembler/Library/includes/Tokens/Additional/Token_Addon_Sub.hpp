@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_ADDON_SUB_HPP
-#define PROJECT_TOKEN_ADDON_SUB_HPP
+#ifndef TOKEN_ADDON_SUB_HPP
+#define TOKEN_ADDON_SUB_HPP
 
 #include "Tokens/Token_Directive.hpp"
 
@@ -35,4 +35,4 @@ private:
         std::shared_ptr<Neg>     neg2;
 };
 
-#endif //PROJECT_TOKEN_ADDON_SUB_HPP
+#endif // TOKEN_ADDON_SUB_HPP

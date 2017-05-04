@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_REGISTER_HPP
-#define PROJECT_TOKEN_REGISTER_HPP
+#ifndef TOKEN_REGISTER_HPP
+#define TOKEN_REGISTER_HPP
 
 #include "Token.hpp"
 
@@ -13,4 +13,4 @@ public:
         char reg;
 };
 
-#endif //PROJECT_TOKEN_REGISTER_HPP
+#endif // TOKEN_REGISTER_HPP

@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_ADDON_LSHIFT_HPP
-#define PROJECT_TOKEN_ADDON_LSHIFT_HPP
+#ifndef TOKEN_ADDON_LSHIFT_HPP
+#define TOKEN_ADDON_LSHIFT_HPP
 
 #include "Tokens/Token_Directive.hpp"
 #include "Tokens/Instructions/Token_Instruction_Add.hpp"
@@ -26,4 +26,4 @@ private:
         std::shared_ptr<Add> add;
 };
 
-#endif //PROJECT_TOKEN_ADDON_LSHIFT_HPP
+#endif // TOKEN_ADDON_LSHIFT_HPP

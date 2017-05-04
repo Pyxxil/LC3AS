@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_OPERATOR_TRAP_HPP
-#define PROJECT_TOKEN_OPERATOR_TRAP_HPP
+#ifndef TOKEN_OPERATOR_TRAP_HPP
+#define TOKEN_OPERATOR_TRAP_HPP
 
 #include "Tokens/Token_Instruction.hpp"
 
@@ -21,4 +21,4 @@ public:
                                         const Assembler &assembler) const override;
 };
 
-#endif //PROJECT_TOKEN_OPERATOR_TRAP_HPP
+#endif // TOKEN_OPERATOR_TRAP_HPP

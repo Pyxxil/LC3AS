@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_OPERATOR_BR_HPP
-#define PROJECT_TOKEN_OPERATOR_BR_HPP
+#ifndef TOKEN_OPERATOR_BR_HPP
+#define TOKEN_OPERATOR_BR_HPP
 
 #include "Tokens/Token_Instruction.hpp"
 
@@ -28,4 +28,4 @@ private:
         bool P;
 };
 
-#endif //PROJECT_TOKEN_OPERATOR_BR_HPP
+#endif // TOKEN_OPERATOR_BR_HPP

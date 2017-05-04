@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_STRING_HPP
-#define PROJECT_TOKEN_STRING_HPP
+#ifndef TOKEN_STRING_HPP
+#define TOKEN_STRING_HPP
 
 #include "Token.hpp"
 
@@ -11,4 +11,4 @@ public:
         virtual Token::token_type type() const override;
 };
 
-#endif //PROJECT_TOKEN_STRING_HPP
+#endif // TOKEN_STRING_HPP

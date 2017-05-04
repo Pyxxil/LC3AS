@@ -1,5 +1,5 @@
-#ifndef PROJECT_STRING_MATCHER_HPP
-#define PROJECT_STRING_MATCHER_HPP
+#ifndef STRING_MATCHER_HPP
+#define STRING_MATCHER_HPP
 
 #include <vector>
 #include <string>
@@ -21,4 +21,4 @@ private:
         std::pair<long, std::string> best;
 };
 
-#endif //PROJECT_STRING_MATCHER_HPP
+#endif // STRING_MATCHER_HPP

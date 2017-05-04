@@ -1,5 +1,5 @@
-#ifndef PROJECT_TOKEN_IMMEDIATE_HPP
-#define PROJECT_TOKEN_IMMEDIATE_HPP
+#ifndef TOKEN_IMMEDIATE_HPP
+#define TOKEN_IMMEDIATE_HPP
 
 #include "Token.hpp"
 
@@ -15,4 +15,4 @@ public:
         std::int16_t value = 0;
 };
 
-#endif //PROJECT_TOKEN_IMMEDIATE_HPP
+#endif // TOKEN_IMMEDIATE_HPP

@@ -1,5 +1,5 @@
-#ifndef PROJECT_ALL_TOKENS_HPP
-#define PROJECT_ALL_TOKENS_HPP
+#ifndef TOKENS_HPP
+#define TOKENS_HPP
 
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_String.hpp"
@@ -48,4 +48,4 @@
 #include "Tokens/Additional/Token_Addon_Set.hpp"
 #endif
 
-#endif // PROJECT_ALL_TOKENS_HPP
+#endif // TOKENS_HPP
