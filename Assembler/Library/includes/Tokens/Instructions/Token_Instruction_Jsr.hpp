@@ -10,15 +10,19 @@ public:
 
         virtual Token::token_type type() const override;
 
+        virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                                      const std::map<std::string, Symbol> &symbols,
+                                      std::uint16_t program_counter) override;
         virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
-        virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler) override;
 
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 
-        virtual std::string disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                                        std::uint16_t &program_counter,
+        virtual std::string disassemble(std::uint16_t &program_counter,
                                         const std::string &symbol,
-                                        const Assembler &assembler) const override;
+                                        int width) const override;
+
+private:
+        std::shared_ptr<Token> provided;
 };
 
 #endif // TOKEN_OPERATOR_JSR_HPP

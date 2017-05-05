@@ -16,11 +16,13 @@ Lshift::Lshift(std::string &directive, std::string &directive_uppercase, int lin
         add->at_line = line_number;
 }
 
-std::int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                              const std::map<std::string, Symbol> &symbols,
+                              std::uint16_t program_counter)
 {
         std::vector<std::shared_ptr<Token>> vec = { add, tokens.at(1), tokens.at(1), tokens.at(1) };
 
-        add->assemble(vec, assembler);
+        add->assemble(vec, symbols, program_counter);
 
         std::uint16_t machine_instruction = add->assembled.front();
 
@@ -64,28 +66,26 @@ bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 std::int32_t Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
         if (!is_valid) {
-             return 0;
+                return 0;
         }
 
         return std::static_pointer_cast<Immediate>(tokens.at(2))->value;
 }
 
-std::string Lshift::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                                std::uint16_t &program_counter,
+std::string Lshift::disassemble(std::uint16_t &program_counter,
                                 const std::string &symbol,
-                                const Assembler &assembler) const
+                                int width) const
 {
         std::stringstream stream;
-        std::vector<std::shared_ptr<Token>> vec = { add, tokens.at(1), tokens.at(1), tokens.at(1) };
 
-        stream << add->disassemble(vec, program_counter, symbol, assembler);
-        const std::string &disassembled_without_symbol = add->disassemble(vec, program_counter, "", assembler);
+        stream << add->disassemble(program_counter, symbol, width);
+        const std::string &disassembled_without_symbol = add->disassemble(program_counter, "", width);
 
         // The previous instruction will increment this. We want it to be it's original value,
         // as we increment it ourself in the loop below.
         --program_counter;
 
-        for (int shift = 1; shift < std::static_pointer_cast<Immediate>(tokens.at(2))->value; ++shift) {
+        for (std::size_t shift = 1; shift < assembled.size(); ++shift) {
                 stream << disassembled_without_symbol;
                 ++program_counter;
         }

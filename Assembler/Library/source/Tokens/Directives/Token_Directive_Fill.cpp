@@ -1,13 +1,10 @@
 #include "Tokens/Directives/Token_Directive_Fill.hpp"
 
-#include <algorithm>
 #include <sstream>
 #include <iomanip>
-#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
-#include "Assembler.hpp"
 
 Fill::Fill(std::string &directive, std::string &directive_uppercase, int line_number)
         : Directive(directive, directive_uppercase, line_number)
@@ -15,8 +12,12 @@ Fill::Fill(std::string &directive, std::string &directive_uppercase, int line_nu
 
 }
 
-std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                            const std::map<std::string, Symbol> &symbols,
+                            std::uint16_t program_counter)
 {
+        (void) program_counter;
+
         if (!is_valid) {
                 return 0;
         }
@@ -25,13 +26,12 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens, const A
                 assembled.emplace_back(static_cast<std::uint16_t>(std::static_pointer_cast<
                         Immediate>(tokens.at(1))->value));
         } else if (tokens.at(1)->type() == Token::LABEL) {
-                if (!assembler.symbols.count(tokens.at(1)->token)) {
-                        const std::string possible_match = assembler.check_for_symbol_match(tokens.at(1)->token);
-                        std::static_pointer_cast<Label>(tokens.at(1))->not_found(possible_match);
+                if (!symbols.count(tokens.at(1)->token)) {
+                        std::static_pointer_cast<Label>(tokens.at(1))->not_found(symbols);
                         return -1;
                 }
 
-                assembled.emplace_back(assembler.symbols.find(tokens.at(1)->token)->second->address);
+                assembled.emplace_back(symbols.find(tokens.at(1)->token)->second.address);
         }
 
         return 1;
@@ -60,35 +60,28 @@ std::int32_t Fill::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Fill::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                              std::uint16_t &program_counter,
-                              const std::string &symbol,
-                              const Assembler &assembler) const
+std::string Fill::disassemble(
+        std::uint16_t &program_counter,
+        const std::string &symbol,
+        int width) const
 {
-        const auto        &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
         std::stringstream stream;
 
-        std::uint16_t fill = 0;
-
-        if (tokens.at(1)->type() == Token::IMMEDIATE) {
-                fill = static_cast<std::uint16_t>(immediate->value);
-        } else {
-                fill = assembler.symbols.find(tokens.at(1)->token)->second->address;
-        }
+        int value = static_cast<int>(assembled.front());
 
         stream
                 // Address in memory
                 << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
                 // Hexadecimal representation of instruction
-                << ' ' << std::hex << std::setfill('0') << std::setw(4) << fill
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
                 // Binary representation of instruction
-                << ' ' << std::bitset<16>(fill)
+                << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << fill << '\n';
+                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value << '\n';
 
         ++program_counter;
 

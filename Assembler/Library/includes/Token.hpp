@@ -5,6 +5,9 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <map>
+
+#include "Symbol.hpp"
 
 class Assembler;
 
@@ -69,23 +72,23 @@ public:
         virtual Token::token_type type() const;
 
         std::string deduce_type() const;
-        virtual std::string disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                                        std::uint16_t &program_counter,
+        virtual std::string disassemble(std::uint16_t &program_counter,
                                         const std::string &symbol,
-                                        const Assembler &assembler) const;
+                                        int width) const;
 
         virtual void expected(const char *const expects) const;
         virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const;
         virtual void requires_too_many_bits(int allowed_bits, bool is_signed = true);
 
-        virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler);
+        // TODO: Change this so it doesn't require taking the assembler as a paramter.
+        virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                                      const std::map<std::string, Symbol> &symbols,
+                                      std::uint16_t program_counter);
         virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const;
 
         virtual const std::vector<uint16_t> as_assembled() const;
 
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens);
-
-        void unterminated(std::string &&t_type);
 };
 
 #endif // TOKEN_HPP

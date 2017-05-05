@@ -48,8 +48,10 @@ set ( ASSEMBLER_SOURCE_FILES
 
 set ( ASSEMBLER_HEADER_FILES
       includes/Assembler.hpp
+      ../../cxxopts.hpp
       includes/String_Matcher.hpp
       includes/Logging/Logger.hpp
+      includes/Symbol.hpp
       includes/Lexer.hpp
       includes/Token.hpp
       includes/Tokens/Token_Immediate.hpp
@@ -90,7 +92,6 @@ set ( ASSEMBLER_HEADER_FILES
       includes/Tokens/Instructions/Token_Instruction_Br.hpp
       includes/Tokens/Instructions/Token_Instruction_Ld.hpp
       includes/Tokens/Instructions/Token_Instruction_St.hpp
-      ../../cxxopts.hpp
       )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )

@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include "Tokens/Token_Register.hpp"
-#include "Assembler.hpp"
 
 Sub::Sub()
         : Directive()
@@ -30,10 +29,10 @@ Sub::Sub(std::string &directive, std::string &directive_uppercase, int line_numb
         add->at_line = set_zero->at_line = decimal_zero->at_line = line_number;
 }
 
-std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                           const std::map<std::string, Symbol> &symbols,
+                           std::uint16_t program_counter)
 {
-        (void) assembler;
-
         if (!is_valid) {
                 return 0;
         }
@@ -54,16 +53,16 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
                         set_zero, tokens.at(1), tokens.at(first_register_index), decimal_zero
                 };
 
-                set_zero->assemble(vec, assembler);
+                set_zero->assemble(vec, symbols, program_counter);
                 assembled = set_zero->assembled;
 
                 ret = 1;
         } else {
-                std::vector<std::shared_ptr<Token>> vec = {neg1, tokens.at(second_register_index)};
-                ret += neg1->assemble(vec, assembler);
+                std::vector<std::shared_ptr<Token>> vec = { neg1, tokens.at(second_register_index) };
+                ret += neg1->assemble(vec, symbols, program_counter);
 
-                vec = {add, tokens.at(1), tokens.at(first_register_index), tokens.at(second_register_index)};
-                ret += add->assemble(vec, assembler);
+                vec = { add, tokens.at(1), tokens.at(first_register_index), tokens.at(second_register_index) };
+                ret += add->assemble(vec, symbols, program_counter);
 
                 assembled = neg1->assembled;
                 for (const auto &as_assembled : add->assembled) {
@@ -72,8 +71,8 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
 
                 if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
                     std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
-                        vec = {neg2, tokens.at(second_register_index)};
-                        ret += neg2->assemble(vec, assembler);
+                        vec = { neg2, tokens.at(second_register_index) };
+                        ret += neg2->assemble(vec, symbols, program_counter);
 
                         for (const auto &as_assembled : neg2->assembled) {
                                 assembled.emplace_back(as_assembled);
@@ -127,7 +126,7 @@ std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
                         return 1;
                 } else {
                         if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
-                        std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
+                            std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
                                 return 5;
                         } else {
                                 return 3;
@@ -154,43 +153,20 @@ void Sub::invalid_argument_count(std::size_t provided, std::size_t expected) con
                   << (provided == 1 ? " argument was " : "arguments were ") << "provided.\n";
 }
 
-std::string Sub::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                             std::uint16_t &program_counter,
+std::string Sub::disassemble(std::uint16_t &program_counter,
                              const std::string &symbol,
-                             const Assembler &assembler) const
+                             int width) const
 {
         std::stringstream stream;
 
-        std::size_t first_register_index  = 1;
-        std::size_t second_register_index = 2;
-
-        if (tokens.size() == 4) {
-                ++first_register_index;
-                ++second_register_index;
-        }
-
-        if (std::static_pointer_cast<Register>(tokens.at(first_register_index))->reg ==
-            std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
-                // If the registers are the same, then it's more efficient to just erase the value in
-                // that register.
-                std::vector<std::shared_ptr<Token>> vec = {
-                        set_zero, tokens.at(1), tokens.at(first_register_index), decimal_zero
-                };
-                stream << set_zero->disassemble(vec, program_counter, symbol, assembler);
+        if (!set_zero->assembled.empty()) {
+                stream << set_zero->disassemble(program_counter, symbol, width);
         } else {
-                std::vector<std::shared_ptr<Token>> vec = {neg1, tokens.at(second_register_index)};
-                stream << neg1->disassemble(vec, program_counter, symbol, assembler);
+                stream << neg1->disassemble(program_counter, symbol, width);
+                stream << add->disassemble(program_counter, " ", width);
 
-                vec = {add, tokens.at(1), tokens.at(first_register_index), tokens.at(second_register_index)};
-                stream << add->disassemble(vec, program_counter, " ", assembler);
-
-                if (second_register_index == 2 ||
-                    std::static_pointer_cast<Register>(tokens.at(1))->reg !=
-                    std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
-                        // If the last provided register is the same as the destination register, then we don't want
-                        // to turn the last register back into it's original value.
-                        vec = {neg2, tokens.at(second_register_index)};
-                        stream << neg2->disassemble(vec, program_counter, " ", assembler);
+                if (!neg2->assembled.empty()) {
+                        stream << neg2->disassemble(program_counter, " ", width);
                 }
         }
 

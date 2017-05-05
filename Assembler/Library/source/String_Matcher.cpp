@@ -7,7 +7,7 @@ String_Matcher::String_Matcher()
 }
 
 String_Matcher::String_Matcher(const std::string &t_string)
-        : m_string(t_string), best{LONG_MAX, "" }
+        : m_string(t_string), best { LONG_MAX, "" }
 {
 
 }
@@ -31,7 +31,7 @@ void String_Matcher::consider(const std::string &str)
 
         const int distance = static_cast<int>(levenshtein_distance(m_string, str));
         if (distance < best.first) {
-                best = {distance, str};
+                best = { distance, str };
         }
 }
 
@@ -57,11 +57,11 @@ std::int32_t String_Matcher::levenshtein_distance(const std::string &string, con
                 matrix1[0] = i + 1;
 
                 for (std::size_t j = 0; j < string_length; j++) {
-                        const std::size_t cost = (string[j] == target[i] ? 0 : 1);
+                        const std::size_t cost         = (string[j] == target[i] ? 0 : 1);
                         const std::size_t deletion     = matrix1[j] + 1;
                         const std::size_t insertion    = matrix0[j + 1] + 1;
                         const std::size_t substitution = matrix0[j] + cost;
-                        std::size_t cheapest = std::min(deletion, insertion);
+                        std::size_t       cheapest     = std::min(deletion, insertion);
                         cheapest = std::min(cheapest, substitution);
                         matrix1[j + 1] = cheapest;
                 }

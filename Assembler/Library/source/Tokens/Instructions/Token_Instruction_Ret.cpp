@@ -2,9 +2,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <bitset>
-
-#include "Assembler.hpp"
 
 Ret::Ret(std::string &instruction, std::string &instruction_uppercase, int line_number)
         : Instruction(instruction, instruction_uppercase, line_number)
@@ -12,10 +9,13 @@ Ret::Ret(std::string &instruction, std::string &instruction_uppercase, int line_
 
 }
 
-std::int32_t Ret::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Ret::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                           const std::map<std::string, Symbol> &symbols,
+                           std::uint16_t program_counter)
 {
         (void) tokens;
-        (void) assembler;
+        (void) symbols;
+        (void) program_counter;
 
         assembled.emplace_back(static_cast<std::uint16_t>(0xC1C0));
 
@@ -38,13 +38,10 @@ std::int32_t Ret::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<int32_t>(is_valid);
 }
 
-std::string Ret::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                             std::uint16_t &program_counter,
+std::string Ret::disassemble(std::uint16_t &program_counter,
                              const std::string &symbol,
-                             const Assembler &assembler) const
+                             int width) const
 {
-        (void) tokens;
-
         std::stringstream stream;
         stream
                 // Address in memory
@@ -56,7 +53,7 @@ std::string Ret::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
                 << " RET\n";
 

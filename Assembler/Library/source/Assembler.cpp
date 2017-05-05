@@ -1,16 +1,12 @@
 #include "Assembler.hpp"
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <algorithm>
 
 #include "../../../cxxopts.hpp"
 #include "String_Matcher.hpp"
 #include "Lexer.hpp"
-
-// TODO: Move all file parsing into a Lexer class.
 
 Assembler::Assembler()
         : symbols(), files_to_assemble(), as_assembled(), m_logger(), tokens()
@@ -35,7 +31,8 @@ Assembler::Assembler(int argument_count, char **arguments)
                                " can be provided together seperated by a comma, e.g."
                                " --warn multiple,syntax                                  ",
                        cxxopts::value<std::string>()->default_value("all"))
-                      ("n,no-warn", "Turn off all warnings");
+                      ("n,no-warn", "Turn off all warnings")
+                      ("pretend", "Don't write the assembled instructions to any files");
 
         try {
                 parser.parse(argument_count, arguments);
@@ -72,6 +69,10 @@ Assembler::Assembler(int argument_count, char **arguments)
         if (parser.count("quiet")) {
                 quiet = true;
                 m_logger.set_quietness(quiet);
+        }
+
+        if (parser.count("pretend")) {
+                do_write = false;
         }
 
         if (parser.count("no-warn")) {
@@ -123,7 +124,7 @@ void Assembler::do_first_pass()
 
         std::int32_t memory_required = 0;
 
-        const auto memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
+        const auto &memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
         {
                 if (!origin_seen) {
                         token->expected(".ORIG statement");
@@ -140,7 +141,7 @@ void Assembler::do_first_pass()
                 }
         };
 
-        for (auto &tokenized_line : tokens) {
+        for (auto &&tokenized_line : tokens) {
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
                         if (origin_seen) {
@@ -165,14 +166,14 @@ void Assembler::do_first_pass()
 
                                 for (const auto &symbol : symbols) {
                                         std::stringstream stream;
-                                        if (symbol.second->address == internal_program_counter) {
+                                        if (symbol.second.address == internal_program_counter) {
                                                 stream << "Multiple labels found for address 0x" << std::hex
                                                        << internal_program_counter << "\nNOTE: \tPrevious label '"
-                                                       << symbol.second->token << "' found on line "
-                                                       << std::dec << symbol.second->at_line << '.';
+                                                       << symbol.first << "' found on line "
+                                                       << std::dec << symbol.second.line_number << '.';
                                                 m_logger.LOG(Logger::WARNING,
-                                                     tokenized_line.front()->at_line,
-                                                     stream.str(), Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                                             tokenized_line.front()->at_line,
+                                                             stream.str(), Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                                 break;
                                         }
                                 }
@@ -182,14 +183,14 @@ void Assembler::do_first_pass()
                                         stream << "Multiple definitions of label '"
                                                << tokenized_line.front()->token
                                                << "'\nNOTE: \tLabel was first defined on line "
-                                               << symbols[tokenized_line.front()->token]->at_line << '.';
+                                               << symbols.at(tokenized_line.front()->token).line_number << '.';
                                         m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line, stream.str());
                                         ++error_count;
                                 }
 
-                                symbols.insert(std::pair<std::string, std::shared_ptr<Label>>(
+                                symbols.insert(std::pair<std::string, Symbol>(
                                         tokenized_line.front()->token,
-                                        std::static_pointer_cast<Label>(tokenized_line.front()))
+                                        Symbol(internal_program_counter, tokenized_line.front()->at_line))
                                 );
 
                                 longest_symbol_length = std::max(
@@ -237,13 +238,13 @@ void Assembler::do_second_pass()
 
         m_logger.LOG(Logger::MESSAGE, 0, "Starting second pass\n");
 
-        for (auto &tokenized_line : tokens) {
+        for (auto &&tokenized_line : tokens) {
                 if (tokenized_line.front()->type() == Token::DIR_END) {
                         end_seen = true;
                         break;
                 }
 
-                memory_required = tokenized_line.front()->assemble(tokenized_line, *this);
+                memory_required = tokenized_line.front()->assemble(tokenized_line, symbols, internal_program_counter);
 
                 if (memory_required < 0) {
                         error_count += static_cast<std::size_t>(-memory_required);
@@ -262,10 +263,11 @@ void Assembler::do_second_pass()
  *
  * @return The machine code gathered into a vector.
  */
-std::vector<std::uint16_t> Assembler::generate_machine_code()
+void Assembler::generate_machine_code()
 {
         if (as_assembled.size()) {
-                return as_assembled;
+                // We've probably already been here.
+                return;
         }
 
         for (const auto &tokenized_line : tokens) {
@@ -274,7 +276,7 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
                                 if ((assembled_line & 0xFE00) == (as_assembled.back() & 0xFE00)) {
                                         m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
                                                      "Statement before this one checks for the same condition code."
-                                                     " This might mean this one will never execute.",
+                                                             " This might mean this one will never execute.",
                                                      Logger::WARNING_TYPE::LOGIC
                                         );
                                 } else if (!(assembled_line & 0xFF)) {
@@ -316,8 +318,6 @@ std::vector<std::uint16_t> Assembler::generate_machine_code()
                         as_assembled.push_back(assembled_line);
                 }
         }
-
-        return as_assembled;
 }
 
 bool Assembler::assemble()
@@ -329,37 +329,7 @@ bool Assembler::assemble()
 
         std::stringstream stream;
 
-        if (files_to_assemble.size() == 1) {
-                m_logger.LOG(Logger::MESSAGE, 0, "Starting first pass\n");
-
-                //tokenizeFile(files_to_assemble.at(0));
-
-                Lexer lexer(files_to_assemble.at(0));
-                error_count = lexer.parse_into(tokens);
-
-                do_first_pass();
-
-                stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
-                m_logger.LOG(Logger::MESSAGE, 0, stream.str());
-
-                if (error_count || tokens.empty()) {
-                        return false;
-                }
-
-                internal_program_counter = file_memory_origin_address;
-
-                do_second_pass();
-
-                if (!error_count) {
-                        generate_machine_code();
-
-                        write(files_to_assemble.at(0).substr(0, files_to_assemble.at(0).find_first_of('.')));
-                }
-
-                return true;
-        }
-
-        for (auto &file : files_to_assemble) {
+        for (const auto &file : files_to_assemble) {
                 stream.str(std::string());
                 stream << "\n --- Assembling " << file << " ---\n\n";
                 m_logger.LOG(Logger::MESSAGE, 0, stream.str());
@@ -384,8 +354,10 @@ bool Assembler::assemble()
                 do_second_pass();
 
                 if (!error_count) {
-                        generate_machine_code();
-                        write(file.substr(0, file.find_first_of('.')));
+                        if (do_write) {
+                                generate_machine_code();
+                                write(file.substr(0, file.find_first_of('.')));
+                        }
                 }
 
                 reset();
@@ -443,7 +415,7 @@ void Assembler::write(std::string &prefix)
         for (const auto &symbol : symbols) {
                 symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
                             << symbol.first << ' ' << std::uppercase << std::hex << std::setfill('0')
-                            << std::setw(4) << symbol.second->address << '\n';
+                            << std::setw(4) << symbol.second.address << '\n';
         }
 
         const auto &symbol_at = [this](const std::uint16_t address)
@@ -452,14 +424,14 @@ void Assembler::write(std::string &prefix)
                         symbols.cbegin(), symbols.cend(),
                         [address](const auto &sym) -> bool
                         {
-                                return sym.second->address == address;
+                                return sym.second.address == address;
                         }
                 );
         };
 
         std::uint16_t pc = 0;
 
-        std::map<std::string, std::shared_ptr<Label>>::const_iterator symbol;
+        std::map<std::string, Symbol>::const_iterator symbol;
 
         const std::string empty = " ";
 
@@ -467,7 +439,7 @@ void Assembler::write(std::string &prefix)
                 symbol = symbol_at(pc);
 
                 lst_file << tokenized_line.front()->disassemble(
-                        tokenized_line, pc, symbol == symbols.cend() ? empty : symbol->second->token, *this
+                        pc, symbol == symbols.cend() ? empty : symbol->first, longest_symbol_length
                 );
 
                 if (tokenized_line.front()->type() == Token::DIR_END) {
@@ -493,11 +465,11 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 {
                         const std::int16_t offset = static_cast<std::int16_t>(
                                 static_cast<std::int16_t>(instruction << shift) >> shift);
-                        return sym.second->address == (offset + pc + 1);
+                        return sym.second.address == (offset + pc + 1);
                 });
         };
 
-        std::map<std::string, std::shared_ptr<Label>>::const_iterator symbol;
+        std::map<std::string, Symbol>::const_iterator symbol;
 
         switch (instruction & 0xF000) {
         case 0xF000:
@@ -534,7 +506,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0xE000:
                 stream << "LEA R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->token;
+                        stream << symbol->first;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -557,7 +529,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0xB000:
                 stream << "STI R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->token;
+                        stream << symbol->first;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -567,7 +539,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0xA000:
                 stream << "LDI R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->token;
+                        stream << symbol->first;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -605,7 +577,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                 if (instruction & 0x0800) {
                         stream << "JSR ";
                         if ((symbol = find_symbol(5)) != symbols.cend()) {
-                                stream << symbol->second->token;
+                                stream << symbol->first;
                         } else if (instruction & 0x700) {
                                 stream << "#-" << std::dec << (-instruction & 0x3FF);
                         } else {
@@ -619,7 +591,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0x3000:
                 stream << "ST R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->token;
+                        stream << symbol->first;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -629,7 +601,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
         case 0x2000:
                 stream << "LD R" << ((instruction & 0x0E00) >> 9) << ", ";
                 if ((symbol = find_symbol(7)) != symbols.cend()) {
-                        stream << symbol->second->token;
+                        stream << symbol->first;
                 } else if (instruction & 0x100) {
                         stream << "#-" << std::dec << (-instruction & 0xFF);
                 } else {
@@ -664,7 +636,7 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
                         stream << ' ';
 
                         if ((symbol = find_symbol(7)) != symbols.cend()) {
-                                stream << symbol->second->token;
+                                stream << symbol->first;
                         } else if (instruction & 0x100) {
                                 stream << "#-" << std::dec << (instruction & 0xFF);
                         } else {
@@ -705,15 +677,4 @@ void Assembler::change_warning_level(std::string &warning)
                           << "Got '" << warning << "'\n";
                 exit(EXIT_FAILURE);
         }
-}
-
-std::string Assembler::check_for_symbol_match(const std::string &symbol) const
-{
-        String_Matcher matcher(symbol);
-
-        for (const auto &_symbol : symbols) {
-                matcher.consider(_symbol.first);
-        }
-
-        return matcher.best_match();
 }

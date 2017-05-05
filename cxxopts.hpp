@@ -500,7 +500,7 @@ namespace cxxopts
 
                 inline void parse_positional(std::vector<std::string> options);
 
-                inline std::string help(const std::vector<std::string> &groups = {""}) const;
+                inline std::string help(const std::vector<std::string> &groups = { "" }) const;
 
                 inline const std::vector<std::string> groups() const;
 
@@ -616,7 +616,7 @@ namespace cxxopts
                         auto startLine = current;
                         auto lastSpace = current;
 
-                        auto size = size_t{};
+                        auto size = size_t{ };
 
                         while (current != std::end(desc)) {
                                 if (*current == ' ') {
@@ -743,7 +743,7 @@ namespace cxxopts
 
         void Options::parse_positional(std::string option)
         {
-                parse_positional(std::vector<std::string>{option});
+                parse_positional(std::vector<std::string>{ option });
         }
 
         void Options::parse_positional(std::vector<std::string> options)
@@ -938,7 +938,7 @@ namespace cxxopts
                 longest = std::min(longest, static_cast<size_t>(OPTION_LONGEST));
 
                 //widest allowed description
-                auto allowed = size_t{76} - longest - OPTION_DESC_GAP;
+                auto allowed = size_t{ 76 } - longest - OPTION_DESC_GAP;
 
                 auto            fiter = format.begin();
                 for (const auto &o : group->second.options) {

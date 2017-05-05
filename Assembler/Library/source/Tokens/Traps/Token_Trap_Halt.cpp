@@ -2,9 +2,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <bitset>
-
-#include "Assembler.hpp"
 
 Halt::Halt(std::string &trap, std::string &trap_uppercase, int line_number)
         : Instruction(trap, trap_uppercase, line_number)
@@ -12,10 +9,13 @@ Halt::Halt(std::string &trap, std::string &trap_uppercase, int line_number)
 
 }
 
-std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                            const std::map<std::string, Symbol> &symbols,
+                            std::uint16_t program_counter)
 {
         (void) tokens;
-        (void) assembler;
+        (void) symbols;
+        (void) program_counter;
 
         if (!is_valid) {
                 return -1;
@@ -42,13 +42,10 @@ std::int32_t Halt::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Halt::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                              std::uint16_t &program_counter,
+std::string Halt::disassemble(std::uint16_t &program_counter,
                               const std::string &symbol,
-                              const Assembler &assembler) const
+                              int width) const
 {
-        (void) tokens;
-
         std::stringstream stream;
         stream
                 // Address in memory
@@ -60,7 +57,7 @@ std::string Halt::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
                 << " HALT\n";
 

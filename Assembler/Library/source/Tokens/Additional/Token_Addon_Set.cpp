@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include "Tokens/Token_Register.hpp"
-#include "Assembler.hpp"
 
 Set::Set()
         : Directive()
@@ -35,7 +34,9 @@ Set::Set(std::string &directive, std::string &directive_uppercase, int line_numb
         decimal_one->at_line = decimal_negative_two->at_line = line_number;
 }
 
-std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                           const std::map<std::string, Symbol> &symbols,
+                           std::uint16_t program_counter)
 {
         if (!is_valid) {
                 return -1;
@@ -45,23 +46,23 @@ std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens, const As
         const std::shared_ptr<Immediate> offset = std::static_pointer_cast<Immediate>(tokens.at(2));
 
         if (offset->value > -16 && offset->value < 15) {
-                std::vector<std::shared_ptr<Token>> vec = {_and, reg, reg, decimal_zero};
-                _and->assemble(vec, assembler);
+                std::vector<std::shared_ptr<Token>> vec = { _and, reg, reg, decimal_zero };
+                _and->assemble(vec, symbols, program_counter);
 
-                vec = {add, reg, reg, offset};
-                add->assemble(vec, assembler);
+                vec = { add, reg, reg, offset };
+                add->assemble(vec, symbols, program_counter);
 
                 assembled = _and->assembled;
                 assembled.emplace_back(add->assembled.front());
         } else {
-                std::vector<std::shared_ptr<Token>> vec = {br, decimal_one};
-                br->assemble(vec, assembler);
+                std::vector<std::shared_ptr<Token>> vec = { br, decimal_one };
+                br->assemble(vec, symbols, program_counter);
 
-                vec = {fill, offset};
-                fill->assemble(vec, assembler);
+                vec = { fill, offset };
+                fill->assemble(vec, symbols, program_counter);
 
-                vec = {ld, reg, decimal_negative_two};
-                ld->assemble(vec, assembler);
+                vec = { ld, reg, decimal_negative_two };
+                ld->assemble(vec, symbols, program_counter);
 
                 assembled = br->assembled;
                 assembled.emplace_back(fill->assembled.front());
@@ -110,31 +111,19 @@ std::int32_t Set::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         }
 }
 
-std::string Set::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                             std::uint16_t &program_counter,
-                             const std::string &symbol,
-                             const Assembler &assembler) const
+std::string Set::disassemble(std::uint16_t &program_counter,
+                             const std::string &symbol, int width) const
 {
-        const std::shared_ptr<Register>  reg    = std::static_pointer_cast<Register>(tokens.at(1));
-        const std::shared_ptr<Immediate> offset = std::static_pointer_cast<Immediate>(tokens.at(2));
 
         std::stringstream stream;
 
-        if (offset->value > -16 && offset->value < 15) {
-                std::vector<std::shared_ptr<Token>> vec = {_and, reg, reg, decimal_zero};
-                stream << _and->disassemble(vec, program_counter, symbol, assembler);
-
-                vec = {add, reg, reg, offset};
-                stream << add->disassemble(vec, program_counter, " ", assembler);
+        if (!_and->assembled.empty()) {
+                stream << _and->disassemble(program_counter, symbol, width);
+                stream << add->disassemble(program_counter, " ", width);
         } else {
-                std::vector<std::shared_ptr<Token>> vec = {br, decimal_one};
-                stream << br->disassemble(vec, program_counter, symbol, assembler);
-
-                vec = {fill, offset};
-                stream << fill->disassemble(vec, program_counter, " ", assembler);
-
-                vec = {ld, reg, decimal_negative_two};
-                stream << ld->disassemble(vec, program_counter, " ", assembler);
+                stream << br->disassemble(program_counter, symbol, width);
+                stream << fill->disassemble(program_counter, " ", width);
+                stream << ld->disassemble(program_counter, " ", width);
         }
 
         return stream.str();

@@ -2,9 +2,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <bitset>
-
-#include "Assembler.hpp"
 
 Stringz::Stringz(std::string &directive, std::string &directive_uppercase, int line_number)
         : Directive(directive, directive_uppercase, line_number)
@@ -12,9 +9,13 @@ Stringz::Stringz(std::string &directive, std::string &directive_uppercase, int l
 
 }
 
-std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                               const std::map<std::string, Symbol> &symbols,
+                               std::uint16_t program_counter)
 {
-        (void) assembler;
+        (void) program_counter;
+        (void) symbols;
+
         if (!is_valid) {
                 return -1;
         }
@@ -45,13 +46,10 @@ std::int32_t Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>> &tok
         return static_cast<std::int32_t>(is_valid) * static_cast<std::int32_t>(tokens.at(1)->assembled.size());
 }
 
-std::string Stringz::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                                 std::uint16_t &program_counter,
+std::string Stringz::disassemble(std::uint16_t &program_counter,
                                  const std::string &symbol,
-                                 const Assembler &assembler) const
+                                 int width) const
 {
-        (void) tokens;
-
         std::stringstream stream;
 
         stream
@@ -64,7 +62,7 @@ std::string Stringz::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
                 << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.front() << '\n';
 
@@ -82,7 +80,7 @@ std::string Stringz::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
                         // Line the instruction is on
                         << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                         // Label at the current address (if any)
-                        << ' ' << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << ' '
+                        << ' ' << std::setfill(' ') << std::setw(width) << ' '
                         // Instruction itself
                         << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.at(index) << '\n';
 

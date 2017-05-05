@@ -26,16 +26,20 @@ public:
                 WARNING = 2,
         };
 
-        void LOG(LOGGING_TYPE level, int line_number, const std::string &&message, WARNING_TYPE warning_level = WARNING_TYPE::NONE);
+        void LOG(LOGGING_TYPE level,
+                 int line_number,
+                 const std::string &&message,
+                 WARNING_TYPE warning_level = WARNING_TYPE::NONE);
 
         void set_warning_level(int level);
         void set_quietness(bool be_quiet);
 
 private:
-        int m_warn = WARNING_TYPE::ALL;
-        bool quiet = false;
+        int  m_warn = WARNING_TYPE::ALL;
+        bool quiet  = false;
 
-        bool we_should_be_quiet() const { return quiet; }
+        bool we_should_be_quiet() const
+        { return quiet; }
 
         void ERR(int line_number, const std::string &error);
         void WARN(WARNING_TYPE level, int line_number, const std::string &warning);

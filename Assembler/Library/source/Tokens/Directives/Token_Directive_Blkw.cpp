@@ -1,9 +1,7 @@
 #include "Tokens/Directives/Token_Directive_Blkw.hpp"
 
-#include <algorithm>
 #include <sstream>
 #include <iomanip>
-#include <bitset>
 
 #include "Assembler.hpp"
 
@@ -13,8 +11,12 @@ Blkw::Blkw(std::string &directive, std::string &directive_uppercase, int line_nu
 
 }
 
-std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                            const std::map<std::string, Symbol> &symbols,
+                            std::uint16_t program_counter)
 {
+        (void) program_counter;
+
         if (!is_valid) {
                 return 0;
         }
@@ -25,13 +27,12 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens, const A
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
                         fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
                 } else if (tokens.at(2)->type() == Token::LABEL) {
-                        if (!assembler.symbols.count(tokens.at(2)->token)) {
-                                const std::string possible_match = assembler.check_for_symbol_match(tokens.at(2)->token);
-                                std::static_pointer_cast<Label>(tokens.at(2))->not_found(possible_match);
+                        if (!symbols.count(tokens.at(2)->token)) {
+                                std::static_pointer_cast<Label>(tokens.at(2))->not_found(symbols);
                                 return -1;
                         }
 
-                        fill = assembler.symbols.find(tokens.at(2)->token)->second->address;
+                        fill = symbols.find(tokens.at(2)->token)->second.address;
                 }
         }
 
@@ -90,55 +91,49 @@ void Blkw::invalid_argument_count(std::size_t provided, std::size_t expected) co
         std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided << " arguments were provided.\n";
 }
 
-std::string Blkw::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                              std::uint16_t &program_counter,
+// TODO: Change the parameters for this to:
+// std::vector<std::shared_ptr<Token>> &tokens,std::uint16_t &program_counter,
+// const std::string &symbol, int width, const std::map<std::string, Symbol) &symbols
+
+std::string Blkw::disassemble(std::uint16_t &program_counter,
                               const std::string &symbol,
-                              const Assembler &assembler) const
+                              int width) const
 {
-        const auto        &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
         std::stringstream stream;
 
-        std::uint16_t fill = 0;
-
-        if (tokens.size() > 2) {
-                if (tokens.at(2)->type() == Token::IMMEDIATE) {
-                        fill = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
-                } else {
-                        fill = assembler.symbols.find(tokens.at(2)->token)->second->address;
-                }
-        }
+        int value = static_cast<int>(assembled.front());
 
         stream
                 // Address in memory
                 << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
                 // Hexadecimal representation of instruction
-                << ' ' << std::hex << std::setfill('0') << std::setw(4) << fill
+                << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
                 // Binary representation of instruction
-                << ' ' << std::bitset<16>(fill)
+                << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::left << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << symbol
+                << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << fill << '\n';
+                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value << '\n';
 
         ++program_counter;
 
-        for (int block = 1; block < immediate->value; ++block, ++program_counter) {
+        for (std::size_t block = 1; block < assembled.size(); ++block, ++program_counter) {
                 stream
                         // Address in memory
                         << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter
                         << ')'
                         // Hexadecimal representation of instruction
-                        << ' ' << std::hex << std::setfill('0') << std::setw(4) << fill
+                        << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
                         // Binary representation of instruction
-                        << ' ' << std::bitset<16>(fill)
+                        << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
                         // Line the instruction is on
                         << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                         // Label at the current address (if any)
-                        << ' ' << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << ' '
+                        << ' ' << std::setfill(' ') << std::setw(width) << ' '
                         // Instruction itself
-                        << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << fill << '\n';
+                        << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value << '\n';
         }
 
         return stream.str();

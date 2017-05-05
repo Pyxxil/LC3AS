@@ -1,11 +1,7 @@
 #include "Tokens/Directives/Token_Directive_Orig.hpp"
 
-#include <algorithm>
 #include <iomanip>
 #include <sstream>
-#include <bitset>
-
-#include "Assembler.hpp"
 
 Orig::Orig(std::string &directive, std::string &directive_uppercase, int line_number)
         : Directive(directive, directive_uppercase, line_number)
@@ -13,9 +9,12 @@ Orig::Orig(std::string &directive, std::string &directive_uppercase, int line_nu
 
 }
 
-std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                            const std::map<std::string, Symbol> &symbols,
+                            std::uint16_t program_counter)
 {
-        (void) assembler;
+        (void) symbols;
+        (void) program_counter;
 
         if (!is_valid) {
                 return -1;
@@ -53,32 +52,30 @@ std::int32_t Orig::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
         }
 }
 
-std::string Orig::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                              std::uint16_t &program_counter,
+std::string Orig::disassemble(std::uint16_t &program_counter,
                               const std::string &symbol,
-                              const Assembler &assembler) const
+                              int width) const
 {
         // You can't have a symbol here...
         (void) symbol;
 
-        const auto &immediate = std::static_pointer_cast<Immediate>(tokens.at(1));
-        program_counter = static_cast<std::uint16_t>(immediate->value);
+        program_counter = assembled.front();
 
         std::stringstream stream;
         stream
                 // Address in memory
                 << "(0000) " << std::uppercase
                 // Hexadecimal representation of instruction
-                << std::hex << std::setfill('0') << std::setw(4) << immediate->value
+                << std::hex << std::setfill('0') << std::setw(4) << program_counter
                 // Binary representation of instruction
-                << ' ' << std::bitset<16>(static_cast<unsigned long long>(immediate->value))
+                << ' ' << std::bitset<16>(program_counter)
                 // Line the instruction is on
                 << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
                 // Label at the current address (if any)
-                << ' ' << std::setfill(' ') << std::setw(assembler.longest_symbol_length) << ' '
+                << ' ' << std::setfill(' ') << std::setw(width) << ' '
                 // Instruction itself
                 << ' ' << token_uppercase << " 0x" << std::hex << std::setfill('0') << std::setw(4)
-                << immediate->value << '\n';
+                << program_counter << '\n';
         return stream.str();
 }
 

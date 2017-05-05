@@ -1,12 +1,16 @@
 #include "Tokens/Token_Label.hpp"
 
+#include "String_Matcher.hpp"
+
 Label::Label(std::string &name, int line_number)
         : Token(name, name, line_number)
 {
 
 }
 
-std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             const std::map<std::string, Symbol> &symbols,
+                             std::uint16_t program_counter)
 {
         if (!is_valid) {
                 return -1;
@@ -18,7 +22,7 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, const 
 
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
 
-        std::int32_t ret = vec.front()->assemble(vec, assembler);
+        std::int32_t ret = vec.front()->assemble(vec, symbols, program_counter);
 
         assembled = vec.front()->assembled;
         return ret;
@@ -27,8 +31,9 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens, const 
 bool Label::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
         if (tokens.size() > 1) {
+                instruction = tokens.at(1);
                 std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
-                return vec.front()->valid_arguments(vec);
+                return instruction->valid_arguments(vec);
         } else {
                 return true;
         }
@@ -44,30 +49,35 @@ std::int32_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &token
         }
 }
 
-void Label::not_found(const std::string &match_candidate)
+void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
 {
+        String_Matcher matcher(token);
+
+        for (const auto &symbol : match_candidates) {
+                matcher.consider(symbol.first);
+        }
+
+        const std::string possible_match = matcher.best_match();
+
         std::cerr << "ERROR: ";
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
         std::cerr << "No such label '" << token << '\'';
 
-        if (!match_candidate.empty()) {
-                std::cerr << "; Did you mean '" << match_candidate << "'?\n";
+        if (!possible_match.empty()) {
+                std::cerr << "; Did you mean '" << possible_match << "'?\n";
         } else {
                 std::cerr << ".\n";
         }
 }
 
-std::string Label::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                               std::uint16_t &program_counter,
+std::string Label::disassemble(std::uint16_t &program_counter,
                                const std::string &symbol,
-                               const Assembler &assembler) const
+                               int width) const
 {
-        if (tokens.size() > 1) {
-                std::vector<std::shared_ptr<Token>> vec(tokens);
-                vec.erase(vec.begin());
-                return tokens.at(1)->disassemble(vec, program_counter, symbol, assembler);
+        if (!assembled.empty()) {
+                return instruction->disassemble(program_counter, symbol, width);
         } else {
                 return "";
         }

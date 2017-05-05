@@ -12,13 +12,13 @@ class Assembler;
 class Lexer
 {
 public:
-        Lexer(std::string &t_file_name);
+        Lexer(const std::string &t_file_name);
 
         std::size_t parse_into(std::vector<std::vector<std::shared_ptr<Token>>> &into);
 
 private:
         std::string m_file_name;
-        Logger m_logger;
+        Logger      m_logger;
 
         std::size_t m_error_count = 0;
 

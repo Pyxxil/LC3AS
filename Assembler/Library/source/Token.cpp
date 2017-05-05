@@ -1,3 +1,4 @@
+#include <map>
 #include "Token.hpp"
 
 Token::Token()
@@ -78,10 +79,13 @@ void Token::expected(const char *const expects) const
         std::cerr << "Expected " << expects << ". Found '" << token << "' ( Type: " << deduce_type() << " ) instead.\n";
 }
 
-std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                             const std::map<std::string, Symbol> &symbols,
+                             std::uint16_t program_counter)
 {
         (void) tokens;
-        (void) assembler;
+        (void) symbols;
+        (void) program_counter;
         expected("one of: instruction, label, or directive");
         return -1;
 }
@@ -119,28 +123,13 @@ std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &token
         return -1;
 }
 
-void Token::unterminated(std::string &&t_type)
-{
-        is_valid = false;
-
-        std::cerr << "ERROR: ";
-        if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
-        }
-        std::cerr << "Unterminated " << t_type << " literal.\n";
-
-        token = "Non-terminated " + t_type;
-}
-
-std::string Token::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                               std::uint16_t &program_counter,
+std::string Token::disassemble(std::uint16_t &program_counter,
                                const std::string &symbol,
-                               const Assembler &assembler) const
+                               int width) const
 {
-        (void) tokens;
-        (void) assembler;
         (void) program_counter;
         (void) symbol;
+        (void) width;
         return token + " has no disassemble (" + deduce_type() + ")\n";
 }
 

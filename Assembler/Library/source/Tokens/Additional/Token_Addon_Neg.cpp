@@ -4,8 +4,6 @@
 #include <sstream>
 
 #include "Tokens/Immediate/Token_Immediate_Decimal.hpp"
-#include "Tokens/Token_Register.hpp"
-#include "Assembler.hpp"
 
 Neg::Neg()
         : Directive()
@@ -23,13 +21,15 @@ Neg::Neg(std::string &directive, std::string &directive_uppercase, int line_numb
         neg->at_line = add->at_line = line_number;
 }
 
-std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens, const Assembler &assembler)
+std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                           const std::map<std::string, Symbol> &symbols,
+                           std::uint16_t program_counter)
 {
-        std::vector<std::shared_ptr<Token>> vec = {neg, tokens.at(1), tokens.at(1)};
+        std::vector<std::shared_ptr<Token>> vec = { neg, tokens.at(1), tokens.at(1) };
 
-        neg->assemble(vec, assembler);
-        vec = {add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1")};
-        add->assemble(vec, assembler);
+        neg->assemble(vec, symbols, program_counter);
+        vec = { add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1") };
+        add->assemble(vec, symbols, program_counter);
 
         assembled = neg->assembled;
         for (const auto &as_assembled : add->assembled) {
@@ -60,18 +60,14 @@ std::int32_t Neg::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid) * 2;
 }
 
-std::string Neg::disassemble(std::vector<std::shared_ptr<Token>> &tokens,
-                             std::uint16_t &program_counter,
+std::string Neg::disassemble(std::uint16_t &program_counter,
                              const std::string &symbol,
-                             const Assembler &assembler) const
+                             int width) const
 {
         std::stringstream stream;
 
-        std::vector<std::shared_ptr<Token>> vec = {neg, tokens.at(1), tokens.at(1)};
-        stream << neg->disassemble(vec, program_counter, symbol, assembler);
-
-        vec = {add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1")};
-        stream << add->disassemble(vec, program_counter, " ", assembler);
+        stream << neg->disassemble(program_counter, symbol, width);
+        stream << add->disassemble(program_counter, " ", width);
 
         return stream.str();
 }

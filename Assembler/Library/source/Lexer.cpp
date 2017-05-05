@@ -52,7 +52,7 @@ static std::size_t hash(std::string &string)
         return _hash;
 }
 
-Lexer::Lexer(std::string &t_file_name)
+Lexer::Lexer(const std::string &t_file_name)
         : m_file_name(t_file_name), m_logger()
 {
 
@@ -242,7 +242,6 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
                 return token;
         }
 }
-
 
 /**
  * Add a token to the current line's tokens.
