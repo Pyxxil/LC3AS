@@ -5,7 +5,6 @@
 #include <sstream>
 
 #include "../../../cxxopts.hpp"
-#include "String_Matcher.hpp"
 #include "Lexer.hpp"
 
 Assembler::Assembler()

@@ -66,6 +66,7 @@ public:
                 ADDON_NEG,
                 ADDON_SUB,
                 ADDON_SET,
+                ADDON_LSHIFT,
 #endif
         };
 
@@ -80,7 +81,6 @@ public:
         virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const;
         virtual void requires_too_many_bits(int allowed_bits, bool is_signed = true);
 
-        // TODO: Change this so it doesn't require taking the assembler as a paramter.
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
                                       const std::map<std::string, Symbol> &symbols,
                                       std::uint16_t program_counter);

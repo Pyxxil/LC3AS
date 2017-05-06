@@ -48,6 +48,7 @@ std::string Token::deduce_type() const
         case ADDON_NEG:
         case ADDON_SUB:
         case ADDON_SET:
+        case ADDON_LSHIFT:
 #endif
                 return std::string("Directive");
         case TRAP_IN:

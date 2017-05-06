@@ -82,7 +82,7 @@ std::string Lshift::disassemble(std::uint16_t &program_counter,
         const std::string &disassembled_without_symbol = add->disassemble(program_counter, "", width);
 
         // The previous instruction will increment this. We want it to be it's original value,
-        // as we increment it ourself in the loop below.
+        // as we increment it ourselves in the loop below.
         --program_counter;
 
         for (std::size_t shift = 1; shift < assembled.size(); ++shift) {
@@ -95,5 +95,5 @@ std::string Lshift::disassemble(std::uint16_t &program_counter,
 
 Token::token_type Lshift::type() const
 {
-        return Token::type();
+        return Token::ADDON_LSHIFT;
 }
