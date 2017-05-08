@@ -8,7 +8,7 @@ class Lshift : public Directive
 {
 public:
         Lshift();
-        Lshift(std::string &directive, std::string &directive_uppercase, int line_number = 0);
+        Lshift(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number);
 
         virtual token_type type() const override;
 

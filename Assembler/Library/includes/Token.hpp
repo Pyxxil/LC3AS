@@ -15,12 +15,13 @@ class Token
 {
 public:
         Token();
-        Token(std::string &t_token, std::string &t_token_uppercase, int line);
+        Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line);
 
         virtual ~Token() = default;
 
         std::string token;
         std::string token_uppercase;
+        std::string file;
 
         std::vector<std::uint16_t> assembled;
 

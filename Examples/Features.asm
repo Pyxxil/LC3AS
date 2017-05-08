@@ -1,5 +1,5 @@
 
-.ORIG 0b0011000000000000; Each program needs to start with a .ORIG directive,
+.ORIG 0B0011000000000000; Each program needs to start with a .ORIG directive,
                         ; supplying it with an immediate value so that the
                         ; simulator (and the assembler) know what the beginning
                         ; address is.

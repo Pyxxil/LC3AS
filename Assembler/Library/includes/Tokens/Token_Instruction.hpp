@@ -7,7 +7,10 @@ class Instruction : public Token
 {
 public:
         Instruction();
-        Instruction(std::string &instruction, std::string &instruction_uppercase, int line_number = 0);
+        Instruction(std::string &instruction,
+                    std::string &instruction_uppercase,
+                    std::string &t_file,
+                    int line_number);
 };
 
 #endif // TOKEN_INSTRUCTION_HPP

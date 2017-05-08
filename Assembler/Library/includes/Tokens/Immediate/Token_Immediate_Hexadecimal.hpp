@@ -6,7 +6,10 @@
 class Hexadecimal : public Immediate
 {
 public:
-        Hexadecimal(std::string &immediate, std::string &immediate_uppercase, int line_number = 0);
+        Hexadecimal(std::string &immediate,
+                    std::string &immediate_uppercase,
+                    std::string &t_file,
+                    int line_number);
 };
 
 #endif // TOKEN_IMMEDIATE_HEXADECIMAL_HPP

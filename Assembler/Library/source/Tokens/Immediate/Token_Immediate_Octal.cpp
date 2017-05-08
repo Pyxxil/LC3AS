@@ -1,7 +1,7 @@
 #include "Tokens/Immediate/Token_Immediate_Octal.hpp"
 
-Octal::Octal(std::string &immediate, int line_number)
-        : Immediate(immediate, immediate, line_number)
+Octal::Octal(std::string &immediate, std::string &t_file, int line_number)
+        : Immediate(immediate, immediate, t_file, line_number)
 {
         if (immediate.length() > 7 || immediate.length() == 1) {
                 Token::expected("octal value up to 16 bits in length");

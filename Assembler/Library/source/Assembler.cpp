@@ -131,7 +131,11 @@ void Assembler::do_first_pass()
                 } else if (end_seen) {
                         std::stringstream stream;
                         stream << token->token << " after .END directive, it will be ignored.";
-                        m_logger.LOG(Logger::WARNING, token->at_line, stream.str(), Logger::WARNING_TYPE::IGNORED);
+                        m_logger.LOG(Logger::WARNING,
+                                     token->at_line,
+                                     token->file,
+                                     stream.str(),
+                                     Logger::WARNING_TYPE::IGNORED);
                         return 0;
                 } else if (token->valid_arguments(t_tokens)) {
                         return token->guess_memory_size(t_tokens);
@@ -144,8 +148,11 @@ void Assembler::do_first_pass()
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
                         if (origin_seen) {
-                                m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line,
-                                             "Redefinition of Origin memory address.");
+                                m_logger.LOG(Logger::ERROR,
+                                             tokenized_line.front()->at_line,
+                                             tokenized_line.front()->file,
+                                             "Redefinition of Origin memory address.",
+                                             Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                 ++error_count;
                                 break;
                         }
@@ -172,7 +179,9 @@ void Assembler::do_first_pass()
                                                        << std::dec << symbol.second.line_number << '.';
                                                 m_logger.LOG(Logger::WARNING,
                                                              tokenized_line.front()->at_line,
-                                                             stream.str(), Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                                             tokenized_line.front()->file,
+                                                             stream.str(),
+                                                             Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                                 break;
                                         }
                                 }
@@ -183,7 +192,11 @@ void Assembler::do_first_pass()
                                                << tokenized_line.front()->token
                                                << "'\nNOTE: \tLabel was first defined on line "
                                                << symbols.at(tokenized_line.front()->token).line_number << '.';
-                                        m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line, stream.str());
+                                        m_logger.LOG(Logger::ERROR,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
+                                                     stream.str(),
+                                                     Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                         ++error_count;
                                 }
 
@@ -218,14 +231,6 @@ void Assembler::do_first_pass()
                         break;
                 }
         }
-
-        if (!origin_seen) {
-                m_logger.LOG(Logger::ERROR, 0, "No .ORIG directive. (Is the file empty?)");
-                ++error_count;
-        } else if (!end_seen) {
-                m_logger.LOG(Logger::ERROR, 0, "Reached the end of the file, and found no .END directive.");
-                ++error_count;
-        }
 }
 
 /**
@@ -234,8 +239,6 @@ void Assembler::do_first_pass()
 void Assembler::do_second_pass()
 {
         std::int32_t memory_required = 0;
-
-        m_logger.LOG(Logger::MESSAGE, 0, "Starting second pass\n");
 
         for (auto &&tokenized_line : tokens) {
                 if (tokenized_line.front()->type() == Token::DIR_END) {
@@ -251,10 +254,6 @@ void Assembler::do_second_pass()
                         internal_program_counter += static_cast<std::uint16_t>(memory_required);
                 }
         }
-
-        std::stringstream stream;
-        stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
-        m_logger.LOG(Logger::MESSAGE, 0, stream.str());
 }
 
 /**
@@ -273,44 +272,51 @@ void Assembler::generate_machine_code()
                 for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
                         if (tokenized_line.front()->type() == Token::OP_BR) {
                                 if ((assembled_line & 0xFE00) == (as_assembled.back() & 0xFE00)) {
-                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                        m_logger.LOG(Logger::WARNING,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
                                                      "Statement before this one checks for the same condition code."
                                                              " This might mean this one will never execute.",
-                                                     Logger::WARNING_TYPE::LOGIC
-                                        );
+                                                     Logger::WARNING_TYPE::LOGIC);
                                 } else if (!(assembled_line & 0xFF)) {
-                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                        m_logger.LOG(Logger::WARNING,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
                                                      "BR with an offset of 0 will probably do nothing.",
-                                                     Logger::WARNING_TYPE::LOGIC
-                                        );
+                                                     Logger::WARNING_TYPE::LOGIC);
                                 } else if ((assembled_line & 0x1FF) == 0x1FF) {
-                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                        m_logger.LOG(Logger::WARNING,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
                                                      "BR with an offset of -1 will probably cause an infinite loop.",
-                                                     Logger::WARNING_TYPE::LOGIC
-                                        );
+                                                     Logger::WARNING_TYPE::LOGIC);
                                 }
                         } else if (tokenized_line.front()->type() == Token::OP_JSR) {
                                 if (!(assembled_line & 0x7FF)) {
                                         // Technically, this isn't true. It could just be a way to get the
                                         // current value of the PC into R7, but it's still worth a warning.
-                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                        m_logger.LOG(Logger::WARNING,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
                                                      "JSR with an offset of 0 will probably do nothing.",
-                                                     Logger::WARNING_TYPE::LOGIC
-                                        );
+                                                     Logger::WARNING_TYPE::LOGIC);
                                 } else if ((assembled_line & 0x7FF) == 0x7FF) {
-                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line,
+                                        m_logger.LOG(Logger::WARNING,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
                                                      "JSR with an offset of -1 will probably cause an infinite loop.",
-                                                     Logger::WARNING_TYPE::LOGIC
-                                        );
+                                                     Logger::WARNING_TYPE::LOGIC);
                                 }
                         } else if (tokenized_line.front()->type() == Token::OP_TRAP) {
                                 if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
                                         std::stringstream stream;
                                         stream << "TRAP was supplied a trap vector of " << (assembled_line & 0x00FF)
                                                << ", which is possibly an illegal trap vector.\n";
-                                        m_logger.LOG(Logger::WARNING, tokenized_line.front()->at_line, stream.str(),
-                                                     Logger::WARNING_TYPE::LOGIC
-                                        );
+                                        m_logger.LOG(Logger::WARNING,
+                                                     tokenized_line.front()->at_line,
+                                                     tokenized_line.front()->file,
+                                                     stream.str(),
+                                                     Logger::WARNING_TYPE::LOGIC);
                                 }
                         }
 
@@ -330,19 +336,33 @@ bool Assembler::assemble()
 
         for (const auto &file : files_to_assemble) {
                 stream.str(std::string());
-                stream << "\n --- Assembling " << file << " ---\n\n";
-                m_logger.LOG(Logger::MESSAGE, 0, stream.str());
-
-                m_logger.LOG(Logger::MESSAGE, 0, "Starting first pass\n");
+                stream << "\n --- Assembling " << file << " ---\n\nStarting first pass\n";
+                m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
                 Lexer lexer(file);
                 error_count = lexer.parse_into(tokens);
 
                 do_first_pass();
 
+                if (!origin_seen) {
+                        m_logger.LOG(Logger::ERROR,
+                                     0,
+                                     file,
+                                     "No .ORIG directive. (Is the file empty?)",
+                                     Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                        ++error_count;
+                } else if (!end_seen) {
+                        m_logger.LOG(Logger::ERROR,
+                                     0,
+                                     file,
+                                     "Reached the end of the file, and found no .END directive.",
+                                     Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                        ++error_count;
+                }
+
                 stream.str(std::string());
                 stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
-                m_logger.LOG(Logger::MESSAGE, 0, stream.str());
+                m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
                 if (error_count || tokens.empty()) {
                         return false;
@@ -350,7 +370,14 @@ bool Assembler::assemble()
 
                 internal_program_counter = file_memory_origin_address;
 
+                stream.str(std::string());
+                m_logger.LOG(Logger::MESSAGE, 0, file, "Starting second pass\n", Logger::NONE);
+
                 do_second_pass();
+
+                stream.str(std::string());
+                stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
+                m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
                 if (!error_count) {
                         if (do_write) {

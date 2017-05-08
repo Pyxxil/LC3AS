@@ -9,8 +9,8 @@ Lshift::Lshift()
 
 }
 
-Lshift::Lshift(std::string &directive, std::string &directive_uppercase, int line_number)
-        : Directive(directive, directive_uppercase, line_number)
+Lshift::Lshift(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
+        : Directive(directive, directive_uppercase, t_file, line_number)
 {
         add = std::make_shared<Add>();
         add->at_line = line_number;

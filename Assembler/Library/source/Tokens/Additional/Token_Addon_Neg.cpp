@@ -12,8 +12,8 @@ Neg::Neg()
         add = std::make_shared<Add>();
 }
 
-Neg::Neg(std::string &directive, std::string &directive_uppercase, int line_number)
-        : Directive(directive, directive_uppercase, line_number)
+Neg::Neg(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
+        : Directive(directive, directive_uppercase, t_file, line_number)
 {
         neg = std::make_shared<Not>();
         add = std::make_shared<Add>();
@@ -28,7 +28,7 @@ std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         std::vector<std::shared_ptr<Token>> vec = { neg, tokens.at(1), tokens.at(1) };
 
         neg->assemble(vec, symbols, program_counter);
-        vec = { add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1") };
+        vec = { add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1", file) };
         add->assemble(vec, symbols, program_counter);
 
         assembled = neg->assembled;

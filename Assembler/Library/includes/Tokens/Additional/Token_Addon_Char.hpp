@@ -7,7 +7,7 @@ class Character : public Immediate
 {
 public:
         Character();
-        Character(std::string &character, int line_number = 0);
+        Character(std::string &character, std::string &t_file, int line_number);
 };
 
 #endif // TOKEN_ADDON_CHAR_HPP

@@ -6,8 +6,14 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Assembler.hpp"
 
-Br::Br(std::string &instruction, std::string &instruction_uppercase, int line_number, bool n, bool z, bool p)
-        : Instruction(instruction, instruction_uppercase, line_number), N(n), Z(z), P(p)
+Br::Br(std::string &instruction,
+       std::string &instruction_uppercase,
+       std::string &t_file,
+       int line_number,
+       bool n,
+       bool z,
+       bool p)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number), N(n), Z(z), P(p)
 {
 
 }

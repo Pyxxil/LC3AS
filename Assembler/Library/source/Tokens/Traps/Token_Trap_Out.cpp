@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
-Out::Out(std::string &trap, std::string &trap_uppercase, int line_number)
-        : Instruction(trap, trap_uppercase, line_number)
+Out::Out(std::string &trap, std::string &trap_uppercase, std::string &t_file, int line_number)
+        : Instruction(trap, trap_uppercase, t_file, line_number)
 {
 
 }

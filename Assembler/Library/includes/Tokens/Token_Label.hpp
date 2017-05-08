@@ -6,7 +6,7 @@
 class Label : public Token
 {
 public:
-        Label(std::string &label, int line_number);
+        Label(std::string &label, std::string &t_file, int line_number);
 
         virtual Token::token_type type() const override;
 

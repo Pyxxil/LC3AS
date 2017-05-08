@@ -7,8 +7,9 @@ Token::Token()
 
 }
 
-Token::Token(std::string &t_token, std::string &t_token_uppercase, int line)
-        : token(t_token), token_uppercase(t_token_uppercase), assembled(), at_line(line), is_valid(true)
+Token::Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line)
+        : token(t_token), token_uppercase(t_token_uppercase), file(t_file)
+          , assembled(), at_line(line), is_valid(true)
 {
 
 }
@@ -73,9 +74,9 @@ std::string Token::deduce_type() const
 
 void Token::expected(const char *const expects) const
 {
-        std::cerr << "ERROR: ";
+        std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
         if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
+                std::cerr << "at line " << std::dec << at_line << ": ";
         }
         std::cerr << "Expected " << expects << ". Found '" << token << "' ( Type: " << deduce_type() << " ) instead.\n";
 }
@@ -100,10 +101,10 @@ void Token::invalid_argument_count(std::size_t provided, std::size_t expected) c
 {
         provided -= 1;  // This is not the best idea, but because tokens.size() returns
         // the number of arguments + the token itself, it's a little easier to do here.
-        std::cerr << "ERROR: ";
+        std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
 
         if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
+                std::cerr << "at line " << std::dec << at_line << ": ";
         }
 
         std::cerr << token << " expects " << expected << " argument" << (expected == 1 ? "" : "'s") << ", but "
@@ -140,7 +141,7 @@ void Token::requires_too_many_bits(int allowed_bits, bool is_signed)
         (void) allowed_bits;
         (void) is_signed;
 
-        std::cerr << "ERROR: ";
+        std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
         if (at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }

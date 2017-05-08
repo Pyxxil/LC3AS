@@ -6,8 +6,11 @@ Instruction::Instruction()
 
 }
 
-Instruction::Instruction(std::string &instruction, std::string &instruction_uppercase, int line_number)
-        : Token(instruction, instruction_uppercase, line_number)
+Instruction::Instruction(std::string &instruction,
+                         std::string &instruction_uppercase,
+                         std::string &t_file,
+                         int line_number)
+        : Token(instruction, instruction_uppercase, t_file, line_number)
 {
 
 }

@@ -1,7 +1,7 @@
 #include "Tokens/Immediate/Token_Immediate_Binary.hpp"
 
-Binary::Binary(std::string &immediate, std::string &immediate_uppercase, int line_number)
-        : Immediate(immediate, immediate_uppercase, line_number)
+Binary::Binary(std::string &immediate, std::string &immediate_uppercase, std::string &t_file, int line_number)
+        : Immediate(immediate, immediate_uppercase, t_file, line_number)
 {
         std::int16_t sign = 1;
 

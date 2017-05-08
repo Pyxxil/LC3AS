@@ -1,7 +1,10 @@
 #include "Tokens/Immediate/Token_Immediate_Hexadecimal.hpp"
 
-Hexadecimal::Hexadecimal(std::string &immediate, std::string &immediate_uppercase, int line_number)
-        : Immediate(immediate, immediate_uppercase, line_number)
+Hexadecimal::Hexadecimal(std::string &immediate,
+                         std::string &immediate_uppercase,
+                         std::string &t_file,
+                         int line_number)
+        : Immediate(immediate, immediate_uppercase, t_file, line_number)
 {
         if (immediate.length() > 6 || immediate.length() == 1 ||
             (immediate.length() == 2 && std::toupper(immediate.at(1)) == 'X')) {

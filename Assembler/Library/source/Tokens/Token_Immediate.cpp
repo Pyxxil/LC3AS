@@ -6,8 +6,11 @@ Immediate::Immediate()
 
 }
 
-Immediate::Immediate(std::string &immediate, std::string &immediate_uppercase, int line_number)
-        : Token(immediate, immediate_uppercase, line_number)
+Immediate::Immediate(std::string &immediate,
+                     std::string &immediate_uppercase,
+                     std::string &t_file,
+                     int line_number)
+        : Token(immediate, immediate_uppercase, t_file, line_number)
 {
 
 }

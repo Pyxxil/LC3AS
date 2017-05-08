@@ -13,25 +13,24 @@ Set::Set()
         br                   = std::make_shared<Br>(true, true, true);
         ld                   = std::make_shared<Ld>();
         fill                 = std::make_shared<Fill>();
-        decimal_one          = std::make_shared<Decimal>("#1");
-        decimal_negative_two = std::make_shared<Decimal>("#-2");
-        decimal_zero         = std::make_shared<Decimal>("#0");
+        decimal_one          = std::make_shared<Decimal>("#1", file, at_line);
+        decimal_negative_two = std::make_shared<Decimal>("#-2", file, at_line);
+        decimal_zero         = std::make_shared<Decimal>("#0", file, at_line);
 }
 
-Set::Set(std::string &directive, std::string &directive_uppercase, int line_number)
-        : Directive(directive, directive_uppercase, line_number)
+Set::Set(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
+        : Directive(directive, directive_uppercase, t_file, line_number)
 {
         _and                 = std::make_shared<And>();
         add                  = std::make_shared<Add>();
         br                   = std::make_shared<Br>(true, true, true);
         ld                   = std::make_shared<Ld>();
         fill                 = std::make_shared<Fill>();
-        decimal_one          = std::make_shared<Decimal>("#1");
-        decimal_negative_two = std::make_shared<Decimal>("#-2");
-        decimal_zero         = std::make_shared<Decimal>("#0");
+        decimal_one          = std::make_shared<Decimal>("#1", file, at_line);
+        decimal_negative_two = std::make_shared<Decimal>("#-2", file, at_line);
+        decimal_zero         = std::make_shared<Decimal>("#0", file, at_line);
 
-        _and->at_line = add->at_line = br->at_line = ld->at_line = fill->at_line = decimal_zero->at_line =
-        decimal_one->at_line = decimal_negative_two->at_line = line_number;
+        _and->at_line = add->at_line = br->at_line = ld->at_line = fill->at_line = line_number;
 }
 
 std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,

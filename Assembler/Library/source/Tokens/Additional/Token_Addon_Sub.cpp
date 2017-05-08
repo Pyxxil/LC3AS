@@ -9,24 +9,24 @@ Sub::Sub()
         : Directive()
 {
         set_zero     = std::make_shared<And>();
-        decimal_zero = std::make_shared<Decimal>("#0");
+        decimal_zero = std::make_shared<Decimal>("#0", file);
         neg1         = std::make_shared<Neg>();
         neg2         = std::make_shared<Neg>();
         add          = std::make_shared<Add>();
 }
 
-Sub::Sub(std::string &directive, std::string &directive_uppercase, int line_number)
-        : Directive(directive, directive_uppercase, line_number)
+Sub::Sub(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
+        : Directive(directive, directive_uppercase, t_file, line_number)
 {
         std::string neg = "NEG";
 
         set_zero     = std::make_shared<And>();
-        decimal_zero = std::make_shared<Decimal>("#0");
-        neg1         = std::make_shared<Neg>(neg, neg, line_number);
-        neg2         = std::make_shared<Neg>(neg, neg, line_number);
+        decimal_zero = std::make_shared<Decimal>("#0", file, line_number);
+        neg1         = std::make_shared<Neg>(neg, neg, file, line_number);
+        neg2         = std::make_shared<Neg>(neg, neg, file, line_number);
         add          = std::make_shared<Add>();
 
-        add->at_line = set_zero->at_line = decimal_zero->at_line = line_number;
+        add->at_line = set_zero->at_line = line_number;
 }
 
 std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,

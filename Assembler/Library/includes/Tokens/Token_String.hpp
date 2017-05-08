@@ -6,7 +6,7 @@
 class String : public Token
 {
 public:
-        String(std::string &string, int line_number = 0);
+        String(std::string &string, std::string &t_file, int line_number);
 
         virtual Token::token_type type() const override;
 };

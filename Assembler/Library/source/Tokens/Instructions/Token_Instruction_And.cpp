@@ -12,8 +12,8 @@ And::And()
 
 }
 
-And::And(std::string &instruction, std::string &instruction_uppercase, int line_number)
-        : Instruction(instruction, instruction_uppercase, line_number)
+And::And(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number)
 {
 
 }

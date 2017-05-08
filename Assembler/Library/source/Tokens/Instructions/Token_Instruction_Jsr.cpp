@@ -6,8 +6,8 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Jsr::Jsr(std::string &instruction, std::string &instruction_uppercase, int line_number)
-        : Instruction(instruction, instruction_uppercase, line_number)
+Jsr::Jsr(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number)
 {
 
 }

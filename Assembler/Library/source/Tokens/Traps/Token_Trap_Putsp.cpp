@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
-Putsp::Putsp(std::string &trap, std::string &trap_uppercase, int line_number)
-        : Instruction(trap, trap_uppercase, line_number)
+Putsp::Putsp(std::string &trap, std::string &trap_uppercase, std::string &t_file, int line_number)
+        : Instruction(trap, trap_uppercase, t_file, line_number)
 {
 
 }

@@ -7,6 +7,12 @@
 #include "Assembler.hpp"
 #include "Tokens/Tokens.hpp"
 
+// TODO: Add some form of import statement.
+//      This will require a few things..
+//              - A .INCLUDE directive
+//              - Tokens will also need to be associated with a file.
+//              - Figuring out how .LST files will work (line numbers will be incorrect ....)
+
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957, 50262, 48407, 51151, 41047, 39371
         , 35401, 37039, 28697, 27791, 20201, 21523, 6449, 4813, 16333, 13337,
@@ -85,6 +91,7 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
                 tokenizeLine(line, line_number, tokenized_line);
 
                 if (!tokenized_line.empty()) {
+                        // TODO: The include check can go here.
                         into.emplace_back(tokenized_line);
                         tokenized_line.clear();
                 }
@@ -119,47 +126,47 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
         if (hashed) {
                 switch (hashed) {
                 case hash("ADD", 3):
-                        return std::make_shared<Add>(word, copy, line_number);
+                        return std::make_shared<Add>(word, copy, m_file_name, line_number);
                 case hash("AND", 3):
-                        return std::make_shared<And>(word, copy, line_number);
+                        return std::make_shared<And>(word, copy, m_file_name, line_number);
                 case hash("NOT", 3):
-                        return std::make_shared<Not>(word, copy, line_number);
+                        return std::make_shared<Not>(word, copy, m_file_name, line_number);
                 case hash("JSR", 3):
-                        return std::make_shared<Jsr>(word, copy, line_number);
+                        return std::make_shared<Jsr>(word, copy, m_file_name, line_number);
                 case hash("JSRR", 4):
-                        return std::make_shared<Jsrr>(word, copy, line_number);
+                        return std::make_shared<Jsrr>(word, copy, m_file_name, line_number);
                 case hash("JMP", 3):
-                        return std::make_shared<Jmp>(word, copy, line_number);
+                        return std::make_shared<Jmp>(word, copy, m_file_name, line_number);
                 case hash("RET", 3):
-                        return std::make_shared<Ret>(word, copy, line_number);
+                        return std::make_shared<Ret>(word, copy, m_file_name, line_number);
                 case hash("ST", 2):
-                        return std::make_shared<St>(word, copy, line_number);
+                        return std::make_shared<St>(word, copy, m_file_name, line_number);
                 case hash("STR", 3):
-                        return std::make_shared<Str>(word, copy, line_number);
+                        return std::make_shared<Str>(word, copy, m_file_name, line_number);
                 case hash("STI", 3):
-                        return std::make_shared<Sti>(word, copy, line_number);
+                        return std::make_shared<Sti>(word, copy, m_file_name, line_number);
                 case hash("LD", 2):
-                        return std::make_shared<Ld>(word, copy, line_number);
+                        return std::make_shared<Ld>(word, copy, m_file_name, line_number);
                 case hash("LEA", 3):
-                        return std::make_shared<Lea>(word, copy, line_number);
+                        return std::make_shared<Lea>(word, copy, m_file_name, line_number);
                 case hash("LDI", 3):
-                        return std::make_shared<Ldi>(word, copy, line_number);
+                        return std::make_shared<Ldi>(word, copy, m_file_name, line_number);
                 case hash("LDR", 3):
-                        return std::make_shared<Ldr>(word, copy, line_number);
+                        return std::make_shared<Ldr>(word, copy, m_file_name, line_number);
                 case hash("PUTS", 4):
-                        return std::make_shared<Puts>(word, copy, line_number);
+                        return std::make_shared<Puts>(word, copy, m_file_name, line_number);
                 case hash("PUTSP", 5):
-                        return std::make_shared<Putsp>(word, copy, line_number);
+                        return std::make_shared<Putsp>(word, copy, m_file_name, line_number);
                 case hash("HALT", 4):
-                        return std::make_shared<Halt>(word, copy, line_number);
+                        return std::make_shared<Halt>(word, copy, m_file_name, line_number);
                 case hash("TRAP", 4):
-                        return std::make_shared<Trap>(word, copy, line_number);
+                        return std::make_shared<Trap>(word, copy, m_file_name, line_number);
                 case hash("GETC", 4):
-                        return std::make_shared<Getc>(word, copy, line_number);
+                        return std::make_shared<Getc>(word, copy, m_file_name, line_number);
                 case hash("OUT", 3):
-                        return std::make_shared<Out>(word, copy, line_number);
+                        return std::make_shared<Out>(word, copy, m_file_name, line_number);
                 case hash("IN", 2):
-                        return std::make_shared<In>(word, copy, line_number);
+                        return std::make_shared<In>(word, copy, m_file_name, line_number);
                 case hash("BR", 2):
                         // FALLTHROUGH
                 case hash("BRNZP", 5):
@@ -173,44 +180,46 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
                 case hash("BRPNZ", 5):
                         // FALLTHROUGH
                 case hash("BRPZN", 5):
-                        return std::make_shared<Br>(word, copy, line_number, true, true, true);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, true, true, true);
                 case hash("BRN", 3):
-                        return std::make_shared<Br>(word, copy, line_number, true, false, false);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, true, false, false);
                 case hash("BRZ", 3):
-                        return std::make_shared<Br>(word, copy, line_number, false, true, false);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, false, true, false);
                 case hash("BRP", 3):
-                        return std::make_shared<Br>(word, copy, line_number, false, false, true);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, false, false, true);
                 case hash("BRNZ", 4):
                         // FALLTHROUGH
                 case hash("BRZN", 4):
-                        return std::make_shared<Br>(word, copy, line_number, true, true, false);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, true, true, false);
                 case hash("BRNP", 4):
                         // FALLTHROUGH
                 case hash("BRPN", 4):
-                        return std::make_shared<Br>(word, copy, line_number, true, false, true);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, true, false, true);
                 case hash("BRZP", 4):
                         // FALLTHROUGH
                 case hash("BRPZ", 4):
-                        return std::make_shared<Br>(word, copy, line_number, false, true, true);
+                        return std::make_shared<Br>(word, copy, m_file_name, line_number, false, true, true);
                 case hash(".ORIG", 5):
-                        return std::make_shared<Orig>(word, copy, line_number);
+                        return std::make_shared<Orig>(word, copy, m_file_name, line_number);
                 case hash(".END", 4):
-                        return std::make_shared<End>(word, copy, line_number);
+                        return std::make_shared<End>(word, copy, m_file_name, line_number);
                 case hash(".FILL", 5):
-                        return std::make_shared<Fill>(word, copy, line_number);
+                        return std::make_shared<Fill>(word, copy, m_file_name, line_number);
                 case hash(".BLKW", 5):
-                        return std::make_shared<Blkw>(word, copy, line_number);
+                        return std::make_shared<Blkw>(word, copy, m_file_name, line_number);
                 case hash(".STRINGZ", 8):
-                        return std::make_shared<Stringz>(word, copy, line_number);
+                        return std::make_shared<Stringz>(word, copy, m_file_name, line_number);
 #ifdef INCLUDE_ADDONS
                 case hash(".NEG", 4):
-                        return std::make_shared<Neg>(word, copy, line_number);
+                        return std::make_shared<Neg>(word, copy, m_file_name, line_number);
                 case hash(".SUB", 4):
-                        return std::make_shared<Sub>(word, copy, line_number);
+                        return std::make_shared<Sub>(word, copy, m_file_name, line_number);
                 case hash(".SET", 4):
-                        return std::make_shared<Set>(word, copy, line_number);
+                        return std::make_shared<Set>(word, copy, m_file_name, line_number);
                 case hash(".LSHIFT", 7):
-                        return std::make_shared<Lshift>(word, copy, line_number);
+                        return std::make_shared<Lshift>(word, copy, m_file_name, line_number);
+                case hash(".INCLUDE", 8):
+                        return std::make_shared<Include>(word, copy, m_file_name, line_number);
 #endif
                 default:
                         break;
@@ -218,26 +227,26 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
         }
 
         static const std::regex decimal("#?-?\\d+");
-        static const std::regex binary("-?0?[bB][0-1]+");
-        static const std::regex hexadecimal("0?[xX][0-9a-fA-F]+");
+        static const std::regex binary("-?0?b[01]+", std::regex_constants::icase);
+        static const std::regex hexadecimal("0?x[\\da-f]+", std::regex_constants::icase);
         static const std::regex octal("\\\\[0-7]+");
-        static const std::regex _register("[rR]\\d");
-        static const std::regex label("[a-zA-Z0-9_]+");
+        static const std::regex _register("r\\d", std::regex_constants::icase);
+        static const std::regex label("[\\da-z_]+", std::regex_constants::icase);
 
         if (std::regex_match(word, decimal)) {
-                return std::make_shared<Decimal>(word, line_number);
+                return std::make_shared<Decimal>(word, m_file_name, line_number);
         } else if (std::regex_match(word, binary)) {
-                return std::make_shared<Binary>(word, copy, line_number);
+                return std::make_shared<Binary>(word, copy, m_file_name, line_number);
         } else if (std::regex_match(word, hexadecimal)) {
-                return std::make_shared<Hexadecimal>(word, copy, line_number);
+                return std::make_shared<Hexadecimal>(word, copy, m_file_name, line_number);
         } else if (std::regex_match(word, octal)) {
-                return std::make_shared<Octal>(word, line_number);
+                return std::make_shared<Octal>(word, m_file_name, line_number);
         } else if (std::regex_match(word, _register)) {
-                return std::make_shared<Register>(word, copy, line_number);
+                return std::make_shared<Register>(word, copy, m_file_name, line_number);
         } else if (std::regex_match(word, label)) {
-                return std::make_shared<Label>(word, line_number);
+                return std::make_shared<Label>(word, m_file_name, line_number);
         } else {
-                const std::shared_ptr<Token> token = std::make_shared<Token>(word, copy, line_number);
+                const std::shared_ptr<Token> token = std::make_shared<Token>(word, copy, m_file_name, line_number);
                 token->is_valid = false;
                 return token;
         }
@@ -301,19 +310,31 @@ void Lexer::tokenizeLine(const std::string &line, int line_number, std::vector<s
                         // '//' is a comment as well.
                         if (index + 1 > line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
-                                m_logger.LOG(Logger::WARNING, line_number, "Expected '//', but found '/'. "
-                                        "Treating it as if it's '//' (i.e. comment).", Logger::SYNTAX);
+                                m_logger.LOG(Logger::WARNING,
+                                             line_number,
+                                             m_file_name,
+                                             "Expected '//', but found '/'. "
+                                                     "Treating it as if it's '//' (i.e. comment).",
+                                             Logger::WARNING_TYPE::SYNTAX);
                         }
                         break;
                 } else if (character == ',') {
                         if (!into.size() || terminated_by) {
-                                m_logger.LOG(Logger::WARNING, line_number, "Extraneous comma.", Logger::SYNTAX);
+                                m_logger.LOG(Logger::WARNING,
+                                             line_number,
+                                             m_file_name,
+                                             "Extraneous comma.",
+                                             Logger::WARNING_TYPE::SYNTAX);
                         }
                         addToken(current, into, line_number);
                         terminated_by = ',';
                 } else if (character == ':') {
                         if (into.size() > 1 || !current.size() || terminated_by) {
-                                m_logger.LOG(Logger::WARNING, line_number, "Extraneous colon.", Logger::SYNTAX);
+                                m_logger.LOG(Logger::WARNING,
+                                             line_number,
+                                             m_file_name,
+                                             "Extraneous colon.",
+                                             Logger::WARNING_TYPE::SYNTAX);
                         }
                         addToken(current, into, line_number);
                         terminated_by = ':';
@@ -343,15 +364,19 @@ void Lexer::tokenizeLine(const std::string &line, int line_number, std::vector<s
 #else
                                 stream << "Unterminated string";
 #endif
-                                m_logger.LOG(Logger::ERROR, line_number, stream.str());
+                                m_logger.LOG(Logger::ERROR,
+                                             line_number,
+                                             m_file_name,
+                                             stream.str(),
+                                             Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                 ++m_error_count;
                                 into.clear();
 #ifdef INCLUDE_ADDONS
                         } else if (terminator == '\'') {
-                                into.push_back(std::make_shared<Character>(current, line_number));
+                                into.push_back(std::make_shared<Character>(current, m_file_name, line_number));
 #endif
                         } else {
-                                into.push_back(std::make_shared<String>(current, line_number));
+                                into.push_back(std::make_shared<String>(current, m_file_name, line_number));
                         }
 
                         current.erase();

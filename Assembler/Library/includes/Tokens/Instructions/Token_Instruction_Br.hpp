@@ -6,8 +6,13 @@
 class Br : public Instruction
 {
 public:
-        Br(std::string &instruction, std::string &instruction_uppercase, int line_number = 0,
-           bool n = false, bool z = false, bool p = false);
+        Br(std::string &instruction,
+           std::string &instruction_uppercase,
+           std::string &t_file,
+           int line_number,
+           bool n,
+           bool z,
+           bool p);
         Br(bool n, bool z, bool p);
 
         virtual Token::token_type type() const override;

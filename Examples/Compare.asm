@@ -5,7 +5,6 @@
 ; the value of R0 being one of the below (mentioned in Calculation Method).
 ;
 
-
 ; Calculation Method
 ; First step, check on what side of 0 R1 and R2 are
 ;   If R1 < 0, and R2 >= 0, then R1 < R2 so R0 <== -1

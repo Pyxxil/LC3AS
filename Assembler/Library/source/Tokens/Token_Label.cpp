@@ -2,8 +2,8 @@
 
 #include "String_Matcher.hpp"
 
-Label::Label(std::string &name, int line_number)
-        : Token(name, name, line_number)
+Label::Label(std::string &name, std::string &t_file, int line_number)
+        : Token(name, name, t_file, line_number)
 {
 
 }
@@ -59,9 +59,9 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
 
         const std::string possible_match = matcher.best_match();
 
-        std::cerr << "ERROR: ";
+        std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
         if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
+                std::cerr << "at line " << std::dec << at_line << ": ";
         }
         std::cerr << "No such label '" << token << '\'';
 

@@ -6,7 +6,7 @@
 class Octal : public Immediate
 {
 public:
-        Octal(std::string &immediate, int line_number = 0);
+        Octal(std::string &immediate, std::string &t_file, int line_number);
 };
 
 #endif // TOKEN_IMMEDIATE_OCTAL_HPP

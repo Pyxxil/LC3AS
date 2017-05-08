@@ -7,7 +7,7 @@ class Not : public Instruction
 {
 public:
         Not();
-        Not(std::string &instruction, std::string &instruction_uppercase, int line_number = 0);
+        Not(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number);
 
         virtual Token::token_type type() const override;
 

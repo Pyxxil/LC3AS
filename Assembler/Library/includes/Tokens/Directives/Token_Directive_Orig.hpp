@@ -7,7 +7,7 @@
 class Orig : public Directive
 {
 public:
-        Orig(std::string &directive, std::string &directive_uppercase, int line_number);
+        Orig(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number);
 
         virtual Token::token_type type() const override;
 

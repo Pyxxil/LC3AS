@@ -9,7 +9,7 @@ class Neg : public Directive
 {
 public:
         Neg();
-        Neg(std::string &directive, std::string &directive_uppercase, int line_number = 0);
+        Neg(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number);
 
         virtual token_type type() const override;
 

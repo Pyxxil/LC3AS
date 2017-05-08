@@ -15,16 +15,20 @@ Logger::Logger(int warning_level, bool quietness)
 
 }
 
-void Logger::LOG(LOGGING_TYPE level, int line_number, const std::string &&message, WARNING_TYPE warning_level)
+void Logger::LOG(LOGGING_TYPE level,
+                 int line_number,
+                 const std::string &file,
+                 const std::string &&message,
+                 WARNING_TYPE warning_level)
 {
         if (we_should_be_quiet()) {
                 return;
         }
 
         if (level == ERROR) {
-                ERR(line_number, message);
+                ERR(line_number, file, message);
         } else if (level == WARNING) {
-                WARN(warning_level, line_number, message);
+                WARN(warning_level, line_number, file, message);
         } else {
                 if (line_number) {
                         std::cout << "Line " << line_number << ": ";
@@ -33,7 +37,7 @@ void Logger::LOG(LOGGING_TYPE level, int line_number, const std::string &&messag
         }
 }
 
-void Logger::WARN(WARNING_TYPE level, int line_number, const std::string &warning)
+void Logger::WARN(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning)
 {
         if (!(m_warn & level)) {
                 return;
@@ -41,10 +45,10 @@ void Logger::WARN(WARNING_TYPE level, int line_number, const std::string &warnin
 
         std::stringstream stream;
 
-        stream << "WARNING: ";
+        stream << "WARNING: In " << file.substr(file.find_last_of('/') + 1) << ' ';
 
         if (line_number) {
-                stream << "Line " << line_number << ": ";
+                stream << "at line " << line_number << ": ";
         }
 
         stream << warning << "\n";
@@ -52,14 +56,14 @@ void Logger::WARN(WARNING_TYPE level, int line_number, const std::string &warnin
         std::cerr << stream.str();
 }
 
-void Logger::ERR(int line_number, const std::string &error)
+void Logger::ERR(int line_number, const std::string &file, const std::string &error)
 {
         std::stringstream stream;
 
-        stream << "ERROR: ";
+        stream << "ERROR: In " << file << ' ';
 
         if (line_number) {
-                stream << "Line " << line_number << ": ";
+                stream << "at line " << line_number << ": ";
         }
 
         stream << error << "\n";
