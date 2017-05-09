@@ -10,6 +10,10 @@ class Include : public Token
 public:
         Include();
         Include(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line);
+
+        virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
+
+        virtual token_type type() const override;
 };
 
 #endif // TOKEN_ADDON_INCLUDE_HPP

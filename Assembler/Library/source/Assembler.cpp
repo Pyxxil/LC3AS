@@ -173,10 +173,11 @@ void Assembler::do_first_pass()
                                 for (const auto &symbol : symbols) {
                                         std::stringstream stream;
                                         if (symbol.second.address == internal_program_counter) {
-                                                stream << "Multiple labels found for address 0x" << std::hex
-                                                       << internal_program_counter << "\nNOTE: \tPrevious label '"
-                                                       << symbol.first << "' found on line "
-                                                       << std::dec << symbol.second.line_number << '.';
+                                                stream << "Multiple labels found for address 0x" << std::uppercase
+                                                       <<std::hex << internal_program_counter
+                                                       << "\nNOTE: \tPrevious label '" << symbol.first
+                                                       << "' found on line " << std::dec
+                                                       << symbol.second.line_number << '.';
                                                 m_logger.LOG(Logger::WARNING,
                                                              tokenized_line.front()->at_line,
                                                              tokenized_line.front()->file,

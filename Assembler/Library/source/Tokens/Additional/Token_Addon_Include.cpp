@@ -11,3 +11,23 @@ Include::Include(std::string &t_token, std::string &t_token_uppercase, std::stri
 {
 
 }
+
+bool Include::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+{
+        if (tokens.size() != 2) {
+                invalid_argument_count(tokens.size(), 1);
+                return (is_valid = false);
+        }
+
+        if (tokens.at(1)->type() != Token::_STRING || !tokens.at(1)->is_valid) {
+                tokens.at(1)->expected("string");
+                return (is_valid = false);
+        }
+
+        return is_valid;
+}
+
+Token::token_type Include::type() const
+{
+        return Token::ADDON_INCLUDE;
+}

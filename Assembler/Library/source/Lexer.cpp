@@ -91,8 +91,25 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
                 tokenizeLine(line, line_number, tokenized_line);
 
                 if (!tokenized_line.empty()) {
-                        // TODO: The include check can go here.
+#ifdef INCLUDE_ADDONS
+                        if (tokenized_line.front()->type() == Token::ADDON_INCLUDE) {
+                                if (tokenized_line.front()->valid_arguments(tokenized_line)) {
+                                        // TODO: This should put the base directory of the current file as the base
+                                        // TODO: of the file provided here.
+                                        // TODO:        - If that file doesn't exist, maybe check the given path?
+                                        // TODO:        - Do we now add a '-I/--Include directory' option?
+                                        Lexer lex(m_file_name.substr(0, m_file_name.find_last_of('/') + 1) +
+                                                          tokenized_line.back()->token);
+                                        m_error_count += lex.parse_into(into);
+                                } else {
+                                        ++m_error_count;
+                                }
+                        } else {
+                                into.emplace_back(tokenized_line);
+                        }
+#else
                         into.emplace_back(tokenized_line);
+#endif
                         tokenized_line.clear();
                 }
         }
@@ -231,7 +248,7 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
         static const std::regex hexadecimal("0?x[\\da-f]+", std::regex_constants::icase);
         static const std::regex octal("\\\\[0-7]+");
         static const std::regex _register("r\\d", std::regex_constants::icase);
-        static const std::regex label("[\\da-z_]+", std::regex_constants::icase);
+        static const std::regex label("\\.?[\\da-z_]+", std::regex_constants::icase);
 
         if (std::regex_match(word, decimal)) {
                 return std::make_shared<Decimal>(word, m_file_name, line_number);

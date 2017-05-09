@@ -52,6 +52,8 @@ cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
 
         .LSHIFT R2, #2
 
+        .INCLUDE "include.h"
+
 WARNING_THROWS:         ; All of the following should throw warnings with
                         ; --warn all
         JSR WARNING_THROWS ; Complains about an infinite loop
@@ -107,6 +109,7 @@ WARNING_THROWS:         ; All of the following should throw warnings with
 ;        BR add
 ;        BRz #-2000      ; Immediate value not representable in signed 9 bits
 ;        BR oc           ; Invalid label
+;        .INCLUDE 0x1    ; Requires string
 
 BRnzp BEGIN_TEST
 

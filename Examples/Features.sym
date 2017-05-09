@@ -4,10 +4,11 @@
 //	-------------------- ------------
 //	BEGIN_TEST           3017
 //	EXTRA_FEATURES       301B
-//	WARNING_THROWS       304C
-//	addr                 3054
-//	b                    3055
-//	bin                  3056
+//	INCLUDED_LABEL       304E
+//	WARNING_THROWS       3050
+//	addr                 3058
+//	b                    3059
+//	bin                  305A
 //	cheat                3044
-//	hex                  3057
+//	hex                  305B
 //	oct                  3031

@@ -68,6 +68,7 @@ public:
                 ADDON_SUB,
                 ADDON_SET,
                 ADDON_LSHIFT,
+                ADDON_INCLUDE,
 #endif
         };
 
