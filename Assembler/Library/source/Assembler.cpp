@@ -36,8 +36,7 @@ Assembler::Assembler(int argument_count, char **arguments)
         try {
                 parser.parse(argument_count, arguments);
         } catch (const cxxopts::OptionException &e) {
-                std::cout << "Error parsing options: " << e.what() << '\n';
-                std::cout << parser.help() << '\n';
+                std::cout << "Error parsing options: " << e.what() << '\n' << parser.help() << '\n';
                 exit(EXIT_FAILURE);
         }
 
@@ -175,7 +174,7 @@ void Assembler::do_first_pass()
                                         if (symbol.second.address == internal_program_counter) {
                                                 stream << "Multiple labels found for address 0x" << std::uppercase
                                                        <<std::hex << internal_program_counter
-                                                       << "\nNOTE: \tPrevious label '" << symbol.first
+                                                       << "\nNOTE: \t Previous label '" << symbol.first
                                                        << "' found on line " << std::dec
                                                        << symbol.second.line_number << '.';
                                                 m_logger.LOG(Logger::WARNING,
@@ -191,7 +190,7 @@ void Assembler::do_first_pass()
                                         std::stringstream stream;
                                         stream << "Multiple definitions of label '"
                                                << tokenized_line.front()->token
-                                               << "'\nNOTE: \tLabel was first defined on line "
+                                               << "'\nNOTE: \t Label was first defined on line "
                                                << symbols.at(tokenized_line.front()->token).line_number << '.';
                                         m_logger.LOG(Logger::ERROR,
                                                      tokenized_line.front()->at_line,
@@ -335,12 +334,14 @@ bool Assembler::assemble()
 
         std::stringstream stream;
 
+        bool all_fine = true;
+
         for (const auto &file : files_to_assemble) {
                 stream.str(std::string());
                 stream << "\n --- Assembling " << file << " ---\n\nStarting first pass\n";
                 m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
-                Lexer lexer(file);
+                Lexer lexer(file, quiet, warning_level);
                 error_count = lexer.parse_into(tokens);
 
                 do_first_pass();
@@ -366,31 +367,32 @@ bool Assembler::assemble()
                 m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
                 if (error_count || tokens.empty()) {
-                        return false;
-                }
+                        all_fine = false;
+                } else {  // No point in this if the first pass failed.
+                        internal_program_counter = file_memory_origin_address;
 
-                internal_program_counter = file_memory_origin_address;
+                        stream.str(std::string());
+                        m_logger.LOG(Logger::MESSAGE, 0, file, "Starting second pass\n", Logger::NONE);
 
-                stream.str(std::string());
-                m_logger.LOG(Logger::MESSAGE, 0, file, "Starting second pass\n", Logger::NONE);
+                        do_second_pass();
 
-                do_second_pass();
+                        stream.str(std::string());
+                        stream << error_count << " error" << (error_count == 1 ? "" : "'s")
+                               << " found on the second pass\n";
+                        m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
-                stream.str(std::string());
-                stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the second pass\n";
-                m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
-
-                if (!error_count) {
-                        if (do_write) {
-                                generate_machine_code();
-                                write(file.substr(0, file.find_first_of('.')));
+                        if (!error_count) {
+                                if (do_write) {
+                                        generate_machine_code();
+                                        write(file.substr(0, file.find_first_of('.')));
+                                }
                         }
                 }
 
                 reset();
         }
 
-        return error_count == 0;
+        return all_fine && error_count == 0;
 }
 
 bool Assembler::assemble(std::string &fileName)

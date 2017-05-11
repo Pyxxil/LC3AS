@@ -9,9 +9,9 @@
 
 // TODO: Add some form of import statement.
 //      This will require a few things..
-//              - A .INCLUDE directive
-//              - Tokens will also need to be associated with a file.
 //              - Figuring out how .LST files will work (line numbers will be incorrect ....)
+//                      - Quite probably make this a compile time thing -- if user doesn't want addons,
+//                        then don't print the file, otherwise use a new column to print the file name.
 
 static constexpr std::size_t hashed_letters[26] = {
         100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957, 50262, 48407, 51151, 41047, 39371
@@ -42,7 +42,8 @@ static constexpr std::size_t hash(const char *const string, std::size_t length)
 
 static std::size_t hash(std::string &string)
 {
-        // Basically, we don't really want something that's likely to be a number, or a label
+        // Basically, we don't really want something that's likely to be an immediate value,
+        // or a label (less likely to be caught here, but may as well try).
         if (string.at(0) != '.' && !std::isprint(string.at(0))) {
                 return 0;
         }
@@ -58,10 +59,22 @@ static std::size_t hash(std::string &string)
         return _hash;
 }
 
-Lexer::Lexer(const std::string &t_file_name)
-        : m_file_name(t_file_name), m_logger()
-{
+std::vector<std::string> Lexer::open_files;
 
+Lexer::Lexer(const std::string &t_file_name, bool quiet, int warn)
+        : m_file_name(t_file_name), m_logger(warn, quiet), be_quiet(quiet), m_warn(warn)
+{
+        open_files.emplace_back(m_file_name);
+}
+
+Lexer::~Lexer()
+{
+        std::remove_if(open_files.begin(), open_files.end(),
+                       [this](const auto &file) -> bool
+                       {
+                               return file == m_file_name;
+                       }
+        );
 }
 
 std::size_t Lexer::parse_into(std::vector<std::vector<std::shared_ptr<Token>>> &into)
@@ -98,9 +111,26 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
                                         // TODO: of the file provided here.
                                         // TODO:        - If that file doesn't exist, maybe check the given path?
                                         // TODO:        - Do we now add a '-I/--Include directory' option?
-                                        Lexer lex(m_file_name.substr(0, m_file_name.find_last_of('/') + 1) +
-                                                          tokenized_line.back()->token);
-                                        m_error_count += lex.parse_into(into);
+                                        const std::string &file_with_path =
+                                                                  m_file_name.substr(0, m_file_name.find_last_of('/') + 1) +
+                                                                          tokenized_line.back()->token;
+                                        const bool already_open = std::find_if(
+                                                open_files.cbegin(), open_files.cend(),
+                                                [&file_with_path](const auto &file) -> bool
+                                                {
+                                                        return file == file_with_path;
+                                                }
+                                        ) != open_files.cend();
+
+                                        if (already_open) {
+                                                m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line,
+                                                             m_file_name, "Recursive include.",
+                                                             Logger::NONE);
+                                                ++m_error_count;
+                                        } else {
+                                                Lexer lex(file_with_path, be_quiet, m_warn);
+                                                m_error_count += lex.parse_into(into);
+                                        }
                                 } else {
                                         ++m_error_count;
                                 }
@@ -135,10 +165,10 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
         std::string copy = word;
         std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
-        // While this makes it a bit more efficient, is it worth double checking that
-        // the strings are the same after comparing the hash's? Just as a precautionary
-        // measure.
-        std::size_t hashed = hash(copy);
+        // TODO: While this makes it a bit more efficient, is it worth double checking that
+        // TODO: the strings are the same after comparing the hash's? Just as a precautionary
+        // TODO: measure.
+        std::size_t hashed = hash(copy); // This is non-zero if the string contains some letters.
 
         if (hashed) {
                 switch (hashed) {
