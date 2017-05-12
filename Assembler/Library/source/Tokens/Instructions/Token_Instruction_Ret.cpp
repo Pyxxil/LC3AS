@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 Ret::Ret(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
         : Instruction(instruction, instruction_uppercase, t_file, line_number)
@@ -55,7 +56,12 @@ std::string Ret::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " RET\n";
+                << " RET"
+
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

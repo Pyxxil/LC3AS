@@ -5,32 +5,18 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Set::Set()
-        : Directive()
-{
-        _and                 = std::make_shared<And>();
-        add                  = std::make_shared<Add>();
-        br                   = std::make_shared<Br>(true, true, true);
-        ld                   = std::make_shared<Ld>();
-        fill                 = std::make_shared<Fill>();
-        decimal_one          = std::make_shared<Decimal>("#1", file, at_line);
-        decimal_negative_two = std::make_shared<Decimal>("#-2", file, at_line);
-        decimal_zero         = std::make_shared<Decimal>("#0", file, at_line);
-}
-
 Set::Set(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
         : Directive(directive, directive_uppercase, t_file, line_number)
+          , _and(new And("AND", "AND", t_file, line_number))
+          , add(new Add("ADD", "ADD", t_file, line_number))
+          , br(new Br("BR", "BR", t_file, line_number, true, true, true))
+          , ld(new Ld("LD", "LD", t_file, line_number))
+          , fill(new Fill(".FILL", ".FILL", t_file, line_number))
+          , decimal_zero(new Decimal("#0", t_file, line_number))
+          , decimal_one(new Decimal("#1", t_file, line_number))
+          , decimal_negative_two(new Decimal("#-2", t_file, line_number))
 {
-        _and                 = std::make_shared<And>();
-        add                  = std::make_shared<Add>();
-        br                   = std::make_shared<Br>(true, true, true);
-        ld                   = std::make_shared<Ld>();
-        fill                 = std::make_shared<Fill>();
-        decimal_one          = std::make_shared<Decimal>("#1", file, at_line);
-        decimal_negative_two = std::make_shared<Decimal>("#-2", file, at_line);
-        decimal_zero         = std::make_shared<Decimal>("#0", file, at_line);
 
-        _and->at_line = add->at_line = br->at_line = ld->at_line = fill->at_line = line_number;
 }
 
 std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,

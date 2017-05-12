@@ -55,7 +55,11 @@ std::string End::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::setfill(' ') << std::setw(width) << ' '
                 // Instruction itself
-                << " .END\n";
+                << " .END"
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         return stream.str();
 }

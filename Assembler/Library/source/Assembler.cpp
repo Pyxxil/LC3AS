@@ -256,11 +256,6 @@ void Assembler::do_second_pass()
         }
 }
 
-/**
- * Generate the machine code for the file.
- *
- * @return The machine code gathered into a vector.
- */
 void Assembler::generate_machine_code()
 {
         if (as_assembled.size()) {

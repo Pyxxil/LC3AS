@@ -2,7 +2,7 @@
 #include "Token.hpp"
 
 Token::Token()
-        : token(), token_uppercase(), assembled()
+        : token(), token_uppercase(), file(), assembled()
 {
 
 }

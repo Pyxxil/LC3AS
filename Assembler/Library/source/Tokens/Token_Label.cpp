@@ -3,7 +3,7 @@
 #include "String_Matcher.hpp"
 
 Label::Label(std::string &name, std::string &t_file, int line_number)
-        : Token(name, name, t_file, line_number)
+        : Token(name, name, t_file, line_number), instruction()
 {
 
 }

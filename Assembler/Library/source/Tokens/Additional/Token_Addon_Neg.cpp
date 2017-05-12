@@ -5,20 +5,18 @@
 
 #include "Tokens/Immediate/Token_Immediate_Decimal.hpp"
 
-Neg::Neg()
-        : Directive()
-{
-        neg = std::make_shared<Not>();
-        add = std::make_shared<Add>();
-}
-
 Neg::Neg(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
         : Directive(directive, directive_uppercase, t_file, line_number)
+          , neg(new Not("NOT", "NOT", t_file, line_number)), add(new Add("ADD", "ADD", t_file, line_number))
 {
-        neg = std::make_shared<Not>();
-        add = std::make_shared<Add>();
+        //neg = std::make_shared<Not>("NOT", "NOT", t_file, line_number);
+        //add = std::make_shared<Add>("ADD", "ADD", t_file, line_number);
+}
 
-        neg->at_line = add->at_line = line_number;
+Neg::Neg(std::string &&directive, std::string &&directive_uppercase, std::string &t_file, int line_number)
+        : Neg(directive, directive_uppercase, t_file, line_number)
+{
+
 }
 
 std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,

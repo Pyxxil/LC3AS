@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
@@ -13,6 +14,12 @@ And::And()
 }
 
 And::And(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+{
+
+}
+
+And::And(std::string &&instruction, std::string &&instruction_uppercase, std::string &t_file, int line_number)
         : Instruction(instruction, instruction_uppercase, t_file, line_number)
 {
 
@@ -30,15 +37,15 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(static_cast<std::uint16_t>(0x5000 |
-                ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
-                ((std::static_pointer_cast<Register>(tokens.at(2))->reg) & 0x7) << 6)
+                (std::static_pointer_cast<Register>(tokens.at(1))->reg << 9) |
+                (std::static_pointer_cast<Register>(tokens.at(2))->reg) << 6)
         );
 
         if (tokens.at(3)->type() == Token::REGISTER) {
-                assembled.front() |= (std::static_pointer_cast<Register>(tokens.at(3))->reg & 0x7);
+                assembled.front() |= static_cast<std::uint16_t>(std::static_pointer_cast<Register>(tokens.at(3))->reg);
         } else {
-                assembled.front() |= 0x20 | static_cast<std::uint16_t>(
-                        std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x1F);
+                assembled.front() |= 0x20u | (static_cast<std::uint16_t>(
+                        std::static_pointer_cast<Immediate>(tokens.at(3))->value) & 0x1Fu);
         }
 
         return 1;
@@ -105,10 +112,15 @@ std::string And::disassemble(std::uint16_t &program_counter,
 
         if (assembled.front() & 0x0020) {
                 stream << '#' << std::dec
-                       << (static_cast<int8_t>(static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >> 3) << '\n';
+                       << (static_cast<int8_t>(static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >> 3);
         } else {
-                stream << 'R' << (assembled.front() & 7) << '\n';
+                stream << 'R' << (assembled.front() & 7);
         }
+
+#ifdef INCLUDE_ADDONS
+        stream << '\t' << file;
+#endif
+        stream << '\n';
 
         ++program_counter;
 

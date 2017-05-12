@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 Orig::Orig(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
         : Directive(directive, directive_uppercase, t_file, line_number)
@@ -75,7 +76,11 @@ std::string Orig::disassemble(std::uint16_t &program_counter,
                 << ' ' << std::setfill(' ') << std::setw(width) << ' '
                 // Instruction itself
                 << ' ' << token_uppercase << " 0x" << std::hex << std::setfill('0') << std::setw(4)
-                << program_counter << '\n';
+                << program_counter
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';;
         return stream.str();
 }
 

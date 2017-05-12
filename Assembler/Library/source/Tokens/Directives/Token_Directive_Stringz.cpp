@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 Stringz::Stringz(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
         : Directive(directive, directive_uppercase, t_file, line_number)
@@ -64,7 +65,11 @@ std::string Stringz::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.front() << '\n';
+                << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+#ifdef INCLUDE_ADDONS
+                << ' ' << file
+#endif
+                << '\n';
 
         ++program_counter;
 
@@ -82,7 +87,11 @@ std::string Stringz::disassemble(std::uint16_t &program_counter,
                         // Label at the current address (if any)
                         << ' ' << std::setfill(' ') << std::setw(width) << ' '
                         // Instruction itself
-                        << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.at(index) << '\n';
+                        << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.at(index)
+#ifdef INCLUDE_ADDONS
+                        << '\t' << file
+#endif
+                        << '\n';
 
                 ++program_counter;
         }

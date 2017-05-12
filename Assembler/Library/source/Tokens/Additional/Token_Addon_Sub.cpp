@@ -5,28 +5,15 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Sub::Sub()
-        : Directive()
-{
-        set_zero     = std::make_shared<And>();
-        decimal_zero = std::make_shared<Decimal>("#0", file);
-        neg1         = std::make_shared<Neg>();
-        neg2         = std::make_shared<Neg>();
-        add          = std::make_shared<Add>();
-}
-
 Sub::Sub(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
         : Directive(directive, directive_uppercase, t_file, line_number)
+          , set_zero(new And("AND", "AND", t_file, line_number))
+          , add(new Add("ADD", "ADD", t_file, line_number))
+          , decimal_zero(new Decimal("#0", t_file, line_number))
+          , neg1(new Neg(".NEG", ".NEG", t_file, line_number))
+          , neg2(new Neg(".NEG", ".NEG", t_file, line_number))
 {
-        std::string neg = "NEG";
 
-        set_zero     = std::make_shared<And>();
-        decimal_zero = std::make_shared<Decimal>("#0", file, line_number);
-        neg1         = std::make_shared<Neg>(neg, neg, file, line_number);
-        neg2         = std::make_shared<Neg>(neg, neg, file, line_number);
-        add          = std::make_shared<Add>();
-
-        add->at_line = set_zero->at_line = line_number;
 }
 
 std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,

@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 
 #include "Assembler.hpp"
 
@@ -115,7 +116,11 @@ std::string Blkw::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value << '\n';
+                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 
@@ -133,7 +138,11 @@ std::string Blkw::disassemble(std::uint16_t &program_counter,
                         // Label at the current address (if any)
                         << ' ' << std::setfill(' ') << std::setw(width) << ' '
                         // Instruction itself
-                        << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value << '\n';
+                        << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value
+#ifdef INCLUDE_ADDONS
+                        << '\t' << file
+#endif
+                        << '\n';
         }
 
         return stream.str();

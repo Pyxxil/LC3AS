@@ -116,9 +116,9 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
                                                                           tokenized_line.back()->token;
                                         const bool already_open = std::find_if(
                                                 open_files.cbegin(), open_files.cend(),
-                                                [&file_with_path](const auto &file) -> bool
+                                                [&file_with_path](const auto &_file) -> bool
                                                 {
-                                                        return file == file_with_path;
+                                                        return _file == file_with_path;
                                                 }
                                         ) != open_files.cend();
 
@@ -138,6 +138,8 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
                                 into.emplace_back(tokenized_line);
                         }
 #else
+                        (void) be_quiet;
+                        (void) m_warn;
                         into.emplace_back(tokenized_line);
 #endif
                         tokenized_line.clear();

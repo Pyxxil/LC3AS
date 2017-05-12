@@ -1,13 +1,16 @@
-#include <cstdlib>
 #include "String_Matcher.hpp"
 
+#include <limits>
+#include <cstdlib>
+
 String_Matcher::String_Matcher()
+        : m_string(), best { std::numeric_limits<long>::max(), "" }
 {
 
 }
 
 String_Matcher::String_Matcher(const std::string &t_string)
-        : m_string(t_string), best { LONG_MAX, "" }
+        : m_string(t_string), best { std::numeric_limits<long>::max(), "" }
 {
 
 }

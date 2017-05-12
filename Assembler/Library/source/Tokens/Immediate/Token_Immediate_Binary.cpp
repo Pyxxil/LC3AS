@@ -3,10 +3,10 @@
 Binary::Binary(std::string &immediate, std::string &immediate_uppercase, std::string &t_file, int line_number)
         : Immediate(immediate, immediate_uppercase, t_file, line_number)
 {
-        std::int16_t sign = 1;
+        bool negative = false;
 
         if (immediate.at(0) == '-') {
-                sign = -1;
+                negative = true;
                 immediate.erase(0, 1);
         }
 
@@ -34,8 +34,10 @@ Binary::Binary(std::string &immediate, std::string &immediate_uppercase, std::st
                 if (at_line) {
                         std::cerr << "Line " << std::dec << at_line << ": ";
                 }
-                std::cerr << "Invalid literal for base 2: '" << value << "'.\n";
+                std::cerr << "Invalid literal for base 2: '" << immediate << "'.\n";
         } else {
-                value *= sign;
+                if (negative) {
+                        value = static_cast<std::int16_t>(-value);
+                }
         }
 }

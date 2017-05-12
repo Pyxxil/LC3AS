@@ -2,12 +2,13 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 
 Jsr::Jsr(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number), provided()
 {
 
 }
@@ -88,11 +89,16 @@ std::string Jsr::disassemble(std::uint16_t &program_counter,
         ++program_counter;
 
         if (provided->type() == Token::LABEL) {
-                stream << provided->token << '\n';
+                stream << provided->token;
         } else {
                 const auto offset = std::static_pointer_cast<Immediate>(provided)->value;
-                stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter) << '\n';
+                stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter);
         }
+
+#ifdef INCLUDE_ADDONS
+        stream << '\t' << file;
+#endif
+        stream << '\n';
 
         return stream.str();
 }

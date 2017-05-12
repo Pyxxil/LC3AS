@@ -59,7 +59,12 @@ std::string Getc::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " GETC\n";
+                << " GETC"
+
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

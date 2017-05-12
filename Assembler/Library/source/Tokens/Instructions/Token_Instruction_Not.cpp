@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Register.hpp"
 
@@ -12,6 +13,12 @@ Not::Not()
 }
 
 Not::Not(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+{
+
+}
+
+Not::Not(std::string &&instruction, std::string &&instruction_uppercase, std::string &t_file, int line_number)
         : Instruction(instruction, instruction_uppercase, t_file, line_number)
 {
 
@@ -82,7 +89,12 @@ std::string Not::disassemble(std::uint16_t &program_counter,
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
                 << " NOT R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
-                << ((assembled.front() & 0x01C0) >> 6 & 7) << '\n';
+                << ((assembled.front() & 0x01C0) >> 6 & 7)
+
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

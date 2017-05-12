@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
@@ -86,9 +87,14 @@ std::string Ldr::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " LDR R" << ((assembled.front() & 0x0E00) >> 9 & 7 - 0x30) << " R"
-                << ((assembled.front() & 0x01C0) >> 6 & 7 - 0x30) << " #" << std::dec
-                << ((static_cast<int8_t>(assembled.front() & 0x3F) << 2) >> 2) << '\n';
+                << " LDR R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
+                << ((assembled.front() & 0x01C0) >> 6 & 7) << " #" << std::dec
+                << ((static_cast<int8_t>(assembled.front() & 0x3F) << 2) >> 2)
+
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

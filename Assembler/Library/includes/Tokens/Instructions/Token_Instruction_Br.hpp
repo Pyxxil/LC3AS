@@ -13,7 +13,14 @@ public:
            bool n,
            bool z,
            bool p);
-        Br(bool n, bool z, bool p);
+
+        Br(std::string &&instruction,
+           std::string &&instruction_uppercase,
+           std::string &t_file,
+           int line_number,
+           bool n,
+           bool z,
+           bool p);
 
         virtual Token::token_type type() const override;
 

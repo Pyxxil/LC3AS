@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Register.hpp"
 
@@ -67,7 +68,12 @@ std::string Jsrr::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " JSRR R" << ((assembled.front() & 0x01C0) >> 6 & 7 - 0x30) << '\n';
+                << " JSRR R" << ((assembled.front() & 0x01C0) >> 6 & 7)
+
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

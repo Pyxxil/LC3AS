@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 
@@ -77,7 +78,12 @@ std::string Trap::disassemble(std::uint16_t &program_counter,
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
                 << " TRAP 0x" << std::right << std::hex << std::uppercase << std::setfill('0') << std::setw(2)
-                << (assembled.front() & 0xFF) << '\n';
+                << (assembled.front() & 0xFF)
+
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

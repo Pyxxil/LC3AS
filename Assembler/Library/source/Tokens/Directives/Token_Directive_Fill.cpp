@@ -2,11 +2,18 @@
 
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 
 Fill::Fill(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
+        : Directive(directive, directive_uppercase, t_file, line_number)
+{
+
+}
+
+Fill::Fill(std::string &&directive, std::string &&directive_uppercase, std::string &t_file, int line_number)
         : Directive(directive, directive_uppercase, t_file, line_number)
 {
 
@@ -81,7 +88,11 @@ std::string Fill::disassemble(
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value << '\n';
+                << " .FILL 0x" << std::right << std::hex << std::setfill('0') << std::setw(4) << value
+#ifdef INCLUDE_ADDONS
+                << '\t' << file
+#endif
+                << '\n';
 
         ++program_counter;
 

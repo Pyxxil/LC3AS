@@ -2,13 +2,14 @@
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
 
 Lea::Lea(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number), provided()
 {
 
 }
@@ -94,16 +95,21 @@ std::string Lea::disassemble(std::uint16_t &program_counter,
                 // Label at the current address (if any)
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
-                << " LEA R" << ((assembled.front() & 0x0E00) >> 9 & 7 - 0x30) << ' ';
+                << " LEA R" << ((assembled.front() & 0x0E00) >> 9 & 7) << ' ';
 
         ++program_counter;
 
         if (provided->type() == Token::LABEL) {
-                stream << provided->token << '\n';
+                stream << provided->token;
         } else {
                 const auto offset = std::static_pointer_cast<Immediate>(provided)->value;
-                stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter) << '\n';
+                stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter);
         }
+
+#ifdef INCLUDE_ADDONS
+        stream << '\t' << file;
+#endif
+        stream << '\n';
 
         return stream.str();
 }
