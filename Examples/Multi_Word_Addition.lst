@@ -105,7 +105,7 @@
 (3067) 0031 0000000000110001 ( 177) ASCII_ONE            .FILL 0x0031	Examples/Multi_Word_Addition.asm
 (3068) 000A 0000000000001010 ( 178) ASCII_NEWLINE        .FILL 0x000A	Examples/Multi_Word_Addition.asm
 (3069) 0020 0000000000100000 ( 179) ASCII_SPACE          .FILL 0x0020	Examples/Multi_Word_Addition.asm
-(306A) 003D 0000000000111101 ( 180) SEPERATOR            .FILL 0x3D00 Examples/Multi_Word_Addition.asm
+(306A) 003D 0000000000111101 ( 180) SEPERATOR            .FILL 0x3D00	Examples/Multi_Word_Addition.asm
 (306B) 3D00 0000000000111101 ( 180)                      .FILL 0x003D	Examples/Multi_Word_Addition.asm
 (306C) 003D 0000000000111101 ( 180)                      .FILL 0x003D	Examples/Multi_Word_Addition.asm
 (306D) 003D 0000000000111101 ( 180)                      .FILL 0x003D	Examples/Multi_Word_Addition.asm
@@ -137,10 +137,10 @@
 (3087) 003D 0000000000111101 ( 180)                      .FILL 0x003D	Examples/Multi_Word_Addition.asm
 (3088) 003D 0000000000111101 ( 180)                      .FILL 0x003D	Examples/Multi_Word_Addition.asm
 (3089) 0000 0000000000000000 ( 180)                      .FILL 0x0000	Examples/Multi_Word_Addition.asm
-(308A) 0020 0000000000100000 ( 181) CARRY_STR            .FILL 0x2000 Examples/Multi_Word_Addition.asm
+(308A) 0020 0000000000100000 ( 181) CARRY_STR            .FILL 0x2000	Examples/Multi_Word_Addition.asm
 (308B) 6300 0000000001100011 ( 181)                      .FILL 0x0063	Examples/Multi_Word_Addition.asm
 (308C) 0000 0000000000000000 ( 181)                      .FILL 0x0000	Examples/Multi_Word_Addition.asm
-(308D) 0020 0000000000100000 ( 182) OVERFLOW_STR         .FILL 0x2000 Examples/Multi_Word_Addition.asm
+(308D) 0020 0000000000100000 ( 182) OVERFLOW_STR         .FILL 0x2000	Examples/Multi_Word_Addition.asm
 (308E) 7600 0000000001110110 ( 182)                      .FILL 0x0076	Examples/Multi_Word_Addition.asm
 (308F) 0000 0000000000000000 ( 182)                      .FILL 0x0000	Examples/Multi_Word_Addition.asm
 (3090) 4000 0100000000000000 ( 185) BITMASKS             .FILL 0x4000	Examples/Multi_Word_Addition.asm

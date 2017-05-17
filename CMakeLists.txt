@@ -16,3 +16,4 @@ set ( RELEASE_FLAGS ${COMPILE_FLAGS} -Os -flto -mtune=native )
 
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Assembler" )  # Builds the assembler
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Simulator" )  # Builds the simulator
+add_subdirectory ( "${CMAKE_SOURCE_DIR}/Tests" )

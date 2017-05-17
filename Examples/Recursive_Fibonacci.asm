@@ -241,6 +241,15 @@ NUMBERS     .FILL #10000
             .FILL #0                    ; So we can tell when we've reached the last digit.
 
 
+;       Getting input               | Converting to ASCII           | Recursion
+; R0 -- Input and output            | R0 -- Output                  | R0 -- Result stack pointer
+; R1 -- The current input           | R1 -- Unused                  | R1 -- Unused
+; R2 -- Unused                      | R2 -- The digit position      | R2 -- Stack pointer
+; R3 -- Used to compare values      | R3 -- Number of digits output | R3 -- The current N
+; R4 -- Used to multiply by ten     | R4 -- The current place       | R4 -- Temporary Value stack pointer
+; R5 -- Used as the character count | R5 -- The number to convert   | R5 -- The fibonacci number
+; R6 -- Used to multiply by ten     | R6 -- The current digit       | R6 -- Temporary Values
+; R7 -- Return address              | R7 -- Return address          | R7 -- Return address
 ; ---------------------------------------------------;
 ; Recursive function to find the Nth fibonacci number;
 ;----------------------------------------------------;

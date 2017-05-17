@@ -184,11 +184,11 @@
 (30B6) 02BC 0000001010111100 ( 306)                         .FILL 0x02BC	Examples/Compare.asm
 (30B7) 0320 0000001100100000 ( 307)                         .FILL 0x0320	Examples/Compare.asm
 (30B8) 0384 0000001110000100 ( 308)                         .FILL 0x0384	Examples/Compare.asm
-(30B9) 002D 0000000000101101 ( 312) NEGATIVE_ONE            .FILL 0x2D00 Examples/Compare.asm
+(30B9) 002D 0000000000101101 ( 312) NEGATIVE_ONE            .FILL 0x2D00	Examples/Compare.asm
 (30BA) 3100 0000000000110001 ( 312)                         .FILL 0x0031	Examples/Compare.asm
 (30BB) 0000 0000000000000000 ( 312)                         .FILL 0x0000	Examples/Compare.asm
-(30BC) 0031 0000000000110001 ( 315) POSITIVE_ONE            .FILL 0x3100 Examples/Compare.asm
+(30BC) 0031 0000000000110001 ( 315) POSITIVE_ONE            .FILL 0x3100	Examples/Compare.asm
 (30BD) 0000 0000000000000000 ( 315)                         .FILL 0x0000	Examples/Compare.asm
-(30BE) 0030 0000000000110000 ( 318) ZERO                    .FILL 0x3000 Examples/Compare.asm
+(30BE) 0030 0000000000110000 ( 318) ZERO                    .FILL 0x3000	Examples/Compare.asm
 (30BF) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Compare.asm
 (30C0) 0000 0000000000000000 ( 320)                         .END	Examples/Compare.asm

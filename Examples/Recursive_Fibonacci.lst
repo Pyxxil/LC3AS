@@ -26,7 +26,7 @@
 (3018) E002 1110000000000010 (  73) TOO_MANY_CHARS          LEA R0 TOO_MANY	Examples/Recursive_Fibonacci.asm
 (3019) F022 1111000000100010 (  74)                         PUTS	Examples/Recursive_Fibonacci.asm
 (301A) 0FE5 0000111111100101 (  75)                         BRnzp OUT_PROMPT	Examples/Recursive_Fibonacci.asm
-(301B) 000A 0000000000001010 (  77) TOO_MANY                .FILL 0xA000 Examples/Recursive_Fibonacci.asm
+(301B) 000A 0000000000001010 (  77) TOO_MANY                .FILL 0xA000	Examples/Recursive_Fibonacci.asm
 (301C) 4500 0000000001000101 (  77)                         .FILL 0x0045	Examples/Recursive_Fibonacci.asm
 (301D) 006E 0000000001101110 (  77)                         .FILL 0x006E	Examples/Recursive_Fibonacci.asm
 (301E) 0074 0000000001110100 (  77)                         .FILL 0x0074	Examples/Recursive_Fibonacci.asm
@@ -138,7 +138,7 @@
 (3088) 2E01 0010111000000001 ( 213)                         LD R7 SAVER7	Examples/Recursive_Fibonacci.asm
 (3089) C1C0 1100000111000000 ( 214)                         RET	Examples/Recursive_Fibonacci.asm
 (308A) 0000 0000000000000000 ( 219) SAVER7                  .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(308B) 000A 0000000000001010 ( 222) PROMPT                  .FILL 0xA000 Examples/Recursive_Fibonacci.asm
+(308B) 000A 0000000000001010 ( 222) PROMPT                  .FILL 0xA000	Examples/Recursive_Fibonacci.asm
 (308C) 4500 0000000001000101 ( 222)                         .FILL 0x0045	Examples/Recursive_Fibonacci.asm
 (308D) 006E 0000000001101110 ( 222)                         .FILL 0x006E	Examples/Recursive_Fibonacci.asm
 (308E) 0074 0000000001110100 ( 222)                         .FILL 0x0074	Examples/Recursive_Fibonacci.asm

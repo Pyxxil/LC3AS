@@ -67,7 +67,7 @@ std::string Stringz::disassemble(std::uint16_t &program_counter,
                 // Instruction itself
                 << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
 #ifdef INCLUDE_ADDONS
-                << ' ' << file
+                << '\t' << file
 #endif
                 << '\n';
 

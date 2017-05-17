@@ -26,9 +26,9 @@ void Logger::LOG(LOGGING_TYPE level,
         }
 
         if (level == ERROR) {
-                ERR(line_number, file, message);
+                err(line_number, file, message);
         } else if (level == WARNING) {
-                WARN(warning_level, line_number, file, message);
+                warn(warning_level, line_number, file, message);
         } else {
                 if (line_number) {
                         std::cout << "Line " << line_number << ": ";
@@ -37,7 +37,7 @@ void Logger::LOG(LOGGING_TYPE level,
         }
 }
 
-void Logger::WARN(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning)
+void Logger::warn(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning)
 {
         if (!(m_warn & level)) {
                 return;
@@ -56,7 +56,7 @@ void Logger::WARN(WARNING_TYPE level, int line_number, const std::string &file, 
         std::cerr << stream.str();
 }
 
-void Logger::ERR(int line_number, const std::string &file, const std::string &error)
+void Logger::err(int line_number, const std::string &file, const std::string &error)
 {
         std::stringstream stream;
 

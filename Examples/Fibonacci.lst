@@ -109,7 +109,7 @@
 (306B) 0401 0000010000000001 ( 208)                         BRz FINISH	Examples/Fibonacci.asm
 (306C) 0FF8 0000111111111000 ( 209)                         BRnzp ITERATIVE_FIBONACCI	Examples/Fibonacci.asm
 (306D) F025 1111000000100101 ( 214) FINISH                  HALT	Examples/Fibonacci.asm
-(306E) 000A 0000000000001010 ( 218) PROMPT                  .FILL 0xA000 Examples/Fibonacci.asm
+(306E) 000A 0000000000001010 ( 218) PROMPT                  .FILL 0xA000	Examples/Fibonacci.asm
 (306F) 4500 0000000001000101 ( 218)                         .FILL 0x0045	Examples/Fibonacci.asm
 (3070) 006E 0000000001101110 ( 218)                         .FILL 0x006E	Examples/Fibonacci.asm
 (3071) 0074 0000000001110100 ( 218)                         .FILL 0x0074	Examples/Fibonacci.asm
@@ -140,7 +140,7 @@
 (308A) 003A 0000000000111010 ( 218)                         .FILL 0x003A	Examples/Fibonacci.asm
 (308B) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
 (308C) 0000 0000000000000000 ( 218)                         .FILL 0x0000	Examples/Fibonacci.asm
-(308D) 0020 0000000000100000 ( 219) SPACE                   .FILL 0x2000 Examples/Fibonacci.asm
+(308D) 0020 0000000000100000 ( 219) SPACE                   .FILL 0x2000	Examples/Fibonacci.asm
 (308E) 0000 0000000000000000 ( 219)                         .FILL 0x0000	Examples/Fibonacci.asm
 (308F) 0000 0000000000000000 ( 221) NUMBER                  .FILL 0x0000	Examples/Fibonacci.asm
 (3090) 0000 0000000000000000 ( 222) FLAG                    .FILL 0x0000	Examples/Fibonacci.asm

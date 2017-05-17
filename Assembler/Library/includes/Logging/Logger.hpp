@@ -42,8 +42,8 @@ private:
         bool we_should_be_quiet() const
         { return quiet; }
 
-        void ERR(int line_number, const std::string &file, const std::string &error);
-        void WARN(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning);
+        void err(int line_number, const std::string &file, const std::string &error);
+        void warn(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning);
 };
 
 #endif // LOGGER_HPP

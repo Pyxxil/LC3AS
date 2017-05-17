@@ -1,4 +1,4 @@
-#include "Lexer.hpp"
+#include "Tokenizer.hpp"
 
 #include <fstream>
 #include <regex>
@@ -59,15 +59,15 @@ static std::size_t hash(std::string &string)
         return _hash;
 }
 
-std::vector<std::string> Lexer::open_files;
+std::vector<std::string> Tokenizer::open_files;
 
-Lexer::Lexer(const std::string &t_file_name, bool quiet, int warn)
+Tokenizer::Tokenizer(const std::string &t_file_name, bool quiet, int warn)
         : m_file_name(t_file_name), m_logger(warn, quiet), be_quiet(quiet), m_warn(warn)
 {
         open_files.emplace_back(m_file_name);
 }
 
-Lexer::~Lexer()
+Tokenizer::~Tokenizer()
 {
         std::remove_if(open_files.begin(), open_files.end(),
                        [this](const auto &file) -> bool
@@ -77,13 +77,13 @@ Lexer::~Lexer()
         );
 }
 
-std::size_t Lexer::parse_into(std::vector<std::vector<std::shared_ptr<Token>>> &into)
+std::size_t Tokenizer::parse_into(std::vector<std::vector<std::shared_ptr<Token>>> &into)
 {
         populate_tokens(into);
         return m_error_count;
 }
 
-void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &into)
+void Tokenizer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &into)
 {
         std::ifstream file(m_file_name);
 
@@ -128,7 +128,7 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
                                                              Logger::NONE);
                                                 ++m_error_count;
                                         } else {
-                                                Lexer lex(file_with_path, be_quiet, m_warn);
+                                                Tokenizer lex(file_with_path, be_quiet, m_warn);
                                                 m_error_count += lex.parse_into(into);
                                         }
                                 } else {
@@ -162,7 +162,7 @@ void Lexer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>> &in
  * @param line_number The current line number. This is only relevant when assembling a file.
  * @return The Token that the string corresponds to.
  */
-std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
+std::shared_ptr<Token> Tokenizer::tokenize(std::string &word, int line_number)
 {
         std::string copy = word;
         std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
@@ -275,12 +275,12 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
                 }
         }
 
-        static const std::regex decimal("#?-?\\d+");
-        static const std::regex binary("-?0?b[01]+", std::regex_constants::icase);
-        static const std::regex hexadecimal("0?x[\\da-f]+", std::regex_constants::icase);
-        static const std::regex octal("\\\\[0-7]+");
-        static const std::regex _register("r\\d", std::regex_constants::icase);
-        static const std::regex label("\\.?[\\da-z_]+", std::regex_constants::icase);
+        static const std::regex decimal("#?-?\\d+", std::regex_constants::optimize);
+        static const std::regex binary("-?0?[bB][01]+", std::regex_constants::optimize);
+        static const std::regex hexadecimal("0?[xX][\\da-fA-F]+", std::regex_constants::optimize);
+        static const std::regex octal("\\\\[0-7]+", std::regex_constants::optimize);
+        static const std::regex _register("[rR]\\d", std::regex_constants::optimize);
+        static const std::regex label("\\.?[\\da-zA-Z_]+", std::regex_constants::optimize);
 
         if (std::regex_match(word, decimal)) {
                 return std::make_shared<Decimal>(word, m_file_name, line_number);
@@ -308,7 +308,7 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, int line_number)
  * @param to The current tokens in the line.
  * @param line_number The line number (only relevant for working with files).
  */
-void Lexer::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &to, int line_number)
+void Tokenizer::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &to, int line_number)
 {
         if (!token.empty()) {
                 to.push_back(tokenize(token, line_number));
@@ -329,7 +329,7 @@ void Lexer::addToken(std::string &token, std::vector<std::shared_ptr<Token>> &to
  *
  * @return A std::vector<Token> which contains the tokens that were found in the line.
  */
-void Lexer::tokenizeLine(const std::string &line, int line_number, std::vector<std::shared_ptr<Token>> &into)
+void Tokenizer::tokenizeLine(const std::string &line, int line_number, std::vector<std::shared_ptr<Token>> &into)
 {
         std::string current;
 

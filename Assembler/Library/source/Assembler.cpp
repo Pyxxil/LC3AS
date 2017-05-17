@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "../../../cxxopts.hpp"
-#include "Lexer.hpp"
+#include "Tokenizer.hpp"
 
 Assembler::Assembler()
         : symbols(), files_to_assemble(), as_assembled(), m_logger(), tokens()
@@ -336,7 +336,7 @@ bool Assembler::assemble()
                 stream << "\n --- Assembling " << file << " ---\n\nStarting first pass\n";
                 m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
 
-                Lexer lexer(file, quiet, warning_level);
+                Tokenizer lexer(file, quiet, warning_level);
                 error_count = lexer.parse_into(tokens);
 
                 do_first_pass();

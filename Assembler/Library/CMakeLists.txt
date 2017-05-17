@@ -5,7 +5,7 @@ set ( ASSEMBLER_SOURCE_FILES
       source/Assembler.cpp
       source/String_Matcher.cpp
       source/Logging/Logger.cpp
-      source/Lexer.cpp
+      source/Tokenizer.cpp
       source/Token.cpp
       source/Tokens/Token_Label.cpp
       source/Tokens/Token_String.cpp
@@ -52,7 +52,7 @@ set ( ASSEMBLER_HEADER_FILES
       includes/String_Matcher.hpp
       includes/Logging/Logger.hpp
       includes/Symbol.hpp
-      includes/Lexer.hpp
+      includes/Tokenizer.hpp
       includes/Token.hpp
       includes/Tokens/Token_Immediate.hpp
       includes/Tokens/Token_Register.hpp
