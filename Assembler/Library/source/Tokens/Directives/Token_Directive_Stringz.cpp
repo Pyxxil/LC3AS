@@ -22,6 +22,7 @@ std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled = tokens.at(1)->assembled;
+
         return static_cast<std::int32_t>(assembled.size());
 }
 

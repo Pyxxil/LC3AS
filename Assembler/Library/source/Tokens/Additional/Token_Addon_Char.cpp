@@ -21,6 +21,9 @@ Character::Character(std::string &character, std::string &t_file, int line_numbe
                         case 't':
                                 value = '\t';
                                 return;
+                        case '\'':
+                                value = '\'';
+                                return;
                         default:
                                 break;
                         }

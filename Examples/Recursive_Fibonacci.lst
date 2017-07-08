@@ -180,350 +180,350 @@
 (30B2) 0064 0000000001100100 ( 239)                         .FILL 0x0064	Examples/Recursive_Fibonacci.asm
 (30B3) 000A 0000000000001010 ( 240)                         .FILL 0x000A	Examples/Recursive_Fibonacci.asm
 (30B4) 0000 0000000000000000 ( 241)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30B5) 7E80 0111111010000000 ( 248) RECURSIVE_FIBONACCI     STR R7 R2 #0	Examples/Recursive_Fibonacci.asm
-(30B6) 14A1 0001010010100001 ( 249)                         ADD R2 R2 #1	Examples/Recursive_Fibonacci.asm
-(30B7) 1CFD 0001110011111101 ( 250)                         ADD R6 R3 #-3	Examples/Recursive_Fibonacci.asm
-(30B8) 080E 0000100000001110 ( 251)                         BRn BASE_CASE	Examples/Recursive_Fibonacci.asm
-(30B9) 16FF 0001011011111111 ( 253)                         ADD R3 R3 #-1	Examples/Recursive_Fibonacci.asm
-(30BA) 7700 0111011100000000 ( 254)                         STR R3 R4 #0	Examples/Recursive_Fibonacci.asm
-(30BB) 1921 0001100100100001 ( 255)                         ADD R4 R4 #1	Examples/Recursive_Fibonacci.asm
-(30BC) 4FF8 0100111111111000 ( 256)                         JSR RECURSIVE_FIBONACCI	Examples/Recursive_Fibonacci.asm
-(30BD) 193F 0001100100111111 ( 258)                         ADD R4 R4 #-1	Examples/Recursive_Fibonacci.asm
-(30BE) 6700 0110011100000000 ( 259)                         LDR R3 R4 #0	Examples/Recursive_Fibonacci.asm
-(30BF) 16FF 0001011011111111 ( 260)                         ADD R3 R3 #-1	Examples/Recursive_Fibonacci.asm
-(30C0) 4FF4 0100111111110100 ( 261)                         JSR RECURSIVE_FIBONACCI	Examples/Recursive_Fibonacci.asm
-(30C1) 103F 0001000000111111 ( 263)                         ADD R0 R0 #-1	Examples/Recursive_Fibonacci.asm
-(30C2) 6600 0110011000000000 ( 264)                         LDR R3 R0 #0	Examples/Recursive_Fibonacci.asm
-(30C3) 103F 0001000000111111 ( 265)                         ADD R0 R0 #-1	Examples/Recursive_Fibonacci.asm
-(30C4) 6A00 0110101000000000 ( 266)                         LDR R5 R0 #0	Examples/Recursive_Fibonacci.asm
-(30C5) 1B43 0001101101000011 ( 267)                         ADD R5 R5 R3	Examples/Recursive_Fibonacci.asm
-(30C6) 0E02 0000111000000010 ( 268)                         BRnzp RETURN	Examples/Recursive_Fibonacci.asm
-(30C7) 5B60 0101101101100000 ( 271) BASE_CASE               AND R5 R5 #0	Examples/Recursive_Fibonacci.asm
-(30C8) 1B61 0001101101100001 ( 272)                         ADD R5 R5 #1	Examples/Recursive_Fibonacci.asm
-(30C9) 14BF 0001010010111111 ( 277) RETURN                  ADD R2 R2 #-1	Examples/Recursive_Fibonacci.asm
-(30CA) 6E80 0110111010000000 ( 278)                         LDR R7 R2 #0	Examples/Recursive_Fibonacci.asm
-(30CB) 7A00 0111101000000000 ( 279)                         STR R5 R0 #0	Examples/Recursive_Fibonacci.asm
-(30CC) 1021 0001000000100001 ( 280)                         ADD R0 R0 #1	Examples/Recursive_Fibonacci.asm
-(30CD) C1C0 1100000111000000 ( 281)                         RET	Examples/Recursive_Fibonacci.asm
-(30CE) 2611 0010011000010001 ( 286) INIT_LOOP               LD R3 COUNT	Examples/Recursive_Fibonacci.asm
-(30CF) E413 1110010000010011 ( 289) LOOP                    LEA R2 STACK	Examples/Recursive_Fibonacci.asm
-(30D0) E076 1110000001110110 ( 290)                         LEA R0 RESULT_STACK	Examples/Recursive_Fibonacci.asm
-(30D1) E8D9 1110100011011001 ( 291)                         LEA R4 TEMP_VAL_STACK	Examples/Recursive_Fibonacci.asm
-(30D2) 4FE2 0100111111100010 ( 292)                         JSR RECURSIVE_FIBONACCI	Examples/Recursive_Fibonacci.asm
-(30D3) 103F 0001000000111111 ( 294)                         ADD R0 R0 #-1	Examples/Recursive_Fibonacci.asm
-(30D4) 6A00 0110101000000000 ( 296)                         LDR R5 R0 #0	Examples/Recursive_Fibonacci.asm
-(30D5) 4F93 0100111110010011 ( 297)                         JSR CONVERT_TO_ASCII	Examples/Recursive_Fibonacci.asm
-(30D6) 2609 0010011000001001 ( 298)                         LD R3 COUNT	Examples/Recursive_Fibonacci.asm
-(30D7) 2DD3 0010110111010011 ( 299)                         LD R6 NUMBER	Examples/Recursive_Fibonacci.asm
-(30D8) 9DBF 1001110110111111 ( 300)                         NOT R6 R6	Examples/Recursive_Fibonacci.asm
-(30D9) 1DA1 0001110110100001 ( 301)                         ADD R6 R6 #1	Examples/Recursive_Fibonacci.asm
-(30DA) 1D83 0001110110000011 ( 302)                         ADD R6 R6 R3	Examples/Recursive_Fibonacci.asm
-(30DB) 0403 0000010000000011 ( 303)                         BRz FINISH	Examples/Recursive_Fibonacci.asm
-(30DC) 16E1 0001011011100001 ( 304)                         ADD R3 R3 #1	Examples/Recursive_Fibonacci.asm
-(30DD) 3602 0011011000000010 ( 305)                         ST R3 COUNT	Examples/Recursive_Fibonacci.asm
-(30DE) 0FF0 0000111111110000 ( 306)                         BRnzp LOOP	Examples/Recursive_Fibonacci.asm
-(30DF) F025 1111000000100101 ( 309) FINISH                  HALT	Examples/Recursive_Fibonacci.asm
-(30E0) 0001 0000000000000001 ( 312) COUNT                   .FILL 0x0001	Examples/Recursive_Fibonacci.asm
-(30E1) 308A 0011000010001010 ( 313) SAVER                   .FILL 0x308A	Examples/Recursive_Fibonacci.asm
-(30E2) 30CE 0011000011001110 ( 314) LOOPER                  .FILL 0x30CE	Examples/Recursive_Fibonacci.asm
-(30E3) 0000 0000000000000000 ( 317) STACK                   .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30E4) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30E5) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30E6) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30E7) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30E8) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30E9) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30EA) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30EB) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30EC) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30ED) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30EE) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30EF) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F0) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F1) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F2) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F3) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F4) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F5) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F6) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F7) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F8) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30F9) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30FA) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30FB) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30FC) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30FD) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30FE) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(30FF) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3100) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3101) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3102) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3103) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3104) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3105) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3106) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3107) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3108) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3109) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(310A) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(310B) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(310C) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(310D) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(310E) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(310F) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3110) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3111) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3112) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3113) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3114) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3115) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3116) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3117) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3118) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3119) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(311A) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(311B) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(311C) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(311D) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(311E) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(311F) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3120) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3121) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3122) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3123) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3124) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3125) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3126) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3127) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3128) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3129) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(312A) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(312B) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(312C) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(312D) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(312E) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(312F) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3130) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3131) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3132) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3133) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3134) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3135) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3136) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3137) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3138) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3139) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(313A) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(313B) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(313C) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(313D) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(313E) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(313F) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3140) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3141) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3142) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3143) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3144) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3145) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3146) 0000 0000000000000000 ( 317)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3147) 0000 0000000000000000 ( 318) RESULT_STACK            .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3148) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3149) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(314A) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(314B) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(314C) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(314D) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(314E) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(314F) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3150) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3151) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3152) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3153) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3154) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3155) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3156) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3157) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3158) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3159) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(315A) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(315B) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(315C) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(315D) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(315E) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(315F) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3160) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3161) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3162) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3163) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3164) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3165) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3166) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3167) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3168) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3169) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(316A) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(316B) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(316C) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(316D) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(316E) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(316F) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3170) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3171) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3172) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3173) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3174) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3175) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3176) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3177) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3178) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3179) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(317A) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(317B) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(317C) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(317D) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(317E) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(317F) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3180) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3181) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3182) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3183) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3184) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3185) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3186) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3187) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3188) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3189) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(318A) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(318B) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(318C) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(318D) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(318E) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(318F) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3190) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3191) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3192) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3193) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3194) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3195) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3196) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3197) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3198) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3199) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(319A) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(319B) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(319C) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(319D) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(319E) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(319F) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A0) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A1) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A2) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A3) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A4) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A5) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A6) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A7) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A8) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31A9) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31AA) 0000 0000000000000000 ( 318)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31AB) 0000 0000000000000000 ( 320) TEMP_VAL_STACK          .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31AC) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31AD) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31AE) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31AF) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B0) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B1) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B2) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B3) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B4) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B5) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B6) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B7) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B8) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31B9) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31BA) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31BB) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31BC) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31BD) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31BE) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31BF) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C0) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C1) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C2) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C3) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C4) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C5) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C6) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C7) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C8) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31C9) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31CA) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31CB) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31CC) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31CD) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31CE) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31CF) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D0) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D1) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D2) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D3) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D4) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D5) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D6) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D7) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D8) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31D9) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31DA) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31DB) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31DC) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31DD) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31DE) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31DF) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E0) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E1) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E2) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E3) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E4) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E5) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E6) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E7) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E8) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31E9) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31EA) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31EB) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31EC) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31ED) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31EE) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31EF) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F0) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F1) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F2) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F3) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F4) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F5) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F6) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F7) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F8) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31F9) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31FA) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31FB) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31FC) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31FD) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31FE) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(31FF) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3200) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3201) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3202) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3203) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3204) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3205) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3206) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3207) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3208) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(3209) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(320A) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(320B) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(320C) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(320D) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(320E) 0000 0000000000000000 ( 320)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
-(320F) 0000 0000000000000000 ( 322)                         .END	Examples/Recursive_Fibonacci.asm
+(30B5) 7E80 0111111010000000 ( 257) RECURSIVE_FIBONACCI     STR R7 R2 #0	Examples/Recursive_Fibonacci.asm
+(30B6) 14A1 0001010010100001 ( 258)                         ADD R2 R2 #1	Examples/Recursive_Fibonacci.asm
+(30B7) 1CFD 0001110011111101 ( 259)                         ADD R6 R3 #-3	Examples/Recursive_Fibonacci.asm
+(30B8) 080E 0000100000001110 ( 260)                         BRn BASE_CASE	Examples/Recursive_Fibonacci.asm
+(30B9) 16FF 0001011011111111 ( 262)                         ADD R3 R3 #-1	Examples/Recursive_Fibonacci.asm
+(30BA) 7700 0111011100000000 ( 263)                         STR R3 R4 #0	Examples/Recursive_Fibonacci.asm
+(30BB) 1921 0001100100100001 ( 264)                         ADD R4 R4 #1	Examples/Recursive_Fibonacci.asm
+(30BC) 4FF8 0100111111111000 ( 265)                         JSR RECURSIVE_FIBONACCI	Examples/Recursive_Fibonacci.asm
+(30BD) 193F 0001100100111111 ( 267)                         ADD R4 R4 #-1	Examples/Recursive_Fibonacci.asm
+(30BE) 6700 0110011100000000 ( 268)                         LDR R3 R4 #0	Examples/Recursive_Fibonacci.asm
+(30BF) 16FF 0001011011111111 ( 269)                         ADD R3 R3 #-1	Examples/Recursive_Fibonacci.asm
+(30C0) 4FF4 0100111111110100 ( 270)                         JSR RECURSIVE_FIBONACCI	Examples/Recursive_Fibonacci.asm
+(30C1) 103F 0001000000111111 ( 272)                         ADD R0 R0 #-1	Examples/Recursive_Fibonacci.asm
+(30C2) 6600 0110011000000000 ( 273)                         LDR R3 R0 #0	Examples/Recursive_Fibonacci.asm
+(30C3) 103F 0001000000111111 ( 274)                         ADD R0 R0 #-1	Examples/Recursive_Fibonacci.asm
+(30C4) 6A00 0110101000000000 ( 275)                         LDR R5 R0 #0	Examples/Recursive_Fibonacci.asm
+(30C5) 1B43 0001101101000011 ( 276)                         ADD R5 R5 R3	Examples/Recursive_Fibonacci.asm
+(30C6) 0E02 0000111000000010 ( 277)                         BRnzp RETURN	Examples/Recursive_Fibonacci.asm
+(30C7) 5B60 0101101101100000 ( 280) BASE_CASE               AND R5 R5 #0	Examples/Recursive_Fibonacci.asm
+(30C8) 1B61 0001101101100001 ( 281)                         ADD R5 R5 #1	Examples/Recursive_Fibonacci.asm
+(30C9) 14BF 0001010010111111 ( 286) RETURN                  ADD R2 R2 #-1	Examples/Recursive_Fibonacci.asm
+(30CA) 6E80 0110111010000000 ( 287)                         LDR R7 R2 #0	Examples/Recursive_Fibonacci.asm
+(30CB) 7A00 0111101000000000 ( 288)                         STR R5 R0 #0	Examples/Recursive_Fibonacci.asm
+(30CC) 1021 0001000000100001 ( 289)                         ADD R0 R0 #1	Examples/Recursive_Fibonacci.asm
+(30CD) C1C0 1100000111000000 ( 290)                         RET	Examples/Recursive_Fibonacci.asm
+(30CE) 2611 0010011000010001 ( 295) INIT_LOOP               LD R3 COUNT	Examples/Recursive_Fibonacci.asm
+(30CF) E413 1110010000010011 ( 298) LOOP                    LEA R2 STACK	Examples/Recursive_Fibonacci.asm
+(30D0) E076 1110000001110110 ( 299)                         LEA R0 RESULT_STACK	Examples/Recursive_Fibonacci.asm
+(30D1) E8D9 1110100011011001 ( 300)                         LEA R4 TEMP_VAL_STACK	Examples/Recursive_Fibonacci.asm
+(30D2) 4FE2 0100111111100010 ( 301)                         JSR RECURSIVE_FIBONACCI	Examples/Recursive_Fibonacci.asm
+(30D3) 103F 0001000000111111 ( 303)                         ADD R0 R0 #-1	Examples/Recursive_Fibonacci.asm
+(30D4) 6A00 0110101000000000 ( 305)                         LDR R5 R0 #0	Examples/Recursive_Fibonacci.asm
+(30D5) 4F93 0100111110010011 ( 306)                         JSR CONVERT_TO_ASCII	Examples/Recursive_Fibonacci.asm
+(30D6) 2609 0010011000001001 ( 307)                         LD R3 COUNT	Examples/Recursive_Fibonacci.asm
+(30D7) 2DD3 0010110111010011 ( 308)                         LD R6 NUMBER	Examples/Recursive_Fibonacci.asm
+(30D8) 9DBF 1001110110111111 ( 309)                         NOT R6 R6	Examples/Recursive_Fibonacci.asm
+(30D9) 1DA1 0001110110100001 ( 310)                         ADD R6 R6 #1	Examples/Recursive_Fibonacci.asm
+(30DA) 1D83 0001110110000011 ( 311)                         ADD R6 R6 R3	Examples/Recursive_Fibonacci.asm
+(30DB) 0403 0000010000000011 ( 312)                         BRz FINISH	Examples/Recursive_Fibonacci.asm
+(30DC) 16E1 0001011011100001 ( 313)                         ADD R3 R3 #1	Examples/Recursive_Fibonacci.asm
+(30DD) 3602 0011011000000010 ( 314)                         ST R3 COUNT	Examples/Recursive_Fibonacci.asm
+(30DE) 0FF0 0000111111110000 ( 315)                         BRnzp LOOP	Examples/Recursive_Fibonacci.asm
+(30DF) F025 1111000000100101 ( 318) FINISH                  HALT	Examples/Recursive_Fibonacci.asm
+(30E0) 0001 0000000000000001 ( 321) COUNT                   .FILL 0x0001	Examples/Recursive_Fibonacci.asm
+(30E1) 308A 0011000010001010 ( 322) SAVER                   .FILL 0x308A	Examples/Recursive_Fibonacci.asm
+(30E2) 30CE 0011000011001110 ( 323) LOOPER                  .FILL 0x30CE	Examples/Recursive_Fibonacci.asm
+(30E3) 0000 0000000000000000 ( 326) STACK                   .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30E4) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30E5) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30E6) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30E7) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30E8) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30E9) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30EA) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30EB) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30EC) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30ED) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30EE) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30EF) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F0) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F1) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F2) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F3) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F4) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F5) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F6) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F7) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F8) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30F9) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30FA) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30FB) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30FC) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30FD) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30FE) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(30FF) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3100) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3101) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3102) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3103) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3104) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3105) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3106) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3107) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3108) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3109) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(310A) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(310B) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(310C) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(310D) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(310E) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(310F) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3110) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3111) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3112) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3113) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3114) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3115) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3116) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3117) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3118) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3119) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(311A) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(311B) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(311C) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(311D) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(311E) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(311F) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3120) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3121) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3122) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3123) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3124) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3125) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3126) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3127) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3128) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3129) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(312A) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(312B) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(312C) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(312D) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(312E) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(312F) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3130) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3131) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3132) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3133) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3134) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3135) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3136) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3137) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3138) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3139) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(313A) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(313B) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(313C) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(313D) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(313E) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(313F) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3140) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3141) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3142) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3143) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3144) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3145) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3146) 0000 0000000000000000 ( 326)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3147) 0000 0000000000000000 ( 327) RESULT_STACK            .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3148) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3149) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(314A) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(314B) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(314C) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(314D) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(314E) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(314F) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3150) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3151) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3152) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3153) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3154) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3155) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3156) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3157) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3158) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3159) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(315A) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(315B) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(315C) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(315D) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(315E) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(315F) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3160) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3161) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3162) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3163) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3164) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3165) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3166) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3167) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3168) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3169) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(316A) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(316B) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(316C) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(316D) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(316E) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(316F) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3170) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3171) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3172) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3173) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3174) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3175) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3176) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3177) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3178) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3179) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(317A) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(317B) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(317C) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(317D) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(317E) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(317F) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3180) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3181) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3182) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3183) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3184) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3185) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3186) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3187) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3188) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3189) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(318A) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(318B) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(318C) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(318D) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(318E) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(318F) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3190) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3191) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3192) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3193) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3194) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3195) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3196) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3197) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3198) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3199) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(319A) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(319B) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(319C) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(319D) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(319E) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(319F) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A0) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A1) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A2) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A3) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A4) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A5) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A6) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A7) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A8) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31A9) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31AA) 0000 0000000000000000 ( 327)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31AB) 0000 0000000000000000 ( 329) TEMP_VAL_STACK          .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31AC) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31AD) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31AE) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31AF) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B0) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B1) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B2) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B3) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B4) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B5) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B6) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B7) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B8) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31B9) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31BA) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31BB) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31BC) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31BD) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31BE) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31BF) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C0) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C1) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C2) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C3) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C4) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C5) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C6) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C7) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C8) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31C9) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31CA) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31CB) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31CC) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31CD) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31CE) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31CF) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D0) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D1) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D2) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D3) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D4) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D5) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D6) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D7) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D8) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31D9) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31DA) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31DB) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31DC) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31DD) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31DE) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31DF) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E0) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E1) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E2) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E3) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E4) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E5) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E6) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E7) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E8) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31E9) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31EA) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31EB) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31EC) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31ED) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31EE) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31EF) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F0) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F1) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F2) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F3) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F4) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F5) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F6) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F7) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F8) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31F9) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31FA) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31FB) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31FC) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31FD) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31FE) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(31FF) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3200) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3201) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3202) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3203) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3204) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3205) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3206) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3207) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3208) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(3209) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(320A) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(320B) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(320C) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(320D) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(320E) 0000 0000000000000000 ( 329)                         .FILL 0x0000	Examples/Recursive_Fibonacci.asm
+(320F) 0000 0000000000000000 ( 331)                         .END	Examples/Recursive_Fibonacci.asm

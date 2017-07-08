@@ -22,7 +22,7 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
 
-        std::int32_t ret = vec.front()->assemble(vec, symbols, program_counter);
+        const std::int32_t ret = vec.front()->assemble(vec, symbols, program_counter);
 
         assembled = vec.front()->assembled;
         return ret;
@@ -57,7 +57,7 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
                 matcher.consider(symbol.first);
         }
 
-        const std::string possible_match = matcher.best_match();
+        auto &&possible_match = matcher.best_match();
 
         std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
         if (at_line) {
@@ -85,7 +85,7 @@ std::string Label::disassemble(std::uint16_t &program_counter,
 
 void Label::requires_too_many_bits(int allowed_bits, bool is_signed)
 {
-        Token::requires_too_many_bits(allowed_bits, false);
+        Token::requires_too_many_bits(allowed_bits, UNSIGNED);
 
         std::cerr << "Address of '" << token << "' has an address not able to be represented in a "
                   << allowed_bits << " bit " << (is_signed ? "signed" : "unsigned") << " PC offset.\n";

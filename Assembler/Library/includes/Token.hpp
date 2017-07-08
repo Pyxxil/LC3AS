@@ -9,6 +9,9 @@
 
 #include "Symbol.hpp"
 
+#define SIGNED true
+#define UNSIGNED false
+
 class Assembler;
 
 class Token
@@ -81,7 +84,7 @@ public:
 
         virtual void expected(const char *const expects) const;
         virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const;
-        virtual void requires_too_many_bits(int allowed_bits, bool is_signed = true);
+        virtual void requires_too_many_bits(int allowed_bits, bool is_signed = SIGNED);
 
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
                                       const std::map<std::string, Symbol> &symbols,

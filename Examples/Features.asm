@@ -62,9 +62,30 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         BRn #-1         ; Complains about infinite loop
         BRn WARNING_THROWS ; Complains about same condition code as line before
         TRAP 0xFF       ; Possible illegal trap vector
+        BRnzp #-256
+        .LSHIFT R0, 0
+        .LSHIFT R0, 1
+        .LSHIFT R0, 2
+        .LSHIFT R0, 3
+        .LSHIFT R0, 4
+        .LSHIFT R0, 5
+        .LSHIFT R0, 6
+        .LSHIFT R0, 7
+        .LSHIFT R0, 8
+        .LSHIFT R0, 9
+        .LSHIFT R0, 10
+        .LSHIFT R0, 11
+        .LSHIFT R0, 12
+        .LSHIFT R0, 13
+        .LSHIFT R0, 14
+        .LSHIFT R0, 15
+        .LSHIFT R0, 16
 
 ; End of warnings
         RET
+
+WARNING_STRING:         ; Should throw a warning about the lone '\'
+        .STRINGZ "\ "
 
 ; Uncomment the following for testing
 ;       Current Error Count = 38

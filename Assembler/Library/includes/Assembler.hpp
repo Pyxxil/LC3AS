@@ -52,8 +52,6 @@ private:
 
         std::size_t error_count = 0;
 
-        Logger m_logger;
-
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
 
         void do_first_pass();
@@ -64,7 +62,7 @@ private:
         bool do_write = true;
 
         bool quiet         = false;
-        int  warning_level = Logger::WARNING_TYPE::ALL;
+        int  warning_level = Logging::WARNING_TYPE::ALL;
         void change_warning_level(std::string &warning);
 };
 

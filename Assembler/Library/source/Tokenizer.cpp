@@ -13,9 +13,10 @@
 //                      - Quite probably make this a compile time thing -- if user doesn't want addons,
 //                        then don't print the file, otherwise use a new column to print the file name.
 
-static constexpr std::size_t hashed_letters[26] = {
-        100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957, 50262, 48407, 51151, 41047, 39371
-        , 35401, 37039, 28697, 27791, 20201, 21523, 6449, 4813, 16333, 13337,
+static constexpr std::size_t hashed_letters[] = {
+        100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457
+        , 65719, 70957, 50262, 48407, 51151, 41047, 39371, 35401, 37039
+        , 28697, 27791, 20201, 21523, 6449, 4813, 16333, 13337,
 };
 
 /**
@@ -29,7 +30,7 @@ static constexpr std::size_t hashed_letters[26] = {
  */
 static constexpr std::size_t hash(const char *const string, std::size_t length)
 {
-        std::size_t _hash = 37;
+        std::size_t _hash { 37 };
 
         for (std::size_t index = 0; index < length; ++index) {
                 _hash = (_hash * hashed_letters[(static_cast<std::size_t>(string[index]) - 0x41u) % 26]) ^
@@ -40,7 +41,7 @@ static constexpr std::size_t hash(const char *const string, std::size_t length)
         return _hash;
 }
 
-static std::size_t hash(std::string &string)
+static std::size_t hash(const std::string &string)
 {
         // Basically, we don't really want something that's likely to be an immediate value,
         // or a label (less likely to be caught here, but may as well try).
@@ -48,7 +49,7 @@ static std::size_t hash(std::string &string)
                 return 0;
         }
 
-        std::size_t _hash = 37;
+        std::size_t _hash { 37 };
 
         for (const auto &character : string) {
                 _hash = (_hash * hashed_letters[(static_cast<std::size_t>(character) - 0x41u) % 26]) ^
@@ -61,8 +62,8 @@ static std::size_t hash(std::string &string)
 
 std::vector<std::string> Tokenizer::open_files;
 
-Tokenizer::Tokenizer(const std::string &t_file_name, bool quiet, int warn)
-        : m_file_name(t_file_name), m_logger(warn, quiet), be_quiet(quiet), m_warn(warn)
+Tokenizer::Tokenizer(const std::string &t_file_name)
+        : m_file_name{t_file_name}
 {
         open_files.emplace_back(m_file_name);
 }
@@ -112,9 +113,11 @@ void Tokenizer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>>
                                         // TODO:        - If that file doesn't exist, maybe check the given path?
                                         // TODO:        - Do we now add a '-I/--Include directory' option?
                                         const std::string &file_with_path =
-                                                                  m_file_name.substr(0, m_file_name.find_last_of('/') + 1) +
-                                                                          tokenized_line.back()->token;
-                                        const bool already_open = std::find_if(
+                                                                  m_file_name.substr(
+                                                                          0, m_file_name.find_last_of('/') + 1) +
+                                                                  tokenized_line.back()->token;
+
+                                        auto &&file_is_already_open = std::find_if(
                                                 open_files.cbegin(), open_files.cend(),
                                                 [&file_with_path](const auto &_file) -> bool
                                                 {
@@ -122,13 +125,15 @@ void Tokenizer::populate_tokens(std::vector<std::vector<std::shared_ptr<Token>>>
                                                 }
                                         ) != open_files.cend();
 
-                                        if (already_open) {
-                                                m_logger.LOG(Logger::ERROR, tokenized_line.front()->at_line,
-                                                             m_file_name, "Recursive include.",
-                                                             Logger::NONE);
+                                        if (file_is_already_open) {
+                                                Logging::logger->LOG(Logging::ERROR,
+                                                                     tokenized_line.front()->at_line,
+                                                                     m_file_name,
+                                                                     "Recursive include.",
+                                                                     Logging::NONE);
                                                 ++m_error_count;
                                         } else {
-                                                Tokenizer lex(file_with_path, be_quiet, m_warn);
+                                                Tokenizer lex(file_with_path);
                                                 m_error_count += lex.parse_into(into);
                                         }
                                 } else {
@@ -170,7 +175,7 @@ std::shared_ptr<Token> Tokenizer::tokenize(std::string &word, int line_number)
         // TODO: While this makes it a bit more efficient, is it worth double checking that
         // TODO: the strings are the same after comparing the hash's? Just as a precautionary
         // TODO: measure.
-        std::size_t hashed = hash(copy); // This is non-zero if the string contains some letters.
+        const std::size_t hashed = hash(copy); // This is non-zero if the string contains some letters.
 
         if (hashed) {
                 switch (hashed) {
@@ -212,7 +217,8 @@ std::shared_ptr<Token> Tokenizer::tokenize(std::string &word, int line_number)
                         return std::make_shared<Trap>(word, copy, m_file_name, line_number);
                 case hash("GETC", 4):
                         return std::make_shared<Getc>(word, copy, m_file_name, line_number);
-                case hash("OUT", 3):
+                case hash("OUT", 3): // FALLTHROUGH
+                case hash("PUTC", 4):
                         return std::make_shared<Out>(word, copy, m_file_name, line_number);
                 case hash("IN", 2):
                         return std::make_shared<In>(word, copy, m_file_name, line_number);
@@ -282,7 +288,9 @@ std::shared_ptr<Token> Tokenizer::tokenize(std::string &word, int line_number)
         static const std::regex _register("[rR]\\d", std::regex_constants::optimize);
         static const std::regex label("\\.?[\\da-zA-Z_]+", std::regex_constants::optimize);
 
-        if (std::regex_match(word, decimal)) {
+        if (std::regex_match(word, _register)) {
+                return std::make_shared<Register>(word, copy, m_file_name, line_number);
+        } else if (std::regex_match(word, decimal)) {
                 return std::make_shared<Decimal>(word, m_file_name, line_number);
         } else if (std::regex_match(word, binary)) {
                 return std::make_shared<Binary>(word, copy, m_file_name, line_number);
@@ -290,8 +298,6 @@ std::shared_ptr<Token> Tokenizer::tokenize(std::string &word, int line_number)
                 return std::make_shared<Hexadecimal>(word, copy, m_file_name, line_number);
         } else if (std::regex_match(word, octal)) {
                 return std::make_shared<Octal>(word, m_file_name, line_number);
-        } else if (std::regex_match(word, _register)) {
-                return std::make_shared<Register>(word, copy, m_file_name, line_number);
         } else if (std::regex_match(word, label)) {
                 return std::make_shared<Label>(word, m_file_name, line_number);
         } else {
@@ -333,10 +339,10 @@ void Tokenizer::tokenizeLine(const std::string &line, int line_number, std::vect
 {
         std::string current;
 
-        char terminated_by = 0;
+        char terminated_by { 0 };
 
         for (std::size_t index = 0; index < line.length();) {
-                char character = line.at(index);
+                char character { line.at(index) };
 
                 if (std::isspace(character)) {
                         // We don't care about space characters.
@@ -359,31 +365,34 @@ void Tokenizer::tokenizeLine(const std::string &line, int line_number, std::vect
                         // '//' is a comment as well.
                         if (index + 1 > line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
-                                m_logger.LOG(Logger::WARNING,
-                                             line_number,
-                                             m_file_name,
-                                             "Expected '//', but found '/'. "
-                                                     "Treating it as if it's '//' (i.e. comment).",
-                                             Logger::WARNING_TYPE::SYNTAX);
+                                Logging::logger->LOG(Logging::WARNING,
+                                                     line_number,
+                                                     m_file_name,
+                                                     "Expected '//', but found '/'. "
+                                                             "Treating it as if it's '//' (i.e. comment).",
+                                                     Logging::WARNING_TYPE::SYNTAX);
+                                ++m_warn_count;
                         }
                         break;
                 } else if (character == ',') {
                         if (!into.size() || terminated_by) {
-                                m_logger.LOG(Logger::WARNING,
-                                             line_number,
-                                             m_file_name,
-                                             "Extraneous comma.",
-                                             Logger::WARNING_TYPE::SYNTAX);
+                                Logging::logger->LOG(Logging::WARNING,
+                                                     line_number,
+                                                     m_file_name,
+                                                     "Extraneous comma.",
+                                                     Logging::WARNING_TYPE::SYNTAX);
+                                ++m_warn_count;
                         }
                         addToken(current, into, line_number);
                         terminated_by = ',';
                 } else if (character == ':') {
                         if (into.size() > 1 || !current.size() || terminated_by) {
-                                m_logger.LOG(Logger::WARNING,
-                                             line_number,
-                                             m_file_name,
-                                             "Extraneous colon.",
-                                             Logger::WARNING_TYPE::SYNTAX);
+                                Logging::logger->LOG(Logging::WARNING,
+                                                     line_number,
+                                                     m_file_name,
+                                                     "Extraneous colon.",
+                                                     Logging::WARNING_TYPE::SYNTAX);
+                                ++m_warn_count;
                         }
                         addToken(current, into, line_number);
                         terminated_by = ':';
@@ -394,7 +403,7 @@ void Tokenizer::tokenizeLine(const std::string &line, int line_number, std::vect
 #endif
                         addToken(current, into, line_number);
 
-                        char terminator = character;
+                        char terminator { character };
                         while (index + 1 < line.length()) {
                                 character = line.at(++index);
                                 if (character == '\\' && line.length() > index + 1 &&
@@ -413,11 +422,12 @@ void Tokenizer::tokenizeLine(const std::string &line, int line_number, std::vect
 #else
                                 stream << "Unterminated string";
 #endif
-                                m_logger.LOG(Logger::ERROR,
-                                             line_number,
-                                             m_file_name,
-                                             stream.str(),
-                                             Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                Logging::logger->LOG(
+                                        Logging::ERROR,
+                                        line_number,
+                                        m_file_name,
+                                        stream.str(),
+                                        Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                 ++m_error_count;
                                 into.clear();
 #ifdef INCLUDE_ADDONS
@@ -435,10 +445,12 @@ void Tokenizer::tokenizeLine(const std::string &line, int line_number, std::vect
                 ++index;
         }
 
-        const bool any_valid_characters = std::any_of(current.cbegin(), current.cend(), [](unsigned char chr) -> bool
-        {
-                return !(std::isspace(chr) || chr == ',' || chr == ':');
-        });
+        const bool any_valid_characters = std::any_of(
+                current.cbegin(), current.cend(), [](unsigned char chr) -> bool
+                {
+                        return !(std::isspace(chr) || chr == ',' || chr == ':');
+                }
+        );
 
         if (any_valid_characters) {
                 addToken(current, into, line_number);

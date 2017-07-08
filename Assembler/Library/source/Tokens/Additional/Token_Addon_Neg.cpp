@@ -9,8 +9,7 @@ Neg::Neg(std::string &directive, std::string &directive_uppercase, std::string &
         : Directive(directive, directive_uppercase, t_file, line_number)
           , neg(new Not("NOT", "NOT", t_file, line_number)), add(new Add("ADD", "ADD", t_file, line_number))
 {
-        //neg = std::make_shared<Not>("NOT", "NOT", t_file, line_number);
-        //add = std::make_shared<Add>("ADD", "ADD", t_file, line_number);
+
 }
 
 Neg::Neg(std::string &&directive, std::string &&directive_uppercase, std::string &t_file, int line_number)

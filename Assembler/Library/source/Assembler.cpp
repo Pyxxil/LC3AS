@@ -8,7 +8,7 @@
 #include "Tokenizer.hpp"
 
 Assembler::Assembler()
-        : symbols(), files_to_assemble(), as_assembled(), m_logger(), tokens()
+        : symbols(), files_to_assemble(), as_assembled(), tokens()
 {
 
 }
@@ -61,12 +61,12 @@ Assembler::Assembler(int argument_count, char **arguments)
                 }
 
                 change_warning_level(warning_value);
-                m_logger.set_warning_level(warning_level);
+                Logging::logger->set_warning_level(warning_level);
         }
 
         if (parser.count("quiet")) {
                 quiet = true;
-                m_logger.set_quietness(quiet);
+                Logging::logger->set_quietness(quiet);
         }
 
         if (parser.count("pretend")) {
@@ -74,12 +74,12 @@ Assembler::Assembler(int argument_count, char **arguments)
         }
 
         if (parser.count("no-warn")) {
-                warning_level = Logger::WARNING_TYPE::NONE;
-                m_logger.set_warning_level(warning_level);
+                warning_level = Logging::WARNING_TYPE::NONE;
+                Logging::logger->set_warning_level(warning_level);
         }
 
         for (int i = 1; i < argument_count; ++i) {
-                files_to_assemble.push_back(std::string(arguments[i]));
+                files_to_assemble.emplace_back(std::string(arguments[i]));
         }
 }
 
@@ -130,11 +130,11 @@ void Assembler::do_first_pass()
                 } else if (end_seen) {
                         std::stringstream stream;
                         stream << token->token << " after .END directive, it will be ignored.";
-                        m_logger.LOG(Logger::WARNING,
+                        Logging::logger->LOG(Logging::WARNING,
                                      token->at_line,
                                      token->file,
                                      stream.str(),
-                                     Logger::WARNING_TYPE::IGNORED);
+                                     Logging::WARNING_TYPE::IGNORED);
                         return 0;
                 } else if (token->valid_arguments(t_tokens)) {
                         return token->guess_memory_size(t_tokens);
@@ -147,11 +147,11 @@ void Assembler::do_first_pass()
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
                         if (origin_seen) {
-                                m_logger.LOG(Logger::ERROR,
+                                Logging::logger->LOG(Logging::ERROR,
                                              tokenized_line.front()->at_line,
                                              tokenized_line.front()->file,
                                              "Redefinition of Origin memory address.",
-                                             Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                             Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                 ++error_count;
                                 break;
                         }
@@ -177,11 +177,11 @@ void Assembler::do_first_pass()
                                                        << "\nNOTE: \t Previous label '" << symbol.first
                                                        << "' found on line " << std::dec
                                                        << symbol.second.line_number << '.';
-                                                m_logger.LOG(Logger::WARNING,
+                                                Logging::logger->LOG(Logging::WARNING,
                                                              tokenized_line.front()->at_line,
                                                              tokenized_line.front()->file,
                                                              stream.str(),
-                                                             Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                                             Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                                 break;
                                         }
                                 }
@@ -192,11 +192,11 @@ void Assembler::do_first_pass()
                                                << tokenized_line.front()->token
                                                << "'\nNOTE: \t Label was first defined on line "
                                                << symbols.at(tokenized_line.front()->token).line_number << '.';
-                                        m_logger.LOG(Logger::ERROR,
+                                        Logging::logger->LOG(Logging::ERROR,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      stream.str(),
-                                                     Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                                     Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                                         ++error_count;
                                 }
 
@@ -267,51 +267,51 @@ void Assembler::generate_machine_code()
                 for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
                         if (tokenized_line.front()->type() == Token::OP_BR) {
                                 if ((assembled_line & 0xFE00) == (as_assembled.back() & 0xFE00)) {
-                                        m_logger.LOG(Logger::WARNING,
+                                        Logging::logger->LOG(Logging::WARNING,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      "Statement before this one checks for the same condition code."
                                                              " This might mean this one will never execute.",
-                                                     Logger::WARNING_TYPE::LOGIC);
-                                } else if (!(assembled_line & 0xFF)) {
-                                        m_logger.LOG(Logger::WARNING,
+                                                     Logging::WARNING_TYPE::LOGIC);
+                                } else if (!(assembled_line & 0x1FF)) {
+                                        Logging::logger->LOG(Logging::WARNING,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      "BR with an offset of 0 will probably do nothing.",
-                                                     Logger::WARNING_TYPE::LOGIC);
+                                                     Logging::WARNING_TYPE::LOGIC);
                                 } else if ((assembled_line & 0x1FF) == 0x1FF) {
-                                        m_logger.LOG(Logger::WARNING,
+                                        Logging::logger->LOG(Logging::WARNING,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      "BR with an offset of -1 will probably cause an infinite loop.",
-                                                     Logger::WARNING_TYPE::LOGIC);
+                                                     Logging::WARNING_TYPE::LOGIC);
                                 }
                         } else if (tokenized_line.front()->type() == Token::OP_JSR) {
                                 if (!(assembled_line & 0x7FF)) {
                                         // Technically, this isn't true. It could just be a way to get the
                                         // current value of the PC into R7, but it's still worth a warning.
-                                        m_logger.LOG(Logger::WARNING,
+                                        Logging::logger->LOG(Logging::WARNING,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      "JSR with an offset of 0 will probably do nothing.",
-                                                     Logger::WARNING_TYPE::LOGIC);
+                                                     Logging::WARNING_TYPE::LOGIC);
                                 } else if ((assembled_line & 0x7FF) == 0x7FF) {
-                                        m_logger.LOG(Logger::WARNING,
+                                        Logging::logger->LOG(Logging::WARNING,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      "JSR with an offset of -1 will probably cause an infinite loop.",
-                                                     Logger::WARNING_TYPE::LOGIC);
+                                                     Logging::WARNING_TYPE::LOGIC);
                                 }
                         } else if (tokenized_line.front()->type() == Token::OP_TRAP) {
                                 if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
                                         std::stringstream stream;
                                         stream << "TRAP was supplied a trap vector of " << (assembled_line & 0x00FF)
-                                               << ", which is possibly an illegal trap vector.\n";
-                                        m_logger.LOG(Logger::WARNING,
+                                               << ", which is possibly an illegal trap vector.";
+                                        Logging::logger->LOG(Logging::WARNING,
                                                      tokenized_line.front()->at_line,
                                                      tokenized_line.front()->file,
                                                      stream.str(),
-                                                     Logger::WARNING_TYPE::LOGIC);
+                                                     Logging::WARNING_TYPE::LOGIC);
                                 }
                         }
 
@@ -334,32 +334,30 @@ bool Assembler::assemble()
         for (const auto &file : files_to_assemble) {
                 stream.str(std::string());
                 stream << "\n --- Assembling " << file << " ---\n\nStarting first pass\n";
-                m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
+                Logging::logger->LOG(Logging::MESSAGE, 0, file, stream.str(), Logging::NONE);
 
-                Tokenizer lexer(file, quiet, warning_level);
+                Tokenizer lexer(file);
                 error_count = lexer.parse_into(tokens);
 
                 do_first_pass();
 
                 if (!origin_seen) {
-                        m_logger.LOG(Logger::ERROR,
-                                     0,
-                                     file,
+                        Logging::logger->LOG(Logging::ERROR,
+                                     0, file,
                                      "No .ORIG directive. (Is the file empty?)",
-                                     Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                     Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                         ++error_count;
                 } else if (!end_seen) {
-                        m_logger.LOG(Logger::ERROR,
-                                     0,
-                                     file,
+                        Logging::logger->LOG(Logging::ERROR,
+                                     0, file,
                                      "Reached the end of the file, and found no .END directive.",
-                                     Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS);
+                                     Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS);
                         ++error_count;
                 }
 
                 stream.str(std::string());
                 stream << error_count << " error" << (error_count == 1 ? "" : "'s") << " found on the first pass\n";
-                m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
+                Logging::logger->LOG(Logging::MESSAGE, 0, file, stream.str(), Logging::NONE);
 
                 if (error_count || tokens.empty()) {
                         all_fine = false;
@@ -367,14 +365,15 @@ bool Assembler::assemble()
                         internal_program_counter = file_memory_origin_address;
 
                         stream.str(std::string());
-                        m_logger.LOG(Logger::MESSAGE, 0, file, "Starting second pass\n", Logger::NONE);
+                        Logging::logger->LOG(Logging::MESSAGE, 0, file,
+                                             "Starting second pass\n", Logging::NONE);
 
                         do_second_pass();
 
                         stream.str(std::string());
                         stream << error_count << " error" << (error_count == 1 ? "" : "'s")
                                << " found on the second pass\n";
-                        m_logger.LOG(Logger::MESSAGE, 0, file, stream.str(), Logger::NONE);
+                        Logging::logger->LOG(Logging::MESSAGE, 0, file, stream.str(), Logging::NONE);
 
                         if (!error_count) {
                                 if (do_write) {
@@ -436,7 +435,7 @@ void Assembler::write(std::string &prefix)
                     << std::setw(longest_symbol_length) << "Symbol Name" << " Page Address\n//\t"
                     << std::setfill('-') << std::setw(longest_symbol_length) << '-' << " ------------\n";
 
-        for (const auto &symbol : symbols) {
+        for (auto &&symbol : symbols) {
                 symbol_file << "//\t" << std::setfill(' ') << std::setw(longest_symbol_length)
                             << symbol.first << ' ' << std::uppercase << std::hex << std::setfill('0')
                             << std::setw(4) << symbol.second.address << '\n';
@@ -459,7 +458,7 @@ void Assembler::write(std::string &prefix)
 
         const std::string empty = " ";
 
-        for (auto &tokenized_line : tokens) {
+        for (auto &&tokenized_line : tokens) {
                 symbol = symbol_at(pc);
 
                 lst_file << tokenized_line.front()->disassemble(
@@ -679,17 +678,17 @@ std::string Assembler::disassemble(std::uint16_t instruction, std::uint16_t pc)
 void Assembler::change_warning_level(std::string &warning)
 {
         if (warning == "none") {
-                warning_level = Logger::WARNING_TYPE::NONE;
+                warning_level = Logging::WARNING_TYPE::NONE;
         } else if (warning == "syntax") {
-                warning_level |= Logger::WARNING_TYPE::SYNTAX;
+                warning_level |= Logging::WARNING_TYPE::SYNTAX;
         } else if (warning == "ignore") {
-                warning_level |= Logger::WARNING_TYPE::IGNORED;
+                warning_level |= Logging::WARNING_TYPE::IGNORED;
         } else if (warning == "multiple") {
-                warning_level |= Logger::WARNING_TYPE::MULTIPLE_DEFINITIONS;
+                warning_level |= Logging::WARNING_TYPE::MULTIPLE_DEFINITIONS;
         } else if (warning == "logic") {
-                warning_level |= Logger::WARNING_TYPE::LOGIC;
+                warning_level |= Logging::WARNING_TYPE::LOGIC;
         } else if (warning == "all") {
-                warning_level = Logger::WARNING_TYPE::ALL;
+                warning_level = Logging::WARNING_TYPE::ALL;
         } else {
                 std::cerr << "Argument --warn expects one (or more) of the following:" << '\n'
                           << "\t- all\n"

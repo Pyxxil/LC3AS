@@ -38,7 +38,7 @@ bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("value value");
+                tokens.at(1)->expected("valid trap vector");
                 return (is_valid = false);
         }
 
@@ -47,7 +47,7 @@ bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (std::static_pointer_cast<Immediate>(tokens.at(1))->value > 0xFF) {
-                tokens.at(1)->requires_too_many_bits(8, false);
+                tokens.at(1)->requires_too_many_bits(8, UNSIGNED);
                 return (is_valid = false);
         }
 

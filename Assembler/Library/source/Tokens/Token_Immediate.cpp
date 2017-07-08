@@ -17,7 +17,7 @@ Immediate::Immediate(std::string &immediate,
 
 void Immediate::requires_too_many_bits(int allowed_bits, bool is_signed)
 {
-        Token::requires_too_many_bits(allowed_bits, false);
+        Token::requires_too_many_bits(allowed_bits, UNSIGNED);
 
         std::cerr << "Immediate value " << value << " can not be represented as a " << allowed_bits
                   << " bit " << (is_signed ? "signed" : "unsigned") << " PC offset.\n";

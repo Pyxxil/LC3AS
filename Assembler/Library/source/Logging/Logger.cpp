@@ -3,19 +3,21 @@
 #include <iostream>
 #include <sstream>
 
-Logger::Logger()
+std::unique_ptr<Logging::Logger> Logging::logger = std::make_unique<Logger>();
+
+Logging::Logger::Logger()
         : Logger(WARNING_TYPE::ALL, false)
 {
 
 }
 
-Logger::Logger(int warning_level, bool quietness)
+Logging::Logger::Logger(int warning_level, bool quietness)
         : m_warn(warning_level), quiet(quietness)
 {
 
 }
 
-void Logger::LOG(LOGGING_TYPE level,
+void Logging::Logger::LOG(LOGGING_TYPE level,
                  int line_number,
                  const std::string &file,
                  const std::string &&message,
@@ -37,7 +39,7 @@ void Logger::LOG(LOGGING_TYPE level,
         }
 }
 
-void Logger::warn(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning)
+void Logging::Logger::warn(WARNING_TYPE level, int line_number, const std::string &file, const std::string &warning)
 {
         if (!(m_warn & level)) {
                 return;
@@ -56,7 +58,7 @@ void Logger::warn(WARNING_TYPE level, int line_number, const std::string &file, 
         std::cerr << stream.str();
 }
 
-void Logger::err(int line_number, const std::string &file, const std::string &error)
+void Logging::Logger::err(int line_number, const std::string &file, const std::string &error)
 {
         std::stringstream stream;
 
@@ -71,12 +73,12 @@ void Logger::err(int line_number, const std::string &file, const std::string &er
         std::cerr << stream.str();
 }
 
-void Logger::set_warning_level(int level)
+void Logging::Logger::set_warning_level(int level)
 {
         m_warn = level;
 }
 
-void Logger::set_quietness(bool be_quiet)
+void Logging::Logger::set_quietness(bool be_quiet)
 {
         quiet = be_quiet;
 }

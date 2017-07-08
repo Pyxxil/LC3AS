@@ -37,9 +37,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                 }
         }
 
-        for (std::uint16_t block = 0; block < std::static_pointer_cast<Immediate>(tokens.at(1))->value; ++block) {
-                assembled.emplace_back(fill);
-        }
+        assembled.insert(assembled.end(), static_cast<std::size_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->value), fill);
 
         return static_cast<std::int32_t>(assembled.size());
 }

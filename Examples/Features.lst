@@ -67,7 +67,7 @@
 (3041) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3042) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3043) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3044) 3058 0011000001011000 (  48) cheat                .FILL 0x3058	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(3044) 305C 0011000001011100 (  48) cheat                .FILL 0x305C	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3045) 54A0 0101010010100000 (  50)                      AND R2 R2 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3046) 14AA 0001010010101010 (  50)                      ADD R2 R2 #10	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3047) 0E01 0000111000000001 (  51)                      BRnzp 0x3049	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
@@ -85,10 +85,14 @@
 (3053) 09FF 0000100111111111 (  62)                      BRn 0x3053	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3054) 09FB 0000100111111011 (  63)                      BRn WARNING_THROWS	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
 (3055) F0FF 1111000011111111 (  64)                      TRAP 0xFF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3056) C1C0 1100000111000000 (  67)                      RET	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3057) 0FBF 0000111110111111 ( 114)                      BRnzp BEGIN_TEST	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3058) 3017 0011000000010111 ( 116) addr                 .FILL 0x3017	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3059) 0000 0000000000000000 ( 119) b                    .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305A) 000A 0000000000001010 ( 121) bin                  .FILL 0x000A	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305B) 0000 0000000000000000 ( 122) hex                  .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305C) 0000 0000000000000000 ( 126)                      .END	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(3056) 0F00 0000111100000000 (  65)                      BRnzp 0x2F57	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(3057) C1C0 1100000111000000 (  68)                      RET	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(3058) 0020 0000000000100000 (  71) WARNING_STRING       .FILL 0x2000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(3059) 2000 0000000000100000 (  71)                      .FILL 0x0020	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(305A) 0000 0000000000000000 (  71)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(305B) 0FBB 0000111110111011 ( 118)                      BRnzp BEGIN_TEST	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(305C) 3017 0011000000010111 ( 120) addr                 .FILL 0x3017	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(305D) 0000 0000000000000000 ( 123) b                    .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(305E) 000A 0000000000001010 ( 125) bin                  .FILL 0x000A	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(305F) 0000 0000000000000000 ( 126) hex                  .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(3060) 0000 0000000000000000 ( 130)                      .END	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
