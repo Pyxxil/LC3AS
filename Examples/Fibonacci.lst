@@ -1,0 +1,158 @@
+(0000) 3000 0011000000000000 (  27)                         .ORIG 0x3000	Examples/Fibonacci.asm
+(3000) E06D 1110000001101101 (  31) OUT_PROMPT              LEA R0 PROMPT	Examples/Fibonacci.asm
+(3001) F022 1111000000100010 (  32)                         PUTS	Examples/Fibonacci.asm
+(3002) 5B60 0101101101100000 (  35)                         AND R5 R5 #0	Examples/Fibonacci.asm
+(3003) 1B6A 0001101101101010 (  36)                         ADD R5 R5 #10	Examples/Fibonacci.asm
+(3004) 228A 0010001010001010 (  37)                         LD R1 NUMBER	Examples/Fibonacci.asm
+(3005) 482D 0100100000101101 (  38)                         JSR CLEAR_FLAG	Examples/Fibonacci.asm
+(3006) F020 1111000000100000 (  44) GET_INPUT               GETC	Examples/Fibonacci.asm
+(3007) F021 1111000000100001 (  45)                         OUT	Examples/Fibonacci.asm
+(3008) 1636 0001011000110110 (  46)                         ADD R3 R0 #-10	Examples/Fibonacci.asm
+(3009) 042D 0000010000101101 (  47)                         BRz CHECK_INPUT	Examples/Fibonacci.asm
+(300A) 2688 0010011010001000 (  49)                         LD R3 ASCII_NINE	Examples/Fibonacci.asm
+(300B) 96FF 1001011011111111 (  50)                         NOT R3 R3	Examples/Fibonacci.asm
+(300C) 16E1 0001011011100001 (  51)                         ADD R3 R3 #1	Examples/Fibonacci.asm
+(300D) 1603 0001011000000011 (  52)                         ADD R3 R0 R3	Examples/Fibonacci.asm
+(300E) 021F 0000001000011111 (  53)                         BRp FLAG_THAT	Examples/Fibonacci.asm
+(300F) 2681 0010011010000001 (  55)                         LD R3 ASCII_ZERO	Examples/Fibonacci.asm
+(3010) 96FF 1001011011111111 (  56)                         NOT R3 R3	Examples/Fibonacci.asm
+(3011) 16E1 0001011011100001 (  57)                         ADD R3 R3 #1	Examples/Fibonacci.asm
+(3012) 16C0 0001011011000000 (  58)                         ADD R3 R3 R0	Examples/Fibonacci.asm
+(3013) 081A 0000100000011010 (  59)                         BRn FLAG_THAT	Examples/Fibonacci.asm
+(3014) 1D76 0001110101110110 (  62)                         ADD R6 R5 #-10	Examples/Fibonacci.asm
+(3015) 0815 0000100000010101 (  63)                         BRn CHECK_ZERO	Examples/Fibonacci.asm
+(3016) 0404 0000010000000100 (  64)                         BRz SET_TO	Examples/Fibonacci.asm
+(3017) 0E05 0000111000000101 (  65)                         BRnzp MULTIPLY_BY_TEN	Examples/Fibonacci.asm
+(3018) 1B7F 0001101101111111 (  70) DECREMENT_INPUT_COUNTER ADD R5 R5 #-1	Examples/Fibonacci.asm
+(3019) 05E6 0000010111100110 (  71)                         BRz OUT_PROMPT	Examples/Fibonacci.asm
+(301A) 0FEB 0000111111101011 (  72)                         BRnzp GET_INPUT	Examples/Fibonacci.asm
+(301B) 12E0 0001001011100000 (  77) SET_TO                  ADD R1 R3 #0	Examples/Fibonacci.asm
+(301C) 0FFB 0000111111111011 (  78)                         BRnzp DECREMENT_INPUT_COUNTER	Examples/Fibonacci.asm
+(301D) 4809 0100100000001001 (  83) MULTIPLY_BY_TEN         JSR CHECK_FLAG	Examples/Fibonacci.asm
+(301E) 1841 0001100001000001 (  85)                         ADD R4 R1 R1	Examples/Fibonacci.asm
+(301F) 1D04 0001110100000100 (  86)                         ADD R6 R4 R4	Examples/Fibonacci.asm
+(3020) 1D86 0001110110000110 (  87)                         ADD R6 R6 R6	Examples/Fibonacci.asm
+(3021) 1384 0001001110000100 (  88)                         ADD R1 R6 R4	Examples/Fibonacci.asm
+(3022) 1243 0001001001000011 (  89)                         ADD R1 R1 R3	Examples/Fibonacci.asm
+(3023) 1870 0001100001110000 (  90)                         ADD R4 R1 #-16	Examples/Fibonacci.asm
+(3024) 1939 0001100100111001 (  91)                         ADD R4 R4 #-7	Examples/Fibonacci.asm
+(3025) 0208 0000001000001000 (  92)                         BRp FLAG_THAT	Examples/Fibonacci.asm
+(3026) 0FF1 0000111111110001 (  93)                         BRnzp DECREMENT_INPUT_COUNTER	Examples/Fibonacci.asm
+(3027) 2868 0010100001101000 (  98) CHECK_FLAG              LD R4 FLAG	Examples/Fibonacci.asm
+(3028) 193F 0001100100111111 (  99)                         ADD R4 R4 #-1	Examples/Fibonacci.asm
+(3029) 05EE 0000010111101110 ( 101)                         BRz DECREMENT_INPUT_COUNTER	Examples/Fibonacci.asm
+(302A) C1C0 1100000111000000 ( 102)                         RET	Examples/Fibonacci.asm
+(302B) 1C7F 0001110001111111 ( 108) CHECK_ZERO              ADD R6 R1 #-1	Examples/Fibonacci.asm
+(302C) 0801 0000100000000001 ( 109)                         BRn FLAG_THAT	Examples/Fibonacci.asm
+(302D) 0FEF 0000111111101111 ( 110)                         BRnzp MULTIPLY_BY_TEN	Examples/Fibonacci.asm
+(302E) E861 1110100001100001 ( 115) FLAG_THAT               LEA R4 FLAG	Examples/Fibonacci.asm
+(302F) 5DA0 0101110110100000 ( 116)                         AND R6 R6 #0	Examples/Fibonacci.asm
+(3030) 1DA1 0001110110100001 ( 117)                         ADD R6 R6 #1	Examples/Fibonacci.asm
+(3031) 7D00 0111110100000000 ( 118)                         STR R6 R4 #0	Examples/Fibonacci.asm
+(3032) 0FE5 0000111111100101 ( 119)                         BRnzp DECREMENT_INPUT_COUNTER	Examples/Fibonacci.asm
+(3033) E85C 1110100001011100 ( 124) CLEAR_FLAG              LEA R4 FLAG	Examples/Fibonacci.asm
+(3034) 5DA0 0101110110100000 ( 125)                         AND R6 R6 #0	Examples/Fibonacci.asm
+(3035) 7D00 0111110100000000 ( 126)                         STR R6 R4 #0	Examples/Fibonacci.asm
+(3036) C1C0 1100000111000000 ( 127)                         RET	Examples/Fibonacci.asm
+(3037) 2658 0010011001011000 ( 132) CHECK_INPUT             LD R3 FLAG	Examples/Fibonacci.asm
+(3038) 16FF 0001011011111111 ( 133)                         ADD R3 R3 #-1	Examples/Fibonacci.asm
+(3039) 07C6 0000011111000110 ( 134)                         BRzp OUT_PROMPT	Examples/Fibonacci.asm
+(303A) 187D 0001100001111101 ( 135)                         ADD R4 R1 #-3	Examples/Fibonacci.asm
+(303B) 09C4 0000100111000100 ( 136)                         BRn OUT_PROMPT	Examples/Fibonacci.asm
+(303C) 56E0 0101011011100000 ( 139)                         AND R3 R3 #0	Examples/Fibonacci.asm
+(303D) 5920 0101100100100000 ( 140)                         AND R4 R4 #0	Examples/Fibonacci.asm
+(303E) 1921 0001100100100001 ( 141)                         ADD R4 R4 #1	Examples/Fibonacci.asm
+(303F) 0E25 0000111000100101 ( 142)                         BRnzp ITERATIVE_FIBONACCI	Examples/Fibonacci.asm
+(3040) 3E58 0011111001011000 ( 147) CONVERT_TO_ASCII        ST R7 SAVER7	Examples/Fibonacci.asm
+(3041) 3858 0011100001011000 ( 148)                         ST R4 SAVER4	Examples/Fibonacci.asm
+(3042) 3658 0011011001011000 ( 149)                         ST R3 SAVER3	Examples/Fibonacci.asm
+(3043) E450 1110010001010000 ( 150)                         LEA R2 NUMBERS	Examples/Fibonacci.asm
+(3044) 5DA0 0101110110100000 ( 151)                         AND R6 R6 #0	Examples/Fibonacci.asm
+(3045) 56E0 0101011011100000 ( 152)                         AND R3 R3 #0	Examples/Fibonacci.asm
+(3046) 6880 0110100010000000 ( 155) OUTER_LOOP              LDR R4 R2 #0	Examples/Fibonacci.asm
+(3047) 0414 0000010000010100 ( 156)                         BRz END	Examples/Fibonacci.asm
+(3048) 993F 1001100100111111 ( 157)                         NOT R4 R4	Examples/Fibonacci.asm
+(3049) 1921 0001100100100001 ( 158)                         ADD R4 R4 #1	Examples/Fibonacci.asm
+(304A) 1B44 0001101101000100 ( 161) INNER_LOOP              ADD R5 R5 R4	Examples/Fibonacci.asm
+(304B) 0802 0000100000000010 ( 162)                         BRn CHECK_DIGIT	Examples/Fibonacci.asm
+(304C) 1DA1 0001110110100001 ( 163)                         ADD R6 R6 #1	Examples/Fibonacci.asm
+(304D) 0FFC 0000111111111100 ( 164)                         BRnzp INNER_LOOP	Examples/Fibonacci.asm
+(304E) 1DA0 0001110110100000 ( 167) CHECK_DIGIT             ADD R6 R6 #0	Examples/Fibonacci.asm
+(304F) 0202 0000001000000010 ( 168)                         BRp OUTPUT	Examples/Fibonacci.asm
+(3050) 16E0 0001011011100000 ( 169)                         ADD R3 R3 #0	Examples/Fibonacci.asm
+(3051) 0404 0000010000000100 ( 170)                         BRz INCREMENT	Examples/Fibonacci.asm
+(3052) 203E 0010000000111110 ( 173) OUTPUT                  LD R0 ASCII_ZERO	Examples/Fibonacci.asm
+(3053) 1006 0001000000000110 ( 174)                         ADD R0 R0 R6	Examples/Fibonacci.asm
+(3054) F021 1111000000100001 ( 175)                         OUT	Examples/Fibonacci.asm
+(3055) 16E1 0001011011100001 ( 176)                         ADD R3 R3 #1	Examples/Fibonacci.asm
+(3056) 14A1 0001010010100001 ( 179) INCREMENT               ADD R2 R2 #1	Examples/Fibonacci.asm
+(3057) 5DA0 0101110110100000 ( 180)                         AND R6 R6 #0	Examples/Fibonacci.asm
+(3058) 993F 1001100100111111 ( 181)                         NOT R4 R4	Examples/Fibonacci.asm
+(3059) 1921 0001100100100001 ( 182)                         ADD R4 R4 #1	Examples/Fibonacci.asm
+(305A) 1B44 0001101101000100 ( 183)                         ADD R5 R5 R4	Examples/Fibonacci.asm
+(305B) 0FEA 0000111111101010 ( 184)                         BRnzp OUTER_LOOP	Examples/Fibonacci.asm
+(305C) 2034 0010000000110100 ( 187) END                     LD R0 ASCII_ZERO	Examples/Fibonacci.asm
+(305D) 1005 0001000000000101 ( 188)                         ADD R0 R0 R5	Examples/Fibonacci.asm
+(305E) F021 1111000000100001 ( 189)                         OUT	Examples/Fibonacci.asm
+(305F) E02D 1110000000101101 ( 190)                         LEA R0 SPACE	Examples/Fibonacci.asm
+(3060) F022 1111000000100010 ( 191)                         PUTS	Examples/Fibonacci.asm
+(3061) 2639 0010011000111001 ( 192)                         LD R3 SAVER3	Examples/Fibonacci.asm
+(3062) 2837 0010100000110111 ( 193)                         LD R4 SAVER4	Examples/Fibonacci.asm
+(3063) 2E35 0010111000110101 ( 194)                         LD R7 SAVER7	Examples/Fibonacci.asm
+(3064) C1C0 1100000111000000 ( 195)                         RET	Examples/Fibonacci.asm
+(3065) 1B20 0001101100100000 ( 201) ITERATIVE_FIBONACCI     ADD R5 R4 #0	Examples/Fibonacci.asm
+(3066) 4FD9 0100111111011001 ( 202)                         JSR CONVERT_TO_ASCII	Examples/Fibonacci.asm
+(3067) 1D20 0001110100100000 ( 204)                         ADD R6 R4 #0	Examples/Fibonacci.asm
+(3068) 18C6 0001100011000110 ( 205)                         ADD R4 R3 R6	Examples/Fibonacci.asm
+(3069) 17A0 0001011110100000 ( 206)                         ADD R3 R6 #0	Examples/Fibonacci.asm
+(306A) 127F 0001001001111111 ( 207)                         ADD R1 R1 #-1	Examples/Fibonacci.asm
+(306B) 0401 0000010000000001 ( 208)                         BRz FINISH	Examples/Fibonacci.asm
+(306C) 0FF8 0000111111111000 ( 209)                         BRnzp ITERATIVE_FIBONACCI	Examples/Fibonacci.asm
+(306D) F025 1111000000100101 ( 214) FINISH                  HALT	Examples/Fibonacci.asm
+(306E) 000A 0000000000001010 ( 218) PROMPT                  .FILL 0xA000	Examples/Fibonacci.asm
+(306F) 4500 0000000001000101 ( 218)                         .FILL 0x0045	Examples/Fibonacci.asm
+(3070) 006E 0000000001101110 ( 218)                         .FILL 0x006E	Examples/Fibonacci.asm
+(3071) 0074 0000000001110100 ( 218)                         .FILL 0x0074	Examples/Fibonacci.asm
+(3072) 0065 0000000001100101 ( 218)                         .FILL 0x0065	Examples/Fibonacci.asm
+(3073) 0072 0000000001110010 ( 218)                         .FILL 0x0072	Examples/Fibonacci.asm
+(3074) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(3075) 0061 0000000001100001 ( 218)                         .FILL 0x0061	Examples/Fibonacci.asm
+(3076) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(3077) 006E 0000000001101110 ( 218)                         .FILL 0x006E	Examples/Fibonacci.asm
+(3078) 0075 0000000001110101 ( 218)                         .FILL 0x0075	Examples/Fibonacci.asm
+(3079) 006D 0000000001101101 ( 218)                         .FILL 0x006D	Examples/Fibonacci.asm
+(307A) 0062 0000000001100010 ( 218)                         .FILL 0x0062	Examples/Fibonacci.asm
+(307B) 0065 0000000001100101 ( 218)                         .FILL 0x0065	Examples/Fibonacci.asm
+(307C) 0072 0000000001110010 ( 218)                         .FILL 0x0072	Examples/Fibonacci.asm
+(307D) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(307E) 0066 0000000001100110 ( 218)                         .FILL 0x0066	Examples/Fibonacci.asm
+(307F) 0072 0000000001110010 ( 218)                         .FILL 0x0072	Examples/Fibonacci.asm
+(3080) 006F 0000000001101111 ( 218)                         .FILL 0x006F	Examples/Fibonacci.asm
+(3081) 006D 0000000001101101 ( 218)                         .FILL 0x006D	Examples/Fibonacci.asm
+(3082) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(3083) 0033 0000000000110011 ( 218)                         .FILL 0x0033	Examples/Fibonacci.asm
+(3084) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(3085) 0074 0000000001110100 ( 218)                         .FILL 0x0074	Examples/Fibonacci.asm
+(3086) 006F 0000000001101111 ( 218)                         .FILL 0x006F	Examples/Fibonacci.asm
+(3087) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(3088) 0032 0000000000110010 ( 218)                         .FILL 0x0032	Examples/Fibonacci.asm
+(3089) 0033 0000000000110011 ( 218)                         .FILL 0x0033	Examples/Fibonacci.asm
+(308A) 003A 0000000000111010 ( 218)                         .FILL 0x003A	Examples/Fibonacci.asm
+(308B) 0020 0000000000100000 ( 218)                         .FILL 0x0020	Examples/Fibonacci.asm
+(308C) 0000 0000000000000000 ( 218)                         .FILL 0x0000	Examples/Fibonacci.asm
+(308D) 0020 0000000000100000 ( 219) SPACE                   .FILL 0x2000	Examples/Fibonacci.asm
+(308E) 0000 0000000000000000 ( 219)                         .FILL 0x0000	Examples/Fibonacci.asm
+(308F) 0000 0000000000000000 ( 221) NUMBER                  .FILL 0x0000	Examples/Fibonacci.asm
+(3090) 0000 0000000000000000 ( 222) FLAG                    .FILL 0x0000	Examples/Fibonacci.asm
+(3091) 0030 0000000000110000 ( 225) ASCII_ZERO              .FILL 0x0030	Examples/Fibonacci.asm
+(3092) 0033 0000000000110011 ( 226) ASCII_THREE             .FILL 0x0033	Examples/Fibonacci.asm
+(3093) 0039 0000000000111001 ( 227) ASCII_NINE              .FILL 0x0039	Examples/Fibonacci.asm
+(3094) 2710 0010011100010000 ( 230) NUMBERS                 .FILL 0x2710	Examples/Fibonacci.asm
+(3095) 03E8 0000001111101000 ( 231)                         .FILL 0x03E8	Examples/Fibonacci.asm
+(3096) 0064 0000000001100100 ( 232)                         .FILL 0x0064	Examples/Fibonacci.asm
+(3097) 000A 0000000000001010 ( 233)                         .FILL 0x000A	Examples/Fibonacci.asm
+(3098) 0000 0000000000000000 ( 234)                         .FILL 0x0000	Examples/Fibonacci.asm
+(3099) 0000 0000000000000000 ( 237) SAVER7                  .FILL 0x0000	Examples/Fibonacci.asm
+(309A) 0000 0000000000000000 ( 238) SAVER4                  .FILL 0x0000	Examples/Fibonacci.asm
+(309B) 0000 0000000000000000 ( 239) SAVER3                  .FILL 0x0000	Examples/Fibonacci.asm
+(309C) 0000 0000000000000000 ( 241)                         .END	Examples/Fibonacci.asm

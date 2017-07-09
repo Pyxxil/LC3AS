@@ -1,0 +1,26 @@
+
+set ( LEXER_SOURCE_FILES
+      ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Lexer.cpp
+     )
+
+set ( PARSER_SOURCE_FILES
+      ${CMAKE_CURRENT_SOURCE_DIR}/Parser/Parser.cpp
+     )
+
+set ( DIAGNOSTICS_SOURCE_FILES
+      ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics/Diagnostics.cpp
+      )
+
+set ( LIBRARY_SOURCE_FILES
+      "${LIBRARY_SOURCE_FILES}"
+      "${PARSER_SOURCE_FILES}"
+      "${LEXER_SOURCE_FILES}"
+      "${DIAGNOSTICS_SOURCE_FILES}"
+     PARENT_SCOPE
+     )
+
+set ( LIBRARY_INCLUDE_DIRECTORIES
+     "${LIBRARY_INCLUDE_DIRECTORIES}"
+      ${CMAKE_CURRENT_SOURCE_DIR}/Includes/
+      PARENT_SCOPE
+     )

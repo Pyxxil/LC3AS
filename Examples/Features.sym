@@ -1,0 +1,15 @@
+// Symbol table
+// Scope Level 0:
+//	Symbol Name          Page Address
+//	-------------------- ------------
+//	BEGIN_TEST           3017
+//	EXTRA_FEATURES       301B
+//	INCLUDED_LABEL       304E
+//	WARNING_STRING       3058
+//	WARNING_THROWS       3050
+//	addr                 305C
+//	b                    305D
+//	bin                  305E
+//	cheat                3044
+//	hex                  305F
+//	oct                  3031
