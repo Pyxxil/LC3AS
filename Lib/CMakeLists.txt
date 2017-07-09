@@ -9,7 +9,10 @@ set ( PARSER_SOURCE_FILES
 
 set ( DIAGNOSTICS_SOURCE_FILES
       ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics/Diagnostics.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics/Console.cpp
+      )
+
+set ( CONFIGURATION_SOURCE_FILES
+      ${CMAKE_CURRENT_SOURCE_DIR}/Config/Configuration.cpp
       )
 
 set ( LIBRARY_SOURCE_FILES
@@ -17,6 +20,7 @@ set ( LIBRARY_SOURCE_FILES
       "${PARSER_SOURCE_FILES}"
       "${LEXER_SOURCE_FILES}"
       "${DIAGNOSTICS_SOURCE_FILES}"
+      "${CONFIGURATION_SOURCE_FILES}"
       PARENT_SCOPE
       )
 

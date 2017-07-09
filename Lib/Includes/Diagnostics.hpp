@@ -211,9 +211,7 @@ namespace Diagnostics
         void push(Diagnostic_Message &&message);
         void push(Diagnostic_Message &message);
 
-        static Diagnostic_Message &pop();
-
-        static std::queue<Diagnostic_Message> diagnostics_log;
+        std::size_t count();
 
         void unwind();
 };

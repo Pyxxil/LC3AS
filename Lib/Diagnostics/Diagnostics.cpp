@@ -1,10 +1,19 @@
 #include "Diagnostics.hpp"
 
+static std::queue<Diagnostics::Diagnostic_Message> diagnostics_log;
+
 static const Console::Colour diagnostic_colours[] = {
         Console::Colour(Console::FOREGROUND_COLOUR::CYAN),
         Console::Colour(Console::FOREGROUND_COLOUR::RED),
         Console::Colour(Console::FOREGROUND_COLOUR::MAGENTA),
 };
+
+static Diagnostics::Diagnostic_Message &pop()
+{
+        auto &&message = diagnostics_log.front();
+        diagnostics_log.pop();
+        return message;
+}
 
 void Diagnostics::unwind()
 {
@@ -21,13 +30,6 @@ void Diagnostics::unwind()
         }
 }
 
-Diagnostics::Diagnostic_Message &Diagnostics::pop()
-{
-        auto &&message = Diagnostics::diagnostics_log.front();
-        diagnostics_log.pop();
-        return message;
-}
-
 void Diagnostics::push(Diagnostic_Message &&message)
 {
         diagnostics_log.emplace(message);
@@ -36,4 +38,9 @@ void Diagnostics::push(Diagnostic_Message &&message)
 void Diagnostics::push(Diagnostic_Message &message)
 {
         diagnostics_log.emplace(message);
+}
+
+std::size_t Diagnostics::count()
+{
+        return diagnostics_log.size();
 }
