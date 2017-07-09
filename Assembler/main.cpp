@@ -6,19 +6,19 @@
 int main(int argc, char **argv)
 {
         if (!Assembler::init()) {
-                // TODO: Change this so that init() creates some sort of string that says what went wrong,
-                // TODO: which can then be used here.
                 std::cout << Assembler::last_error << '\n';
-                return 1;
+                return 1;  // No point in continuing if initialisation failed.
         }
 
-        Diagnostics::push(
-                Diagnostics::Diagnostic_Message(
-                        "Random Message",
-                        Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
-                        Diagnostics::DIAGNOSTIC::WARNING
-                )
+        Diagnostics::Diagnostic_Message m(
+                "Random Message",
+                Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+                Diagnostics::DIAGNOSTIC::WARNING
         );
+
+        m.provide_context(Diagnostics::Diagnostic_Context());
+
+        Diagnostics::push(m);
 
         Diagnostics::push(
                 Diagnostics::Diagnostic_Message(

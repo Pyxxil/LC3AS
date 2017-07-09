@@ -1,7 +1,8 @@
 #include "Assembler.hpp"
 
 ::Assembler::Assembler *Assembler::assembler = nullptr;
-std::string Assembler::last_error;
+std::string              Assembler::last_error;
+std::vector<std::string> Assembler::lines;
 
 bool Assembler::init()
 {

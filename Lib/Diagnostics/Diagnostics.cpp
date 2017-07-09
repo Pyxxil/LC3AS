@@ -1,11 +1,23 @@
 #include "Diagnostics.hpp"
 
-#include <iostream>
+static const Console::Colour diagnostic_colours[] = {
+        Console::Colour(Console::FOREGROUND_COLOUR::CYAN),
+        Console::Colour(Console::FOREGROUND_COLOUR::RED),
+        Console::Colour(Console::FOREGROUND_COLOUR::MAGENTA),
+};
 
 void Diagnostics::unwind()
 {
         while (!diagnostics_log.empty()) {
-                std::cout << Diagnostics::pop().to_string() << '\n';
+                auto &&diagnostic = pop();
+
+                Console::write(diagnostic.to_string(), diagnostic_colours[static_cast<std::size_t>(diagnostic.type())]);
+
+                if (diagnostic.has_context()) {
+                        // TODO: Print it's context too.
+                        Console::write(diagnostic.given_context());
+                }
+
         }
 }
 
