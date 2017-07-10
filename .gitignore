@@ -1,5 +1,3 @@
 .idea/
 cmake-build*
 tests/
-
-cxxopts.hpp

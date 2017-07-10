@@ -18,13 +18,15 @@ set ( ASSEMBLER_INCLUDE_DIRECTORIES "" )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -pg -Werror -pedantic -Wshadow -Wnon-virtual-dtor -Wconversion )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
-set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ )
+set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ -Wextra )
 
 set ( RELEASE_FLAGS ${COMPILE_FLAGS} -O3 -flto -mtune=native -march=native )
 
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Lib" )
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Assembler" )
 
-add_executable ( LC3AS "${LIBRARY_SOURCE_FILES}" "${ASSEMBLER_SOURCE_FILES}" )
+add_executable ( LC3AS "${LIBRARY_SOURCE_FILES}" "${ASSEMBLER_SOURCE_FILES}" "${}" )
 
 target_include_directories ( LC3AS PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}" "${ASSEMBLER_INCLUDE_DIRECTORIES}" )
+target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
+target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )

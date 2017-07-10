@@ -99,15 +99,15 @@ namespace Diagnostics
                         LEFT,
                 };
 
-                friend std::ostream &operator <<(std::ostream &os, const Diagnostic_Context &context)
+                friend std::ostream &operator <<(std::ostream &os, const Diagnostic_Context &con)
                 {
-                        os << "In " << context.file << ':' << context.line_number << ':';
-                        if (context.show_column) {
-                                os << context.column << ':';
+                        os << "In " << con.file << ':' << con.line_number << ':';
+                        if (con.show_column) {
+                                os << con.column << ':';
                         }
-                        os << context.message << '\n';
+                        os << con.message << '\n';
 
-                        return os << context.context;
+                        return os << con.context;
                 }
 
         private:
@@ -188,7 +188,7 @@ namespace Diagnostics
                         return message;
                 }
 
-                const DIAGNOSTIC_TYPE type() const
+                DIAGNOSTIC_TYPE type() const
                 {
                         return d_type;
                 }

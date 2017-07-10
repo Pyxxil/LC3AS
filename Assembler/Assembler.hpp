@@ -21,16 +21,16 @@ namespace Assembler
                 //              Default: false          Report warnings as errors
                 //      --warn=[all,syntax,logic,none]
                 //              Default = all           Enable/Disable warnings
+                //      --verbose/-v                    Enable Verbose logging
+                //                                      TODO: Decide if this requires differing levels (e.g. -vvv or --verbose-level=3)
+                //                                      TODO:   If so, add enum options for config (VERBOSE_LEVEL_ONE, VERBOSE_LEVEL_TWO, etc.)
+                //                                      TODO: Decide if this relates to diagnostics too
         };
-
-        extern Assembler *assembler;
-
-        extern std::string last_error;
 
         bool init();
         void de_init();
 
-        extern std::vector<std::string> lines;
+        int run(int argc, char **args);
 };
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef LC3_ASSEMBLER_CONFIGURATION_HPP
 #define LC3_ASSEMBLER_CONFIGURATION_HPP
 
+#include <string>
+
 namespace Config
 {
         enum CONFIG_OPTIONS
@@ -10,7 +12,9 @@ namespace Config
         };
 
         bool config_on(std::size_t option);
+
         void config_set(std::size_t option);
+        void config_add_search_directory(const std::string &directory);
 }
 
 #endif
