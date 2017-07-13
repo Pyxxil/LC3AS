@@ -1,8 +1,14 @@
 
 set ( ASSEMBLER_SOURCE_FILES
-      "${ASSEMBLER_SOURC_FILES}"
+      "${ASSEMBLER_SOURCE_FILES}"
       "${CMAKE_CURRENT_SOURCE_DIR}/Assembler.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+      PARENT_SCOPE
+      )
+
+set ( ASSEMBLER_HEADER_FILES
+      "${ASSEMBLER_HEADER_FILES}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/Assembler.hpp"
       PARENT_SCOPE
       )
 

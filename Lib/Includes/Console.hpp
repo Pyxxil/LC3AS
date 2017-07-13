@@ -45,8 +45,8 @@ namespace Console
                 { }
                 Colour(const Colour &other)
                         : fg(other.fg), bg(other.bg)
-                {}
-                Colour &operator =(const Colour& other)
+                { }
+                Colour &operator =(const Colour &other)
                 {
                         fg = other.fg;
                         bg = other.bg;
@@ -75,25 +75,31 @@ namespace Console
 
         static const Colour reset(FOREGROUND_COLOUR::RESET, BACKGROUND_COLOUR::RESET);
 
-        template <typename T>
-        void write(const T &&message, const Colour &colour = reset)
+        template<typename T>
+        inline void write(const T &message)
         {
-                if (colour == reset) {
-                        std::cout << message << '\n';
-                } else {
-                        std::cout << colour << message << reset << '\n';
-                }
+                std::cout << message;
         }
 
-        template <typename T>
-        void write(const T &message, const Colour &colour = reset)
+        template<typename T>
+        inline void write(const T &&message)
         {
-                if (colour == reset) {
-                        std::cout << message << '\n';
-                } else {
-                        std::cout << colour << message << reset << '\n';
-                }
+                std::cout << message;
         }
-};
+
+        template<typename T>
+        void write_line(const T &message)
+        {
+                write(message);
+                std::cout << '\n';
+        }
+
+        template<typename T>
+        void write_line(const T &&message)
+        {
+                write(message);
+                std::cout << '\n';
+        }
+}
 
 #endif

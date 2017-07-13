@@ -2,10 +2,10 @@
 #define LC3_ASSEMBLER_DIAGNOSTICS_HPP
 
 #include <string>
-#include <stack>
+#include <memory>
 #include <queue>
 
-#include "Console.hpp"
+#include "Context.hpp"
 
 namespace Diagnostics
 {
@@ -22,198 +22,68 @@ namespace Diagnostics
                 SPELLING,
         };
 
-        class Diagnostic_Context
+        struct diagnostic_type
         {
-        public:
-                Diagnostic_Context()
-                        : selector('^'), highlighter('~'), next(nullptr), show_column(true), show_selector(true)
-                          , show_highlights(false), column(0), line_number(0), highlight_length(0), highlight_direction(NONE)
-                          , context(), file(), message()
+                diagnostic_type(const std::string &t, const Console::Colour &col)
+                        : type(t), colour(col)
                 { }
-                Diagnostic_Context(const Diagnostic_Context &other)
-                        : selector(other.selector), highlighter(other.highlighter), next(other.next)
-                          , show_column(other.show_column), show_selector(other.show_selector)
-                          , show_highlights(other.show_highlights), column(other.column)
-                          , line_number(other.line_number), highlight_length(other.highlight_length)
-                          , highlight_direction(other.highlight_direction), context(other.context)
-                          , file(other.file), message(other.message)
-                { }
-                Diagnostic_Context &operator =(const Diagnostic_Context &&other)
+
+                friend std::ostream &operator <<(std::ostream &os, const diagnostic_type &t)
                 {
-                        if (this != &other) {
-                                selector            = other.selector;
-                                highlighter         = other.highlighter;
-                                next                = other.next;
-                                show_column         = other.show_column;
-                                show_selector       = other.show_selector;
-                                show_highlights     = other.show_highlights;
-                                column              = other.column;
-                                line_number         = other.line_number;
-                                highlight_length    = other.highlight_length;
-                                highlight_direction = other.highlight_direction;
-                                context             = other.context;
-                                file                = other.file;
-                                message             = other.message;
-                        }
-                        return *this;
+                        return os << t.colour << t.type << Console::reset;
                 }
 
-                Diagnostic_Context &operator =(const Diagnostic_Context &other)
-                {
-                        selector = other.selector;
-                        highlighter = other.highlighter;
-                        next = other.next;
-                        show_column = other.show_column;
-                        show_selector = other.show_selector;
-                        show_highlights = other.show_highlights;
-                        column = other.column;
-                        line_number = other.line_number;
-                        highlight_length = other.highlight_length;
-                        highlight_direction = other.highlight_direction;
-                        context = other.context;
-                        file = other.file;
-                        message = other.message;
-                        return *this;
-                }
-
-                static void operator delete(void *ptr, std::size_t size)
-                {
-                        if (static_cast<Diagnostic_Context *>(ptr)->next) {
-                                delete static_cast<Diagnostic_Context *>(ptr)->next;
-                        }
-
-                        ::operator delete(ptr, size);
-                }
-
-                ~Diagnostic_Context()
-                {
-                        if (next) {
-                                delete next;
-                        }
-                }
-
-                enum CONTEXT_DIRECTION
-                {
-                        NONE,
-                        RIGHT,
-                        LEFT,
-                };
-
-                friend std::ostream &operator <<(std::ostream &os, const Diagnostic_Context &con)
-                {
-                        os << "In " << con.file << ':' << con.line_number << ':';
-                        if (con.show_column) {
-                                os << con.column << ':';
-                        }
-                        os << con.message << '\n';
-
-                        return os << con.context;
-                }
-
-        private:
-                char selector = '^';
-                char highlighter = '~';
-
-                Diagnostic_Context *next = nullptr;
-
-                bool show_column;
-                bool show_selector;
-                bool show_highlights;
-
-                std::size_t column;
-                std::size_t line_number;
-                std::size_t highlight_length;
-
-                CONTEXT_DIRECTION highlight_direction;
-
-                std::string context;
-                std::string file;
-                std::string message;
+                std::string     type;
+                Console::Colour colour;
         };
 
-        class Diagnostic_Message
+        extern const diagnostic_type diagnostic_colours[];
+
+        class Diagnostic
         {
         public:
-                Diagnostic_Message()
-                        : message(), d_type(), d()
-                { }
-                explicit Diagnostic_Message(std::string &&t_message, DIAGNOSTIC_TYPE t_type, DIAGNOSTIC diagnostic)
-                        : message(t_message), d_type(t_type), d(diagnostic), _context(false)
-                { }
-                Diagnostic_Message(const Diagnostic_Message &other)
-                        : message(other.message), d_type(other.d_type), d(other.d), context(other.context)
-                          , _context(other._context)
-                {
+                Diagnostic(const FileContext &file);
+                Diagnostic(const FileContext &file, std::string &&t_message, DIAGNOSTIC_TYPE t_type, DIAGNOSTIC diagnostic);
+                Diagnostic(Diagnostic &other);
 
-                }
-                Diagnostic_Message &operator =(const Diagnostic_Message &&other)
+                Diagnostic &operator =(Diagnostic &rhs);
+                Diagnostic &operator =(Diagnostic &&rhs);
+
+                Diagnostic &operator ()();
+
+                inline void provide_context(std::unique_ptr<Context> &&t_context)
                 {
-                        message = other.message;
-                        d       = other.d;
-                        d_type  = other.d_type;
-                        return *this;
-                }
-                Diagnostic_Message &operator =(const Diagnostic_Message &other)
-                {
-                        message = other.message;
-                        d       = other.d;
-                        d_type  = other.d_type;
-                        return *this;
+                        context.emplace_back(std::move(t_context));
                 }
 
-                Diagnostic_Message &operator <<(const std::string &&extra)
+                inline DIAGNOSTIC type() const
                 {
-                        message += extra;
-                        return *this;
+                        return d;
                 }
 
-                Diagnostic_Message &operator ()()
+                inline bool has_context() const
                 {
-                        return *this;
-                }
-
-                void provide_context(const Diagnostic_Context &&t_context)
-                {
-                        context = t_context;
-                        _context = true;
-                }
-
-                const Diagnostic_Context &given_context()
-                {
-                        return context;
-                }
-
-                const std::string &to_string() const
-                {
-                        return message;
-                }
-
-                DIAGNOSTIC_TYPE type() const
-                {
-                        return d_type;
-                }
-
-                bool has_context() const
-                {
-                        return _context;
+                        return !!context.size();
                 }
 
         private:
-                // TODO: Add some sort of contextual string.
+                friend std::ostream &operator <<(std::ostream &os, const Diagnostic &d_msg);
+
                 std::string     message;
                 DIAGNOSTIC_TYPE d_type;
                 DIAGNOSTIC      d;
 
-                Diagnostic_Context context;
-                bool _context;
+                std::vector<std::unique_ptr<Context>> context;
+
+                FileContext info;
         };
 
-        void push(Diagnostic_Message &&message);
-        void push(Diagnostic_Message &message);
+        void push(Diagnostic &&message);
+        void push(Diagnostic &message);
 
         std::size_t count();
 
         void unwind();
-};
+}
 
 #endif

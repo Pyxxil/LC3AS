@@ -6,35 +6,132 @@
 #include "Diagnostics.hpp"
 #include "cxxopts.hpp"
 
-static Assembler::Assembler *assembler = nullptr;
-static std::string          last_error;
-
-bool Assembler::init()
+int Assembler::assemble(int argc, char **args)
 {
-        assembler = new ::Assembler::Assembler();
+        std::ios_base::sync_with_stdio(false);
 
-        if (!assembler) {
-                last_error = "Assembler allocation failed";
-                return false;
+        Assembler assembler;
+        if (!assembler.configure(argc, args)) {
+                return 1;
         }
 
-        return true;
+        // TODO: Move this to when the Assembler finishes.
+
+        Diagnostics::Diagnostic m {
+                Diagnostics::FileContext(
+                        Diagnostics::Variant<std::string>("Assembler.cpp", Console::FOREGROUND_COLOUR::YELLOW),
+                        Diagnostics::Variant<std::size_t>(44, Console::FOREGROUND_COLOUR::YELLOW),
+                        Diagnostics::Variant<std::size_t>(60, Console::FOREGROUND_COLOUR::YELLOW)
+                ), "Incorrect spelling", Diagnostics::DIAGNOSTIC_TYPE::SPELLING, Diagnostics::DIAGNOSTIC::WARNING
+        };
+
+        m.provide_context(
+                std::make_unique<Diagnostics::HighlightContext>(
+                        Diagnostics::SelectionContext(
+                                Diagnostics::FileContext(
+                                        Diagnostics::Variant<std::string>("Assembler.cpp",
+                                                                          Console::FOREGROUND_COLOUR::YELLOW),
+                                        Diagnostics::Variant<std::size_t>(44, Console::FOREGROUND_COLOUR::YELLOW),
+                                        Diagnostics::Variant<std::size_t>(60, Console::FOREGROUND_COLOUR::YELLOW)
+                                ),
+                                '^',
+                                "Dictionary does not contain word 'seet'; Did you mean 'set'?",
+                                "\tSome rather long line that contains an invalid word called seet"
+                        ), '~', 4, "set"
+                )
+        );
+
+        Diagnostics::push(m);
+
+        m = Diagnostics::Diagnostic(
+                Diagnostics::FileContext("Assembler.cpp", 44, 64),
+                "Invalid punctuation",
+                Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+                Diagnostics::DIAGNOSTIC::ERROR
+        );
+
+        m.provide_context(
+                std::make_unique<Diagnostics::SelectionContext>(
+                        Diagnostics::FileContext(
+                                Diagnostics::Variant<std::string>("Assembler.cpp",
+                                                                  Console::FOREGROUND_COLOUR::YELLOW),
+                                Diagnostics::Variant<std::size_t>(44, Console::FOREGROUND_COLOUR::YELLOW),
+                                Diagnostics::Variant<std::size_t>(64, Console::FOREGROUND_COLOUR::YELLOW)
+                        ),
+                        '^',
+                        "Missing punctuation at end of sentence",
+                        "\tSome rather long line that contains an invalid word called seet",
+                        "(.!?)"
+                )
+        );
+
+        Diagnostics::push(m);
+
+        if (Config::find_path("/Users/pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp").empty()) {
+                m = Diagnostics::Diagnostic(
+                        Diagnostics::FileContext("Assembler.cpp", 69, 32),
+                        "File '/Users/pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp' not found",
+                        Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+                        Diagnostics::DIAGNOSTIC::ERROR
+                );
+
+                m.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+                        Diagnostics::SelectionContext(
+                                Diagnostics::FileContext(Diagnostics::Variant<std::string>("Assembler.cpp",
+                                                                                           Console::FOREGROUND_COLOUR::YELLOW),
+                                                         Diagnostics::Variant<std::size_t>(69,
+                                                                                           Console::FOREGROUND_COLOUR::YELLOW),
+                                                         Diagnostics::Variant<std::size_t>(30,
+                                                                                           Console::FOREGROUND_COLOUR::YELLOW)
+                                ),
+                                '^',
+                                "Include found here",
+                                "        if (Config::find_path(\"/Users/pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp\").empty()) {"
+                        ), '~', 58
+                ));
+
+                Diagnostics::push(m);
+        }
+
+        const std::string s { "pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp" };
+        if (Config::find_path(s).empty()) {
+                std::stringstream ss;
+                m = Diagnostics::Diagnostic(
+                        Diagnostics::FileContext("Assembler.cpp", 92, 32),
+                        "File '" + s + "' not found",
+                        Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+                        Diagnostics::DIAGNOSTIC::ERROR
+                );
+
+                m.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+                        Diagnostics::SelectionContext(
+                                Diagnostics::FileContext(
+                                        Diagnostics::Variant<std::string>("Assembler.cpp",
+                                                                          Console::FOREGROUND_COLOUR::YELLOW),
+                                        Diagnostics::Variant<std::size_t>(92, Console::FOREGROUND_COLOUR::YELLOW),
+                                        Diagnostics::Variant<std::size_t>(31, Console::FOREGROUND_COLOUR::YELLOW)
+                                ),
+                                '^',
+                                "Include found here",
+                                "        const std::string s { \"pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp\" };"
+                        ), '~', s.length()
+                ));
+
+                Diagnostics::push(m);
+        }
+
+        Diagnostics::unwind();
+
+        return 0;
 }
 
-void Assembler::de_init()
+Assembler::Assembler::Assembler()
 {
-        if (assembler) {
-                delete assembler;
-        }
+
 }
 
-int ::Assembler::run(int argc, char **args)
+bool Assembler::Assembler::configure(int argc, char **args)
 {
-        if (!init()) {
-                std::perror(last_error.c_str());
-                return 1;  // No point in continuing if initialisation failed.
-        }
-
         cxxopts::Options option_parser("LC3AS", "LC-3 Assembly Language Assembler");
         try {
                 option_parser.positional_help("<assembly files>");
@@ -51,67 +148,42 @@ int ::Assembler::run(int argc, char **args)
 
                 option_parser.parse_positional("files");
                 option_parser.parse(argc, args);
-
-                if (option_parser.count("help")) {
-                        std::cout << option_parser.help() << '\n';
-                        de_init();
-                        return 0;
-                }
-
-                if (option_parser.count("include")) {
-                        auto      &&dirs = option_parser["include"].as<std::vector<std::string>>();
-                        for (auto &&dir : dirs) {
-                                Config::config_add_search_directory(dir);
-                        }
-                }
-
-                if (option_parser.count("stop")) {
-                        Config::config_set(Config::CONFIG_OPTIONS::STOP_ON_FIRST_ERR);
-                }
-
-                if (option_parser.count("error")) {
-                        Config::config_set(Config::CONFIG_OPTIONS::WARN_AS_ERROR);
-                }
-
-                if (option_parser.count("warn")) {
-                        // TODO: Implement (as above).
-                }
-
-        } catch (const cxxopts::OptionException& e)
-        {
+        } catch (const cxxopts::OptionException &e) {
                 std::cout << "LC3AS Command Line Error: " << e.what() << '\n';
-                return 1;
+                return false;
         }
 
-        // TODO: Move this to when the Assembler finishes.
-        /*
-        Diagnostics::Diagnostic_Message m(
-                "Random Message",
-                Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
-                Diagnostics::DIAGNOSTIC::WARNING
-        );
+        Config::add_search_directory(".", "Current Running Directory");
 
-        m.provide_context(Diagnostics::Diagnostic_Context());
+        if (option_parser.count("help")) {
+                std::cout << option_parser.help() << '\n';
+                return false;
+        }
 
-        Diagnostics::push(m);
+        if (!option_parser.count("files")) {
+                std::cout << "LC3AS: No input files.\n";
+                return false;
+        }
 
-        Diagnostics::push(
-                Diagnostics::Diagnostic_Message(
-                        "Another message",
-                        Diagnostics::DIAGNOSTIC_TYPE::SPELLING,
-                        Diagnostics::DIAGNOSTIC::ERROR
-                )
-        );
-        */
+        if (option_parser.count("include")) {
+                auto      &&dirs = option_parser["include"].as<std::vector<std::string>>();
+                for (auto &&dir : dirs) {
+                        Config::add_search_directory(dir);
+                }
+        }
 
-        Diagnostics::unwind();
+        if (option_parser.count("stop")) {
+                Config::set(Config::CONFIG_OPTIONS::STOP_ON_FIRST_ERR);
+        }
 
-        de_init();
+        if (option_parser.count("error")) {
+                Config::set(Config::CONFIG_OPTIONS::WARN_AS_ERROR);
+        }
 
-        return 0;
-}
+        if (option_parser.count("warn")) {
+                // TODO: Implement (as above).
+        }
 
-Assembler::Assembler::Assembler()
-{
 
+        return true;
 }

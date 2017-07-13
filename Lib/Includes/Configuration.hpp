@@ -9,12 +9,27 @@ namespace Config
         {
                 WARN_AS_ERROR     = 0x01,
                 STOP_ON_FIRST_ERR = 0x02,
+                VERBOSE           = 0x04,
         };
 
-        bool config_on(std::size_t option);
+        extern std::size_t configuration;
 
-        void config_set(std::size_t option);
-        void config_add_search_directory(const std::string &directory);
+        inline bool is_set(std::size_t option)
+        {
+                return !!(configuration & option);
+        }
+
+        inline void set(std::size_t option)
+        {
+                configuration |= option;
+        }
+
+        void set(std::size_t option);
+        void add_search_directory(const std::string &directory);
+        void add_search_directory(const std::string &&directory, const std::string &&name);
+
+        // TODO: Make this return some sort of context, e.g. File that includes it
+        std::string find_path(const std::string &path);
 }
 
 #endif

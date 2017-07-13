@@ -1,41 +1,28 @@
 #include "Diagnostics.hpp"
 
-static std::queue<Diagnostics::Diagnostic_Message> diagnostics_log;
+static std::queue<Diagnostics::Diagnostic> diagnostics_log;
 
-static const Console::Colour diagnostic_colours[] = {
-        Console::Colour(Console::FOREGROUND_COLOUR::CYAN),
-        Console::Colour(Console::FOREGROUND_COLOUR::RED),
-        Console::Colour(Console::FOREGROUND_COLOUR::MAGENTA),
+const Diagnostics::diagnostic_type Diagnostics::diagnostic_colours[] = {
+        Diagnostics::diagnostic_type("Warning", Console::Colour(Console::FOREGROUND_COLOUR::CYAN)),
+        Diagnostics::diagnostic_type("Error", Console::Colour(Console::FOREGROUND_COLOUR::RED)),
+        Diagnostics::diagnostic_type("Note", Console::Colour(Console::FOREGROUND_COLOUR::MAGENTA)),
 };
-
-static Diagnostics::Diagnostic_Message &pop()
-{
-        auto &&message = diagnostics_log.front();
-        diagnostics_log.pop();
-        return message;
-}
 
 void Diagnostics::unwind()
 {
         while (!diagnostics_log.empty()) {
-                auto &&diagnostic = pop();
-
-                Console::write(diagnostic.to_string(), diagnostic_colours[static_cast<std::size_t>(diagnostic.type())]);
-
-                if (diagnostic.has_context()) {
-                        // TODO: Print it's context too.
-                        Console::write(diagnostic.given_context());
-                }
-
+                auto &&diagnostic = diagnostics_log.front();
+                Console::write(diagnostic);
+                diagnostics_log.pop();
         }
 }
 
-void Diagnostics::push(Diagnostic_Message &&message)
+void Diagnostics::push(Diagnostic &&message)
 {
         diagnostics_log.emplace(message);
 }
 
-void Diagnostics::push(Diagnostic_Message &message)
+void Diagnostics::push(Diagnostic &message)
 {
         diagnostics_log.emplace(message);
 }
@@ -43,4 +30,69 @@ void Diagnostics::push(Diagnostic_Message &message)
 std::size_t Diagnostics::count()
 {
         return diagnostics_log.size();
+}
+
+Diagnostics::Diagnostic::Diagnostic(const Diagnostics::FileContext &file)
+        : message("Something happened..."), d_type(), d(), context(), info(file)
+{ }
+
+Diagnostics::Diagnostic::Diagnostic(const Diagnostics::FileContext &file,
+                                    std::string &&t_message,
+                                    Diagnostics::DIAGNOSTIC_TYPE t_type,
+                                    Diagnostics::DIAGNOSTIC diagnostic)
+        : message(t_message), d_type(t_type), d(diagnostic), context(), info(file)
+{ }
+
+Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &other)
+        : message(other.message), d_type(other.d_type), d(other.d), context(std::move(other.context))
+          , info(other.info)
+{
+
+}
+
+Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagnostic &&rhs)
+{
+        if (&rhs != this) {
+                message = rhs.message;
+                d       = rhs.d;
+                d_type  = rhs.d_type;
+                context = std::move(rhs.context);
+        }
+        return *this;
+}
+
+Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagnostic &rhs)
+{
+        message = rhs.message;
+        d       = rhs.d;
+        d_type  = rhs.d_type;
+        context = std::move(rhs.context);
+        return *this;
+}
+
+Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator ()()
+{
+        return *this;
+}
+
+std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::Diagnostic &d_msg)
+{
+        os << d_msg.info << ' ' << diagnostic_colours[d_msg.type()] << ": " << d_msg.message << '\n';
+
+        if (d_msg.has_context()) {
+                for (auto &&context_item : d_msg.context) {
+                        switch (context_item->type()) {
+                        case Context::HIGHLIGHT:
+                                Console::write_line(*(static_cast<HighlightContext *>(context_item.get())));
+                                break;
+                        case Context::SELECTOR:
+                                Console::write_line(*(static_cast<SelectionContext *>(context_item.get())));
+                        default:
+                                Console::write_line(*context_item);
+                                break;
+                        }
+                }
+        }
+
+        return os;
 }
