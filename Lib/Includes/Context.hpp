@@ -104,6 +104,9 @@ namespace Diagnostics
         class SelectionContext : public Context
         {
         public:
+                SelectionContext(const Diagnostics::FileContext &file, char t_selector,
+                                 const std::string &t_message, const std::string &t_line,
+                                 const std::string &changer);
                 SelectionContext(const FileContext &file, char t_selector, const std::string &&t_message,
                                  const std::string &&t_line, const std::string &changer = std::string());
                 SelectionContext(const SelectionContext &other)

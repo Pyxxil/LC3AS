@@ -14,6 +14,9 @@
                         ; an error if BEGIN_TEST is used at any point.
 
 
+INTENTIONAL_WARNING_CHECK:                 /
+
+
 ; This is a label
 BEGIN_TEST:
         ADD R5, R5, #-10; Comments can be as close to the instruction as you'd
