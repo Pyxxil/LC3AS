@@ -69,7 +69,7 @@ int Assembler::assemble(int argc, char **args)
 
         if (Config::find_path("/Users/pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp").empty()) {
                 m = Diagnostics::Diagnostic(
-                        Diagnostics::FileContext("Assembler.cpp", 69, 32),
+                        Diagnostics::FileContext("Assembler.cpp", 69, 31),
                         "File '/Users/pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp' not found",
                         Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
                         Diagnostics::DIAGNOSTIC::ERROR
@@ -81,21 +81,20 @@ int Assembler::assemble(int argc, char **args)
                                                                                            Console::FOREGROUND_COLOUR::YELLOW),
                                                          Diagnostics::Variant<std::size_t>(69,
                                                                                            Console::FOREGROUND_COLOUR::YELLOW),
-                                                         Diagnostics::Variant<std::size_t>(30,
+                                                         Diagnostics::Variant<std::size_t>(31,
                                                                                            Console::FOREGROUND_COLOUR::YELLOW)
                                 ),
                                 '^',
                                 "Include found here",
                                 "        if (Config::find_path(\"/Users/pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp\").empty()) {"
-                        ), '~', 58
+                        ), '~', 55
                 ));
 
                 Diagnostics::push(m);
         }
 
-        const std::string s { "pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp" };
+        const std::string s { "../Assembler/Assembler.cpp" };
         if (Config::find_path(s).empty()) {
-                std::stringstream ss;
                 m = Diagnostics::Diagnostic(
                         Diagnostics::FileContext("Assembler.cpp", 92, 32),
                         "File '" + s + "' not found",
@@ -113,12 +112,14 @@ int Assembler::assemble(int argc, char **args)
                                 ),
                                 '^',
                                 "Include found here",
-                                "        const std::string s { \"pyxxil/Sync/Projects/LC3/Assembler/Assembler.cpp\" };"
+                                "        const std::string s { \"../Assembler/Assembler.cpp\" };"
                         ), '~', s.length()
                 ));
 
                 Diagnostics::push(m);
         }
+
+        assembler.assemble();
 
         Diagnostics::unwind();
 
@@ -163,6 +164,11 @@ bool Assembler::Assembler::configure(int argc, char **args)
         if (!option_parser.count("files")) {
                 std::cout << "LC3AS: No input files.\n";
                 return false;
+        } else {
+                auto &&files = option_parser["files"].as<std::vector<std::string>>();
+                for (auto &&file : files) {
+                        files_to_assemble.emplace_back(file);
+                }
         }
 
         if (option_parser.count("include")) {
@@ -184,6 +190,10 @@ bool Assembler::Assembler::configure(int argc, char **args)
                 // TODO: Implement (as above).
         }
 
-
         return true;
+}
+
+void Assembler::Assembler::assemble()
+{
+
 }

@@ -8,7 +8,7 @@
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 
-#include "Console.hpp"
+#include "Diagnostics.hpp"
 
 struct Directory
 {
@@ -63,15 +63,25 @@ void Config::add_search_directory(const std::string &&directory, const std::stri
 
 std::string Config::find_path(const std::string &path)
 {
-        boost::filesystem::path p { path };
+        // TODO: This should all be done in a different file (Config is the wrong place).
+        const boost::filesystem::path p { path };
+
+        if (!boost::filesystem::is_regular_file(p)) {
+                return std::string();
+        }
 
         if (p.is_absolute() && boost::filesystem::exists(p)) {
                 return path;
         }
 
+        if (p.is_relative() && boost::filesystem::exists(p)) {
+                const boost::filesystem::path abs_path = boost::filesystem::absolute(p);
+                return abs_path.string();
+        }
+
         for (auto &&dir : search_directories) {
                 if (dir.contains(p)) {
-                        boost::filesystem::path s { boost::filesystem::absolute(path) };
+                        const boost::filesystem::path s { boost::filesystem::absolute(path) };
                         return s.string();
                 }
         }

@@ -3,9 +3,27 @@
 static std::queue<Diagnostics::Diagnostic> diagnostics_log;
 
 const Diagnostics::diagnostic_type Diagnostics::diagnostic_colours[] = {
-        Diagnostics::diagnostic_type("Warning", Console::Colour(Console::FOREGROUND_COLOUR::CYAN)),
-        Diagnostics::diagnostic_type("Error", Console::Colour(Console::FOREGROUND_COLOUR::RED)),
-        Diagnostics::diagnostic_type("Note", Console::Colour(Console::FOREGROUND_COLOUR::MAGENTA)),
+        Diagnostics::diagnostic_type(
+                "Warning",
+                Console::Colour(
+                        Console::FOREGROUND_COLOUR::CYAN,
+                        Console::MODIFIER::UNDERLINE
+                )
+        )
+        , Diagnostics::diagnostic_type(
+                "Error",
+                Console::Colour(
+                        Console::FOREGROUND_COLOUR::RED,
+                        Console::MODIFIER::UNDERLINE
+                )
+        )
+        , Diagnostics::diagnostic_type(
+                "Note",
+                Console::Colour(
+                        Console::FOREGROUND_COLOUR::BLACK,
+                        Console::MODIFIER::BOLD
+                )
+        )
 };
 
 void Diagnostics::unwind()
@@ -87,6 +105,7 @@ std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::Diag
                                 break;
                         case Context::SELECTOR:
                                 Console::write_line(*(static_cast<SelectionContext *>(context_item.get())));
+                                break;
                         default:
                                 Console::write_line(*context_item);
                                 break;

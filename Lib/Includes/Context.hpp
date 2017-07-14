@@ -18,14 +18,14 @@ namespace Diagnostics
                 Variant &operator =(const Variant<T> &rhs)
                 {
                         information = rhs.information;
-                        colour = rhs.colour;
+                        colour      = rhs.colour;
                         return *this;
                 }
                 Variant &operator =(const Variant<T> &&rhs)
                 {
                         if (&rhs != this) {
                                 information = rhs.information;
-                                colour = rhs.colour;
+                                colour      = rhs.colour;
                         }
                         return *this;
                 }
@@ -40,7 +40,7 @@ namespace Diagnostics
                         return os << variant.colour << variant.information << Console::reset;
                 }
 
-                T information;
+                T               information;
                 Console::Colour colour;
         };
 
@@ -52,11 +52,16 @@ namespace Diagnostics
                 FileContext(Variant<std::string> &name, Variant<std::size_t> &t_line, Variant<std::size_t> &t_col);
                 FileContext(Variant<std::string> &&name, Variant<std::size_t> &&t_line, Variant<std::size_t> &&t_col);
 
-                Variant<std::size_t> column;
+                inline const Variant<std::size_t> &get_column() const
+                {
+                        return column;
+                }
+
         private:
                 friend std::ostream &operator <<(std::ostream &os, const FileContext &file);
 
                 Variant<std::string> file_name;
+                Variant<std::size_t> column;
                 Variant<std::size_t> line;
         };
 
@@ -103,15 +108,15 @@ namespace Diagnostics
                                  const std::string &&t_line, const std::string &changer = std::string());
                 SelectionContext(const SelectionContext &other)
                         : Context(other.file_information, other.message, other.line, other.context_type)
-                          , selector(other.selector), change(other.change)
-                {}
+                          , selector(other.selector), fix_it(other.fix_it)
+                { }
 
                 friend std::ostream &operator <<(std::ostream &os, const SelectionContext &context);
 
         private:
                 char selector;
 
-                std::string change;
+                std::string fix_it;
         };
 
         class HighlightContext : public Context

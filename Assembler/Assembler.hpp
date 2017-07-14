@@ -26,6 +26,12 @@ namespace Assembler
                 //                                      TODO:   If so, add enum options for config (VERBOSE_LEVEL_ONE, VERBOSE_LEVEL_TWO, etc.)
                 //                                      TODO: Decide if this relates to diagnostics too
                 bool configure(int argc, char **args);
+
+                void assemble();
+
+        private:
+                std::vector<std::string> files_to_assemble;
+                std::size_t errors;
         };
 
         int assemble(int argc, char **args);

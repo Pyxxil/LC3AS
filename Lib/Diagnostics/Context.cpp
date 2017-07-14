@@ -7,23 +7,23 @@
 static const Console::Colour HIGHLIGHTER(Console::FOREGROUND_COLOUR::YELLOW);
 
 Diagnostics::FileContext::FileContext(std::string &name, std::size_t t_line, std::size_t t_col)
-        : column(t_col), file_name(Variant<std::string>(name)), line(t_line)
+        : file_name(name), column(t_col), line(t_line)
 { }
 
 Diagnostics::FileContext::FileContext(std::string &&name, std::size_t t_line, std::size_t t_col)
-        : column(t_col), file_name(Variant<std::string>(name)), line(t_line)
+        : file_name(name), column(t_col), line(t_line)
 { }
 
 Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> &name,
                                       Diagnostics::Variant<size_t> &t_line,
                                       Diagnostics::Variant<size_t> &t_col)
-        : column(t_col), file_name(name), line(t_line)
+        : file_name(name), column(t_col), line(t_line)
 { }
 
 Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> &&name,
                                       Diagnostics::Variant<size_t> &&t_line,
                                       Diagnostics::Variant<size_t> &&t_col)
-        : column(t_col), file_name(name), line(t_line)
+        : file_name(name), column(t_col), line(t_line)
 { }
 
 std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::FileContext &file)
@@ -37,7 +37,7 @@ Diagnostics::Context::Context(const Diagnostics::FileContext &file,
                               Context::CONTEXT_TYPE t_type)
         : file_information(file), message(t_message), line(t_line), context_type(t_type)
 {
-        for (std::size_t i = 0; i < file.column.var(); ++i) {
+        for (std::size_t i = 0; i < file.get_column().var(); ++i) {
                 empty_line += std::isspace(t_line[i]) ? t_line[i] : ' ';
         }
 }
@@ -82,7 +82,7 @@ Diagnostics::Context::Context(const Diagnostics::FileContext &file,
                               Diagnostics::Context::CONTEXT_TYPE t_type)
         : file_information(file), message(t_message), line(t_line), empty_line(), context_type(t_type)
 {
-        for (std::size_t i = 0; i < file.column.var(); ++i) {
+        for (std::size_t i = 0; i < file.get_column().var(); ++i) {
                 empty_line += std::isspace(t_line[i]) ? t_line[i] : ' ';
         }
 }
@@ -120,17 +120,17 @@ Diagnostics::SelectionContext::SelectionContext(const Diagnostics::FileContext &
                                                 const std::string &&t_message,
                                                 const std::string &&t_line,
                                                 const std::string &changer)
-        : Context(file, t_message, t_line, SELECTOR), selector(t_selector), change(changer)
+        : Context(file, t_message, t_line, SELECTOR), selector(t_selector), fix_it(changer)
 { }
 
 std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::SelectionContext &context)
 {
         os << context.file_information << ' ' << diagnostic_colours[DIAGNOSTIC::NOTE] << ": "
-                  << Console::reset << context.message << '\n' << context.line << '\n'
-                  << HIGHLIGHTER << context.empty_line << context.selector;
+           << context.message << '\n' << context.line << '\n' << HIGHLIGHTER << context.empty_line
+           << context.selector;
 
-        if (!context.change.empty()) {
-                os << '\n' << context.empty_line << context.change;
+        if (!context.fix_it.empty()) {
+                os << '\n' << context.empty_line << context.fix_it;
         }
 
         return os << Console::reset;

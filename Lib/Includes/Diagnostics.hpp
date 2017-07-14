@@ -43,7 +43,10 @@ namespace Diagnostics
         {
         public:
                 Diagnostic(const FileContext &file);
-                Diagnostic(const FileContext &file, std::string &&t_message, DIAGNOSTIC_TYPE t_type, DIAGNOSTIC diagnostic);
+                Diagnostic(const FileContext &file,
+                           std::string &&t_message,
+                           DIAGNOSTIC_TYPE t_type,
+                           DIAGNOSTIC diagnostic);
                 Diagnostic(Diagnostic &other);
 
                 Diagnostic &operator =(Diagnostic &rhs);
@@ -63,7 +66,7 @@ namespace Diagnostics
 
                 inline bool has_context() const
                 {
-                        return !!context.size();
+                        return context.size() != 0;
                 }
 
         private:
