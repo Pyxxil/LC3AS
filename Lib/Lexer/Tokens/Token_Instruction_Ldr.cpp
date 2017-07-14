@@ -92,9 +92,9 @@ std::string Ldr::disassemble(std::uint16_t &program_counter,
                 << ((assembled.front() & 0x01C0) >> 6 & 7) << " #" << std::dec
                 << ((static_cast<int8_t>(assembled.front() & 0x3F) << 2) >> 2)
 
-                #ifdef INCLUDE_ADDONS
+#ifdef INCLUDE_ADDONS
                 << '\t' << file
-                #endif
+#endif
                 << '\n';
 
         ++program_counter;

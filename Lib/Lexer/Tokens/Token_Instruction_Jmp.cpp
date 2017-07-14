@@ -73,9 +73,9 @@ std::string Jmp::disassemble(std::uint16_t &program_counter,
                 // Instruction itself
                 << " JMP R" << ((assembled.front() & 0x01C0) >> 6 & 7)
 
-                #ifdef INCLUDE_ADDONS
+#ifdef INCLUDE_ADDONS
                 << '\t' << file
-                #endif
+#endif
                 << '\n';
 
         ++program_counter;

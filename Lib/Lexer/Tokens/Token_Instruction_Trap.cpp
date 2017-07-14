@@ -81,9 +81,9 @@ std::string Trap::disassemble(std::uint16_t &program_counter,
                 << " TRAP 0x" << std::right << std::hex << std::uppercase << std::setfill('0') << std::setw(2)
                 << (assembled.front() & 0xFF)
 
-                #ifdef INCLUDE_ADDONS
+#ifdef INCLUDE_ADDONS
                 << '\t' << file
-                #endif
+#endif
                 << '\n';
 
         ++program_counter;

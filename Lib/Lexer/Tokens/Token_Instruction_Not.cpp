@@ -92,9 +92,9 @@ std::string Not::disassemble(std::uint16_t &program_counter,
                 << " NOT R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
                 << ((assembled.front() & 0x01C0) >> 6 & 7)
 
-                #ifdef INCLUDE_ADDONS
+#ifdef INCLUDE_ADDONS
                 << '\t' << file
-                #endif
+#endif
                 << '\n';
 
         ++program_counter;
