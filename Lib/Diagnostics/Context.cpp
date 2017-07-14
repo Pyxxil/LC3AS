@@ -117,6 +117,14 @@ std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::High
 
 Diagnostics::SelectionContext::SelectionContext(const Diagnostics::FileContext &file,
                                                 char t_selector,
+                                                const std::string &t_message,
+                                                const std::string &t_line,
+                                                const std::string &changer)
+        : Context(file, t_message, t_line, SELECTOR), selector(t_selector), fix_it(changer)
+{ }
+
+Diagnostics::SelectionContext::SelectionContext(const Diagnostics::FileContext &file,
+                                                char t_selector,
                                                 const std::string &&t_message,
                                                 const std::string &&t_line,
                                                 const std::string &changer)

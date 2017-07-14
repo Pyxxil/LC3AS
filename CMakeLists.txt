@@ -10,6 +10,8 @@ if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
         set ( CMAKE_VERBOSE_MAKEFILE ON )
 endif ()
 
+option ( ALLOW_EXTRAS OFF )
+
 ### Populated by Lib/CMakeLists.txt
 set ( LIBRARY_SOURCE_FILES "" )
 set ( LIBRARY_HEADER_FILES "" )
@@ -37,3 +39,7 @@ target_include_directories ( LC3AS PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}" "${AS
 target_link_libraries ( LC3AS PUBLIC "${Boost_FILESYSTEM_LIBRARY}" "${Boost_SYSTEM_LIBRARY}" )
 target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
 target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )
+
+if ( ALLOW_EXTRAS )
+        target_compile_definitions ( LC3AS PUBLIC INCLUDE_ADDONS )
+endif ()

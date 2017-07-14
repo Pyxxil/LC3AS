@@ -1,6 +1,8 @@
 #include "Assembler.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <Lib/Includes/Lexer.hpp>
 
 #include "Configuration.hpp"
 #include "Diagnostics.hpp"
@@ -17,7 +19,7 @@ int Assembler::assemble(int argc, char **args)
 
         // TODO: Move this to when the Assembler finishes.
 
-        Diagnostics::Diagnostic m {
+        /*Diagnostics::Diagnostic m {
                 Diagnostics::FileContext(
                         Diagnostics::Variant<std::string>("Assembler.cpp", Console::FOREGROUND_COLOUR::YELLOW),
                         Diagnostics::Variant<std::size_t>(44, Console::FOREGROUND_COLOUR::YELLOW),
@@ -118,15 +120,14 @@ int Assembler::assemble(int argc, char **args)
 
                 Diagnostics::push(m);
         }
-
+*/
         assembler.assemble();
 
-        Diagnostics::unwind();
-
-        return 0;
+        return assembler.error_count();
 }
 
 Assembler::Assembler::Assembler()
+        : files_to_assemble(), errors(0)
 {
 
 }
@@ -165,7 +166,7 @@ bool Assembler::Assembler::configure(int argc, char **args)
                 std::cout << "LC3AS: No input files.\n";
                 return false;
         } else {
-                auto &&files = option_parser["files"].as<std::vector<std::string>>();
+                auto      &&files = option_parser["files"].as<std::vector<std::string>>();
                 for (auto &&file : files) {
                         files_to_assemble.emplace_back(file);
                 }
@@ -195,5 +196,27 @@ bool Assembler::Assembler::configure(int argc, char **args)
 
 void Assembler::Assembler::assemble()
 {
+        for (auto &&file : files_to_assemble) {
+                std::ifstream f(file);
 
+                if (f.fail()) {
+                        // We can't do anything with a file that failed to open for some reason...
+                        Console::write_line(Diagnostics::Variant<std::string>("Unable to open file '" + file + "'"));
+                        f.close();
+                        continue;
+                } else {
+                        f.close();
+                }
+
+                Console::write("--- ");
+                Console::write(Diagnostics::Variant<std::string>("Assembling file '" + file + "'"));
+                Console::write(" ---\n");
+
+                Lexer lexer(file);
+                lexer.lex();
+
+                errors = static_cast<int>(Diagnostics::count());
+
+                Diagnostics::unwind();
+        }
 }
