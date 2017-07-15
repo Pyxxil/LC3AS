@@ -4,10 +4,10 @@
 
 #include "Diagnostics.hpp"
 
-String::String(std::string &string, std::string &t_file, int line_number)
-        : Token(string, string, t_file, line_number)
+String::String(std::string &string, std::string &t_file, size_t line_number, size_t column)
+        : Token(string, string, t_file, line_number, column)
 {
-        for (std::size_t index = 0; index < string.size(); ++index) {
+        for (size_t index = 0; index < string.size(); ++index) {
                 if (string.at(index) == '\\') {
                         switch (string.at(index + 1)) {
                         case 'n':
@@ -41,7 +41,7 @@ String::String(std::string &string, std::string &t_file, int line_number)
                                 break;
                         }
                 } else {
-                        assembled.emplace_back(static_cast<std::uint16_t>(string.at(index)));
+                        assembled.emplace_back(static_cast<uint16_t>(string.at(index)));
                 }
         }
 

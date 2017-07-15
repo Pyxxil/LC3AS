@@ -4,21 +4,25 @@
 #include <sstream>
 #include <bitset>
 
-Ret::Ret(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+Ret::Ret(std::string &instruction,
+         std::string &instruction_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Ret::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         (void) tokens;
         (void) symbols;
         (void) program_counter;
 
-        assembled.emplace_back(static_cast<std::uint16_t>(0xC1C0));
+        assembled.emplace_back(static_cast<uint16_t>(0xC1C0));
 
         return 1;
 }
@@ -39,7 +43,7 @@ std::int32_t Ret::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<int32_t>(is_valid);
 }
 
-std::string Ret::disassemble(std::uint16_t &program_counter,
+std::string Ret::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

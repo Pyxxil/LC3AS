@@ -8,15 +8,19 @@
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Sti::Sti(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number), provided()
+Sti::Sti(std::string &instruction,
+         std::string &instruction_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), provided()
 {
 
 }
 
 int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                       const std::map<std::string, Symbol> &symbols,
-                      std::uint16_t program_counter)
+                      uint16_t program_counter)
 {
         if (!is_valid) {
                 return 0;
@@ -37,14 +41,14 @@ int32_t Sti::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         if (offset > 255 || offset < -256) {
-                tokens.at(2)->requires_too_many_bits(9);
+                tokens.at(2)->requires_too_many_bits(9, false, this, symbols);
                 return -1;
         }
 
         provided = tokens.at(2);
 
         assembled.emplace_back(
-                static_cast<std::uint16_t >(0xB000 |
+                static_cast<uint16_t >(0xB000 |
                         ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
                         (offset & 0x1FF))
         );
@@ -80,7 +84,7 @@ std::int32_t Sti::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Sti::disassemble(std::uint16_t &program_counter,
+std::string Sti::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

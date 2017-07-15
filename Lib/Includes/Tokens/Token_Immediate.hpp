@@ -10,10 +10,14 @@ public:
         Immediate(std::string &immediate,
                   std::string &immediate_uppercase,
                   std::string &t_file,
-                  int line_number);
+                  size_t line_number,
+                  size_t column);
 
         virtual Token::token_type type() const override;
-        virtual void requires_too_many_bits(int allowed_bits, bool is_signed = true) override;
+        virtual void requires_too_many_bits(int allowed_bits,
+                                            bool is_signed,
+                                            const Token *const caller,
+                                            const std::map<std::string, Symbol> &symbols) override;
 
         std::int16_t value = 0;
 };

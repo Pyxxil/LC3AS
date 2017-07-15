@@ -7,20 +7,24 @@
 
 #ifdef INCLUDE_ADDONS
 
-Sub::Sub(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
-          , set_zero(new And("AND", "AND", t_file, line_number))
-          , add(new Add("ADD", "ADD", t_file, line_number))
-          , decimal_zero(new Decimal("#0", t_file, line_number))
-          , neg1(new Neg(".NEG", ".NEG", t_file, line_number))
-          , neg2(new Neg(".NEG", ".NEG", t_file, line_number))
+Sub::Sub(std::string &directive,
+         std::string &directive_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
+          , set_zero(std::make_shared<And>("AND", "AND", t_file, line_number, column))
+          , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
+          , decimal_zero(std::make_shared<Decimal>("#0", t_file, line_number, column))
+          , neg1(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
+          , neg2(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
 {
 
 }
 
 std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         if (!is_valid) {
                 return 0;
@@ -28,8 +32,8 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         std::int32_t ret = 0;
 
-        std::size_t first_register_index  = 1;
-        std::size_t second_register_index = 2;
+        size_t first_register_index  = 1;
+        size_t second_register_index = 2;
 
         if (tokens.size() == 4) {
                 ++first_register_index;
@@ -102,8 +106,8 @@ bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
         if (is_valid) {
-                std::size_t first_register_index  = 1;
-                std::size_t second_register_index = 2;
+                size_t first_register_index  = 1;
+                size_t second_register_index = 2;
 
                 if (tokens.size() == 4) {
                         ++first_register_index;
@@ -126,11 +130,13 @@ std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         }
 }
 
-void Sub::invalid_argument_count(std::size_t provided, std::size_t expected) const
+void Sub::invalid_argument_count(size_t provided, size_t expected) const
 {
         (void) expected;
 
         provided -= 1;
+
+        // TODO: Turn this into a Diagnostics call
 
         std::cerr << "ERROR: ";
 
@@ -142,7 +148,7 @@ void Sub::invalid_argument_count(std::size_t provided, std::size_t expected) con
                   << (provided == 1 ? " argument was " : "arguments were ") << "provided.\n";
 }
 
-std::string Sub::disassemble(std::uint16_t &program_counter,
+std::string Sub::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

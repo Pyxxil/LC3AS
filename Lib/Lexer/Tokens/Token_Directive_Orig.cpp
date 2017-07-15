@@ -4,15 +4,19 @@
 #include <sstream>
 #include <bitset>
 
-Orig::Orig(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
+Orig::Orig(std::string &directive,
+           std::string &directive_uppercase,
+           std::string &t_file,
+           size_t line_number,
+           size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,
-                            std::uint16_t program_counter)
+                            uint16_t program_counter)
 {
         (void) symbols;
         (void) program_counter;
@@ -21,7 +25,7 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                 return -1;
         }
 
-        origin = static_cast<std::uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->value);
+        origin = static_cast<uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->value);
         assembled.emplace_back(origin);
 
         return origin;
@@ -53,7 +57,7 @@ std::int32_t Orig::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
         }
 }
 
-std::string Orig::disassemble(std::uint16_t &program_counter,
+std::string Orig::disassemble(uint16_t &program_counter,
                               const std::string &symbol,
                               int width) const
 {

@@ -6,24 +6,28 @@
 
 #ifdef INCLUDE_ADDONS
 
-Lshift::Lshift(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
-          , add(new Add("ADD", "ADD", t_file, line_number))
+Lshift::Lshift(std::string &directive,
+               std::string &directive_uppercase,
+               std::string &t_file,
+               size_t line_number,
+               size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
+          , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
 {
 
 }
 
 std::int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                               const std::map<std::string, Symbol> &symbols,
-                              std::uint16_t program_counter)
+                              uint16_t program_counter)
 {
         std::vector<std::shared_ptr<Token>> vec = { add, tokens.at(1), tokens.at(1), tokens.at(1) };
 
         add->assemble(vec, symbols, program_counter);
 
-        const std::uint16_t machine_instruction = add->assembled.front();
+        const uint16_t machine_instruction = add->assembled.front();
 
-        assembled.insert(assembled.end(), static_cast<std::size_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value), machine_instruction);
+        assembled.insert(assembled.end(), static_cast<size_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value), machine_instruction);
 
         return static_cast<std::int32_t>(assembled.size());
 }
@@ -67,7 +71,7 @@ std::int32_t Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &toke
         return std::static_pointer_cast<Immediate>(tokens.at(2))->value;
 }
 
-std::string Lshift::disassemble(std::uint16_t &program_counter,
+std::string Lshift::disassemble(uint16_t &program_counter,
                                 const std::string &symbol,
                                 int width) const
 {
@@ -80,7 +84,7 @@ std::string Lshift::disassemble(std::uint16_t &program_counter,
         // as we increment it ourselves in the loop below.
         --program_counter;
 
-        for (std::size_t shift = 1; shift < assembled.size(); ++shift) {
+        for (size_t shift = 1; shift < assembled.size(); ++shift) {
                 stream << disassembled_without_symbol;
                 ++program_counter;
         }

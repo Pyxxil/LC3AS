@@ -7,27 +7,36 @@
 
 #ifdef INCLUDE_ADDONS
 
-Neg::Neg(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
-          , neg(new Not("NOT", "NOT", t_file, line_number)), add(new Add("ADD", "ADD", t_file, line_number))
+Neg::Neg(std::string &directive,
+         std::string &directive_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
+          , neg(std::make_shared<Not>("NOT", "NOT", t_file, line_number, column))
+          , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
 {
 
 }
 
-Neg::Neg(std::string &&directive, std::string &&directive_uppercase, std::string &t_file, int line_number)
-        : Neg(directive, directive_uppercase, t_file, line_number)
+Neg::Neg(std::string &&directive,
+         std::string &&directive_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Neg(directive, directive_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         std::vector<std::shared_ptr<Token>> vec = { neg, tokens.at(1), tokens.at(1) };
 
         neg->assemble(vec, symbols, program_counter);
-        vec = { add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1", file) };
+        vec = { add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1", file, at_line, at_column) };
         add->assemble(vec, symbols, program_counter);
 
         assembled = neg->assembled;
@@ -59,7 +68,7 @@ std::int32_t Neg::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid) * 2;
 }
 
-std::string Neg::disassemble(std::uint16_t &program_counter,
+std::string Neg::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

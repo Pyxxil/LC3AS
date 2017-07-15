@@ -7,23 +7,27 @@
 
 #ifdef INCLUDE_ADDONS
 
-Set::Set(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
-          , _and(new And("AND", "AND", t_file, line_number))
-          , add(new Add("ADD", "ADD", t_file, line_number))
-          , br(new Br("BR", "BR", t_file, line_number, true, true, true))
-          , ld(new Ld("LD", "LD", t_file, line_number))
-          , fill(new Fill(".FILL", ".FILL", t_file, line_number))
-          , decimal_zero(new Decimal("#0", t_file, line_number))
-          , decimal_one(new Decimal("#1", t_file, line_number))
-          , decimal_negative_two(new Decimal("#-2", t_file, line_number))
+Set::Set(std::string &directive,
+         std::string &directive_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
+          , _and(std::make_shared<And>("AND", "AND", t_file, line_number, column))
+          , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
+          , br(std::make_shared<Br>("BR", "BR", t_file, line_number, column, true, true, true))
+          , ld(std::make_shared<Ld>("LD", "LD", t_file, line_number, column))
+          , fill(std::make_shared<Fill>(".FILL", ".FILL", t_file, line_number, column))
+          , decimal_zero(std::make_shared<Decimal>("#0", t_file, line_number, column))
+          , decimal_one(std::make_shared<Decimal>("#1", t_file, line_number, column))
+          , decimal_negative_two(std::make_shared<Decimal>("#-2", t_file, line_number, column))
 {
 
 }
 
 std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         if (!is_valid) {
                 return -1;
@@ -98,7 +102,7 @@ std::int32_t Set::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         }
 }
 
-std::string Set::disassemble(std::uint16_t &program_counter,
+std::string Set::disassemble(uint16_t &program_counter,
                              const std::string &symbol, int width) const
 {
 

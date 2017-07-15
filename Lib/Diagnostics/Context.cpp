@@ -4,13 +4,13 @@
 
 #include "Diagnostics.hpp"
 
-static const Console::Colour HIGHLIGHTER(Console::FOREGROUND_COLOUR::YELLOW);
+static const Console::Colour HIGHLIGHTER(Console::FOREGROUND_COLOUR::MAGENTA);
 
-Diagnostics::FileContext::FileContext(std::string &name, std::size_t t_line, std::size_t t_col)
+Diagnostics::FileContext::FileContext(std::string &name, size_t t_line, size_t t_col)
         : file_name(name), column(t_col), line(t_line)
 { }
 
-Diagnostics::FileContext::FileContext(std::string &&name, std::size_t t_line, std::size_t t_col)
+Diagnostics::FileContext::FileContext(std::string &&name, size_t t_line, size_t t_col)
         : file_name(name), column(t_col), line(t_line)
 { }
 
@@ -37,7 +37,7 @@ Diagnostics::Context::Context(const Diagnostics::FileContext &file,
                               Context::CONTEXT_TYPE t_type)
         : file_information(file), message(t_message), line(t_line), context_type(t_type)
 {
-        for (std::size_t i = 0; i < file.get_column().var(); ++i) {
+        for (size_t i = 0; i < file.get_column().var(); ++i) {
                 empty_line += std::isspace(t_line[i]) ? t_line[i] : ' ';
         }
 }
@@ -82,7 +82,7 @@ Diagnostics::Context::Context(const Diagnostics::FileContext &file,
                               Diagnostics::Context::CONTEXT_TYPE t_type)
         : file_information(file), message(t_message), line(t_line), empty_line(), context_type(t_type)
 {
-        for (std::size_t i = 0; i < file.get_column().var(); ++i) {
+        for (size_t i = 0; i < file.get_column().var(); ++i) {
                 empty_line += std::isspace(t_line[i]) ? t_line[i] : ' ';
         }
 }
@@ -99,17 +99,24 @@ Diagnostics::HighlightContext::HighlightContext(const SelectionContext &t_select
                                                 const std::string &changer)
         : Context(t_selector.file_information, t_selector.message, t_selector.line, HIGHLIGHT)
           , highlighter(t_highlighter), highlight_length(t_highlight_length - 1), selector(t_selector)
-          , change(changer)
+          , fix_it(changer)
 { }
 
 std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::HighlightContext &context)
 {
 
-        os << context.selector << HIGHLIGHTER << std::setw(context.highlight_length)
-           << std::setfill(context.highlighter) << '~';
+        os << context.selector;
 
-        if (!context.change.empty()) {
-                os << '\n' << context.empty_line << context.change;
+        if (context.highlight_length) {
+                // For the cases when we're attempting to highlight something with a single character,
+                // which is already highlighted by the selection context, and so we won't need the extra
+                // highlight character that this will produce.
+                os << HIGHLIGHTER << std::setw(context.highlight_length)
+                   << std::setfill(context.highlighter) << '~';
+        }
+
+        if (!context.fix_it.empty()) {
+                os << '\n' << context.empty_line << context.fix_it;
         }
 
         return os << Console::reset;

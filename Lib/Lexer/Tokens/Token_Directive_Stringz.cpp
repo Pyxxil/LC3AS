@@ -4,15 +4,19 @@
 #include <sstream>
 #include <bitset>
 
-Stringz::Stringz(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
+Stringz::Stringz(std::string &directive,
+                 std::string &directive_uppercase,
+                 std::string &t_file,
+                 size_t line_number,
+                 size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                                const std::map<std::string, Symbol> &symbols,
-                               std::uint16_t program_counter)
+                               uint16_t program_counter)
 {
         (void) program_counter;
         (void) symbols;
@@ -48,7 +52,7 @@ std::int32_t Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>> &tok
         return static_cast<std::int32_t>(is_valid) * static_cast<std::int32_t>(tokens.at(1)->assembled.size());
 }
 
-std::string Stringz::disassemble(std::uint16_t &program_counter,
+std::string Stringz::disassemble(uint16_t &program_counter,
                                  const std::string &symbol,
                                  int width) const
 {
@@ -74,7 +78,7 @@ std::string Stringz::disassemble(std::uint16_t &program_counter,
 
         ++program_counter;
 
-        for (std::size_t index = 1; index != assembled.size(); ++index) {
+        for (size_t index = 1; index != assembled.size(); ++index) {
                 stream
                         // Address in memory
                         << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter

@@ -10,7 +10,8 @@ public:
         Directive(std::string &directive,
                   std::string &directive_uppercase,
                   std::string &t_file,
-                  int line_number);
+                  size_t line_number,
+                  size_t column);
 };
 
 #endif // TOKEN_DIRECTIVE_HPP

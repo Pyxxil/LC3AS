@@ -3,15 +3,15 @@
 #include <iomanip>
 #include <sstream>
 
-Out::Out(std::string &trap, std::string &trap_uppercase, std::string &t_file, int line_number)
-        : Instruction(trap, trap_uppercase, t_file, line_number)
+Out::Out(std::string &trap, std::string &trap_uppercase, std::string &t_file, size_t line_number, size_t column)
+        : Instruction(trap, trap_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Out::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         (void) tokens;
         (void) symbols;
@@ -21,7 +21,7 @@ std::int32_t Out::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                 return -1;
         }
 
-        assembled.emplace_back(static_cast<std::uint16_t>(0xF021));
+        assembled.emplace_back(static_cast<uint16_t>(0xF021));
 
         return 1;
 }
@@ -42,7 +42,7 @@ std::int32_t Out::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Out::disassemble(std::uint16_t &program_counter,
+std::string Out::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

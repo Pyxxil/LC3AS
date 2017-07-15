@@ -49,7 +49,7 @@ struct Directory
 
 static std::vector<Directory> search_directories;
 
-std::size_t Config::configuration = 0;
+size_t Config::configuration = 0;
 
 void Config::add_search_directory(const std::string &directory)
 {

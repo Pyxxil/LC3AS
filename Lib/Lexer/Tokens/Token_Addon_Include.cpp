@@ -2,8 +2,13 @@
 #include "Tokens/Token_Addon_Include.hpp"
 
 #ifdef INCLUDE_ADDONS
-Include::Include(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line)
-        : Token(t_token, t_token_uppercase, t_file, line)
+
+Include::Include(std::string &t_token,
+                 std::string &t_token_uppercase,
+                 std::string &t_file,
+                 size_t line,
+                 size_t column)
+        : Token(t_token, t_token_uppercase, t_file, line, column)
 {
 
 }

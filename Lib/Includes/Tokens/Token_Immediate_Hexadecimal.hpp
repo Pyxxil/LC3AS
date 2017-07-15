@@ -9,7 +9,8 @@ public:
         Hexadecimal(std::string &immediate,
                     std::string &immediate_uppercase,
                     std::string &t_file,
-                    int line_number);
+                    size_t line_number,
+                    size_t column);
 };
 
 #endif // TOKEN_IMMEDIATE_HEXADECIMAL_HPP

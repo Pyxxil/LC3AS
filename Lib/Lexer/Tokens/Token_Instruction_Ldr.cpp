@@ -7,15 +7,19 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Ldr::Ldr(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+Ldr::Ldr(std::string &instruction,
+         std::string &instruction_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         (void) symbols;
         (void) program_counter;
@@ -25,7 +29,7 @@ std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(
-                static_cast<std::uint16_t>(0x6000 |
+                static_cast<uint16_t>(0x6000 |
                         ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
                         ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6) |
                         (std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x3F))
@@ -58,7 +62,7 @@ bool Ldr::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
         if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 31 ||
             std::static_pointer_cast<Immediate>(tokens.at(3))->value < -32) {
-                tokens.at(3)->requires_too_many_bits(6);
+                tokens.at(3)->requires_too_many_bits(6, false, this, std::map<std::string, Symbol>());
                 return (is_valid = false);
         }
 
@@ -71,7 +75,7 @@ std::int32_t Ldr::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Ldr::disassemble(std::uint16_t &program_counter,
+std::string Ldr::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

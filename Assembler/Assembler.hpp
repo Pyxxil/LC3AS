@@ -29,14 +29,8 @@ namespace Assembler
 
                 void assemble();
 
-                inline int error_count() const
-                {
-                        return errors;
-                }
-
         private:
                 std::vector<std::string> files_to_assemble;
-                int                      errors;
         };
 
         int assemble(int argc, char **args);

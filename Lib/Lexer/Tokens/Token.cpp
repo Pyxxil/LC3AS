@@ -1,6 +1,9 @@
-#include <map>
-
 #include "Tokens/Token.hpp"
+
+#include <map>
+#include <Lib/Includes/LexHelper.hpp>
+
+#include "Diagnostics.hpp"
 
 Token::Token()
         : token(), token_uppercase(), file(), assembled()
@@ -8,9 +11,9 @@ Token::Token()
 
 }
 
-Token::Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line)
+Token::Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column)
         : token(t_token), token_uppercase(t_token_uppercase), file(t_file)
-          , assembled(), at_line(line), is_valid(true)
+          , assembled(), at_line(line), at_column(column), is_valid(true)
 {
 
 }
@@ -69,27 +72,44 @@ std::string Token::deduce_type() const
         case _STRING:
                 return std::string("String Literal");
         default:
-                return std::string("NoneType");
+                return std::string("None Type");
         }
 }
 
 void Token::expected(const char *const expects) const
 {
-        std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
-        if (at_line) {
-                std::cerr << "at line " << std::dec << at_line << ": ";
-        }
-        std::cerr << "Expected " << expects << ". Found '" << token << "' ( Type: " << deduce_type() << " ) instead.\n";
+        Diagnostics::Diagnostic diag(
+                Diagnostics::FileContext(
+                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
+                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
+                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                ), "Expected " + std::string(expects), Diagnostics::SYNTAX, Diagnostics::ERROR
+        );
+
+        diag.provide_context(
+                std::make_unique<Diagnostics::HighlightContext>(
+                        Diagnostics::SelectionContext(
+                                Diagnostics::FileContext(
+                                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
+                                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
+                                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                ), '^', "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
+                                std::string(lexed_lines[file].at(at_line - 1))
+                        ), '~', token.length()
+                )
+        );
+
+        Diagnostics::push(diag);
 }
 
 std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                              const std::map<std::string, Symbol> &symbols,
-                             std::uint16_t program_counter)
+                             uint16_t program_counter)
 {
         (void) tokens;
         (void) symbols;
         (void) program_counter;
-        expected("one of: instruction, label, or directive");
+        expected("one of: Instruction, Label, or Directive");
         return -1;
 }
 
@@ -98,7 +118,7 @@ const std::vector<uint16_t> Token::as_assembled() const
         return assembled;
 }
 
-void Token::invalid_argument_count(std::size_t provided, std::size_t expected) const
+void Token::invalid_argument_count(size_t provided, size_t expected) const
 {
         provided -= 1;  // This is not the best idea, but because tokens.size() returns
         // the number of arguments + the token itself, it's a little easier to do here.
@@ -116,7 +136,7 @@ void Token::invalid_argument_count(std::size_t provided, std::size_t expected) c
 bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
         (void) tokens;
-        expected("one of: instruction, label, or directive");
+        expected("one of: Instruction, Label, or Directive");
         return false;
 }
 
@@ -126,7 +146,7 @@ std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &token
         return -1;
 }
 
-std::string Token::disassemble(std::uint16_t &program_counter,
+std::string Token::disassemble(uint16_t &program_counter,
                                const std::string &symbol,
                                int width) const
 {
@@ -134,16 +154,4 @@ std::string Token::disassemble(std::uint16_t &program_counter,
         (void) symbol;
         (void) width;
         return token + " has no disassemble (" + deduce_type() + ")\n";
-}
-
-void Token::requires_too_many_bits(int allowed_bits, bool is_signed)
-{
-        is_valid = false;
-        (void) allowed_bits;
-        (void) is_signed;
-
-        std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
-        if (at_line) {
-                std::cerr << "Line " << std::dec << at_line << ": ";
-        }
 }

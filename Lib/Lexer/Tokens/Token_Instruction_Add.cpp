@@ -13,21 +13,29 @@ Add::Add()
 
 }
 
-Add::Add(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+Add::Add(std::string &instruction,
+         std::string &instruction_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }
 
-Add::Add(std::string &&instruction, std::string &&instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number)
+Add::Add(std::string &&instruction,
+         std::string &&instruction_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         (void) symbols;
         (void) program_counter;
@@ -37,17 +45,17 @@ std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(
-                static_cast<std::uint16_t>(0x1000 |
+                static_cast<uint16_t>(0x1000 |
                         (std::static_pointer_cast<Register>(tokens.at(1))->reg << 9) |
                         (std::static_pointer_cast<Register>(tokens.at(2))->reg << 6)
                 )
         );
 
         if (tokens.at(3)->type() == Token::REGISTER) {
-                assembled.front() |= static_cast<std::uint16_t>(std::static_pointer_cast<Register>(tokens.at(3))->reg);
+                assembled.front() |= static_cast<uint16_t>(std::static_pointer_cast<Register>(tokens.at(3))->reg);
         } else {
                 assembled.front() |= 0x20u |
-                        (static_cast<std::uint16_t>(
+                        (static_cast<uint16_t>(
                                  std::static_pointer_cast<Immediate>(tokens.at(3))->value) &
                                 0x1Fu);
         }
@@ -76,7 +84,7 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(3)->type() == Token::IMMEDIATE) {
                 if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 15 ||
                     std::static_pointer_cast<Immediate>(tokens.at(3))->value < -16) {
-                        tokens.at(3)->requires_too_many_bits(5);
+                        tokens.at(3)->requires_too_many_bits(5, false, this, std::map<std::string, Symbol>());
                         return (is_valid = false);
                 }
         }
@@ -94,7 +102,7 @@ std::int32_t Add::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Add::disassemble(std::uint16_t &program_counter,
+std::string Add::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

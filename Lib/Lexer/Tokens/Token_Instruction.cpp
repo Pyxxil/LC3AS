@@ -9,8 +9,9 @@ Instruction::Instruction()
 Instruction::Instruction(std::string &instruction,
                          std::string &instruction_uppercase,
                          std::string &t_file,
-                         int line_number)
-        : Token(instruction, instruction_uppercase, t_file, line_number)
+                         size_t line_number,
+                         size_t column)
+        : Token(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }

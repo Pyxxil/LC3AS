@@ -6,14 +6,16 @@
 
 struct Symbol
 {
-        Symbol(std::uint16_t addr, int line)
-                : address(addr), line_number(line)
+        Symbol(uint16_t addr, size_t line, size_t t_column, const std::string &t_file)
+                : address(addr), line_number(line), column(t_column), file(t_file)
         {
 
         }
 
-        std::uint16_t address;
-        int           line_number;
+        uint16_t address;
+        size_t        line_number;
+        size_t        column;
+        std::string   file;
 };
 
 #endif //PROJECT_SYMBOL_HPP

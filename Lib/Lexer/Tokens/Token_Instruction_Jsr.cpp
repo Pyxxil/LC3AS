@@ -7,15 +7,19 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Jsr::Jsr(std::string &instruction, std::string &instruction_uppercase, std::string &t_file, int line_number)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number), provided()
+Jsr::Jsr(std::string &instruction,
+         std::string &instruction_uppercase,
+         std::string &t_file,
+         size_t line_number,
+         size_t column)
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), provided()
 {
 
 }
 
 std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
-                           std::uint16_t program_counter)
+                           uint16_t program_counter)
 {
         if (!is_valid) {
                 return -1;
@@ -36,12 +40,12 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         if (offset > 1023 || offset < -1024) {
-                tokens.at(1)->requires_too_many_bits(11);
+                tokens.at(1)->requires_too_many_bits(11, false, this, symbols);
                 return -1;
         }
 
         provided = tokens.at(1);
-        assembled.emplace_back(0x4800 | static_cast<std::uint16_t>(offset & 0x7FF));
+        assembled.emplace_back(0x4800 | static_cast<uint16_t>(offset & 0x7FF));
 
         return 1;
 }
@@ -67,7 +71,7 @@ std::int32_t Jsr::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
         return static_cast<std::int32_t>(is_valid);
 }
 
-std::string Jsr::disassemble(std::uint16_t &program_counter,
+std::string Jsr::disassemble(uint16_t &program_counter,
                              const std::string &symbol,
                              int width) const
 {

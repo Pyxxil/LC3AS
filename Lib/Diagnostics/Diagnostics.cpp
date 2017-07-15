@@ -1,6 +1,6 @@
 #include "Diagnostics.hpp"
 
-static std::queue<Diagnostics::Diagnostic> diagnostics_log;
+static std::deque<Diagnostics::Diagnostic> diagnostics_log;
 
 const Diagnostics::diagnostic_type Diagnostics::diagnostic_colours[] = {
         Diagnostics::diagnostic_type(
@@ -31,21 +31,26 @@ void Diagnostics::unwind()
         while (!diagnostics_log.empty()) {
                 auto &&diagnostic = diagnostics_log.front();
                 Console::write(diagnostic);
-                diagnostics_log.pop();
+                diagnostics_log.pop_front();
         }
 }
 
 void Diagnostics::push(Diagnostic &&message)
 {
-        diagnostics_log.emplace(message);
+        diagnostics_log.emplace_back(message);
 }
 
 void Diagnostics::push(Diagnostic &message)
 {
-        diagnostics_log.emplace(message);
+        diagnostics_log.emplace_back(message);
 }
 
-std::size_t Diagnostics::count()
+bool Diagnostics::critical()
+{
+        return std::any_of(diagnostics_log.cbegin(), diagnostics_log.cend(), [](auto &&diag) { return diag.is_critical(); });
+}
+
+size_t Diagnostics::count()
 {
         return diagnostics_log.size();
 }

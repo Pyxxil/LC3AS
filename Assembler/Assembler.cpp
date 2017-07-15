@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <Lib/Includes/Lexer.hpp>
+#include <Lib/Includes/Parser.hpp>
 
 #include "Configuration.hpp"
 #include "Diagnostics.hpp"
@@ -123,11 +124,11 @@ int Assembler::assemble(int argc, char **args)
 */
         assembler.assemble();
 
-        return assembler.error_count();
+        return 0;
 }
 
 Assembler::Assembler::Assembler()
-        : files_to_assemble(), errors(0)
+        : files_to_assemble()
 {
 
 }
@@ -147,6 +148,13 @@ bool Assembler::Assembler::configure(int argc, char **args)
                                      ("e,error", "Report warnings as errors")
                                      ("w,warn", "Choose warning type") // TODO: Fix this
                                      ("files", "Files to assemble", cxxopts::value<std::vector<std::string>>());
+
+                // TODO: Add a --attempt-fix. Basically, assume that a problem is meant to be fixed to what we
+                // TODO: think it should, e.g. when we encounter a single '/', the assembler keeps going because
+                // TODO: it assumes that it was meant to be a double '//', indiccation a comment. Do the same thing
+                // TODO: for character literals and strings -- basically, anything left on that line will be treated
+                // TODO: as a string/character (which, of course, would lead to problems with character literals).
+                // TODO:    - Maybe only use 1 character for character literals, and anything else as extra?
 
                 option_parser.parse_positional("files");
                 option_parser.parse(argc, args);
@@ -212,10 +220,8 @@ void Assembler::Assembler::assemble()
                 Console::write(Diagnostics::Variant<std::string>("Assembling file '" + file + "'"));
                 Console::write(" ---\n");
 
-                Lexer lexer(file);
-                lexer.lex();
-
-                errors = static_cast<int>(Diagnostics::count());
+                Parser parser(file);
+                parser.parse();
 
                 Diagnostics::unwind();
         }

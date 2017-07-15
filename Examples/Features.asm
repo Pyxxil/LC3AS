@@ -13,8 +13,10 @@
                         ; multiple labels found for an address. This leads to
                         ; an error if BEGIN_TEST is used at any point.
 
-
 INTENTIONAL_WARNING_CHECK:                 /
+.STRINGZ "Unterminated string check
+UNTERMINATED_CHAR: .FILL 'a'
+.FILL ''
 
 
 ; This is a label

@@ -7,21 +7,29 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Fill::Fill(std::string &directive, std::string &directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
+Fill::Fill(std::string &directive,
+           std::string &directive_uppercase,
+           std::string &t_file,
+           size_t line_number,
+           size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
 {
 
 }
 
-Fill::Fill(std::string &&directive, std::string &&directive_uppercase, std::string &t_file, int line_number)
-        : Directive(directive, directive_uppercase, t_file, line_number)
+Fill::Fill(std::string &&directive,
+           std::string &&directive_uppercase,
+           std::string &t_file,
+           size_t line_number,
+           size_t column)
+        : Directive(directive, directive_uppercase, t_file, line_number, column)
 {
 
 }
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,
-                            std::uint16_t program_counter)
+                            uint16_t program_counter)
 {
         (void) program_counter;
 
@@ -30,7 +38,7 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         if (tokens.at(1)->type() == Token::IMMEDIATE) {
-                assembled.emplace_back(static_cast<std::uint16_t>(std::static_pointer_cast<
+                assembled.emplace_back(static_cast<uint16_t>(std::static_pointer_cast<
                         Immediate>(tokens.at(1))->value));
         } else if (tokens.at(1)->type() == Token::LABEL) {
                 if (!symbols.count(tokens.at(1)->token)) {
@@ -52,7 +60,7 @@ bool Fill::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::IMMEDIATE && tokens.at(1)->type() != Token::LABEL) {
-                tokens.at(1)->expected("register or label");
+                tokens.at(1)->expected("immediate value or label");
                 return (is_valid = false);
         } else if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
@@ -68,7 +76,7 @@ std::int32_t Fill::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
 }
 
 std::string Fill::disassemble(
-        std::uint16_t &program_counter,
+        uint16_t &program_counter,
         const std::string &symbol,
         int width) const
 {

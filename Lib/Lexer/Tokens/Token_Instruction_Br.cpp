@@ -10,11 +10,12 @@
 Br::Br(std::string &instruction,
        std::string &instruction_uppercase,
        std::string &t_file,
-       int line_number,
+       size_t line_number,
+       size_t column,
        bool n,
        bool z,
        bool p)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number), N(n), Z(z), P(p), provided()
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p), provided()
 {
 
 }
@@ -22,18 +23,19 @@ Br::Br(std::string &instruction,
 Br::Br(std::string &&instruction,
        std::string &&instruction_uppercase,
        std::string &t_file,
-       int line_number,
+       size_t line_number,
+       size_t column,
        bool n,
        bool z,
        bool p)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number), N(n), Z(z), P(p), provided()
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p), provided()
 {
 
 }
 
 std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                           const std::map<std::string, Symbol> &symbols,
-                          std::uint16_t program_counter)
+                          uint16_t program_counter)
 {
         if (!is_valid) {
                 return 0;
@@ -54,12 +56,12 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         if (offset > 255 || offset < -256) {
-                tokens.at(1)->requires_too_many_bits(9);
+                tokens.at(1)->requires_too_many_bits(9, false, this, symbols);
                 return -1;
         }
 
         provided = tokens.at(1);
-        assembled.emplace_back(static_cast<std::uint16_t>(0x0000 | N << 11 | Z << 10 | P << 9 | (offset & 0x1FF)));
+        assembled.emplace_back(static_cast<uint16_t>(0x0000 | N << 11 | Z << 10 | P << 9 | (offset & 0x1FF)));
 
         return 1;
 }
@@ -73,7 +75,7 @@ bool Br::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::LABEL && tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("label or value value");
+                tokens.at(1)->expected("label or immediate value");
                 return (is_valid = false);
         } else if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
@@ -88,7 +90,7 @@ std::int32_t Br::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) 
         return static_cast<int32_t>(is_valid);
 }
 
-std::string Br::disassemble(std::uint16_t &program_counter,
+std::string Br::disassemble(uint16_t &program_counter,
                             const std::string &symbol,
                             int width) const
 {

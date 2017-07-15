@@ -12,19 +12,19 @@ namespace Config
                 VERBOSE           = 0x04,
         };
 
-        extern std::size_t configuration;
+        extern size_t configuration;
 
-        inline bool is_set(std::size_t option)
+        inline bool is_set(size_t option)
         {
                 return !!(configuration & option);
         }
 
-        inline void set(std::size_t option)
+        inline void set(size_t option)
         {
                 configuration |= option;
         }
 
-        void set(std::size_t option);
+        void set(size_t option);
         void add_search_directory(const std::string &directory);
         void add_search_directory(const std::string &&directory, const std::string &&name);
 

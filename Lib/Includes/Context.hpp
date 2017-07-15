@@ -47,12 +47,12 @@ namespace Diagnostics
         class FileContext
         {
         public:
-                FileContext(std::string &name, std::size_t t_line, std::size_t t_col);
-                FileContext(std::string &&name, std::size_t t_line, std::size_t t_col);
-                FileContext(Variant<std::string> &name, Variant<std::size_t> &t_line, Variant<std::size_t> &t_col);
-                FileContext(Variant<std::string> &&name, Variant<std::size_t> &&t_line, Variant<std::size_t> &&t_col);
+                FileContext(std::string &name, size_t t_line, size_t t_col);
+                FileContext(std::string &&name, size_t t_line, size_t t_col);
+                FileContext(Variant<std::string> &name, Variant<size_t> &t_line, Variant<size_t> &t_col);
+                FileContext(Variant<std::string> &&name, Variant<size_t> &&t_line, Variant<size_t> &&t_col);
 
-                inline const Variant<std::size_t> &get_column() const
+                inline const Variant<size_t> &get_column() const
                 {
                         return column;
                 }
@@ -61,8 +61,8 @@ namespace Diagnostics
                 friend std::ostream &operator <<(std::ostream &os, const FileContext &file);
 
                 Variant<std::string> file_name;
-                Variant<std::size_t> column;
-                Variant<std::size_t> line;
+                Variant<size_t> column;
+                Variant<size_t> line;
         };
 
         class Context
@@ -137,7 +137,7 @@ namespace Diagnostics
 
                 SelectionContext selector;
 
-                std::string change;
+                std::string fix_it;
         };
 }
 

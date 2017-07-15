@@ -9,7 +9,11 @@
 class Include : public Token
 {
 public:
-        Include(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line);
+        Include(std::string &t_token,
+                std::string &t_token_uppercase,
+                std::string &t_file,
+                size_t line,
+                size_t column);
 
         virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 

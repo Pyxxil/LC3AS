@@ -20,6 +20,9 @@ namespace Diagnostics
         {
                 SYNTAX,
                 SPELLING,
+                INVALID_LABEL,
+                MULTIPLE_DEFINITIONS,
+                INVALID_LITERAL,
         };
 
         struct diagnostic_type
@@ -69,6 +72,10 @@ namespace Diagnostics
                         return context.size() != 0;
                 }
 
+                inline bool is_critical() const {
+                        return type() == Diagnostics::ERROR;
+                }
+
         private:
                 friend std::ostream &operator <<(std::ostream &os, const Diagnostic &d_msg);
 
@@ -84,9 +91,11 @@ namespace Diagnostics
         void push(Diagnostic &&message);
         void push(Diagnostic &message);
 
-        std::size_t count();
+        size_t count();
 
         void unwind();
+
+        bool critical();
 }
 
 #endif

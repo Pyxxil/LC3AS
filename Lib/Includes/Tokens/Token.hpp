@@ -16,7 +16,7 @@ class Token
 {
 public:
         Token();
-        Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, int line);
+        Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column);
 
         virtual ~Token() = default;
 
@@ -24,10 +24,11 @@ public:
         std::string token_uppercase;
         std::string file;
 
-        std::vector<std::uint16_t> assembled;
+        std::vector<uint16_t> assembled;
 
-        int  at_line  = 0;
-        bool is_valid = true;
+        size_t  at_line   = 0;
+        size_t  at_column = 0;
+        bool is_valid     = true;
 
         enum token_type
         {
@@ -76,17 +77,26 @@ public:
         virtual Token::token_type type() const;
 
         std::string deduce_type() const;
-        virtual std::string disassemble(std::uint16_t &program_counter,
+        virtual std::string disassemble(uint16_t &program_counter,
                                         const std::string &symbol,
                                         int width) const;
 
         virtual void expected(const char *const expects) const;
-        virtual void invalid_argument_count(std::size_t provided, std::size_t expected) const;
-        virtual void requires_too_many_bits(int allowed_bits, bool is_signed = SIGNED);
+        virtual void invalid_argument_count(size_t provided, size_t expected) const;
+        virtual void requires_too_many_bits(int allowed_bits,
+                                            bool is_signed,
+                                            const Token *const caller,
+                                            const std::map<std::string, Symbol> &symbols)
+        {
+                (void) allowed_bits;
+                (void) is_signed;
+                (void) caller;
+                (void) symbols;
+        }
 
         virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
                                       const std::map<std::string, Symbol> &symbols,
-                                      std::uint16_t program_counter);
+                                      uint16_t program_counter);
         virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const;
 
         virtual const std::vector<uint16_t> as_assembled() const;

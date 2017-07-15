@@ -10,6 +10,15 @@ if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
         set ( CMAKE_VERBOSE_MAKEFILE ON )
 endif ()
 
+option ( Debug OFF )
+
+if ( Debug )
+        # To get around a problem with CLion where defining CMAKE_BUILD_TYPE as Debug
+        # in Preferences for ADDONS_Debug would cause it to think it's the same as a
+        # a normal debug build
+        set ( CMAKE_BUILD_TYPE "Debug" )
+endif ()
+
 option ( ALLOW_EXTRAS OFF )
 
 ### Populated by Lib/CMakeLists.txt

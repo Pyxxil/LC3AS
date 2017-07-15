@@ -1,7 +1,14 @@
 #include "Tokens/Token_Immediate_Binary.hpp"
 
-Binary::Binary(std::string &immediate, std::string &immediate_uppercase, std::string &t_file, int line_number)
-        : Immediate(immediate, immediate_uppercase, t_file, line_number)
+#include "Diagnostics.hpp"
+#include "LexHelper.hpp"
+
+Binary::Binary(std::string &immediate,
+               std::string &immediate_uppercase,
+               std::string &t_file,
+               size_t line_number,
+               size_t column)
+        : Immediate(immediate, immediate_uppercase, t_file, line_number, column)
 {
         bool negative = false;
 
@@ -17,24 +24,44 @@ Binary::Binary(std::string &immediate, std::string &immediate_uppercase, std::st
         }
 
         if (immediate.length() > 16) {
-                Token::expected("binary value up to 16 bits");
                 is_valid = false;
-                return;
-        }
-
-        try {
-                value = static_cast<std::int16_t>(std::bitset<16>(immediate).to_ulong());
-        } catch (const std::invalid_argument &e) {
-                Token::expected("valid binary value");
-                is_valid = false;
+        } else {
+                try {
+                        const uint64_t v = std::bitset<16>(immediate).to_ullong();
+                        if (v & (~0xFFFF)) {
+                                is_valid = false;
+                        } else {
+                                value = static_cast<int16_t>(v);
+                        }
+                } catch (const std::invalid_argument &e) {
+                        is_valid = false;
+                }
         }
 
         if (!is_valid) {
-                std::cerr << "ERROR: ";
-                if (at_line) {
-                        std::cerr << "Line " << std::dec << at_line << ": ";
-                }
-                std::cerr << "Invalid literal for base 2: '" << immediate << "'.\n";
+                Diagnostics::Diagnostic diag(
+                        Diagnostics::FileContext(
+                                Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
+                                Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
+                                Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                        ),
+                        "Invalid literal for 16 bit signed base 2 value", Diagnostics::INVALID_LITERAL, Diagnostics::ERROR
+                );
+
+                diag.provide_context(
+                        std::make_unique<Diagnostics::HighlightContext>(
+                                Diagnostics::SelectionContext(
+                                        Diagnostics::FileContext(
+                                                Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                        ), '^', "Found here",
+                                        std::string(lexed_lines[file].at(at_line - 1))
+                                ), '~', token.length()
+                        )
+                );
+
+                Diagnostics::push(diag);
         } else {
                 if (negative) {
                         value = static_cast<std::int16_t>(-value);
