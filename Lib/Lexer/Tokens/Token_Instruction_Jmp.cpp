@@ -29,7 +29,7 @@ std::int32_t Jmp::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         assembled.emplace_back(
                 static_cast<uint16_t>(0xC000 |
-                        (std::static_pointer_cast<Register>(tokens.at(1))->reg << 6))
+                                      (std::static_pointer_cast<Register>(tokens.at(1))->reg << 6))
         );
 
         return 1;
@@ -76,7 +76,6 @@ std::string Jmp::disassemble(uint16_t &program_counter,
                 << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
                 // Instruction itself
                 << " JMP R" << ((assembled.front() & 0x01C0) >> 6 & 7)
-
 #ifdef INCLUDE_ADDONS
                 << '\t' << file
 #endif

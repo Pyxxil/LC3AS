@@ -21,15 +21,29 @@ public:
                 return program_counter;
         }
 
+        inline const std::vector<std::vector<std::shared_ptr<Token>>> &parsed_tokens() const
+        {
+                return tokens;
+        }
+
+        inline const std::map<std::string, Symbol> &parsed_symbols() const
+        {
+                return symbols;
+        }
+
+        inline int symbol_padding() const {
+                return longest_symbol_length;
+        }
+
 private:
         std::string file;
-        bool origin_seen = false;
-        bool end_seen    = false;
-        uint16_t internal_program_counter = 0;
-        uint16_t program_counter;
+        bool        origin_seen              = false;
+        bool        end_seen                 = false;
+        uint16_t    internal_program_counter = 0;
+        uint16_t    program_counter;
 
-        int longest_symbol_length = 20;
-        std::map<std::string, Symbol> symbols;
+        int                                              longest_symbol_length = 20;
+        std::map<std::string, Symbol>                    symbols;
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
 
         void do_first_pass();

@@ -13,12 +13,6 @@
                         ; multiple labels found for an address. This leads to
                         ; an error if BEGIN_TEST is used at any point.
 
-INTENTIONAL_WARNING_CHECK:                 /
-.STRINGZ "Unterminated string check
-UNTERMINATED_CHAR: .FILL 'a'
-.FILL ''
-
-
 ; This is a label
 BEGIN_TEST:
         ADD R5, R5, #-10; Comments can be as close to the instruction as you'd
@@ -59,16 +53,17 @@ cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
 
         .INCLUDE "include.h"
 
+        JSR WARNING_THROWS
 WARNING_THROWS:         ; All of the following should throw warnings with
                         ; --warn all
         JSR WARNING_THROWS ; Complains about an infinite loop
         JSR #0          ; Statement has no effect
+        BRp #-1
         BRp #0          ; Statement has no effect
         BRn #-1         ; Complains about infinite loop
         BRn WARNING_THROWS ; Complains about same condition code as line before
         TRAP 0xFF       ; Possible illegal trap vector
         BRnzp #-256
-        .LSHIFT R0, 0
         .LSHIFT R0, 1
         .LSHIFT R0, 2
         .LSHIFT R0, 3
@@ -84,11 +79,10 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         .LSHIFT R0, 13
         .LSHIFT R0, 14
         .LSHIFT R0, 15
-        .LSHIFT R0, 16
 
 ; End of warnings
         RET
-
+Br WARNING_STRING
 WARNING_STRING:         ; Should throw a warning about the lone '\'
         .STRINGZ "\ "
 
@@ -136,6 +130,8 @@ WARNING_STRING:         ; Should throw a warning about the lone '\'
 ;        BRz #-2000      ; Immediate value not representable in signed 9 bits
 ;        BR oc           ; Invalid label
 ;        .INCLUDE 0x1    ; Requires string
+;        .LSHIFT R0, 0   ; Literal value too small
+;        .LSHIFT R0, 16  ; Literal value too large
 
 BRnzp BEGIN_TEST
 

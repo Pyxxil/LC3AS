@@ -26,10 +26,16 @@ Register::Register(std::string &which,
                         std::make_unique<Diagnostics::HighlightContext>(
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
-                                        ), '^', "A valid register lies between 0..7", std::string(lexed_lines[file].at(at_line - 1))
+                                                Diagnostics::Variant<std::string>(file,
+                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(at_line,
+                                                                             Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(at_column,
+                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        '^',
+                                        "A valid register lies between 0..7",
+                                        std::string(lexed_lines[file].at(at_line - 1))
                                 ), '~', token.length(), "R{0..7}"
                         )
                 );

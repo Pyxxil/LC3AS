@@ -48,8 +48,8 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         provided = tokens.at(2);
         assembled.emplace_back(
                 static_cast<uint16_t>(0xA000 |
-                        ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
-                        (offset & 0x1FF))
+                                      ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
+                                      (offset & 0x1FF))
         );
 
         return 1;

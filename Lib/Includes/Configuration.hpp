@@ -10,6 +10,7 @@ namespace Config
                 WARN_AS_ERROR     = 0x01,
                 STOP_ON_FIRST_ERR = 0x02,
                 VERBOSE           = 0x04,
+                BE_QUIET          = 0x08,
         };
 
         extern size_t configuration;

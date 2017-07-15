@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <string>
+#include <map>
+
+#include "Tokens/Tokens.hpp"
 
 namespace Assembler
 {
@@ -30,7 +33,17 @@ namespace Assembler
                 void assemble();
 
         private:
-                std::vector<std::string> files_to_assemble;
+                void write(const std::string &file);
+                void generate_machine_code();
+                void check_and_mark_warnings(const std::vector<std::shared_ptr<Token>> &tokenized_line,
+                                             uint16_t assembled_line,
+                                             size_t i);
+
+                std::vector<std::string>                         files_to_assemble;
+                std::vector<std::vector<std::shared_ptr<Token>>> tokens;
+                std::map<std::string, Symbol>                    symbols;
+                std::vector<uint16_t>                            assembled;
+                int                                              symbol_padding;
         };
 
         int assemble(int argc, char **args);

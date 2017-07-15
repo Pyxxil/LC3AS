@@ -47,7 +47,13 @@ void Diagnostics::push(Diagnostic &message)
 
 bool Diagnostics::critical()
 {
-        return std::any_of(diagnostics_log.cbegin(), diagnostics_log.cend(), [](auto &&diag) { return diag.is_critical(); });
+        return std::any_of(
+                diagnostics_log.cbegin(), diagnostics_log.cend(),
+                [](auto &&diag)
+                {
+                        return diag.is_critical();
+                }
+        );
 }
 
 size_t Diagnostics::count()
@@ -119,4 +125,9 @@ std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::Diag
         }
 
         return os;
+}
+
+void Diagnostics::reset()
+{
+        diagnostics_log.clear();
 }

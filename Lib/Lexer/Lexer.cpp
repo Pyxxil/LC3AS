@@ -67,7 +67,8 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                 if (lexed_lines.count(file_name)) {
                         lexed_lines[file_name].emplace_back(line);
                 } else {
-                        lexed_lines.insert(std::make_pair<std::string, std::vector<std::string>>(std::string(file_name), { line }));
+                        lexed_lines.insert(std::make_pair<std::string, std::vector<std::string>>(std::string(file_name),
+                                                                                                 { line }));
                 }
 
                 if (line.empty()) {
@@ -121,7 +122,7 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                 }
         }
 
-        t_tokens = tokens;
+        t_tokens  = tokens;
         t_symbols = symbols;
 }
 
@@ -301,7 +302,7 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
 {
         std::string current;
 
-        char        terminated_by { 0 };
+        char   terminated_by { 0 };
         size_t index { 0 };
 
         for (; index < line.length();) {
@@ -400,7 +401,7 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
 #ifdef INCLUDE_ADDONS
                 } else if (character == '"' || character == '\'') {
 #else
-                } else if (character == '"') {
+                        } else if (character == '"') {
 #endif
                         addToken(current, into, line_number, index);
 
@@ -428,30 +429,50 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
 
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(line_number, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(index - current.size(), Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(file_name,
+                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(line_number,
+                                                                             Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(index - current.size(),
+                                                                             Console::FOREGROUND_COLOUR::YELLOW)
                                         ), stream.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
                                 );
+
                                 diag.provide_context(
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
-                                                        Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(line_number, Console::FOREGROUND_COLOUR::YELLOW),
+                                                        Diagnostics::Variant<std::string>(file_name,
+                                                                                          Console::FOREGROUND_COLOUR::YELLOW),
+                                                        Diagnostics::Variant<size_t>(line_number,
+                                                                                     Console::FOREGROUND_COLOUR::YELLOW),
                                                         // Has to be index + 1 because otherwise it'll select the last character
-                                                        Diagnostics::Variant<size_t>(index + 1, Console::FOREGROUND_COLOUR::YELLOW)
+                                                        Diagnostics::Variant<size_t>(index + 1,
+                                                                                     Console::FOREGROUND_COLOUR::YELLOW)
                                                 ),
-                                                '^', "Expected '" + std::string({terminator}) + "' before end of line.", line, std::string({terminator})
+                                                '^',
+                                                "Expected '" + std::string({ terminator }) + "' before end of line.",
+                                                line,
+                                                std::string({ terminator })
                                         )
                                 );
 
                                 Diagnostics::push(diag);
 #ifdef INCLUDE_ADDONS
                         } else if (terminator == '\'') {
-                                into.push_back(std::make_shared<Character>(current, file_name, line_number, index - current.length()));
+                                into.push_back(
+                                        std::make_shared<Character>(
+                                                current, file_name, line_number,
+                                                index - current.length()
+                                        )
+                                );
 #endif
                         } else {
-                                into.push_back(std::make_shared<String>(current, file_name, line_number, index - current.length()));
+                                into.push_back(
+                                        std::make_shared<String>(
+                                                current, file_name, line_number,
+                                                index - current.length()
+                                        )
+                                );
                         }
                         current.erase();
                 } else {

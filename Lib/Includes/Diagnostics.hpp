@@ -23,6 +23,7 @@ namespace Diagnostics
                 INVALID_LABEL,
                 MULTIPLE_DEFINITIONS,
                 INVALID_LITERAL,
+                LOGIC,
         };
 
         struct diagnostic_type
@@ -72,7 +73,8 @@ namespace Diagnostics
                         return context.size() != 0;
                 }
 
-                inline bool is_critical() const {
+                inline bool is_critical() const
+                {
                         return type() == Diagnostics::ERROR;
                 }
 
@@ -96,6 +98,8 @@ namespace Diagnostics
         void unwind();
 
         bool critical();
+
+        void reset();
 }
 
 #endif

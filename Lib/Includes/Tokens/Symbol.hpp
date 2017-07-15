@@ -12,10 +12,10 @@ struct Symbol
 
         }
 
-        uint16_t address;
-        size_t        line_number;
-        size_t        column;
-        std::string   file;
+        uint16_t    address;
+        size_t      line_number;
+        size_t      column;
+        std::string file;
 };
 
 #endif //PROJECT_SYMBOL_HPP

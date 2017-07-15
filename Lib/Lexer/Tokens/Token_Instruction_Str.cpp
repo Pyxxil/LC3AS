@@ -30,9 +30,9 @@ std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         assembled.emplace_back(
                 static_cast<uint16_t>(0x7000 |
-                        ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
-                        ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6) |
-                        (std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x3F))
+                                      ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
+                                      ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6) |
+                                      (std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x3F))
         );
 
         return 1;
@@ -97,9 +97,9 @@ std::string Str::disassemble(
                 << ((assembled.front() & 0x01C0) >> 6 & 7) << " #" << std::dec
                 << ((static_cast<int8_t>(assembled.front() & 0x3F) << 2) >> 2)
 
-#ifdef INCLUDE_ADDONS
+                #ifdef INCLUDE_ADDONS
                 << '\t' << file
-#endif
+                #endif
                 << '\n';
 
         ++program_counter;

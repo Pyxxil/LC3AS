@@ -29,7 +29,7 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         assembled.emplace_back(
                 static_cast<uint16_t>(0xF000 |
-                        (std::static_pointer_cast<Immediate>(tokens.at(1))->value & 0xFF))
+                                      (std::static_pointer_cast<Immediate>(tokens.at(1))->value & 0xFF))
         );
 
         return 1;
@@ -84,7 +84,6 @@ std::string Trap::disassemble(uint16_t &program_counter,
                 // Instruction itself
                 << " TRAP 0x" << std::right << std::hex << std::uppercase << std::setfill('0') << std::setw(2)
                 << (assembled.front() & 0xFF)
-
 #ifdef INCLUDE_ADDONS
                 << '\t' << file
 #endif

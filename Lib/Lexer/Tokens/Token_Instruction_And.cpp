@@ -46,17 +46,17 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         assembled.emplace_back(
                 static_cast<uint16_t>(0x5000 |
-                        (std::static_pointer_cast<Register>(tokens.at(1))->reg << 9) |
-                        (std::static_pointer_cast<Register>(tokens.at(2))->reg) << 6)
+                                      (std::static_pointer_cast<Register>(tokens.at(1))->reg << 9) |
+                                      (std::static_pointer_cast<Register>(tokens.at(2))->reg) << 6)
         );
 
         if (tokens.at(3)->type() == Token::REGISTER) {
                 assembled.front() |= static_cast<uint16_t>(std::static_pointer_cast<Register>(tokens.at(3))->reg);
         } else {
                 assembled.front() |= 0x20u |
-                        (static_cast<uint16_t>(
-                                 std::static_pointer_cast<Immediate>(tokens.at(3))->value) &
-                                0x1Fu);
+                                     (static_cast<uint16_t>(
+                                              std::static_pointer_cast<Immediate>(tokens.at(3))->value) &
+                                      0x1Fu);
         }
 
         return 1;

@@ -45,8 +45,8 @@ std::int32_t Not::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
         assembled.emplace_back(
                 static_cast<uint16_t>(0x903F |
-                        ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
-                        ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6))
+                                      ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
+                                      ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6))
         );
 
         return 1;
@@ -99,7 +99,6 @@ std::string Not::disassemble(uint16_t &program_counter,
                 // Instruction itself
                 << " NOT R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
                 << ((assembled.front() & 0x01C0) >> 6 & 7)
-
 #ifdef INCLUDE_ADDONS
                 << '\t' << file
 #endif

@@ -22,13 +22,16 @@ void Parser::do_first_pass()
                         Diagnostics::push(
                                 Diagnostics::Diagnostic(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(token->file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(token->at_line,
+                                                Diagnostics::Variant<std::string>(token->file,
                                                                                   Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(token->at_line,
+                                                                             Console::FOREGROUND_COLOUR::YELLOW),
                                                 Diagnostics::Variant<size_t>(token->at_column,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW)
+                                                                             Console::FOREGROUND_COLOUR::YELLOW)
                                         ),
-                                        "Token after .END directive, it will be ignored.", Diagnostics::SYNTAX, Diagnostics::WARNING
+                                        "Token after .END directive, it will be ignored.",
+                                        Diagnostics::SYNTAX,
+                                        Diagnostics::WARNING
                                 )
                         );
                         return 0;
@@ -45,13 +48,16 @@ void Parser::do_first_pass()
                         if (origin_seen) {
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(tokenized_line.front()->file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_line,
+                                                Diagnostics::Variant<std::string>(tokenized_line.front()->file,
                                                                                   Console::FOREGROUND_COLOUR::YELLOW),
+                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_line,
+                                                                             Console::FOREGROUND_COLOUR::YELLOW),
                                                 Diagnostics::Variant<size_t>(tokenized_line.front()->at_column,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW)
+                                                                             Console::FOREGROUND_COLOUR::YELLOW)
                                         ),
-                                        "Redefinition of Origin memory address.", Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::WARNING
+                                        "Redefinition of Origin memory address.",
+                                        Diagnostics::MULTIPLE_DEFINITIONS,
+                                        Diagnostics::WARNING
                                 );
 
                                 // TODO: Do we try to find the original definition?
@@ -75,24 +81,39 @@ void Parser::do_first_pass()
                                         if (symbol.second.address == internal_program_counter) {
                                                 Diagnostics::Diagnostic diag(
                                                         Diagnostics::FileContext(
-                                                                Diagnostics::Variant<std::string>(tokenized_line.front()->file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_line,
-                                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                                                Diagnostics::Variant<
+                                                                        std::string>(tokenized_line.front()->file,
+                                                                                     Console::FOREGROUND_COLOUR::YELLOW),
+                                                                Diagnostics::Variant<
+                                                                        size_t>(tokenized_line.front()->at_line,
+                                                                                Console::FOREGROUND_COLOUR::YELLOW),
+                                                                Diagnostics::Variant<
+                                                                        size_t>(tokenized_line.front()->at_column,
+                                                                                Console::FOREGROUND_COLOUR::YELLOW)
                                                         ),
-                                                        "Multiple labels found for address", Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::ERROR
+                                                        "Multiple labels found for address",
+                                                        Diagnostics::MULTIPLE_DEFINITIONS,
+                                                        Diagnostics::ERROR
                                                 );
 
                                                 diag.provide_context(
                                                         std::make_unique<Diagnostics::SelectionContext>(
                                                                 Diagnostics::FileContext(
-                                                                        Diagnostics::Variant<std::string>(symbol.second.file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                        Diagnostics::Variant<size_t>(symbol.second.line_number,
-                                                                                                          Console::FOREGROUND_COLOUR::YELLOW),
-                                                                        Diagnostics::Variant<size_t>(symbol.second.column,
-                                                                                                          Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        Diagnostics::Variant<
+                                                                                std::string>(symbol.second.file,
+                                                                                             Console::FOREGROUND_COLOUR::YELLOW),
+                                                                        Diagnostics::Variant<
+                                                                                size_t>(symbol.second.line_number,
+                                                                                        Console::FOREGROUND_COLOUR::YELLOW),
+                                                                        Diagnostics::Variant<
+                                                                                size_t>(symbol.second.column,
+                                                                                        Console::FOREGROUND_COLOUR::YELLOW)
                                                                 ), '^', "Previous label found here",
-                                                                std::string(lexed_lines[symbol.second.file].at(symbol.second.line_number - 1))
+                                                                std::string(
+                                                                        lexed_lines[symbol.second.file].at(
+                                                                                symbol.second.line_number - 1
+                                                                        )
+                                                                )
                                                         )
                                                 );
 
@@ -102,40 +123,55 @@ void Parser::do_first_pass()
                                 }
 
                                 if (symbols.count(tokenized_line.front()->token)) {
-                                        auto &&sym = symbols.at(tokenized_line.front()->token);
+                                        auto                    &&sym = symbols.at(tokenized_line.front()->token);
                                         Diagnostics::Diagnostic diag(
                                                 Diagnostics::FileContext(
-                                                        Diagnostics::Variant<std::string>(tokenized_line.front()->file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(tokenized_line.front()->at_line,
+                                                        Diagnostics::Variant<std::string>(tokenized_line.front()->file,
                                                                                           Console::FOREGROUND_COLOUR::YELLOW),
+                                                        Diagnostics::Variant<size_t>(tokenized_line.front()->at_line,
+                                                                                     Console::FOREGROUND_COLOUR::YELLOW),
                                                         Diagnostics::Variant<size_t>(tokenized_line.front()->at_column,
-                                                                                          Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                     Console::FOREGROUND_COLOUR::YELLOW)
                                                 ),
-                                                "Multiple definitions of label", Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::WARNING
+                                                "Multiple definitions of label",
+                                                Diagnostics::MULTIPLE_DEFINITIONS,
+                                                Diagnostics::WARNING
                                         );
 
                                         diag.provide_context(
                                                 std::make_unique<Diagnostics::SelectionContext>(
                                                         Diagnostics::FileContext(
-                                                                Diagnostics::Variant<std::string>(tokenized_line.front()->file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_line,
-                                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_column,
-                                                                                                  Console::FOREGROUND_COLOUR::YELLOW)
+                                                                Diagnostics::Variant<
+                                                                        std::string>(tokenized_line.front()->file,
+                                                                                     Console::FOREGROUND_COLOUR::YELLOW),
+                                                                Diagnostics::Variant<
+                                                                        size_t>(tokenized_line.front()->at_line,
+                                                                                Console::FOREGROUND_COLOUR::YELLOW),
+                                                                Diagnostics::Variant<
+                                                                        size_t>(tokenized_line.front()->at_column,
+                                                                                Console::FOREGROUND_COLOUR::YELLOW)
                                                         ), '^', "Redefinition of this label",
-                                                        std::string(lexed_lines[tokenized_line.front()->file].at(tokenized_line.front()->at_line - 1))
+                                                        std::string(
+                                                                lexed_lines[tokenized_line.front()->file].at(
+                                                                        tokenized_line.front()->at_line - 1
+                                                                )
+                                                        )
                                                 )
                                         );
 
                                         diag.provide_context(
                                                 std::make_unique<Diagnostics::SelectionContext>(
                                                         Diagnostics::FileContext(
-                                                                Diagnostics::Variant<std::string>(sym.file, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(sym.line_number,
+                                                                Diagnostics::Variant<std::string>(sym.file,
                                                                                                   Console::FOREGROUND_COLOUR::YELLOW),
+                                                                Diagnostics::Variant<size_t>(sym.line_number,
+                                                                                             Console::FOREGROUND_COLOUR::YELLOW),
                                                                 Diagnostics::Variant<size_t>(sym.column,
-                                                                                                  Console::FOREGROUND_COLOUR::YELLOW)
-                                                        ), '^', "Previous definition found here", std::string(lexed_lines[sym.file].at(sym.line_number - 1))
+                                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
+                                                        '^',
+                                                        "Previous definition found here",
+                                                        std::string(lexed_lines[sym.file].at(sym.line_number - 1))
                                                 )
                                         );
 
@@ -206,7 +242,7 @@ int Parser::parse()
         origin_seen = false;
         end_seen    = false;
 
-        program_counter = internal_program_counter;
+        program_counter          = internal_program_counter;
         internal_program_counter = 0;
 
         do_second_pass();

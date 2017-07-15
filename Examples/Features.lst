@@ -1,98 +1,217 @@
-(0000) 3000 0011000000000000 (   2)                      .ORIG 0x3000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3000) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3001) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3002) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3003) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3004) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3005) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3006) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3007) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3008) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3009) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(300A) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(300B) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(300C) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(300D) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(300E) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(300F) 0000 0000000000000000 (   7)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3010) 0000 0000000000000000 (   9)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3011) 0048 0000000001001000 (  10)                      .FILL 0x4800	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3012) 6500 0000000001100101 (  10)                      .FILL 0x0065	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3013) 006C 0000000001101100 (  10)                      .FILL 0x006C	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3014) 006C 0000000001101100 (  10)                      .FILL 0x006C	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3015) 006F 0000000001101111 (  10)                      .FILL 0x006F	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3016) 0000 0000000000000000 (  10)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3017) 1B76 0001101101110110 (  19) BEGIN_TEST           ADD R5 R5 #-10	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3018) 12A1 0001001010100001 (  21)                      ADD R1 R2 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3019) 1B60 0001101101100000 (  23)                      ADD R5 R5 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(301A) AE29 1010111000101001 (  25)                      LDI R7 cheat	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(301B) 927F 1001001001111111 (  32) EXTRA_FEATURES       NOT R1 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(301C) 1261 0001001001100001 (  32)                      ADD R1 R1 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(301D) 927F 1001001001111111 (  33)                      NOT R1 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(301E) 1261 0001001001100001 (  33)                      ADD R1 R1 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(301F) 1B41 0001101101000001 (  33)                      ADD R5 R5 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3020) 927F 1001001001111111 (  33)                      NOT R1 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3021) 1261 0001001001100001 (  33)                      ADD R1 R1 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3022) 5B60 0101101101100000 (  34)                      AND R5 R5 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3023) 94BF 1001010010111111 (  36)                      NOT R2 R2	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3024) 14A1 0001010010100001 (  36)                      ADD R2 R2 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3025) 1242 0001001001000010 (  36)                      ADD R1 R1 R2	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3026) 94BF 1001010010111111 (  36)                      NOT R2 R2	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3027) 14A1 0001010010100001 (  36)                      ADD R2 R2 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3028) 52A0 0101001010100000 (  37)                      AND R1 R2 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3029) 927F 1001001001111111 (  38)                      NOT R1 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(302A) 1261 0001001001100001 (  38)                      ADD R1 R1 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(302B) 1281 0001001010000001 (  38)                      ADD R1 R2 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(302C) 96FF 1001011011111111 (  39)                      NOT R3 R3	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(302D) 16E1 0001011011100001 (  39)                      ADD R3 R3 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(302E) 1283 0001001010000011 (  39)                      ADD R1 R2 R3	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(302F) 96FF 1001011011111111 (  39)                      NOT R3 R3	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3030) 16E1 0001011011100001 (  39)                      ADD R3 R3 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3031) 01C0 0000000111000000 (  41) oct                  .FILL 0x01C0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3032) 0041 0000000001000001 (  44)                      .FILL 0x0041	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3033) 000A 0000000000001010 (  45)                      .FILL 0x000A	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3034) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3035) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3036) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3037) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3038) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3039) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(303A) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(303B) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(303C) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(303D) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(303E) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(303F) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3040) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3041) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3042) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3043) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3044) 305C 0011000001011100 (  48) cheat                .FILL 0x305C	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3045) 54A0 0101010010100000 (  50)                      AND R2 R2 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3046) 14AA 0001010010101010 (  50)                      ADD R2 R2 #10	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3047) 0E01 0000111000000001 (  51)                      BRnzp 0x3049	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3048) 3000 0011000000000000 (  51)                      .FILL 0x3000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3049) 27FE 0010011111111110 (  51)                      LD R3 0x3048	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(304A) 1482 0001010010000010 (  53)                      ADD R2 R2 R2	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(304B) 1482 0001010010000010 (  53)                      ADD R2 R2 R2	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(304C) 12A0 0001001010100000 (   1)                      ADD R1 R2 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/include.h
-(304D) 5260 0101001001100000 (   2)                      AND R1 R1 #0	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/include.h
-(304E) 927F 1001001001111111 (   5) INCLUDED_LABEL       NOT R1 R1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/include.h
-(304F) 1261 0001001001100001 (   5)                      ADD R1 R1 #1	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/include.h
-(3050) 4FFF 0100111111111111 (  59) WARNING_THROWS       JSR WARNING_THROWS	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3051) 4800 0100100000000000 (  60)                      JSR 0x3052	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3052) 0200 0000001000000000 (  61)                      BRp 0x3053	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3053) 09FF 0000100111111111 (  62)                      BRn 0x3053	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3054) 09FB 0000100111111011 (  63)                      BRn WARNING_THROWS	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3055) F0FF 1111000011111111 (  64)                      TRAP 0xFF	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3056) 0F00 0000111100000000 (  65)                      BRnzp 0x2F57	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3057) C1C0 1100000111000000 (  68)                      RET	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3058) 0020 0000000000100000 (  71) WARNING_STRING       .FILL 0x2000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3059) 2000 0000000000100000 (  71)                      .FILL 0x0020	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305A) 0000 0000000000000000 (  71)                      .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305B) 0FBB 0000111110111011 ( 118)                      BRnzp BEGIN_TEST	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305C) 3017 0011000000010111 ( 120) addr                 .FILL 0x3017	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305D) 0000 0000000000000000 ( 123) b                    .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305E) 000A 0000000000001010 ( 125) bin                  .FILL 0x000A	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(305F) 0000 0000000000000000 ( 126) hex                  .FILL 0x0000	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
-(3060) 0000 0000000000000000 ( 130)                      .END	/Users/pyxxil/Sync/Projects/LC3-simulator/Examples/Features.asm
+(0000) 3000 0011000000000000 (   2)                      .ORIG 0x3000	Examples/Features.asm
+(3000) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3001) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3002) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3003) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3004) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3005) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3006) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3007) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3008) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3009) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(300A) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(300B) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(300C) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(300D) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(300E) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(300F) 0000 0000000000000000 (   7)                      .FILL 0x0000	Examples/Features.asm
+(3010) 0000 0000000000000000 (   9)                      .FILL 0x0000	Examples/Features.asm
+(3011) 0048 0000000001001000 (  10)                      .FILL 0x4800	Examples/Features.asm
+(3012) 6500 0000000001100101 (  10)                      .FILL 0x0065	Examples/Features.asm
+(3013) 006C 0000000001101100 (  10)                      .FILL 0x006C	Examples/Features.asm
+(3014) 006C 0000000001101100 (  10)                      .FILL 0x006C	Examples/Features.asm
+(3015) 006F 0000000001101111 (  10)                      .FILL 0x006F	Examples/Features.asm
+(3016) 0000 0000000000000000 (  10)                      .FILL 0x0000	Examples/Features.asm
+(3017) 1B76 0001101101110110 (  18) BEGIN_TEST           ADD R5 R5 #-10	Examples/Features.asm
+(3018) 12A1 0001001010100001 (  20)                      ADD R1 R2 #1	Examples/Features.asm
+(3019) 1B60 0001101101100000 (  22)                      ADD R5 R5 #0	Examples/Features.asm
+(301A) AE29 1010111000101001 (  24)                      LDI R7 cheat	Examples/Features.asm
+(301B) 927F 1001001001111111 (  31) EXTRA_FEATURES       NOT R1 R1	Examples/Features.asm
+(301C) 1261 0001001001100001 (  31)                      ADD R1 R1 #1	Examples/Features.asm
+(301D) 927F 1001001001111111 (  32)                      NOT R1 R1	Examples/Features.asm
+(301E) 1261 0001001001100001 (  32)                      ADD R1 R1 #1	Examples/Features.asm
+(301F) 1B41 0001101101000001 (  32)                      ADD R5 R5 R1	Examples/Features.asm
+(3020) 927F 1001001001111111 (  32)                      NOT R1 R1	Examples/Features.asm
+(3021) 1261 0001001001100001 (  32)                      ADD R1 R1 #1	Examples/Features.asm
+(3022) 5B60 0101101101100000 (  33)                      AND R5 R5 #0	Examples/Features.asm
+(3023) 94BF 1001010010111111 (  35)                      NOT R2 R2	Examples/Features.asm
+(3024) 14A1 0001010010100001 (  35)                      ADD R2 R2 #1	Examples/Features.asm
+(3025) 1242 0001001001000010 (  35)                      ADD R1 R1 R2	Examples/Features.asm
+(3026) 94BF 1001010010111111 (  35)                      NOT R2 R2	Examples/Features.asm
+(3027) 14A1 0001010010100001 (  35)                      ADD R2 R2 #1	Examples/Features.asm
+(3028) 52A0 0101001010100000 (  36)                      AND R1 R2 #0	Examples/Features.asm
+(3029) 927F 1001001001111111 (  37)                      NOT R1 R1	Examples/Features.asm
+(302A) 1261 0001001001100001 (  37)                      ADD R1 R1 #1	Examples/Features.asm
+(302B) 1281 0001001010000001 (  37)                      ADD R1 R2 R1	Examples/Features.asm
+(302C) 96FF 1001011011111111 (  38)                      NOT R3 R3	Examples/Features.asm
+(302D) 16E1 0001011011100001 (  38)                      ADD R3 R3 #1	Examples/Features.asm
+(302E) 1283 0001001010000011 (  38)                      ADD R1 R2 R3	Examples/Features.asm
+(302F) 96FF 1001011011111111 (  38)                      NOT R3 R3	Examples/Features.asm
+(3030) 16E1 0001011011100001 (  38)                      ADD R3 R3 #1	Examples/Features.asm
+(3031) 01C0 0000000111000000 (  40) oct                  .FILL 0x01C0	Examples/Features.asm
+(3032) 0041 0000000001000001 (  43)                      .FILL 0x0041	Examples/Features.asm
+(3033) 000A 0000000000001010 (  44)                      .FILL 0x000A	Examples/Features.asm
+(3034) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3035) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3036) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3037) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3038) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3039) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(303A) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(303B) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(303C) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(303D) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(303E) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(303F) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3040) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3041) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3042) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3043) 00FF 0000000011111111 (  46)                      .FILL 0x00FF	Examples/Features.asm
+(3044) 30D3 0011000011010011 (  47) cheat                .FILL 0x30D3	Examples/Features.asm
+(3045) 54A0 0101010010100000 (  49)                      AND R2 R2 #0	Examples/Features.asm
+(3046) 14AA 0001010010101010 (  49)                      ADD R2 R2 #10	Examples/Features.asm
+(3047) 0E01 0000111000000001 (  50)                      BRnzp 0x3049	Examples/Features.asm
+(3048) 3000 0011000000000000 (  50)                      .FILL 0x3000	Examples/Features.asm
+(3049) 27FE 0010011111111110 (  50)                      LD R3 0x3048	Examples/Features.asm
+(304A) 1482 0001010010000010 (  52)                      ADD R2 R2 R2	Examples/Features.asm
+(304B) 1482 0001010010000010 (  52)                      ADD R2 R2 R2	Examples/Features.asm
+(304C) 4800 0100100000000000 (  56)                      JSR WARNING_THROWS	Examples/Features.asm
+(304D) 4FFF 0100111111111111 (  59) WARNING_THROWS       JSR WARNING_THROWS	Examples/Features.asm
+(304E) 4800 0100100000000000 (  60)                      JSR 0x304F	Examples/Features.asm
+(304F) 03FF 0000001111111111 (  61)                      BRp 0x304F	Examples/Features.asm
+(3050) 0200 0000001000000000 (  62)                      BRp 0x3051	Examples/Features.asm
+(3051) 09FF 0000100111111111 (  63)                      BRn 0x3051	Examples/Features.asm
+(3052) 09FA 0000100111111010 (  64)                      BRn WARNING_THROWS	Examples/Features.asm
+(3053) F0FF 1111000011111111 (  65)                      TRAP 0xFF	Examples/Features.asm
+(3054) 0F00 0000111100000000 (  66)                      BRnzp 0x2F55	Examples/Features.asm
+(3055) 1000 0001000000000000 (  67)                      ADD R0 R0 R0	Examples/Features.asm
+(3056) 1000 0001000000000000 (  68)                      ADD R0 R0 R0	Examples/Features.asm
+(3057) 1000 0001000000000000 (  68)                      ADD R0 R0 R0	Examples/Features.asm
+(3058) 1000 0001000000000000 (  69)                      ADD R0 R0 R0	Examples/Features.asm
+(3059) 1000 0001000000000000 (  69)                      ADD R0 R0 R0	Examples/Features.asm
+(3059) 1000 0001000000000000 (  69)                      ADD R0 R0 R0	Examples/Features.asm
+(305B) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
+(305C) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
+(305C) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
+(305C) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
+(305F) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(3060) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(3060) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(3060) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(3060) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(3064) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(306A) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3072) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3079) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(307A) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3082) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3083) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(308C) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(308D) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3097) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3098) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(30A3) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30A4) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(30B0) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30B1) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30BE) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30BF) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30CD) C1C0 1100000111000000 (  84)                      RET	Examples/Features.asm
+(30CE) 0E00 0000111000000000 (  85)                      BRnzp WARNING_STRING	Examples/Features.asm
+(30CF) 0020 0000000000100000 (  87) WARNING_STRING       .FILL 0x2000	Examples/Features.asm
+(30D0) 2000 0000000000100000 (  87)                      .FILL 0x0020	Examples/Features.asm
+(30D1) 0000 0000000000000000 (  87)                      .FILL 0x0000	Examples/Features.asm
+(30D2) 0F44 0000111101000100 ( 136)                      BRnzp BEGIN_TEST	Examples/Features.asm
+(30D3) 3017 0011000000010111 ( 138) addr                 .FILL 0x3017	Examples/Features.asm
+(30D4) 0000 0000000000000000 ( 141) b                    .FILL 0x0000	Examples/Features.asm
+(30D5) 000A 0000000000001010 ( 143) bin                  .FILL 0x000A	Examples/Features.asm
+(30D6) 0000 0000000000000000 ( 144) hex                  .FILL 0x0000	Examples/Features.asm
+(30D7) 0000 0000000000000000 ( 148)                      .END	Examples/Features.asm

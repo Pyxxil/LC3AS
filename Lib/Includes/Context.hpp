@@ -61,8 +61,8 @@ namespace Diagnostics
                 friend std::ostream &operator <<(std::ostream &os, const FileContext &file);
 
                 Variant<std::string> file_name;
-                Variant<size_t> column;
-                Variant<size_t> line;
+                Variant<size_t>      column;
+                Variant<size_t>      line;
         };
 
         class Context

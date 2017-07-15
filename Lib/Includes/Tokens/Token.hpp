@@ -26,9 +26,9 @@ public:
 
         std::vector<uint16_t> assembled;
 
-        size_t  at_line   = 0;
-        size_t  at_column = 0;
-        bool is_valid     = true;
+        size_t at_line   = 0;
+        size_t at_column = 0;
+        bool   is_valid  = true;
 
         enum token_type
         {
