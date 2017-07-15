@@ -30,6 +30,12 @@ Assembler::Assembler::Assembler()
 
 }
 
+/*! Configure the assembler
+ *
+ * @param argc The argument count
+ * @param args Command line arguments
+ * @return Whether configuration succeeded or not.
+ */
 bool Assembler::Assembler::configure(int argc, char **args)
 {
         cxxopts::Options option_parser("LC3AS", "LC-3 Assembly Language Assembler");
@@ -104,6 +110,9 @@ bool Assembler::Assembler::configure(int argc, char **args)
         return true;
 }
 
+/*! Assemble every file provided via the command line.
+ *
+ */
 void Assembler::Assembler::assemble()
 {
         for (auto &&file : files_to_assemble) {
@@ -149,6 +158,9 @@ void Assembler::Assembler::assemble()
         }
 }
 
+/*! Generate a std::vector<uint16_t> containing the assembled version of the code.
+ *
+ */
 void Assembler::Assembler::generate_machine_code()
 {
         for (size_t i = 0; i < tokens.size(); ++i) {
@@ -164,6 +176,18 @@ void Assembler::Assembler::generate_machine_code()
         }
 }
 
+/*! Perform last minute warning checks
+ *
+ * These checks are mostly for figuring out any small logic errors (if any) there are in the code,
+ * e.g. A branch with an offset of 0 is superfluous, a branch with an offset of -1 is likely an
+ * infitie loop, etc.
+ *
+ * Some of these are just there in the case they're accidents, as some of them can be useful.
+ *
+ * @param tokenized_line The line we're working with
+ * @param assembled_line The assembled version of the token
+ * @param i Index into tokens which allows us to work with previous instructions
+ */
 void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared_ptr<Token>> &tokenized_line,
                                                    uint16_t assembled_line,
                                                    size_t i)
@@ -411,6 +435,18 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
         }
 }
 
+/*!
+ * Write the instructions to all relevant files.
+ *
+ * symbol file (.sym): The symbols found in the file.
+ * hexadecimal file (.hex): The hexadecimal representation of each instruction.
+ * binary file (.bin): The binary representation of each instruction.
+ * object file (.obj): The machine code of each instruction.
+ * list file (.lst):   Each instruction with it's address, hex representation, binary representation, line number,
+ *                     and the string representation.
+ *
+ * @param file The source code file name as a string
+ */
 void Assembler::Assembler::write(const std::string &file)
 {
         const std::string prefix = file.substr(0, file.find_last_of('.'));
@@ -454,24 +490,17 @@ void Assembler::Assembler::write(const std::string &file)
 
         std::uint16_t pc = 0;
 
-        std::map<std::string, Symbol>::const_iterator symbol;
-
         const std::string empty = " ";
 
         for (auto &&tokenized_line : tokens) {
-                symbol = symbol_at(pc);
+                auto &&symbol = symbol_at(pc);
 
-                if (symbol == symbols.cend()) {
-                        lst_file << tokenized_line.front()->disassemble(
-                                pc, empty, symbol_padding
-                        );
-                } else {
-                        lst_file << tokenized_line.front()->disassemble(
-                                pc, symbol->first, symbol_padding
-                        );
-                }
+                lst_file << tokenized_line.front()->disassemble(
+                        pc, symbol == symbols.cend() ? empty : symbol->first, symbol_padding
+                );
 
                 if (tokenized_line.front()->type() == Token::DIR_END) {
+                        // Ignore anything after the .END statement.
                         break;
                 }
         }

@@ -28,7 +28,7 @@ Binary::Binary(std::string &immediate,
         } else {
                 try {
                         const uint64_t v = std::bitset<16>(immediate).to_ullong();
-                        if (v & (~0xFFFF)) {
+                        if (v & (~0xFFFFull)) {
                                 is_valid = false;
                         } else {
                                 value = static_cast<int16_t>(v);

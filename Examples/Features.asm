@@ -15,8 +15,9 @@
 
 ; This is a label
 BEGIN_TEST:
-        ADD R5, R5, #-10; Comments can be as close to the instruction as you'd
+        ADD R5,, R5, ,#-10; Comments can be as close to the instruction as you'd
                         ; like
+        ADD R5,R5,R5
         ADD R1, R2, #1  // Comments can also be like so ('/' will is treated as
                         // a comment, but provides a warning)
         ADD R5, R5, 0
@@ -82,9 +83,9 @@ WARNING_THROWS:         ; All of the following should throw warnings with
 
 ; End of warnings
         RET
-Br WARNING_STRING
-WARNING_STRING:         ; Should throw a warning about the lone '\'
-        .STRINGZ "\ "
+Br WARNING_STRING        ; Should complain about the offset of 0
+WARNING_STRING:
+        .STRINGZ "\ "    ; Should throw a warning about the lone '\'
 
 ; Uncomment the following for testing
 ;       Current Error Count = 38

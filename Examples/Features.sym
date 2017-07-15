@@ -3,12 +3,13 @@
 //	Symbol Name          Page Address
 //	-------------------- ------------
 //	BEGIN_TEST           3017
-//	EXTRA_FEATURES       301B
-//	WARNING_STRING       30CF
-//	WARNING_THROWS       304D
-//	addr                 30D3
-//	b                    30D4
-//	bin                  30D5
-//	cheat                3044
-//	hex                  30D6
-//	oct                  3031
+//	EXTRA_FEATURES       301C
+//	INCLUDED_LABEL       304F
+//	WARNING_STRING       30D4
+//	WARNING_THROWS       3052
+//	addr                 30D8
+//	b                    30D9
+//	bin                  30DA
+//	cheat                3045
+//	hex                  30DB
+//	oct                  3032
