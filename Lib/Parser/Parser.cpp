@@ -5,14 +5,27 @@
 #include "LexHelper.hpp"
 #include "Lexer.hpp"
 
+/*! Generate the symbol table
+ *
+ * Create the symbol table, given a starting address by a .ORIG directive. If none is found, this
+ * currently treats that as an error (the same happens if an instruction of some kind is found before
+ * a .ORIG statement).
+ *
+ * The position in memory for each instruction is dependent on our best guess as to how much memory
+ * each instruction between each label.
+ */
 void Parser::do_first_pass()
 {
         int memory_required = 0;
 
-        // TODO: As it is, if there is no .ORIG directive as the first instruction in the file,
-        // TODO: we still look at the rest of the file. Is it smarter to stop if we don't see it
-        // TODO: first? Or should we just default to setting the memory address to 0x3000?
-
+        /**
+         * Make our best guess at how much memory a line requires.
+         *
+         * @param token: The token currently being processed.
+         * @param t_tokens: All of the tokens on that line (needed for calling guess_memory_size on token)
+         *
+         * @returns The best guess we have for how much memory the line requires.
+         */
         const auto &memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
         {
                 if (!origin_seen) {
@@ -42,6 +55,9 @@ void Parser::do_first_pass()
                 }
         };
 
+        // TODO: As it is, if there is no .ORIG directive as the first instruction in the file,
+        // TODO: we still look at the rest of the file. Is it smarter to stop if we don't see it
+        // TODO: first? Or should we just default to setting the memory address to 0x3000?
         for (auto &&tokenized_line : tokens) {
                 switch (tokenized_line.front()->type()) {
                 case Token::DIR_ORIG:
@@ -205,6 +221,11 @@ void Parser::do_first_pass()
         }
 }
 
+/*! Assemble the program
+ *
+ * For each line we have, generate the assembled version of that line. Each line stores its own assembled
+ * code, which can be accessed by getting it's assembled vector.
+ */
 void Parser::do_second_pass()
 {
         int memory_required = 0;
@@ -223,6 +244,10 @@ void Parser::do_second_pass()
         }
 }
 
+/*! Parse the source code given in file.
+ *
+ * @return 0 on success, anything else for failure.
+ */
 int Parser::parse()
 {
         Lexer lexer(file);
@@ -236,6 +261,7 @@ int Parser::parse()
         do_first_pass();
 
         if (Diagnostics::critical()) {
+                // There were errors, so don't bother continuing.
                 return 1;
         }
 
@@ -247,6 +273,7 @@ int Parser::parse()
 
         do_second_pass();
 
-        // Tell the caller whether there are no errors (so, continue with whatever), or there were errors on the second pass.
+        // Tell the caller whether or not there were errors on the second pass, or not (in which case, the caller
+        // can continue the assembly).
         return Diagnostics::critical();
 }

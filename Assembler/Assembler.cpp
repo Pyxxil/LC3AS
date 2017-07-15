@@ -11,6 +11,7 @@
 
 int Assembler::assemble(int argc, char **args)
 {
+        // Won't be using C-style input/output, so why not.
         std::ios_base::sync_with_stdio(false);
 
         Assembler assembler;

@@ -23,7 +23,7 @@ std::string String_Matcher::best_match() const
 void String_Matcher::consider(const std::string &str)
 {
         const int length_difference = std::abs(static_cast<int>(str.length() - m_string.length()));
-        if (length_difference >= best.first) {
+        if (length_difference > best.first) {
                 return;
         }
 
@@ -33,7 +33,13 @@ void String_Matcher::consider(const std::string &str)
         }
 
         const int distance = static_cast<int>(levenshtein_distance(m_string, str));
-        if (distance < best.first) {
+        if (distance <= best.first || (str.length() > m_string.length() && best.second.length() < m_string.length())) {
+                /* The second half of this if statement should help in cases where we have the following:
+                 * Valid labels = { oct, b }
+                 * m_string = oc
+                 * Without the second half of the if statement, this will get a best match of 'b', but it's likely
+                 * that oct is a better guess.
+                 */
                 best = { distance, str };
         }
 }
