@@ -46,7 +46,7 @@ static size_t hash(const std::string &string)
 {
         // Basically, we don't really want something that's likely to be an immediate value,
         // or a label (less likely to be caught here, but may as well try).
-        if (string.at(0) != '.' && !std::isprint(string.at(0))) {
+        if (string.at(0) != '.' && (std::isprint(string.at(0)) == 0)) {
                 return 0;
         }
 
@@ -70,7 +70,7 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
         std::vector<std::shared_ptr<Token>> tokenized_line;
 
         for (size_t line_number = 1; std::getline(file, line); line_number++) {
-                if (lexed_lines.count(file_name)) {
+                if (0u != lexed_lines.count(file_name)) {
                         lexed_lines[file_name].emplace_back(line);
                 } else {
                         lexed_lines.insert(
@@ -107,35 +107,58 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                                         if (file_is_already_open) {
                                                 Diagnostics::Diagnostic diag(
                                                         Diagnostics::FileContext(
-                                                                Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                Diagnostics::Variant<size_t>(tokenized_line[1]->at_column, Console::FOREGROUND_COLOUR::YELLOW)
-                                                        ), "Recursive include detected.", Diagnostics::LOGIC, Diagnostics::ERROR
+                                                                Diagnostics::Variant<std::string>(
+                                                                        file_name,
+                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                ),
+                                                                Diagnostics::Variant<size_t>(
+                                                                        tokenized_line.front()->at_line,
+                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                ),
+                                                                Diagnostics::Variant<size_t>(
+                                                                        tokenized_line[1]->at_column,
+                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                )
+                                                        ),
+                                                        "Recursive include detected.",
+                                                        Diagnostics::LOGIC,
+                                                        Diagnostics::ERROR
                                                 );
 
                                                 diag.provide_context(
                                                         std::make_unique<Diagnostics::HighlightContext>(
                                                                 Diagnostics::SelectionContext(
                                                                         Diagnostics::FileContext(
-                                                                                Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                                Diagnostics::Variant<size_t>(tokenized_line.front()->at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                                                                Diagnostics::Variant<size_t>(tokenized_line[1]->at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                Diagnostics::Variant<std::string>(
+                                                                                        file_name,
+                                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                ),
+                                                                                Diagnostics::Variant<size_t>(
+                                                                                        tokenized_line.front()->at_line,
+                                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                ),
+                                                                                Diagnostics::Variant<size_t>(
+                                                                                        tokenized_line[1]->at_column,
+                                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                )
                                                                         ), '^', "In include directive found here",
-                                                                        std::string(lexed_lines[file_name].at(tokenized_line.front()->at_line - 1))
+                                                                        std::string(lexed_lines[file_name].at(
+                                                                                tokenized_line.front()->at_line - 1)
+                                                                        )
                                                                 ), '~', tokenized_line[1]->token.length()
                                                         )
                                                 );
 
-                                                if (parent) {
-                                                        provide_context(diag);
-                                                }
-
+                                                provide_context(diag);
                                                 Diagnostics::push(diag);
                                         } else {
                                                 std::vector<std::vector<std::shared_ptr<Token>>> _tokens;
-                                                std::map<std::string, Symbol> _symbols;
-                                                Lexer lexer(this, file_with_path, tokenized_line.front()->at_line, tokenized_line[1]->at_column,
-                                                            tokenized_line[1]->token.length());
+                                                std::map<std::string, Symbol>                    _symbols;
+
+                                                Lexer lexer(
+                                                        this, file_with_path, tokenized_line.front()->at_line, tokenized_line[1]->at_column,
+                                                        tokenized_line[1]->token.length()
+                                                );
                                                 lexer.lex(_tokens, _symbols);
 
                                                 tokens.insert(tokens.end(), _tokens.begin(), _tokens.end());
@@ -174,7 +197,7 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, size_t line_number, si
         // TODO: measure.
         const size_t hashed = hash(copy); // This is non-zero if the string contains some letters.
 
-        if (hashed) {
+        if (0u != hashed) {
                 switch (hashed) {
                 case hash("ADD", 3):
                         return std::make_shared<Add>(word, copy, file_name, line_number, column);
@@ -287,22 +310,32 @@ std::shared_ptr<Token> Lexer::tokenize(std::string &word, size_t line_number, si
 
         if (std::regex_match(word, _register)) {
                 return std::make_shared<Register>(word, copy, file_name, line_number, column);
-        } else if (std::regex_match(word, decimal)) {
-                return std::make_shared<Decimal>(word, file_name, line_number, column);
-        } else if (std::regex_match(word, binary)) {
-                return std::make_shared<Binary>(word, copy, file_name, line_number, column);
-        } else if (std::regex_match(word, hexadecimal)) {
-                return std::make_shared<Hexadecimal>(word, copy, file_name, line_number, column);
-        } else if (std::regex_match(word, octal)) {
-                return std::make_shared<Octal>(word, file_name, line_number, column);
-        } else if (std::regex_match(word, label)) {
-                return std::make_shared<Label>(word, file_name, line_number, column);
-        } else {
-                const std::shared_ptr<Token>
-                        token = std::make_shared<Token>(word, copy, file_name, line_number, column);
-                token->is_valid = false;
-                return token;
         }
+
+        if (std::regex_match(word, decimal)) {
+                return std::make_shared<Decimal>(word, file_name, line_number, column);
+        }
+
+        if (std::regex_match(word, binary)) {
+                return std::make_shared<Binary>(word, copy, file_name, line_number, column);
+        }
+
+        if (std::regex_match(word, hexadecimal)) {
+                return std::make_shared<Hexadecimal>(word, copy, file_name, line_number, column);
+        }
+
+        if (std::regex_match(word, octal)) {
+                return std::make_shared<Octal>(word, file_name, line_number, column);
+        }
+
+        if (std::regex_match(word, label)) {
+                return std::make_shared<Label>(word, file_name, line_number, column);
+        }
+
+        const std::shared_ptr<Token>
+                token = std::make_shared<Token>(word, copy, file_name, line_number, column);
+        token->is_valid = false;
+        return token;
 }
 
 /*! Add a token to the current line's tokens.
@@ -347,12 +380,20 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                 char character { line.at(index) };
 
                 // We don't care about space characters.
-                if (std::isspace(character)) {
-                        terminated_by = 0;
+                if (0 != std::isspace(character)) {
+                        terminated_by = ' ';
 
                         const size_t col = index;
-                        while (line.length() > index + 1 && std::isspace(character)) {
+                        while (line.length() > index + 1 && 0 != std::isspace(character)) {
                                 character = line.at(++index);
+                        }
+
+                        if (0u != current.length()) {
+                                // We terminated with something, so we want to remember that.
+                                // This helps in cases like this:
+                                // ADD R0 , R0 , R1
+                                // Which, without this, would make 2 warnings (one for each comma)
+                                terminated_by = 1;
                         }
 
                         // However, it does mean we want to check what we just got.
@@ -362,7 +403,9 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                 if (character == ';') {
                         // We've hit a comment, so skip to the end of the line.
                         break;
-                } else if (character == '\r') {
+                }
+
+                if (character == '\r') {
                         // getline doesn't consume '\r' (at least on OSX)
                         break;
                 } else if (character == '/') {
@@ -373,15 +416,15 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
                                                         file_name,
-                                                        Console::FOREGROUND_COLOUR::YELLOW
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                 ),
                                                 Diagnostics::Variant<size_t>(
                                                         static_cast<size_t>(line_number),
-                                                        Console::FOREGROUND_COLOUR::YELLOW
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                 ),
                                                 Diagnostics::Variant<size_t>(
                                                         index,
-                                                        Console::FOREGROUND_COLOUR::YELLOW
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                 )
                                         ),
                                         "Treating this as a comment",
@@ -394,15 +437,15 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
                                                                 file_name,
-                                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         ),
                                                         Diagnostics::Variant<size_t>(
                                                                 static_cast<size_t>(line_number),
-                                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         ),
                                                         Diagnostics::Variant<size_t>(
                                                                 index,
-                                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         )
                                                 ),
                                                 '^',
@@ -416,22 +459,44 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                         }
                         break;
                 } else if (character == ',') {
-                        if (!into.size() || terminated_by || !current.length()) {
+                        if (into.empty() || (' ' != terminated_by && 0 != terminated_by && 1 != terminated_by) ||
+                                (0u == current.length() && terminated_by != 1)) {
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(line_number, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(index, Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        file_name,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        line_number,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        index,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), "Extraneous comma", Diagnostics::SYNTAX, Diagnostics::WARNING
                                 );
 
                                 diag.provide_context(
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
-                                                        Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(line_number, Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(index, Console::FOREGROUND_COLOUR::YELLOW)
-                                                ), '^', "Found here", std::string(lexed_lines[file_name].at(line_number - 1))
+                                                        Diagnostics::Variant<std::string>(
+                                                                file_name,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
+                                                        Diagnostics::Variant<size_t>(
+                                                                line_number,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
+                                                        Diagnostics::Variant<size_t>(
+                                                                index,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        )
+                                                ),
+                                                '^',
+                                                "Found here",
+                                                std::string(lexed_lines[file_name].at(line_number - 1))
                                         )
                                 );
 
@@ -440,22 +505,43 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                         }
                         addToken(current, into, line_number, index);
                 } else if (character == ':') {
-                        if (into.size() > 1 || !current.length() || terminated_by) {
+                        if (!into.empty() || 0u == current.length() || 0 != terminated_by) {
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(line_number, Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(index, Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        file_name,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        line_number,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        index,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), "Extraneous colon", Diagnostics::SYNTAX, Diagnostics::WARNING
                                 );
 
                                 diag.provide_context(
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
-                                                        Diagnostics::Variant<std::string>(file_name, Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(line_number, Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(index, Console::FOREGROUND_COLOUR::YELLOW)
-                                                ), '^', "Found here", std::string(lexed_lines[file_name].at(line_number - 1))
+                                                        Diagnostics::Variant<std::string>(
+                                                                file_name,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
+                                                        Diagnostics::Variant<size_t>(
+                                                                line_number,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
+                                                        Diagnostics::Variant<size_t>(
+                                                                index,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        )
+                                                ),
+                                                '^',
+                                                "Found here",
+                                                std::string(lexed_lines[file_name].at(line_number - 1))
                                         )
                                 );
 
@@ -494,25 +580,37 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
 
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file_name,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(line_number,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(index - current.size(),
-                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        file_name,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        line_number,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        index - current.size(),
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), stream.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
                                 );
 
                                 diag.provide_context(
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
-                                                        Diagnostics::Variant<std::string>(file_name,
-                                                                                          Console::FOREGROUND_COLOUR::YELLOW),
-                                                        Diagnostics::Variant<size_t>(line_number,
-                                                                                     Console::FOREGROUND_COLOUR::YELLOW),
+                                                        Diagnostics::Variant<std::string>(
+                                                                file_name,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
+                                                        Diagnostics::Variant<size_t>(
+                                                                line_number,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        ),
                                                         // Has to be index + 1 because otherwise it'll select the last character
-                                                        Diagnostics::Variant<size_t>(index + 1,
-                                                                                     Console::FOREGROUND_COLOUR::YELLOW)
+                                                        Diagnostics::Variant<size_t>(
+                                                                index + 1,
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        )
                                                 ),
                                                 '^',
                                                 "Expected '" + std::string({ terminator }) + "' before end of line.",
@@ -542,14 +640,15 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
                         current.erase();
                 } else {
                         current += character;
+                        terminated_by = 0;
                 }
                 ++index;
         }
 
-        const bool any_valid_characters = std::any_of(
+        const auto any_valid_characters = std::any_of(
                 current.cbegin(), current.cend(), [](unsigned char chr) -> bool
                 {
-                        return !(std::isspace(chr) || chr == ',' || chr == ':');
+                        return 0 == std::isspace(chr) && chr != ',' && chr != ':';
                 }
         );
 
@@ -560,17 +659,23 @@ void Lexer::tokenizeLine(const std::string &line, size_t line_number, std::vecto
 
 void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
 {
-        if (parent) {
+        if (nullptr != parent) {
                 diagnostic.provide_context(
                         std::make_unique<Diagnostics::HighlightContext>(
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(parent->file_name,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_line,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_column,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        parent->file_name,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_line,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_column,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ),
                                         '^',
                                         "In file included from here",
@@ -584,7 +689,7 @@ void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
 }
 
 Lexer::Lexer(const std::string &t_file)
-        : at_line(0), at_column(0), length(0), file_name(t_file), file(t_file),  parent(nullptr)
+        : at_line(0), at_column(0), length(0), file_name(t_file), file(t_file), parent(nullptr)
 {
         open_files.emplace_back(file_name);
 }
@@ -597,5 +702,6 @@ Lexer::Lexer(Lexer *const t_parent, const std::string &t_file, size_t line, size
 
 Lexer::~Lexer()
 {
-        open_files.erase(std::find_if(open_files.begin(), open_files.end(), [this](auto &&_file) { return _file == file_name; }));
+        open_files.erase(std::find_if(open_files.begin(), open_files.end(), [this](auto &&_file)
+        { return _file == file_name; }));
 }

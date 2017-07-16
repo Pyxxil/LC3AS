@@ -6,7 +6,7 @@
 class Directive : public Token
 {
 public:
-        Directive();
+        Directive() = default;
         Directive(std::string &directive,
                   std::string &directive_uppercase,
                   std::string &t_file,

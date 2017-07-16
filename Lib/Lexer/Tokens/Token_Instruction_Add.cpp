@@ -7,12 +7,6 @@
 #include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Immediate.hpp"
 
-Add::Add()
-        : Instruction()
-{
-
-}
-
 Add::Add(std::string &instruction,
          std::string &instruction_uppercase,
          std::string &t_file,
@@ -73,11 +67,15 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(2)->type() != Token::REGISTER) {
+        }
+
+        if (tokens.at(2)->type() != Token::REGISTER) {
                 tokens.at(2)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(3)->type() != Token::REGISTER && tokens.at(3)->type() != Token::IMMEDIATE) {
-                tokens.at(3)->expected("register or value value");
+        }
+
+        if (tokens.at(3)->type() != Token::REGISTER && tokens.at(3)->type() != Token::IMMEDIATE) {
+                tokens.at(3)->expected("register or immediate value");
                 return (is_valid = false);
         }
 
@@ -89,11 +87,9 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 }
         }
 
-        if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid && tokens.at(3)->is_valid)) {
-                return (is_valid = false);
-        }
+        return !(tokens.at(1)->is_valid && tokens.at(2)->is_valid && tokens.at(3)->is_valid) ? (is_valid = false)
+                                                                                             : is_valid;
 
-        return is_valid;
 }
 
 std::int32_t Add::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
@@ -122,7 +118,7 @@ std::string Add::disassemble(uint16_t &program_counter,
                 << " ADD R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
                 << ((assembled.front() & 0x01C0) >> 6 & 7) << ' ';
 
-        if (assembled.front() & 0x0020) {
+        if (0 != (assembled.front() & 0x0020)) {
                 stream << '#' << std::dec
                        << (static_cast<int8_t>(static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >> 3);
         } else {

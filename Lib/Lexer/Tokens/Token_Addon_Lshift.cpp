@@ -45,14 +45,18 @@ bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 
         if (tokens.at(2)->type() != Token::IMMEDIATE) {
                 tokens.at(2)->expected("immediate value");
                 return (is_valid = false);
-        } else if (!tokens.at(2)->is_valid) {
+        }
+
+        if (!tokens.at(2)->is_valid) {
                 return (is_valid = false);
         }
 

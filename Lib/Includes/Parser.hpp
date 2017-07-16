@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <utility>
 
 #include "Tokens/Token.hpp"
 #include "Tokens/Symbol.hpp"
@@ -10,8 +11,9 @@
 class Parser
 {
 public:
-        Parser(const std::string &t_file)
-                : file(t_file)
+        explicit Parser(std::string t_file)
+                : file(std::move(t_file)), origin_seen(false), end_seen(false), internal_program_counter(0)
+                  , program_counter(0), longest_symbol_length(20)
         { }
 
         int parse();
@@ -31,19 +33,24 @@ public:
                 return symbols;
         }
 
-        inline int symbol_padding() const {
+        inline int symbol_padding() const
+        {
                 return longest_symbol_length;
         }
 
 private:
         std::string file;
-        bool        origin_seen              = false;
-        bool        end_seen                 = false;
-        uint16_t    internal_program_counter = 0;
-        uint16_t    program_counter;
 
-        int                                              longest_symbol_length = 20;
-        std::map<std::string, Symbol>                    symbols;
+        bool origin_seen;
+        bool end_seen;
+
+        uint16_t internal_program_counter;
+        uint16_t program_counter;
+
+        int longest_symbol_length;
+
+        std::map<std::string, Symbol> symbols;
+
         std::vector<std::vector<std::shared_ptr<Token>>> tokens;
 
         void do_first_pass();

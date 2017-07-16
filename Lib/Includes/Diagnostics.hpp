@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <queue>
+#include <utility>
 
 #include "Context.hpp"
 
@@ -28,8 +29,8 @@ namespace Diagnostics
 
         struct diagnostic_type
         {
-                diagnostic_type(const std::string &t, const Console::Colour &col)
-                        : type(t), colour(col)
+                diagnostic_type(std::string t, Console::Colour col)
+                        : type(std::move(t)), colour(std::move(col))
                 { }
 
                 friend std::ostream &operator <<(std::ostream &os, const diagnostic_type &t)
@@ -46,17 +47,17 @@ namespace Diagnostics
         class Diagnostic
         {
         public:
-                Diagnostic(const FileContext &file);
                 Diagnostic(const FileContext &file,
                            std::string &&t_message,
                            DIAGNOSTIC_TYPE t_type,
                            DIAGNOSTIC diagnostic);
                 Diagnostic(Diagnostic &other);
+                Diagnostic(Diagnostic &&other) noexcept;
 
-                Diagnostic &operator =(Diagnostic &rhs);
-                Diagnostic &operator =(Diagnostic &&rhs);
+                Diagnostic &operator =(const Diagnostic &rhs) = delete;
+                Diagnostic &operator =(Diagnostic &&rhs) noexcept;
 
-                Diagnostic &operator ()();
+                ~Diagnostic() = default;
 
                 inline void provide_context(std::unique_ptr<Context> &&t_context)
                 {
@@ -70,7 +71,7 @@ namespace Diagnostics
 
                 inline bool has_context() const
                 {
-                        return context.size() != 0;
+                        return !context.empty();
                 }
 
                 inline bool is_critical() const
@@ -78,15 +79,15 @@ namespace Diagnostics
                         return type() == Diagnostics::ERROR;
                 }
 
-        private:
-                friend std::ostream &operator <<(std::ostream &os, const Diagnostic &d_msg);
+                std::ostream &write_to(std::ostream &os) const;
 
+        private:
                 std::string     message;
                 DIAGNOSTIC_TYPE d_type;
+
                 DIAGNOSTIC      d;
 
                 std::vector<std::unique_ptr<Context>> context;
-
                 FileContext info;
         };
 

@@ -41,7 +41,7 @@ std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                 assembled.emplace_back(static_cast<uint16_t>(std::static_pointer_cast<
                         Immediate>(tokens.at(1))->value));
         } else if (tokens.at(1)->type() == Token::LABEL) {
-                if (!symbols.count(tokens.at(1)->token)) {
+                if (0u == symbols.count(tokens.at(1)->token)) {
                         std::static_pointer_cast<Label>(tokens.at(1))->not_found(symbols);
                         return -1;
                 }
@@ -62,7 +62,9 @@ bool Fill::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::IMMEDIATE && tokens.at(1)->type() != Token::LABEL) {
                 tokens.at(1)->expected("immediate value or label");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 
@@ -82,7 +84,7 @@ std::string Fill::disassemble(
 {
         std::stringstream stream;
 
-        int value = static_cast<int>(assembled.front());
+        auto value = static_cast<int>(assembled.front());
 
         stream
                 // Address in memory

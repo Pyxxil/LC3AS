@@ -68,7 +68,7 @@
 (3042) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	Examples/Features.asm
 (3043) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	Examples/Features.asm
 (3044) 00FF 0000000011111111 (  47)                      .FILL 0x00FF	Examples/Features.asm
-(3045) 30D8 0011000011011000 (  48) cheat                .FILL 0x30D8	Examples/Features.asm
+(3045) 30D9 0011000011011001 (  48) cheat                .FILL 0x30D9	Examples/Features.asm
 (3046) 54A0 0101010010100000 (  50)                      AND R2 R2 #0	Examples/Features.asm
 (3047) 14AA 0001010010101010 (  50)                      ADD R2 R2 #10	Examples/Features.asm
 (3048) 0E01 0000111000000001 (  51)                      BRnzp 0x304A	Examples/Features.asm
@@ -76,147 +76,148 @@
 (304A) 27FE 0010011111111110 (  51)                      LD R3 0x3049	Examples/Features.asm
 (304B) 1482 0001010010000010 (  53)                      ADD R2 R2 R2	Examples/Features.asm
 (304C) 1482 0001010010000010 (  53)                      ADD R2 R2 R2	Examples/Features.asm
-(304D) 12A0 0001001010100000 (   1)                      ADD R1 R2 #0	Examples/include.h
-(304E) 5260 0101001001100000 (   2)                      AND R1 R1 #0	Examples/include.h
-(304F) 927F 1001001001111111 (   5) INCLUDED_LABEL       NOT R1 R1	Examples/include.h
-(3050) 1261 0001001001100001 (   5)                      ADD R1 R1 #1	Examples/include.h
-(3051) 4800 0100100000000000 (  57)                      JSR WARNING_THROWS	Examples/Features.asm
-(3052) 4FFF 0100111111111111 (  60) WARNING_THROWS       JSR WARNING_THROWS	Examples/Features.asm
-(3053) 4800 0100100000000000 (  61)                      JSR 0x3054	Examples/Features.asm
-(3054) 03FF 0000001111111111 (  62)                      BRp 0x3054	Examples/Features.asm
-(3055) 0200 0000001000000000 (  63)                      BRp 0x3056	Examples/Features.asm
-(3056) 09FF 0000100111111111 (  64)                      BRn 0x3056	Examples/Features.asm
-(3057) 09FA 0000100111111010 (  65)                      BRn WARNING_THROWS	Examples/Features.asm
-(3058) F0FF 1111000011111111 (  66)                      TRAP 0xFF	Examples/Features.asm
-(3059) 0F00 0000111100000000 (  67)                      BRnzp 0x2F5A	Examples/Features.asm
-(305A) 1000 0001000000000000 (  68)                      ADD R0 R0 R0	Examples/Features.asm
+(304D) 4802 0100100000000010 (  55)                      JSR INCLUDED_LABEL	Examples/Features.asm
+(304E) 12A0 0001001010100000 (   1)                      ADD R1 R2 #0	Examples/include.h
+(304F) 5260 0101001001100000 (   2)                      AND R1 R1 #0	Examples/include.h
+(3050) 927F 1001001001111111 (   5) INCLUDED_LABEL       NOT R1 R1	Examples/include.h
+(3051) 1261 0001001001100001 (   5)                      ADD R1 R1 #1	Examples/include.h
+(3052) 4800 0100100000000000 (  58)                      JSR WARNING_THROWS	Examples/Features.asm
+(3053) 4FFF 0100111111111111 (  61) WARNING_THROWS       JSR WARNING_THROWS	Examples/Features.asm
+(3054) 4800 0100100000000000 (  62)                      JSR 0x3055	Examples/Features.asm
+(3055) 03FF 0000001111111111 (  63)                      BRp 0x3055	Examples/Features.asm
+(3056) 0200 0000001000000000 (  64)                      BRp 0x3057	Examples/Features.asm
+(3057) 09FF 0000100111111111 (  65)                      BRn 0x3057	Examples/Features.asm
+(3058) 09FA 0000100111111010 (  66)                      BRn WARNING_THROWS	Examples/Features.asm
+(3059) F0FF 1111000011111111 (  67)                      TRAP 0xFF	Examples/Features.asm
+(305A) 0F00 0000111100000000 (  68)                      BRnzp 0x2F5B	Examples/Features.asm
 (305B) 1000 0001000000000000 (  69)                      ADD R0 R0 R0	Examples/Features.asm
-(305C) 1000 0001000000000000 (  69)                      ADD R0 R0 R0	Examples/Features.asm
+(305C) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
 (305D) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
-(305E) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
-(305E) 1000 0001000000000000 (  70)                      ADD R0 R0 R0	Examples/Features.asm
-(3060) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
-(3061) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
-(3061) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
-(3061) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
-(3064) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
-(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
-(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
-(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
-(3065) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
-(3069) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
-(306A) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
-(306A) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
-(306A) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
-(306A) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
-(306A) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
-(306F) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3070) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3070) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3070) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3070) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3070) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3070) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
-(3076) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(3077) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
-(307E) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(307F) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
-(3087) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3088) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
-(3091) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(3092) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
-(309C) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(309D) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
-(30A8) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30A9) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
-(30B5) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30B6) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
-(30C3) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30C4) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
-(30D2) C1C0 1100000111000000 (  85)                      RET	Examples/Features.asm
-(30D3) 0E00 0000111000000000 (  86)                      BRnzp WARNING_STRING	Examples/Features.asm
-(30D4) 0020 0000000000100000 (  88) WARNING_STRING       .FILL 0x2000	Examples/Features.asm
-(30D5) 2000 0000000000100000 (  88)                      .FILL 0x0020	Examples/Features.asm
-(30D6) 0000 0000000000000000 (  88)                      .FILL 0x0000	Examples/Features.asm
-(30D7) 0F3F 0000111100111111 ( 137)                      BRnzp BEGIN_TEST	Examples/Features.asm
-(30D8) 3017 0011000000010111 ( 139) addr                 .FILL 0x3017	Examples/Features.asm
-(30D9) 0000 0000000000000000 ( 142) b                    .FILL 0x0000	Examples/Features.asm
-(30DA) 000A 0000000000001010 ( 144) bin                  .FILL 0x000A	Examples/Features.asm
-(30DB) 0000 0000000000000000 ( 145) hex                  .FILL 0x0000	Examples/Features.asm
-(30DC) 0000 0000000000000000 ( 149)                      .END	Examples/Features.asm
+(305E) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(305F) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(305F) 1000 0001000000000000 (  71)                      ADD R0 R0 R0	Examples/Features.asm
+(3061) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3062) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3062) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3062) 1000 0001000000000000 (  72)                      ADD R0 R0 R0	Examples/Features.asm
+(3065) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(3066) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(3066) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(3066) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(3066) 1000 0001000000000000 (  73)                      ADD R0 R0 R0	Examples/Features.asm
+(306A) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(306B) 1000 0001000000000000 (  74)                      ADD R0 R0 R0	Examples/Features.asm
+(3070) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3071) 1000 0001000000000000 (  75)                      ADD R0 R0 R0	Examples/Features.asm
+(3077) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(3078) 1000 0001000000000000 (  76)                      ADD R0 R0 R0	Examples/Features.asm
+(307F) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3080) 1000 0001000000000000 (  77)                      ADD R0 R0 R0	Examples/Features.asm
+(3088) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3089) 1000 0001000000000000 (  78)                      ADD R0 R0 R0	Examples/Features.asm
+(3092) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(3093) 1000 0001000000000000 (  79)                      ADD R0 R0 R0	Examples/Features.asm
+(309D) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(309E) 1000 0001000000000000 (  80)                      ADD R0 R0 R0	Examples/Features.asm
+(30A9) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30AA) 1000 0001000000000000 (  81)                      ADD R0 R0 R0	Examples/Features.asm
+(30B6) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30B7) 1000 0001000000000000 (  82)                      ADD R0 R0 R0	Examples/Features.asm
+(30C4) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30C5) 1000 0001000000000000 (  83)                      ADD R0 R0 R0	Examples/Features.asm
+(30D3) C1C0 1100000111000000 (  86)                      RET	Examples/Features.asm
+(30D4) 0E00 0000111000000000 (  87)                      BRnzp WARNING_STRING	Examples/Features.asm
+(30D5) 0020 0000000000100000 (  89) WARNING_STRING       .FILL 0x2000	Examples/Features.asm
+(30D6) 2000 0000000000100000 (  89)                      .FILL 0x0020	Examples/Features.asm
+(30D7) 0000 0000000000000000 (  89)                      .FILL 0x0000	Examples/Features.asm
+(30D8) 0F3E 0000111100111110 ( 138)                      BRnzp BEGIN_TEST	Examples/Features.asm
+(30D9) 3017 0011000000010111 ( 140) addr                 .FILL 0x3017	Examples/Features.asm
+(30DA) 0000 0000000000000000 ( 143) b                    .FILL 0x0000	Examples/Features.asm
+(30DB) 000A 0000000000001010 ( 145) bin                  .FILL 0x000A	Examples/Features.asm
+(30DC) 0000 0000000000000000 ( 146) hex                  .FILL 0x0000	Examples/Features.asm
+(30DD) 0000 0000000000000000 ( 150)                      .END	Examples/Features.asm

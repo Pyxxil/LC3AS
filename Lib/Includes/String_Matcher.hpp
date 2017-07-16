@@ -8,7 +8,7 @@ class String_Matcher
 {
 public:
         String_Matcher();
-        String_Matcher(const std::string &);
+        explicit String_Matcher(const std::string &);
 
         std::string best_match() const;
         void consider(const std::string &str);

@@ -1,5 +1,8 @@
 #ifndef LC3_ASSEMBLER_CONTEXT_HPP
+
 #define LC3_ASSEMBLER_CONTEXT_HPP
+
+#include <utility>
 
 #include "Console.hpp"
 
@@ -9,10 +12,13 @@ namespace Diagnostics
         class Variant
         {
         public:
-                Variant(T var, const Console::Colour &col = Console::reset)
-                        : information(var), colour(col)
+                explicit Variant(T var, Console::Colour col = Console::reset)
+                        : information(var), colour(std::move(col))
                 { }
                 Variant(const Variant<T> &other)
+                        : information(other.information), colour(other.colour)
+                { }
+                Variant(Variant<T> &&other) noexcept
                         : information(other.information), colour(other.colour)
                 { }
                 Variant &operator =(const Variant<T> &rhs)
@@ -21,7 +27,7 @@ namespace Diagnostics
                         colour      = rhs.colour;
                         return *this;
                 }
-                Variant &operator =(const Variant<T> &&rhs)
+                Variant &operator =(Variant<T> &&rhs) noexcept
                 {
                         if (&rhs != this) {
                                 information = rhs.information;
@@ -30,15 +36,19 @@ namespace Diagnostics
                         return *this;
                 }
 
+                ~Variant() = default;
+
                 const T &var() const
                 {
                         return information;
                 }
-        private:
-                friend std::ostream &operator <<(std::ostream &os, const Variant<T> variant)
+
+                std::ostream &write_to(std::ostream &os) const
                 {
-                        return os << variant.colour << variant.information << Console::reset;
+                        return os << colour << information << Console::reset;
                 }
+
+        private:
 
                 T               information;
                 Console::Colour colour;
@@ -57,9 +67,15 @@ namespace Diagnostics
                         return column;
                 }
 
-        private:
-                friend std::ostream &operator <<(std::ostream &os, const FileContext &file);
+                inline std::ostream &write_to(std::ostream &os) const
+                {
+                        os << "In ";
+                        file_name.write_to(os) << ':';
+                        line.write_to(os) << ':';
+                        return column.write_to(os) << ':';
+                }
 
+        private:
                 Variant<std::string> file_name;
                 Variant<size_t>      column;
                 Variant<size_t>      line;
@@ -79,13 +95,15 @@ namespace Diagnostics
                         CONTEXT_TYPE t_type = NONE);
                 Context(const FileContext &file, const std::string &&t_message, const std::string &&t_line,
                         CONTEXT_TYPE t_type = NONE);
-                Context(const Context &other);
-                Context(const Context &&other);
+                Context(const Context &other) = default;
+                Context(const Context &&other) noexcept;
 
-                Context &operator =(const Context &rhs);
-                Context &operator =(const Context &&rhs);
+                Context &operator =(const Context &rhs) = default;
+                Context &operator =(Context &&rhs) noexcept = default;
 
-                friend std::ostream &operator <<(std::ostream &os, const Context &con);
+                virtual ~Context() = default;
+
+                virtual std::ostream &write_to(std::ostream &os) const;
 
                 inline CONTEXT_TYPE type() const
                 {
@@ -113,8 +131,14 @@ namespace Diagnostics
                         : Context(other.file_information, other.message, other.line, other.context_type)
                           , selector(other.selector), fix_it(other.fix_it)
                 { }
+                SelectionContext(SelectionContext &&other) noexcept = default;
 
-                friend std::ostream &operator <<(std::ostream &os, const SelectionContext &context);
+                SelectionContext &operator =(const SelectionContext &rhs) = default;
+                SelectionContext &operator =(SelectionContext &&rhs) noexcept = default;
+
+                ~SelectionContext() override = default;
+
+                std::ostream &write_to(std::ostream &os) const override;
 
         private:
                 char selector;
@@ -128,7 +152,7 @@ namespace Diagnostics
                 HighlightContext(const SelectionContext &t_selector, char t_highlighter,
                                  int t_highlight_length, const std::string &changer = std::string());
 
-                friend std::ostream &operator <<(std::ostream &os, const HighlightContext &context);
+                std::ostream &write_to(std::ostream &os) const override;
 
         private:
                 char highlighter;

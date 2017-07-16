@@ -39,9 +39,11 @@ bool Orig::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         }
 
         if (tokens.at(1)->type() != Token::IMMEDIATE) {
-                tokens.at(1)->expected("value value");
+                tokens.at(1)->expected("immediate value");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 
@@ -50,11 +52,7 @@ bool Orig::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
 std::int32_t Orig::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-        if (is_valid) {
-                return static_cast<std::int32_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->value);
-        } else {
-                return -1;
-        }
+        return is_valid ? static_cast<std::int32_t>(std::static_pointer_cast<Immediate>(tokens.at(1))->value) : -1;
 }
 
 std::string Orig::disassemble(uint16_t &program_counter,

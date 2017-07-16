@@ -3,12 +3,6 @@
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
-Character::Character()
-        : Immediate()
-{
-
-}
-
 Character::Character(std::string &character,
                      std::string &t_file,
                      size_t line_number,
@@ -43,15 +37,15 @@ Character::Character(std::string &character,
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
                                                 file,
-                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                         ),
                                         Diagnostics::Variant<size_t>(
                                                 line_number,
-                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                         ),
                                         Diagnostics::Variant<size_t>(
                                                 column,
-                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                         )
                                 ),
                                 "Invalid character literal",
@@ -65,15 +59,15 @@ Character::Character(std::string &character,
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
                                                                 file,
-                                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         ),
                                                         Diagnostics::Variant<size_t>(
                                                                 line_number,
-                                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         ),
                                                         Diagnostics::Variant<size_t>(
                                                                 column,
-                                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         )
                                                 ), '^', "Found here", std::string(lexed_lines[file].at(line_number - 1))
                                         ), '~', character.length()
@@ -82,20 +76,20 @@ Character::Character(std::string &character,
 
                         Diagnostics::push(diag);
                 }
-        } else if (!character.length()) {
+        } else if (0u == character.length()) {
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
                                 Diagnostics::Variant<std::string>(
                                         file,
-                                        Console::FOREGROUND_COLOUR::YELLOW
+                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                 ),
                                 Diagnostics::Variant<size_t>(
                                         line_number,
-                                        Console::FOREGROUND_COLOUR::YELLOW
+                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                 ),
                                 Diagnostics::Variant<size_t>(
                                         column,
-                                        Console::FOREGROUND_COLOUR::YELLOW
+                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                 )
                         ),
                         "Invalid character literal",
@@ -108,15 +102,15 @@ Character::Character(std::string &character,
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
                                                 file,
-                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                         ),
                                         Diagnostics::Variant<size_t>(
                                                 line_number,
-                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                         ),
                                         Diagnostics::Variant<size_t>(
                                                 column,
-                                                Console::FOREGROUND_COLOUR::YELLOW
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                         )
                                 ),
                                 '^',

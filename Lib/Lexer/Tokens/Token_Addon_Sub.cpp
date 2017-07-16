@@ -86,7 +86,9 @@ bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(2)->type() != Token::REGISTER) {
+        }
+
+        if (tokens.at(2)->type() != Token::REGISTER) {
                 tokens.at(2)->expected("register");
                 return (is_valid = false);
         }
@@ -95,7 +97,9 @@ bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 if (tokens.at(3)->type() != Token::REGISTER) {
                         tokens.at(3)->expected("register");
                         return (is_valid = false);
-                } else if (!tokens.at(3)->is_valid) {
+                }
+
+                if (!tokens.at(3)->is_valid) {
                         return (is_valid = false);
                 }
         }
@@ -140,7 +144,7 @@ void Sub::invalid_argument_count(size_t provided, size_t expected) const
 
         std::cerr << "ERROR: ";
 
-        if (at_line) {
+        if (0u != at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
 

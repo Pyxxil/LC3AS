@@ -5,6 +5,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #include <boost/filesystem.hpp>
+#include <utility>
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 
@@ -13,8 +14,8 @@
 struct Directory
 {
         // TODO: Probably move this somewhere else ... Maybe the Lexer?
-        Directory(const std::string &_directory, const std::string _name = "")
-                : directory(_directory), name(_name), exists(boost::filesystem::exists(directory))
+        explicit Directory(const std::string &_directory, std::string _name = "")
+                : directory(_directory), name(std::move(_name)), exists(boost::filesystem::exists(directory))
                   , is_directory(boost::filesystem::is_directory(directory))
         { }
 
@@ -24,17 +25,21 @@ struct Directory
 
                 if (!(exists && is_directory)) {
                         if (Config::is_set(Config::VERBOSE)) {
+                                /*
                                 std::stringstream ss;
                                 ss << "Ignoring invalid directory \"" << name << '"';
                                 Console::write_line(ss.str());
+                                */
                         }
                         return false;
                 }
 
                 if (Config::is_set(Config::VERBOSE)) {
+                        /*
                         std::stringstream ss;
                         ss << "Searching \"" << name << '"';
                         Console::write_line(ss.str());
+                        */
                 }
 
                 return false;

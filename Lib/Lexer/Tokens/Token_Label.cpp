@@ -5,7 +5,7 @@
 #include "LexHelper.hpp"
 
 Label::Label(std::string &name, std::string &t_file, size_t line_number, size_t column)
-        : Token(name, name, t_file, line_number, column), instruction()
+        : Token(name, name, t_file, line_number, column)
 {
 
 }
@@ -36,9 +36,9 @@ bool Label::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
                 instruction = tokens.at(1);
                 std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
                 return instruction->valid_arguments(vec);
-        } else {
-                return true;
         }
+
+        return true;
 }
 
 std::int32_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
@@ -46,9 +46,9 @@ std::int32_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &token
         if (tokens.size() > 1) {
                 std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
                 return vec.front()->guess_memory_size(vec);
-        } else {
-                return 0;
         }
+
+        return 0;
 }
 
 void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
@@ -63,9 +63,9 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
 
         Diagnostics::Diagnostic diag(
                 Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                 ), "Invalid label", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
         );
 
@@ -75,12 +75,18 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
                         std::make_unique<Diagnostics::HighlightContext>(
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_line,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_column,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        file,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_line,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_column,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), '^', "No such label '" + token + "'; Did you mean '" + possible_match + "'?",
                                         std::string(lexed_lines[file].at(at_line - 1))
                                 ), '~', token.size(), possible_match
@@ -92,12 +98,18 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
                         std::make_unique<Diagnostics::HighlightContext>(
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(sym->second.file,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(sym->second.line_number,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(sym->second.column,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        sym->second.file,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        sym->second.line_number,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        sym->second.column,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), '^', "'" + possible_match + "' declared here",
                                         std::string(lexed_lines[sym->second.file].at(sym->second.line_number - 1))
                                 ),
@@ -115,9 +127,9 @@ std::string Label::disassemble(uint16_t &program_counter,
 {
         if (!assembled.empty()) {
                 return instruction->disassemble(program_counter, symbol, width);
-        } else {
-                return "";
         }
+
+        return "";
 }
 
 void Label::requires_too_many_bits(int allowed_bits,
@@ -129,9 +141,9 @@ void Label::requires_too_many_bits(int allowed_bits,
 
         Diagnostics::Diagnostic diag(
                 Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                 ), "Address too far away.", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
         );
 
@@ -143,9 +155,9 @@ void Label::requires_too_many_bits(int allowed_bits,
                 std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                                 Diagnostics::FileContext(
-                                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                                 ), '^', ss.str(), std::string(lexed_lines[file].at(at_line - 1))
                         ), '~', token.length()
                 )
@@ -156,12 +168,18 @@ void Label::requires_too_many_bits(int allowed_bits,
                 std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                                 Diagnostics::FileContext(
-                                        Diagnostics::Variant<std::string>(sym->second.file,
-                                                                          Console::FOREGROUND_COLOUR::YELLOW),
-                                        Diagnostics::Variant<size_t>(sym->second.line_number,
-                                                                     Console::FOREGROUND_COLOUR::YELLOW),
-                                        Diagnostics::Variant<size_t>(sym->second.column,
-                                                                     Console::FOREGROUND_COLOUR::YELLOW)
+                                        Diagnostics::Variant<std::string>(
+                                                sym->second.file,
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        Diagnostics::Variant<size_t>(
+                                                sym->second.line_number,
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        Diagnostics::Variant<size_t>(
+                                                sym->second.column,
+                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        )
                                 ), '^', "'" + sym->first + "' declared here",
                                 std::string(lexed_lines[sym->second.file].at(sym->second.line_number - 1))
                         ), '~', sym->first.length()

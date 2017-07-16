@@ -54,22 +54,15 @@ namespace Console
 
         struct Colour
         {
-                Colour(FOREGROUND_COLOUR _fg,
+                explicit Colour(FOREGROUND_COLOUR _fg,
                        MODIFIER modifier = MODIFIER::NORMAL,
                        BACKGROUND_COLOUR _bg = BACKGROUND_COLOUR::RESET)
                         : fg(_fg), bg(_bg), mod(modifier)
                 { }
-                Colour(const Colour &other)
-                        : fg(other.fg), bg(other.bg), mod(other.mod)
-                { }
-                Colour &operator =(const Colour &other)
-                {
-                        fg  = other.fg;
-                        bg  = other.bg;
-                        mod = other.mod;
-                        return *this;
-                }
-                Colour &operator =(const Colour &&other)
+                Colour(const Colour &other) = default;
+                Colour(Colour &&other) = default;
+                Colour &operator =(const Colour &other) = default;
+                Colour &operator =(Colour &&other) noexcept
                 {
                         if (this != &other) {
                                 fg  = other.fg;
@@ -79,6 +72,8 @@ namespace Console
 
                         return *this;
                 }
+
+                ~Colour() = default;
 
                 friend std::ostream &operator <<(std::ostream &os, const Colour &colour)
                 {
@@ -102,18 +97,18 @@ namespace Console
                 MODIFIER          mod;
         };
 
-        static const Colour reset(FOREGROUND_COLOUR::RESET, MODIFIER::RESET, BACKGROUND_COLOUR::RESET);
+        extern const Colour reset;
 
         template <typename T>
         inline void write(const T &message)
         {
-                std::cout << message;
+                message.write_to(std::cout);
         }
 
         template <typename T>
         inline void write(const T &&message)
         {
-                std::cout << message;
+                message.write_to(std::cout);
         }
 
         template <typename T>

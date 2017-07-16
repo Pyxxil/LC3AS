@@ -11,13 +11,14 @@ namespace Config
                 STOP_ON_FIRST_ERR = 0x02,
                 VERBOSE           = 0x04,
                 BE_QUIET          = 0x08,
+                KEEP_GOING        = 0x10,
         };
 
         extern size_t configuration;
 
         inline bool is_set(size_t option)
         {
-                return !!(configuration & option);
+                return (configuration & option) != 0;
         }
 
         inline void set(size_t option)
@@ -25,7 +26,6 @@ namespace Config
                 configuration |= option;
         }
 
-        void set(size_t option);
         void add_search_directory(const std::string &directory);
         void add_search_directory(const std::string &&directory, const std::string &&name);
 

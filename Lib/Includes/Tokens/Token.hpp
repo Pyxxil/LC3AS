@@ -15,8 +15,13 @@
 class Token
 {
 public:
-        Token();
+        Token() = default;
         Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column);
+        Token(const Token &other) = default;
+        Token(Token &&other) noexcept = default;
+
+        Token &operator =(const Token &rhs) = default;
+        Token &operator =(Token &&rhs) noexcept = default;
 
         virtual ~Token() = default;
 
@@ -81,7 +86,7 @@ public:
                                         const std::string &symbol,
                                         int width) const;
 
-        virtual void expected(const char *const expects) const;
+        virtual void expected(const char *expects) const;
         virtual void invalid_argument_count(size_t provided, size_t expected) const;
         virtual void requires_too_many_bits(int allowed_bits,
                                             bool is_signed,
