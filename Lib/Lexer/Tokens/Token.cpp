@@ -84,11 +84,17 @@ void Token::expected(const char *const expects) const
                 std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                                 Diagnostics::FileContext(
-                                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
+                                        Diagnostics::Variant<std::string>(
+                                                file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        Diagnostics::Variant<size_t>(
+                                                at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        Diagnostics::Variant<size_t>(
+                                                at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        )
                                 ), '^', "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
-                                std::string(lexed_lines[file].at(at_line - 1))
+                                lexed_lines[file].at(at_line - 1)
                         ), '~', token.length()
                 )
         );

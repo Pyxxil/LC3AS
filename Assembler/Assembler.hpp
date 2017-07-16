@@ -27,8 +27,10 @@ namespace Assembler
                 //      --warn=[all,syntax,logic,none]
                 //              Default = all           Enable/Disable warnings
                 //      --verbose/-v                    Enable Verbose logging
-                //                                      TODO: Decide if this requires differing levels (e.g. -vvv or --verbose-level=3)
-                //                                      TODO:   If so, add enum options for config (VERBOSE_LEVEL_ONE, VERBOSE_LEVEL_TWO, etc.)
+                //                                      TODO: Decide if this requires differing levels (e.g. -vvv or
+                //                                            --verbose-level=3)
+                //                                      TODO:   If so, add enum options for config (VERBOSE_LEVEL_ONE,
+                //                                              VERBOSE_LEVEL_TWO, etc.)
                 //                                      TODO: Decide if this relates to diagnostics too
                 bool configure(int argc, char **args);
 

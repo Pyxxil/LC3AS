@@ -67,7 +67,7 @@ Diagnostics::Diagnostic::Diagnostic(Diagnostics::FileContext file,
                                     std::string t_message,
                                     Diagnostics::DIAGNOSTIC_TYPE t_type,
                                     Diagnostics::DIAGNOSTIC diagnostic)
-        : message(std::move(t_message)), d_type(t_type), d(diagnostic), info(std::move(file))
+        : message(std::move(t_message)), d_type(t_type), d(diagnostic), context(), info(std::move(file))
 { }
 
 Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &other)

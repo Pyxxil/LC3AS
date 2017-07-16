@@ -13,7 +13,7 @@ class Parser
 public:
         explicit Parser(std::string t_file)
                 : file(std::move(t_file)), origin_seen(false), end_seen(false), internal_program_counter(0)
-                  , program_counter(0), longest_symbol_length(20)
+                  , program_counter(0), longest_symbol_length(20), symbols(), tokens()
         { }
 
         int parse();

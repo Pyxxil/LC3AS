@@ -29,7 +29,7 @@ public:
         std::string token_uppercase;
         std::string file;
 
-        std::vector<uint16_t> assembled;
+        std::vector<uint16_t> assembled { };
 
         size_t at_line   = 0;
         size_t at_column = 0;

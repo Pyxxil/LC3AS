@@ -31,7 +31,7 @@ set ( ASSEMBLER_INCLUDE_DIRECTORIES "" )
 
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -pg -Werror -pedantic -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion )
 set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ )
-set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ )
+set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=effc++ -Wno-error=conversion )
 
 set ( RELEASE_FLAGS ${COMPILE_FLAGS} -O3 -flto -mtune=native -march=native )
 

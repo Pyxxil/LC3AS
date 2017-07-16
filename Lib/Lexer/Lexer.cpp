@@ -2,7 +2,6 @@
 
 #include <regex>
 
-#include "Diagnostics.hpp"
 #include "Tokens/Tokens.hpp"
 #include "LexHelper.hpp"
 
@@ -142,8 +141,8 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                                                                                         Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                                                 )
                                                                         ), '^', "In include directive found here",
-                                                                        std::string(lexed_lines[file_name].at(
-                                                                                tokenized_line.front()->at_line - 1)
+                                                                        lexed_lines[file_name].at(
+                                                                                tokenized_line.front()->at_line - 1
                                                                         )
                                                                 ), '~', tokenized_line[1]->token.length()
                                                         )
@@ -408,7 +407,9 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                 if (character == '\r') {
                         // getline doesn't consume '\r' (at least on OSX)
                         break;
-                } else if (character == '/') {
+                }
+
+                if (character == '/') {
                         // '//' is a comment as well.
                         if (index + 1 >= line.length() || line.at(index + 1) != '/') {
                                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
@@ -458,9 +459,11 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                 Diagnostics::push(diag);
                         }
                         break;
-                } else if (character == ',') {
+                }
+
+                if (',' == character) {
                         if (into.empty() || (' ' != terminated_by && 0 != terminated_by && 1 != terminated_by) ||
-                                (0u == current.length() && terminated_by != 1)) {
+                            (0u == current.length() && terminated_by != 1)) {
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
@@ -496,7 +499,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                                 ),
                                                 '^',
                                                 "Found here",
-                                                std::string(lexed_lines[file_name].at(line_number - 1))
+                                                lexed_lines[file_name].at(line_number - 1)
                                         )
                                 );
 
@@ -504,7 +507,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                 terminated_by = ',';
                         }
                         addToken(current, into, line_number, index);
-                } else if (character == ':') {
+                } else if (':' == character) {
                         if (!into.empty() || 0u == current.length() || 0 != terminated_by) {
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
@@ -541,7 +544,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                                 ),
                                                 '^',
                                                 "Found here",
-                                                std::string(lexed_lines[file_name].at(line_number - 1))
+                                                lexed_lines[file_name].at(line_number - 1)
                                         )
                                 );
 
@@ -550,7 +553,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                         }
                         addToken(current, into, line_number, index);
 #ifdef INCLUDE_ADDONS
-                } else if (character == '"' || character == '\'') {
+                } else if ('"' == character || '\'' == character) {
 #else
                 } else if (character == '"') {
 #endif
@@ -621,7 +624,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
 
                                 Diagnostics::push(diag);
 #ifdef INCLUDE_ADDONS
-                        } else if (terminator == '\'') {
+                        } else if ('\'' == terminator) {
                                 into.push_back(
                                         std::make_shared<Character>(
                                                 current, file_name, line_number,
@@ -679,7 +682,7 @@ void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
                                         ),
                                         '^',
                                         "In file included from here",
-                                        std::string(lexed_lines[parent->file_name].at(at_line - 1))
+                                        lexed_lines[parent->file_name].at(at_line - 1)
                                 ), '~', length
                         )
                 );
@@ -689,13 +692,13 @@ void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
 }
 
 Lexer::Lexer(const std::string &t_file)
-        : at_line(0), at_column(0), length(0), file_name(t_file), file(t_file), parent(nullptr)
+        : at_line(0), at_column(0), length(0), file_name(t_file), file(t_file), symbols(), tokens(), parent(nullptr)
 {
         open_files.emplace_back(file_name);
 }
 
 Lexer::Lexer(Lexer *const t_parent, const std::string &t_file, size_t line, size_t col, size_t len)
-        : at_line(line), at_column(col), length(len), file_name(t_file), file(t_file), parent(t_parent)
+        : at_line(line), at_column(col), length(len), file_name(t_file), file(t_file), symbols(), tokens(), parent(t_parent)
 {
         open_files.emplace_back(file_name);
 }

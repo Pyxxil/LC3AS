@@ -46,11 +46,12 @@ bool Assembler::Assembler::configure(int argc, char **args)
                                      ("w,warn", "Choose warning type") // TODO: Fix this
                                      ("files", "Files to assemble", cxxopts::value<std::vector<std::string>>())
                                      ("q,quiet", "Be quiet")
-                                     ("keep-going", "Keep going despite errors (mostly used for testing. Doesn't write to files unless no errors occurred)");
+                                     ("keep-going", "Keep going despite errors (mostly used for testing. Doesn't write "
+                                             "to files unless no errors occurred)");
 
                 // TODO: Add a --attempt-fix. Basically, assume that a problem is meant to be fixed to what we
                 // TODO: think it should, e.g. when we encounter a single '/', the assembler keeps going because
-                // TODO: it assumes that it was meant to be a double '//', indiccation a comment. Do the same thing
+                // TODO: it assumes that it was meant to be a double '//', indication a comment. Do the same thing
                 // TODO: for character literals and strings -- basically, anything left on that line will be treated
                 // TODO: as a string/character (which, of course, would lead to problems with character literals).
                 // TODO:    - Maybe only use 1 character for character literals, and anything else as extra?
@@ -74,14 +75,14 @@ bool Assembler::Assembler::configure(int argc, char **args)
                 return false;
         }
 
-        auto &&files = option_parser["files"].as<std::vector<std::string>>();
+        auto files = option_parser["files"].as<std::vector<std::string>>();
 
         for (auto &&file : files) {
                 files_to_assemble.emplace_back(file);
         }
 
         if (0 != option_parser.count("include")) {
-                auto &&dirs = option_parser["include"].as<std::vector<std::string>>();
+                auto dirs = option_parser["include"].as<std::vector<std::string>>();
                 for (auto &&dir : dirs) {
                         Config::add_search_directory(dir);
                 }
@@ -158,7 +159,7 @@ void Assembler::Assembler::assemble()
         }
 }
 
-/*! Generate a std::vector<uint16_t> containing the assembled version of the code.
+/*! Generate a vector containing the assembled version of the code.
  *
  */
 void Assembler::Assembler::generate_machine_code()
@@ -196,7 +197,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
             tokenized_line.front()->type() == Token::OP_JSR) {
                 if (tokenized_line.front()->type() == Token::OP_BR &&
                     ((assembled_line & 0xFE00) == (assembled.back() & 0xFE00))) {
-                        Diagnostics::Diagnostic diag(
+                        Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
                                                 tokenized_line.front()->file,
@@ -216,7 +217,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                 Diagnostics::WARNING
                         );
 
-                        diag.provide_context(
+                        diagnostic.provide_context(
                                 std::make_unique<Diagnostics::HighlightContext>(
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
@@ -233,16 +234,14 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                                 Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         )
                                                 ), '^', "This might mean this line is superfluous",
-                                                std::string(
-                                                        lexed_lines[tokenized_line.front()->file].at(
-                                                                tokenized_line.front()->at_line - 1
-                                                        )
+                                                lexed_lines[tokenized_line.front()->file].at(
+                                                        tokenized_line.front()->at_line - 1
                                                 )
                                         ), '~', tokenized_line.front()->token.length()
                                 )
                         );
 
-                        diag.provide_context(
+                        diagnostic.provide_context(
                                 std::make_unique<Diagnostics::HighlightContext>(
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
@@ -259,20 +258,18 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                                 Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         )
                                                 ), '^', "Checks the same condition code as this line",
-                                                std::string(
-                                                        lexed_lines[tokens[i - 1].front()->file].at(
-                                                                tokens[i - 1].front()->at_line - 1
-                                                        )
+                                                lexed_lines[tokens[i - 1].front()->file].at(
+                                                        tokens[i - 1].front()->at_line - 1
                                                 )
                                         ), '~', tokens[i - 1].front()->token.length()
                                 )
                         );
 
-                        Diagnostics::push(diag);
+                        Diagnostics::push(diagnostic);
                 }
 
                 if (0 == (assembled_line & 0x1FF)) {
-                        Diagnostics::Diagnostic diag(
+                        Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
                                                 tokenized_line.front()->file,
@@ -289,7 +286,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                 ), "Superfluous statement", Diagnostics::LOGIC, Diagnostics::WARNING
                         );
 
-                        diag.provide_context(
+                        diagnostic.provide_context(
                                 std::make_unique<Diagnostics::HighlightContext>(
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
@@ -307,18 +304,16 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                         )
                                                 ),
                                                 '^',
-                                                "Offset of 0 is superfluous -- simulator will go to next line no matter what",
-                                                std::string(lexed_lines[tokenized_line[1]->file].at(
-                                                        tokenized_line[1]->at_line - 1
-                                                            )
-                                                )
+                                                "Offset of 0 is superfluous -- simulator will go to next line no "
+                                                        "matter what",
+                                                lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line - 1)
                                         ), '~', tokenized_line[1]->token.length()
                                 )
                         );
 
                         if (tokenized_line[1]->type() == Token::LABEL) {
                                 auto &&sym = symbols.find(tokenized_line[1]->token);
-                                diag.provide_context(
+                                diagnostic.provide_context(
                                         std::make_unique<Diagnostics::HighlightContext>(
                                                 Diagnostics::SelectionContext(
                                                         Diagnostics::FileContext(
@@ -335,19 +330,15 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                                         Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                                 )
                                                         ), '^', "Referred to label defined here",
-                                                        std::string(
-                                                                lexed_lines[sym->second.file].at(
-                                                                        sym->second.line_number - 1
-                                                                )
-                                                        )
+                                                        lexed_lines[sym->second.file].at(sym->second.line_number - 1)
                                                 ), '~', sym->first.length()
                                         )
                                 );
                         }
 
-                        Diagnostics::push(diag);
+                        Diagnostics::push(diagnostic);
                 } else if ((assembled_line & 0x1FF) == 0x1FF) {
-                        Diagnostics::Diagnostic diag(
+                        Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
                                                 tokenized_line.front()->file,
@@ -364,7 +355,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                 ), "Possible infinite loop", Diagnostics::LOGIC, Diagnostics::WARNING
                         );
 
-                        diag.provide_context(
+                        diagnostic.provide_context(
                                 std::make_unique<Diagnostics::HighlightContext>(
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
@@ -381,18 +372,14 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                                 Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         )
                                                 ), '^', "Offset of -1 might cause an infinite loop",
-                                                std::string(
-                                                        lexed_lines[tokenized_line[1]->file].at(
-                                                                tokenized_line[1]->at_line - 1
-                                                        )
-                                                )
+                                                lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line - 1)
                                         ), '~', tokenized_line[1]->token.length()
                                 )
                         );
 
                         if (tokenized_line[1]->type() == Token::LABEL) {
                                 auto &&sym = symbols.find(tokenized_line[1]->token);
-                                diag.provide_context(
+                                diagnostic.provide_context(
                                         std::make_unique<Diagnostics::HighlightContext>(
                                                 Diagnostics::SelectionContext(
                                                         Diagnostics::FileContext(
@@ -409,23 +396,19 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                                         Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                                 )
                                                         ), '^', "Referred to label defined here",
-                                                        std::string(
-                                                                lexed_lines[sym->second.file].at(
-                                                                        sym->second.line_number - 1
-                                                                )
-                                                        )
+                                                        lexed_lines[sym->second.file].at(sym->second.line_number - 1)
                                                 ), '~', sym->first.length()
                                         )
                                 );
                         }
 
-                        Diagnostics::push(diag);
+                        Diagnostics::push(diagnostic);
                 }
         }
 
         if (tokenized_line.front()->type() == Token::OP_TRAP) {
                 if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
-                        Diagnostics::Diagnostic diag(
+                        Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
                                                 tokenized_line.front()->file,
@@ -445,7 +428,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                 Diagnostics::WARNING
                         );
 
-                        diag.provide_context(
+                        diagnostic.provide_context(
                                 std::make_unique<Diagnostics::HighlightContext>(
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
@@ -465,14 +448,14 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                 '^',
                                                 "Trap vector not between 0x20 and 0x25 (inclusive) might cause"
                                                         " an illegal trap vector exception",
-                                                std::string(lexed_lines[tokenized_line[1]->file].at(
-                                                        tokenized_line[1]->at_line - 1)
+                                                lexed_lines[tokenized_line[1]->file].at(
+                                                        tokenized_line[1]->at_line - 1
                                                 )
                                         ), '~', tokenized_line[1]->token.length(), "0x2{0..5}"
                                 )
                         );
 
-                        Diagnostics::push(diag);
+                        Diagnostics::push(diagnostic);
                 }
         }
 }

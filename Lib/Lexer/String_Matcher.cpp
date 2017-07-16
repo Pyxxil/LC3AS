@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 String_Matcher::String_Matcher()
-        : best { std::numeric_limits<long>::max(), "" }
+        : m_string(), best { std::numeric_limits<long>::max(), "" }
 {
 
 }

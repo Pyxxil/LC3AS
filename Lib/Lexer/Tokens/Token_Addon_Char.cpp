@@ -69,7 +69,7 @@ Character::Character(std::string &character,
                                                                 column,
                                                                 Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                         )
-                                                ), '^', "Found here", std::string(lexed_lines[file].at(line_number - 1))
+                                                ), '^', "Found here",lexed_lines[file].at(line_number - 1)
                                         ), '~', character.length()
                                 )
                         );
@@ -115,7 +115,7 @@ Character::Character(std::string &character,
                                 ),
                                 '^',
                                 "Expected character, not empty sequence",
-                                std::string(lexed_lines[file].at(line_number - 1))
+                                lexed_lines[file].at(line_number - 1)
                         )
                 );
 

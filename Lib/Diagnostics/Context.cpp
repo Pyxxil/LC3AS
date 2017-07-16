@@ -30,7 +30,7 @@ Diagnostics::Context::Context(Diagnostics::FileContext file,
                               std::string t_message,
                               std::string t_line,
                               Diagnostics::Context::CONTEXT_TYPE t_type)
-        : file_information(std::move(file)), message(std::move(t_message)), line(std::move(t_line)), context_type(t_type)
+        : file_information(std::move(file)), message(std::move(t_message)), line(t_line), context_type(t_type), empty_line()
 {
         for (size_t i = 0; i < file.get_column().var(); ++i) {
                 empty_line += 0 != std::isspace(t_line[i]) ? t_line[i] : ' ';
@@ -47,7 +47,7 @@ Diagnostics::HighlightContext::HighlightContext(SelectionContext t_selector,
                                                 char t_highlighter,
                                                 int t_highlight_length,
                                                 std::string changer)
-        : Context(std::move(t_selector.file_information), std::move(t_selector.message), std::move(t_selector.line), HIGHLIGHT)
+        : Context(std::move(t_selector.file_information), std::move(t_selector.message), t_selector.line, HIGHLIGHT)
           , highlighter(t_highlighter), highlight_length(t_highlight_length - 1), selector(t_selector)
           , fix_it(std::move(changer))
 { }
@@ -75,7 +75,7 @@ Diagnostics::SelectionContext::SelectionContext(Diagnostics::FileContext file,
                                                 std::string t_message,
                                                 std::string t_line,
                                                 std::string changer)
-        : Context(std::move(file), std::move(t_message), std::move(t_line), SELECTOR)
+        : Context(std::move(file), std::move(t_message), t_line, SELECTOR)
           , selector(t_selector), fix_it(std::move(changer))
 { }
 

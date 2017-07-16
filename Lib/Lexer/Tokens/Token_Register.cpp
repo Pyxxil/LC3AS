@@ -16,9 +16,15 @@ Register::Register(std::string &which,
                 // TODO: Use a highlight context, with the fix_it being "R{0..7}"
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
+                                Diagnostics::Variant<std::string>(
+                                        file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                ),
+                                Diagnostics::Variant<size_t>(
+                                        at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                ),
+                                Diagnostics::Variant<size_t>(
+                                        at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                )
                         ), "Invalid register", Diagnostics::SPELLING, Diagnostics::ERROR
                 );
 
@@ -40,8 +46,7 @@ Register::Register(std::string &which,
                                                 )
                                         ),
                                         '^',
-                                        "A valid register lies between 0..7",
-                                        std::string(lexed_lines[file].at(at_line - 1))
+                                        "A valid register lies between 0..7", lexed_lines[file].at(at_line - 1)
                                 ), '~', token.length(), "R{0..7}"
                         )
                 );

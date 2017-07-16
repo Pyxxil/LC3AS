@@ -57,8 +57,7 @@ Decimal::Decimal(std::string &immediate, std::string &t_file, size_t line_number
                                                         at_column,
                                                         Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
                                                 )
-                                        ), '^', "Found here",
-                                        std::string(lexed_lines[file].at(at_line - 1))
+                                        ), '^', "Found here", lexed_lines[file].at(at_line - 1)
                                 ), '~', token.length()
                         )
                 );

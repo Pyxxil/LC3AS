@@ -37,10 +37,16 @@ void Immediate::requires_too_many_bits(int allowed_bits,
                 std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                                 Diagnostics::FileContext(
-                                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                        Diagnostics::Variant<size_t>(at_column,Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
-                                ), '^', ss.str(), std::string(lexed_lines[file].at(at_line - 1))
+                                        Diagnostics::Variant<std::string>(
+                                                file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        Diagnostics::Variant<size_t>(
+                                                at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        ),
+                                        Diagnostics::Variant<size_t>(
+                                                at_column,Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        )
+                                ), '^', ss.str(), lexed_lines[file].at(at_line - 1)
                         ), '~', token.length()
                 )
         );
