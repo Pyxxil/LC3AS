@@ -36,16 +36,13 @@ Character::Character(std::string &character,
                         Diagnostics::Diagnostic diag(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                file,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                line_number,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                line_number
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                column,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                column
                                         )
                                 ),
                                 "Invalid character literal",
@@ -58,16 +55,13 @@ Character::Character(std::string &character,
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                file,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                file
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                line_number,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                line_number
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                column,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                column
                                                         )
                                                 ), '^', "Found here",lexed_lines[file].at(line_number - 1)
                                         ), '~', character.length()
@@ -80,16 +74,13 @@ Character::Character(std::string &character,
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
                                 Diagnostics::Variant<std::string>(
-                                        file,
-                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        file
                                 ),
                                 Diagnostics::Variant<size_t>(
-                                        line_number,
-                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        line_number
                                 ),
                                 Diagnostics::Variant<size_t>(
-                                        column,
-                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        column
                                 )
                         ),
                         "Invalid character literal",
@@ -101,16 +92,13 @@ Character::Character(std::string &character,
                         std::make_unique<Diagnostics::SelectionContext>(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                file,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                line_number,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                line_number
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                column,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                column
                                         )
                                 ),
                                 '^',

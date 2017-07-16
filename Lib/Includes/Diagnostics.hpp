@@ -52,10 +52,10 @@ namespace Diagnostics
                            DIAGNOSTIC_TYPE t_type,
                            DIAGNOSTIC diagnostic);
                 Diagnostic(Diagnostic &other);
-                Diagnostic(Diagnostic &&other) noexcept;
+                Diagnostic(Diagnostic &&other) = default;
 
-                Diagnostic &operator =(const Diagnostic &rhs) = delete;
-                Diagnostic &operator =(Diagnostic &&rhs) noexcept;
+                Diagnostic &operator =(const Diagnostic &rhs) = default;
+                Diagnostic &operator =(Diagnostic &&rhs) = default;
 
                 ~Diagnostic() = default;
 

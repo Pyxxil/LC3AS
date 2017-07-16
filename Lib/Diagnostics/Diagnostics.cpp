@@ -77,24 +77,6 @@ Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &other)
 
 }
 
-Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &&other) noexcept
-        : message(other.message), d_type(other.d_type), d(other.d), context(std::move(other.context))
-          , info(other.info)
-{
-
-}
-
-Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagnostic &&rhs) noexcept
-{
-        if (&rhs != this) {
-                message = rhs.message;
-                d       = rhs.d;
-                d_type  = rhs.d_type;
-                context = std::move(rhs.context);
-        }
-        return *this;
-}
-
 std::ostream &Diagnostics::Diagnostic::write_to(std::ostream &os) const
 {
         info.write_to(os) << ' ' << diagnostic_colours[type()] << ": " << message << '\n';

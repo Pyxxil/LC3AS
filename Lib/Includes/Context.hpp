@@ -12,29 +12,15 @@ namespace Diagnostics
         class Variant
         {
         public:
-                explicit Variant(T var, Console::Colour col = Console::reset)
+                explicit Variant(T var, Console::Colour col = Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                         : information(var), colour(std::move(col))
                 { }
-                Variant(const Variant<T> &other)
-                        : information(other.information), colour(other.colour)
+                Variant(const Variant<T> &other) = default;
+                Variant(Variant<T> &&other)
+                        : information(other.information), colour(std::move(other.colour))
                 { }
-                Variant(Variant<T> &&other) noexcept
-                        : information(other.information), colour(other.colour)
-                { }
-                Variant &operator =(const Variant<T> &rhs)
-                {
-                        information = rhs.information;
-                        colour      = rhs.colour;
-                        return *this;
-                }
-                Variant &operator =(Variant<T> &&rhs) noexcept
-                {
-                        if (&rhs != this) {
-                                information = rhs.information;
-                                colour      = rhs.colour;
-                        }
-                        return *this;
-                }
+                Variant &operator =(const Variant<T> &rhs) = default;
+                Variant &operator =(Variant<T> &&rhs) = default;
 
                 ~Variant() = default;
 
@@ -49,7 +35,6 @@ namespace Diagnostics
                 }
 
         private:
-
                 T               information;
                 Console::Colour colour;
         };
@@ -57,10 +42,14 @@ namespace Diagnostics
         class FileContext
         {
         public:
-                FileContext(std::string &name, size_t t_line, size_t t_col);
-                FileContext(std::string &&name, size_t t_line, size_t t_col);
-                FileContext(Variant<std::string> &name, Variant<size_t> &t_line, Variant<size_t> &t_col);
-                FileContext(Variant<std::string> &&name, Variant<size_t> &&t_line, Variant<size_t> &&t_col);
+                FileContext(std::string name, size_t t_line, size_t t_col);
+                FileContext(Variant<std::string> name, Variant<size_t> t_line, Variant<size_t> t_col);
+                FileContext(const FileContext &other) = default;
+                FileContext(FileContext &&other) = default;
+                FileContext &operator =(const FileContext &rhs) = default;
+                FileContext &operator =(FileContext &&rhs) = default;
+
+                ~FileContext() = default;
 
                 inline const Variant<size_t> &get_column() const
                 {
@@ -93,10 +82,10 @@ namespace Diagnostics
 
                 Context(FileContext file, std::string t_message, std::string t_line, CONTEXT_TYPE t_type = NONE);
                 Context(const Context &other) = default;
-                Context(Context &&other) noexcept = default;
+                Context(Context &&other) = default;
 
                 Context &operator =(const Context &rhs) = default;
-                Context &operator =(Context &&rhs) noexcept = default;
+                Context &operator =(Context &&rhs) = default;
 
                 virtual ~Context() = default;
 

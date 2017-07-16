@@ -107,16 +107,13 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                                                 Diagnostics::Diagnostic diag(
                                                         Diagnostics::FileContext(
                                                                 Diagnostics::Variant<std::string>(
-                                                                        file_name,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        file_name
                                                                 ),
                                                                 Diagnostics::Variant<size_t>(
-                                                                        tokenized_line.front()->at_line,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        tokenized_line.front()->at_line
                                                                 ),
                                                                 Diagnostics::Variant<size_t>(
-                                                                        tokenized_line[1]->at_column,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        tokenized_line[1]->at_column
                                                                 )
                                                         ),
                                                         "Recursive include detected.",
@@ -129,16 +126,13 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                                                                 Diagnostics::SelectionContext(
                                                                         Diagnostics::FileContext(
                                                                                 Diagnostics::Variant<std::string>(
-                                                                                        file_name,
-                                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                        file_name
                                                                                 ),
                                                                                 Diagnostics::Variant<size_t>(
-                                                                                        tokenized_line.front()->at_line,
-                                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                        tokenized_line.front()->at_line
                                                                                 ),
                                                                                 Diagnostics::Variant<size_t>(
-                                                                                        tokenized_line[1]->at_column,
-                                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                                        tokenized_line[1]->at_column
                                                                                 )
                                                                         ), '^', "In include directive found here",
                                                                         lexed_lines[file_name].at(
@@ -416,16 +410,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file_name,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file_name
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        static_cast<size_t>(line_number),
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        static_cast<size_t>(line_number)
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        index,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        index
                                                 )
                                         ),
                                         "Treating this as a comment",
@@ -437,16 +428,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                file_name,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                file_name
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                static_cast<size_t>(line_number),
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                static_cast<size_t>(line_number)
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                index,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                index
                                                         )
                                                 ),
                                                 '^',
@@ -467,16 +455,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file_name,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file_name
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        line_number,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        line_number
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        index,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        index
                                                 )
                                         ), "Extraneous comma", Diagnostics::SYNTAX, Diagnostics::WARNING
                                 );
@@ -485,16 +470,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                file_name,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                file_name
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                line_number,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                line_number
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                index,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                index
                                                         )
                                                 ),
                                                 '^',
@@ -512,16 +494,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file_name,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file_name
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        line_number,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        line_number
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        index,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        index
                                                 )
                                         ), "Extraneous colon", Diagnostics::SYNTAX, Diagnostics::WARNING
                                 );
@@ -530,16 +509,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                file_name,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                file_name
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                line_number,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                line_number
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                index,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                index
                                                         )
                                                 ),
                                                 '^',
@@ -584,16 +560,13 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                 Diagnostics::Diagnostic diag(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file_name,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file_name
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        line_number,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        line_number
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        index - current.size(),
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        index - current.size()
                                                 )
                                         ), stream.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
                                 );
@@ -602,17 +575,14 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                         std::make_unique<Diagnostics::SelectionContext>(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                file_name,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                file_name
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                line_number,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                line_number
                                                         ),
                                                         // Has to be index + 1 because otherwise it'll select the last character
                                                         Diagnostics::Variant<size_t>(
-                                                                index + 1,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                index + 1
                                                         )
                                                 ),
                                                 '^',
@@ -668,16 +638,13 @@ void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        parent->file_name,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        parent->file_name
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_line,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_line
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_column,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_column
                                                 )
                                         ),
                                         '^',

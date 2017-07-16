@@ -17,13 +17,13 @@ Register::Register(std::string &which,
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
                                 Diagnostics::Variant<std::string>(
-                                        file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        file
                                 ),
                                 Diagnostics::Variant<size_t>(
-                                        at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        at_line
                                 ),
                                 Diagnostics::Variant<size_t>(
-                                        at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                        at_column
                                 )
                         ), "Invalid register", Diagnostics::SPELLING, Diagnostics::ERROR
                 );
@@ -33,16 +33,13 @@ Register::Register(std::string &which,
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_line,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_line
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_column,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_column
                                                 )
                                         ),
                                         '^',

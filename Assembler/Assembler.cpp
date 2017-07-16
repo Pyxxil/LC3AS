@@ -129,9 +129,15 @@ void Assembler::Assembler::assemble()
                 f.close();
 
                 if (!Config::is_set(Config::CONFIG_OPTIONS::BE_QUIET)) {
-                        Console::write(Diagnostics::Variant<std::string>("--- "));
-                        Console::write(Diagnostics::Variant<std::string>("Assembling file '" + file + "'"));
-                        Console::write(Diagnostics::Variant<std::string>(" ---\n"));
+                        Console::write(Diagnostics::Variant<std::string>(
+                                "--- ",Console::Colour(Console::FOREGROUND_COLOUR::RESET))
+                        );
+                        Console::write(Diagnostics::Variant<std::string>(
+                                "Assembling file '" + file + "'", Console::Colour(Console::FOREGROUND_COLOUR::RESET))
+                        );
+                        Console::write(Diagnostics::Variant<std::string>(
+                                " ---\n", Console::Colour(Console::FOREGROUND_COLOUR::RESET))
+                        );
                 }
 
                 Parser parser(file);
@@ -200,16 +206,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                         Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                tokenized_line.front()->file,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_line,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_line
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_column,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_column
                                         )
                                 ),
                                 "Statement before this one checks for the same condition code.",
@@ -222,16 +225,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                tokenized_line.front()->file,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line.front()->file
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line.front()->at_line,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line.front()->at_line
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line.front()->at_column,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line.front()->at_column
                                                         )
                                                 ), '^', "This might mean this line is superfluous",
                                                 lexed_lines[tokenized_line.front()->file].at(
@@ -246,16 +246,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                tokens[i - 1].front()->file,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokens[i - 1].front()->file
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokens[i - 1].front()->at_line,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokens[i - 1].front()->at_line
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokens[i - 1].front()->at_column,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokens[i - 1].front()->at_column
                                                         )
                                                 ), '^', "Checks the same condition code as this line",
                                                 lexed_lines[tokens[i - 1].front()->file].at(
@@ -272,16 +269,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                         Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                tokenized_line.front()->file,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_line,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_line
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_column,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_column
                                         )
                                 ), "Superfluous statement", Diagnostics::LOGIC, Diagnostics::WARNING
                         );
@@ -291,16 +285,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                tokenized_line[1]->file,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->file
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line[1]->at_line,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->at_line
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line[1]->at_column,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->at_column
                                                         )
                                                 ),
                                                 '^',
@@ -318,16 +309,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                 Diagnostics::SelectionContext(
                                                         Diagnostics::FileContext(
                                                                 Diagnostics::Variant<std::string>(
-                                                                        sym->second.file,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        sym->second.file
                                                                 ),
                                                                 Diagnostics::Variant<size_t>(
-                                                                        sym->second.line_number,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        sym->second.line_number
                                                                 ),
                                                                 Diagnostics::Variant<size_t>(
-                                                                        sym->second.column,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        sym->second.column
                                                                 )
                                                         ), '^', "Referred to label defined here",
                                                         lexed_lines[sym->second.file].at(sym->second.line_number - 1)
@@ -341,16 +329,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                         Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                tokenized_line.front()->file,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_line,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_line
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_column,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_column
                                         )
                                 ), "Possible infinite loop", Diagnostics::LOGIC, Diagnostics::WARNING
                         );
@@ -360,16 +345,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                tokenized_line[1]->file,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->file
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line[1]->at_line,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->at_line
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line[1]->at_column,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->at_column
                                                         )
                                                 ), '^', "Offset of -1 might cause an infinite loop",
                                                 lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line - 1)
@@ -384,16 +366,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                 Diagnostics::SelectionContext(
                                                         Diagnostics::FileContext(
                                                                 Diagnostics::Variant<std::string>(
-                                                                        sym->second.file,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        sym->second.file
                                                                 ),
                                                                 Diagnostics::Variant<size_t>(
-                                                                        sym->second.line_number,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        sym->second.line_number
                                                                 ),
                                                                 Diagnostics::Variant<size_t>(
-                                                                        sym->second.column,
-                                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                        sym->second.column
                                                                 )
                                                         ), '^', "Referred to label defined here",
                                                         lexed_lines[sym->second.file].at(sym->second.line_number - 1)
@@ -411,16 +390,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                         Diagnostics::Diagnostic diagnostic(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                tokenized_line.front()->file,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_line,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_line
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                tokenized_line.front()->at_column,
-                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                tokenized_line.front()->at_column
                                         )
                                 ),
                                 "Possible illegal trap vector",
@@ -433,16 +409,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                         Diagnostics::SelectionContext(
                                                 Diagnostics::FileContext(
                                                         Diagnostics::Variant<std::string>(
-                                                                tokenized_line[1]->file,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->file
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line[1]->at_line,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->at_line
                                                         ),
                                                         Diagnostics::Variant<size_t>(
-                                                                tokenized_line[1]->at_column,
-                                                                Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                                tokenized_line[1]->at_column
                                                         )
                                                 ),
                                                 '^',

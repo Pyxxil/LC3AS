@@ -74,9 +74,9 @@ void Token::expected(const char *const expects) const
 {
         Diagnostics::Diagnostic diag(
                 Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
+                        Diagnostics::Variant<std::string>(file),
+                        Diagnostics::Variant<size_t>(at_line),
+                        Diagnostics::Variant<size_t>(at_column)
                 ), "Expected " + std::string(expects), Diagnostics::SYNTAX, Diagnostics::ERROR
         );
 
@@ -85,13 +85,13 @@ void Token::expected(const char *const expects) const
                         Diagnostics::SelectionContext(
                                 Diagnostics::FileContext(
                                         Diagnostics::Variant<std::string>(
-                                                file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                file
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                at_line
                                         ),
                                         Diagnostics::Variant<size_t>(
-                                                at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                at_column
                                         )
                                 ), '^', "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
                                 lexed_lines[file].at(at_line - 1)

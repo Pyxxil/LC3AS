@@ -27,9 +27,9 @@ Octal::Octal(std::string &immediate, std::string &t_file, size_t line_number, si
                 // TODO: Provide helpful fixits here if possible (e.g. think of changing to base 10/16, etc.)
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
+                                Diagnostics::Variant<std::string>(file),
+                                Diagnostics::Variant<size_t>(at_line),
+                                Diagnostics::Variant<size_t>(at_column)
                         ),
                         "Invalid literal for 16 bit signed base 8 value",
                         Diagnostics::INVALID_LITERAL,
@@ -41,16 +41,13 @@ Octal::Octal(std::string &immediate, std::string &t_file, size_t line_number, si
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_line,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_line
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_column,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_column
                                                 )
                                         ), '^', "Found here", lexed_lines[file].at(at_line - 1)
                                 ), '~', token.length()

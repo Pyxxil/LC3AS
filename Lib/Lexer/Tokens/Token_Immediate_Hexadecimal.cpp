@@ -38,9 +38,9 @@ Hexadecimal::Hexadecimal(std::string &immediate,
         if (!is_valid) {
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
-                                Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
+                                Diagnostics::Variant<std::string>(file),
+                                Diagnostics::Variant<size_t>(at_line),
+                                Diagnostics::Variant<size_t>(at_column)
                         ),
                         "Invalid literal for 16 bit signed base 16 value",
                         Diagnostics::INVALID_LITERAL,
@@ -52,16 +52,13 @@ Hexadecimal::Hexadecimal(std::string &immediate,
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
                                                 Diagnostics::Variant<std::string>(
-                                                        file,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        file
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_line,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_line
                                                 ),
                                                 Diagnostics::Variant<size_t>(
-                                                        at_column,
-                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                        at_column
                                                 )
                                         ), '^', "Found here", lexed_lines[file].at(at_line - 1)
                                 ), '~', token.length()

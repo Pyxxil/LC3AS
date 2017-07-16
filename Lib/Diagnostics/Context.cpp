@@ -6,24 +6,14 @@
 
 static const Console::Colour HIGHLIGHTER(Console::FOREGROUND_COLOUR::MAGENTA);
 
-Diagnostics::FileContext::FileContext(std::string &name, size_t t_line, size_t t_col)
+Diagnostics::FileContext::FileContext(std::string name, size_t t_line, size_t t_col)
         : file_name(name), column(t_col), line(t_line)
 { }
 
-Diagnostics::FileContext::FileContext(std::string &&name, size_t t_line, size_t t_col)
-        : file_name(name), column(t_col), line(t_line)
-{ }
-
-Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> &name,
-                                      Diagnostics::Variant<size_t> &t_line,
-                                      Diagnostics::Variant<size_t> &t_col)
-        : file_name(name), column(t_col), line(t_line)
-{ }
-
-Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> &&name,
-                                      Diagnostics::Variant<size_t> &&t_line,
-                                      Diagnostics::Variant<size_t> &&t_col)
-        : file_name(name), column(t_col), line(t_line)
+Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> name,
+                                      Diagnostics::Variant<size_t> t_line,
+                                      Diagnostics::Variant<size_t> t_col)
+        : file_name(std::move(name)), column(std::move(t_col)), line(std::move(t_line))
 { }
 
 Diagnostics::Context::Context(Diagnostics::FileContext file,
@@ -40,14 +30,14 @@ Diagnostics::Context::Context(Diagnostics::FileContext file,
 std::ostream &Diagnostics::Context::write_to(std::ostream &os) const
 {
         return file_information.write_to(os) << ' ' << diagnostic_colours[DIAGNOSTIC::NOTE] << ": "
-                  << Console::reset << message;
+                                             << Console::reset << message;
 }
 
 Diagnostics::HighlightContext::HighlightContext(SelectionContext t_selector,
                                                 char t_highlighter,
                                                 int t_highlight_length,
                                                 std::string changer)
-        : Context(std::move(t_selector.file_information), std::move(t_selector.message), t_selector.line, HIGHLIGHT)
+        : Context(std:: move(t_selector.file_information), t_selector.message, t_selector.line, HIGHLIGHT)
           , highlighter(t_highlighter), highlight_length(t_highlight_length - 1), selector(t_selector)
           , fix_it(std::move(changer))
 { }
