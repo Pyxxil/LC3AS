@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 String_Matcher::String_Matcher()
-        : m_string(), best { std::numeric_limits<long>::max(), "" }
+        : best { std::numeric_limits<long>::max(), "" }
 {
 
 }
@@ -22,17 +22,17 @@ std::string String_Matcher::best_match() const
 
 void String_Matcher::consider(const std::string &str)
 {
-        const int length_difference = std::abs(static_cast<int>(str.length() - m_string.length()));
+        auto length_difference = std::abs(static_cast<int>(str.length() - m_string.length()));
         if (length_difference > best.first) {
                 return;
         }
 
-        const int cutoff = static_cast<int>(std::max(m_string.length(), str.length())) / 2;
+        auto cutoff = static_cast<int>(std::max(m_string.length(), str.length())) / 2;
         if (length_difference > cutoff) {
                 return;
         }
 
-        const int distance = static_cast<int>(levenshtein_distance(m_string, str));
+        auto distance = static_cast<int>(levenshtein_distance(m_string, str));
         if (distance <= best.first || (str.length() > m_string.length() && best.second.length() < m_string.length())) {
                 /* The second half of this if statement should help in cases where we have the following:
                  * Valid labels = { oct, b }
@@ -51,7 +51,9 @@ std::int32_t String_Matcher::levenshtein_distance(const std::string &string, con
 
         if (string_length == 0) {
                 return static_cast<std::int32_t>(target_length);
-        } else if (target_length == 0) {
+        }
+
+        if (target_length == 0) {
                 return static_cast<std::int32_t>(string_length);
         }
 

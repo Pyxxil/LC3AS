@@ -5,15 +5,9 @@
 
 #include "Diagnostics.hpp"
 
-Token::Token()
-        : token(), token_uppercase(), file(), assembled()
-{
-
-}
-
 Token::Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column)
         : token(t_token), token_uppercase(t_token_uppercase), file(t_file)
-          , assembled(), at_line(line), at_column(column), is_valid(true)
+          ,at_line(line), at_column(column)
 {
 
 }
@@ -80,9 +74,9 @@ void Token::expected(const char *const expects) const
 {
         Diagnostics::Diagnostic diag(
                 Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                 ), "Expected " + std::string(expects), Diagnostics::SYNTAX, Diagnostics::ERROR
         );
 
@@ -90,9 +84,9 @@ void Token::expected(const char *const expects) const
                 std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                                 Diagnostics::FileContext(
-                                        Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                                        Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                        Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                        Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                        Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                        Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                                 ), '^', "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
                                 std::string(lexed_lines[file].at(at_line - 1))
                         ), '~', token.length()
@@ -124,7 +118,7 @@ void Token::invalid_argument_count(size_t provided, size_t expected) const
         // the number of arguments + the token itself, it's a little easier to do here.
         std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
 
-        if (at_line) {
+        if (0u != at_line) {
                 std::cerr << "at line " << std::dec << at_line << ": ";
         }
 

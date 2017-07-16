@@ -6,7 +6,7 @@
 class Immediate : public Token
 {
 public:
-        Immediate();
+        Immediate() = default;
         Immediate(std::string &immediate,
                   std::string &immediate_uppercase,
                   std::string &t_file,
@@ -14,9 +14,9 @@ public:
                   size_t column);
 
         virtual Token::token_type type() const override;
-        virtual void requires_too_many_bits(int allowed_bits,
+        void requires_too_many_bits(int allowed_bits,
                                             bool is_signed,
-                                            const Token *const caller,
+                                            const Token *caller,
                                             const std::map<std::string, Symbol> &symbols) override;
 
         std::int16_t value = 0;

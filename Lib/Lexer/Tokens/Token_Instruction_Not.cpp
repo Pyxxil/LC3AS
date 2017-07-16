@@ -6,12 +6,6 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Not::Not()
-        : Instruction()
-{
-
-}
-
 Not::Not(std::string &instruction,
          std::string &instruction_uppercase,
          std::string &t_file,
@@ -62,7 +56,9 @@ bool Not::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(2)->type() != Token::REGISTER) {
+        }
+
+        if (tokens.at(2)->type() != Token::REGISTER) {
                 tokens.at(2)->expected("register");
                 return (is_valid = false);
         }

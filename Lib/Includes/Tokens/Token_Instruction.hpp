@@ -6,7 +6,7 @@
 class Instruction : public Token
 {
 public:
-        Instruction();
+        Instruction() = default;
         Instruction(std::string &instruction,
                     std::string &instruction_uppercase,
                     std::string &t_file,

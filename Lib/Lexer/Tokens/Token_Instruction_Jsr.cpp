@@ -12,7 +12,7 @@ Jsr::Jsr(std::string &instruction,
          std::string &t_file,
          size_t line_number,
          size_t column)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), provided()
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }
@@ -28,7 +28,7 @@ std::int32_t Jsr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         int offset = 0;
 
         if (tokens.at(1)->type() == Token::LABEL) {
-                if (!symbols.count(tokens.at(1)->token)) {
+                if (0u == symbols.count(tokens.at(1)->token)) {
                         std::static_pointer_cast<Label>(tokens.at(1))->not_found(symbols);
                         return -1;
                 }

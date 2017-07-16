@@ -10,19 +10,24 @@
 class Lexer
 {
 public:
-        Lexer() = delete;
-        Lexer(const std::string &t_file);
-        Lexer(Lexer *const t_parent, const std::string &t_file, size_t line, size_t col, size_t len);
-        Lexer(Lexer *const other)
-                : at_line(other->at_line), at_column(other->at_column), length(other->length), file_name(other->file_name)
-                  , file(std::move(other->file)), symbols(other->symbols), parent(other), tokens(other->tokens)
+        explicit Lexer(const std::string &t_file);
+        Lexer(Lexer *t_parent, const std::string &t_file, size_t line, size_t col, size_t len);
+        explicit Lexer(Lexer *const other)
+                : at_line(other->at_line), at_column(other->at_column), length(other->length)
+                  , file_name(other->file_name), file(std::move(other->file)), symbols(other->symbols)
+                  , parent(other), tokens(other->tokens)
         { }
+        Lexer(const Lexer &other) = default;
+        Lexer(Lexer &&other) = default;
+
+        Lexer &operator =(const Lexer &rhs) = default;
+        Lexer &operator = (Lexer &&rhs) = default;
 
         ~Lexer();
 
         void lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens, std::map<std::string, Symbol> &t_symbols);
         std::shared_ptr<Token> tokenize(std::string &word, size_t line_number, size_t column);
-        void tokenizeLine(const std::string &line, size_t line_number, std::vector<std::shared_ptr<Token>> &into);
+        void tokenizeLine(std::string line, size_t line_number, std::vector<std::shared_ptr<Token>> &into);
         void addToken(std::string &token,
                       std::vector<std::shared_ptr<Token>> &to,
                       size_t line_number,

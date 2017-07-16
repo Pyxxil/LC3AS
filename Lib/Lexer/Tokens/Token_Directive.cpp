@@ -1,11 +1,5 @@
 #include "Tokens/Token_Directive.hpp"
 
-Directive::Directive()
-        : Token()
-{
-
-}
-
 Directive::Directive(std::string &directive,
                      std::string &directive_uppercase,
                      std::string &t_file,

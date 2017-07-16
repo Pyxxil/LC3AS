@@ -1,5 +1,7 @@
 #include "Tokens/Token_Immediate_Hexadecimal.hpp"
 
+#include <limits>
+
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
@@ -36,9 +38,9 @@ Hexadecimal::Hexadecimal(std::string &immediate,
         if (!is_valid) {
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                                Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                         ),
                         "Invalid literal for 16 bit signed base 16 value",
                         Diagnostics::INVALID_LITERAL,
@@ -49,12 +51,18 @@ Hexadecimal::Hexadecimal(std::string &immediate,
                         std::make_unique<Diagnostics::HighlightContext>(
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_line,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_column,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        file,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_line,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_column,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), '^', "Found here",
                                         std::string(lexed_lines[file].at(at_line - 1))
                                 ), '~', token.length()

@@ -6,7 +6,7 @@
 class Character : public Immediate
 {
 public:
-        Character();
+        Character() = default;
         Character(std::string &character,
                   std::string &t_file,
                   size_t line_number,

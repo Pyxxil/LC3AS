@@ -40,7 +40,9 @@ bool Stringz::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::_STRING) {
                 tokens.at(1)->expected("string literal");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 

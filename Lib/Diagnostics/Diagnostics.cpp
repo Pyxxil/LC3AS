@@ -1,5 +1,7 @@
 #include "Diagnostics.hpp"
 
+#include <algorithm>
+
 static std::deque<Diagnostics::Diagnostic> diagnostics_log;
 
 const Diagnostics::diagnostic_type Diagnostics::diagnostic_colours[] = {
@@ -61,15 +63,11 @@ size_t Diagnostics::count()
         return diagnostics_log.size();
 }
 
-Diagnostics::Diagnostic::Diagnostic(const Diagnostics::FileContext &file)
-        : message("Something happened..."), d_type(), d(), context(), info(file)
-{ }
-
-Diagnostics::Diagnostic::Diagnostic(const Diagnostics::FileContext &file,
-                                    std::string &&t_message,
+Diagnostics::Diagnostic::Diagnostic(Diagnostics::FileContext file,
+                                    std::string t_message,
                                     Diagnostics::DIAGNOSTIC_TYPE t_type,
                                     Diagnostics::DIAGNOSTIC diagnostic)
-        : message(t_message), d_type(t_type), d(diagnostic), context(), info(file)
+        : message(std::move(t_message)), d_type(t_type), d(diagnostic), info(std::move(file))
 { }
 
 Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &other)
@@ -79,7 +77,14 @@ Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &other)
 
 }
 
-Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagnostic &&rhs)
+Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic &&other) noexcept
+        : message(other.message), d_type(other.d_type), d(other.d), context(std::move(other.context))
+          , info(other.info)
+{
+
+}
+
+Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagnostic &&rhs) noexcept
 {
         if (&rhs != this) {
                 message = rhs.message;
@@ -90,38 +95,12 @@ Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagno
         return *this;
 }
 
-Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator =(Diagnostics::Diagnostic &rhs)
+std::ostream &Diagnostics::Diagnostic::write_to(std::ostream &os) const
 {
-        message = rhs.message;
-        d       = rhs.d;
-        d_type  = rhs.d_type;
-        context = std::move(rhs.context);
-        return *this;
-}
+        info.write_to(os) << ' ' << diagnostic_colours[type()] << ": " << message << '\n';
 
-Diagnostics::Diagnostic &Diagnostics::Diagnostic::operator ()()
-{
-        return *this;
-}
-
-std::ostream &Diagnostics::operator <<(std::ostream &os, const Diagnostics::Diagnostic &d_msg)
-{
-        os << d_msg.info << ' ' << diagnostic_colours[d_msg.type()] << ": " << d_msg.message << '\n';
-
-        if (d_msg.has_context()) {
-                for (auto &&context_item : d_msg.context) {
-                        switch (context_item->type()) {
-                        case Context::HIGHLIGHT:
-                                Console::write_line(*(static_cast<HighlightContext *>(context_item.get())));
-                                break;
-                        case Context::SELECTOR:
-                                Console::write_line(*(static_cast<SelectionContext *>(context_item.get())));
-                                break;
-                        default:
-                                Console::write_line(*context_item);
-                                break;
-                        }
-                }
+        for (auto &&context_item : context) {
+                Console::write_line(*context_item);
         }
 
         return os;

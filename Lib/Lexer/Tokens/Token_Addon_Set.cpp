@@ -73,14 +73,18 @@ bool Set::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 
         if (tokens.at(2)->type() != Token::IMMEDIATE) {
-                tokens.at(2)->expected("value value");
+                tokens.at(2)->expected("immediate value");
                 return (is_valid = false);
-        } else if (!tokens.at(2)->is_valid) {
+        }
+
+        if (!tokens.at(2)->is_valid) {
                 return (is_valid = false);
         }
 
@@ -95,11 +99,7 @@ std::int32_t Set::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
 
         const std::int16_t value = std::static_pointer_cast<Immediate>(tokens.at(2))->value;
 
-        if (value > 15 || value < -16) {
-                return 3;
-        } else {
-                return 2;
-        }
+        return (value > 15 || value < -16) ? 3 : 2;
 }
 
 std::string Set::disassemble(uint16_t &program_counter,

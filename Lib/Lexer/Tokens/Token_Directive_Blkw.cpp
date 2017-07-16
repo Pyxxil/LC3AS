@@ -32,7 +32,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                 if (tokens.at(2)->type() == Token::IMMEDIATE) {
                         fill = static_cast<uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
                 } else if (tokens.at(2)->type() == Token::LABEL) {
-                        if (!symbols.count(tokens.at(2)->token)) {
+                        if (0u == symbols.count(tokens.at(2)->token)) {
                                 std::static_pointer_cast<Label>(tokens.at(2))->not_found(symbols);
                                 return -1;
                         }
@@ -60,7 +60,9 @@ bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::IMMEDIATE) {
                 tokens.at(1)->expected("immediate value");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 
@@ -93,7 +95,7 @@ void Blkw::invalid_argument_count(size_t provided, size_t expected) const
 
         std::cerr << "ERROR: ";
 
-        if (at_line) {
+        if (0u != at_line) {
                 std::cerr << "Line " << std::dec << at_line << ": ";
         }
 
@@ -110,7 +112,7 @@ std::string Blkw::disassemble(uint16_t &program_counter,
 {
         std::stringstream stream;
 
-        int value = static_cast<int>(assembled.front());
+        auto value = static_cast<int>(assembled.front());
 
         stream
                 // Address in memory

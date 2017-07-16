@@ -48,11 +48,15 @@ bool Str::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(2)->type() != Token::REGISTER) {
+        }
+
+        if (tokens.at(2)->type() != Token::REGISTER) {
                 tokens.at(2)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(3)->type() != Token::IMMEDIATE) {
-                tokens.at(3)->expected("value value");
+        }
+
+        if (tokens.at(3)->type() != Token::IMMEDIATE) {
+                tokens.at(3)->expected("immediate value");
                 return (is_valid = false);
         }
 

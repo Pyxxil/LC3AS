@@ -12,7 +12,9 @@ namespace Assembler
         class Assembler
         {
         public:
-                Assembler();
+                Assembler()
+                        : symbol_padding(0)
+                { }
 
                 // TODO: Options:
                 //      --include/-I[=]Directory:
@@ -43,7 +45,7 @@ namespace Assembler
                 std::vector<std::vector<std::shared_ptr<Token>>> tokens;
                 std::map<std::string, Symbol>                    symbols;
                 std::vector<uint16_t>                            assembled;
-                int                                              symbol_padding;
+                int                                              symbol_padding { };
         };
 
         int assemble(int argc, char **args);

@@ -13,7 +13,7 @@ St::St(std::string &instruction,
        std::string &t_file,
        size_t line_number,
        size_t column)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), provided()
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {
 
 }
@@ -29,7 +29,7 @@ std::int32_t St::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         int offset = 0;
 
         if (tokens.at(2)->type() == Token::LABEL) {
-                if (!symbols.count(tokens.at(2)->token)) {
+                if (0u == symbols.count(tokens.at(2)->token)) {
                         std::static_pointer_cast<Label>(tokens.at(2))->not_found(symbols);
                         return -1;
                 }
@@ -65,8 +65,10 @@ bool St::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::REGISTER) {
                 tokens.at(1)->expected("register");
                 return (is_valid = false);
-        } else if (tokens.at(2)->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
-                tokens.at(2)->expected("label or value value");
+        }
+
+        if (tokens.at(2)->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
+                tokens.at(2)->expected("label or immediate value");
                 return (is_valid = false);
         }
 

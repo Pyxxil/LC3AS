@@ -15,7 +15,7 @@ Br::Br(std::string &instruction,
        bool n,
        bool z,
        bool p)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p), provided()
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p)
 {
 
 }
@@ -28,7 +28,7 @@ Br::Br(std::string &&instruction,
        bool n,
        bool z,
        bool p)
-        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p), provided()
+        : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p)
 {
 
 }
@@ -44,7 +44,7 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         int offset = 0;
 
         if (tokens.at(1)->type() == Token::LABEL) {
-                if (!symbols.count(tokens.at(1)->token)) {
+                if (0u == symbols.count(tokens.at(1)->token)) {
                         std::static_pointer_cast<Label>(tokens.at(1))->not_found(symbols);
                         return -1;
                 }
@@ -61,7 +61,8 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         provided = tokens.at(1);
-        assembled.emplace_back(static_cast<uint16_t>(0x0000 | N << 11 | Z << 10 | P << 9 | (offset & 0x1FF)));
+        assembled.emplace_back(static_cast<uint16_t>(0x0000 |
+                static_cast<int>(N) << 11 | static_cast<int>(Z) << 10 | static_cast<int>(P) << 9 | (offset & 0x1FF)));
 
         return 1;
 }
@@ -77,7 +78,9 @@ bool Br::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         if (tokens.at(1)->type() != Token::LABEL && tokens.at(1)->type() != Token::IMMEDIATE) {
                 tokens.at(1)->expected("label or immediate value");
                 return (is_valid = false);
-        } else if (!tokens.at(1)->is_valid) {
+        }
+
+        if (!tokens.at(1)->is_valid) {
                 return (is_valid = false);
         }
 

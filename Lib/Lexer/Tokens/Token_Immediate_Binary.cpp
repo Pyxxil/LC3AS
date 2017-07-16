@@ -28,7 +28,7 @@ Binary::Binary(std::string &immediate,
         } else {
                 try {
                         const uint64_t v = std::bitset<16>(immediate).to_ullong();
-                        if (v & (~0xFFFFull)) {
+                        if (v & ~0xFFFFull) {
                                 is_valid = false;
                         } else {
                                 value = static_cast<int16_t>(v);
@@ -41,9 +41,9 @@ Binary::Binary(std::string &immediate,
         if (!is_valid) {
                 Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(file, Console::FOREGROUND_COLOUR::YELLOW),
-                                Diagnostics::Variant<size_t>(at_line, Console::FOREGROUND_COLOUR::YELLOW),
-                                Diagnostics::Variant<size_t>(at_column, Console::FOREGROUND_COLOUR::YELLOW)
+                                Diagnostics::Variant<std::string>(file, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                Diagnostics::Variant<size_t>(at_line, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)),
+                                Diagnostics::Variant<size_t>(at_column, Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
                         ),
                         "Invalid literal for 16 bit signed base 2 value",
                         Diagnostics::INVALID_LITERAL,
@@ -54,12 +54,18 @@ Binary::Binary(std::string &immediate,
                         std::make_unique<Diagnostics::HighlightContext>(
                                 Diagnostics::SelectionContext(
                                         Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(file,
-                                                                                  Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_line,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW),
-                                                Diagnostics::Variant<size_t>(at_column,
-                                                                             Console::FOREGROUND_COLOUR::YELLOW)
+                                                Diagnostics::Variant<std::string>(
+                                                        file,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_line,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                ),
+                                                Diagnostics::Variant<size_t>(
+                                                        at_column,
+                                                        Console::Colour(Console::FOREGROUND_COLOUR::YELLOW)
+                                                )
                                         ), '^', "Found here",
                                         std::string(lexed_lines[file].at(at_line - 1))
                                 ), '~', token.length()
