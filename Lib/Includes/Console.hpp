@@ -20,11 +20,11 @@ namespace Console
         BLUE    = 1,
         GREEN   = 2,
         YELLOW  = 14,
-        RED     = 4,
-        MAGENTA = 5,
-        CYAN    = 3,
-        WHITE   = 7,
-        RESET   = FOREGROUND_COLOUR::WHITE,
+        RED     = 12,
+        MAGENTA = 13,
+        CYAN    = 11,
+        WHITE   = 15,
+        RESET   = 7,
     };
 
     enum class BACKGROUND_COLOUR : int
@@ -42,7 +42,7 @@ namespace Console
 
     enum class MODIFIER
     {
-        BOLD      = BACKGROUND_INTENSITY,
+        BOLD      = FOREGROUND_INTENSITY,
         REVERSE   = COMMON_LVB_REVERSE_VIDEO,
         UNDERLINE = COMMON_LVB_UNDERSCORE,
         NORMAL    = 0,

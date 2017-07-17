@@ -1,27 +1,47 @@
 #include "Configuration.hpp"
 
-#if !defined(_WIN64)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#include <boost/filesystem.hpp>
-#include <utility>
-#pragma GCC diagnostic pop
-#pragma GCC diagnostic pop
-#endif
+#include <experimental/filesystem>
 
 #include "Diagnostics.hpp"
 
 struct Directory
 {
         // TODO: Probably move this somewhere else ... Maybe the Lexer?
-        explicit Directory(std::string _directory, std::string _name = "")
-                : directory(std::move(_directory)), name(std::move(_name)), is_directory(false)
+        explicit Directory(const std::string &_directory, std::string _name = "")
+                : directory(_directory), name(std::move(_name)), exists(std::experimental::filesystem::exists(directory))
+                  , is_directory(std::experimental::filesystem::is_directory(directory))
         { }
 
-        std::string name;
-	    std::string directory;
+        bool contains(const std::experimental::filesystem::path &path)
+        {
+                (void) path;
+
+                if (!(exists && is_directory)) {
+                        if (Config::is_set(Config::VERBOSE)) {
+                                /*
+                                std::stringstream ss;
+                                ss << "Ignoring invalid directory \"" << name << '"';
+                                Console::write_line(ss.str());
+                                */
+                        }
+                        return false;
+                }
+
+                if (Config::is_set(Config::VERBOSE)) {
+                        /*
+                        std::stringstream ss;
+                        ss << "Searching \"" << name << '"';
+                        Console::write_line(ss.str());
+                        */
+                }
+
+                return false;
+        }
+
+        std::experimental::filesystem::path directory;
+        std::string             name;
+
+        bool exists;
         bool is_directory;
 };
 
@@ -41,29 +61,28 @@ void Config::add_search_directory(const std::string &&directory, const std::stri
 
 std::string Config::find_path(const std::string &path)
 {
-/*
         // TODO: This should all be done in a different file (Config is the wrong place).
-        const boost::filesystem::path p { path };
+        const std::experimental::filesystem::path p { path };
 
-        if (!boost::filesystem::is_regular_file(p)) {
+        if (!std::experimental::filesystem::is_regular_file(p)) {
                 return std::string();
         }
 
-        if (p.is_absolute() && boost::filesystem::exists(p)) {
+        if (p.is_absolute() && std::experimental::filesystem::exists(p)) {
                 return path;
         }
 
-        if (p.is_relative() && boost::filesystem::exists(p)) {
-                const boost::filesystem::path abs_path = boost::filesystem::absolute(p);
+        if (p.is_relative() && std::experimental::filesystem::exists(p)) {
+                const std::experimental::filesystem::path abs_path = std::experimental::filesystem::absolute(p);
                 return abs_path.string();
         }
 
         for (auto &&dir : search_directories) {
                 if (dir.contains(p)) {
-                        const boost::filesystem::path s { boost::filesystem::absolute(path) };
+                        const std::experimental::filesystem::path s { std::experimental::filesystem::absolute(path) };
                         return s.string();
                 }
         }
-*/
+
         return std::string();
 }

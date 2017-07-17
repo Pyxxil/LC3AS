@@ -9,7 +9,9 @@ cmake-build*
 *.vcxproj*
 *.dir/
 x64/
-Debug/
+[Dd]ebug/
+[Rr]elease/
+*.exe
 *.sln
 *.psess
 *.vsp
