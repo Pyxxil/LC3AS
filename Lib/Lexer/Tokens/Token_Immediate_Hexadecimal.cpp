@@ -1,6 +1,9 @@
 #include "Tokens/Token_Immediate_Hexadecimal.hpp"
 
 #include <limits>
+#if defined(_WIN64)
+#include <cctype>
+#endif
 
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"

@@ -1,7 +1,7 @@
 #include "Lib/Includes/String_Matcher.hpp"
 
+#include <algorithm>
 #include <limits>
-#include <cstdlib>
 
 String_Matcher::String_Matcher()
         : m_string(), best { std::numeric_limits<long>::max(), "" }

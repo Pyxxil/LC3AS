@@ -5,13 +5,50 @@
 #include <sstream>
 #include <string>
 
-// TODO: Make this cross-platform
-//#ifdef _WIN32
-//#include <windows.h>
-//#endif
+#if defined(_WIN64)
+#define NOMINMAX
+#include <Windows.h>
+#undef ERROR
+#endif
 
 namespace Console
 {
+#if defined(_WIN64)
+    enum class FOREGROUND_COLOUR : int
+    {
+        BLACK   = 0,
+        BLUE    = 1,
+        GREEN   = 2,
+        YELLOW  = 14,
+        RED     = 4,
+        MAGENTA = 5,
+        CYAN    = 3,
+        WHITE   = 7,
+        RESET   = FOREGROUND_COLOUR::WHITE,
+    };
+
+    enum class BACKGROUND_COLOUR : int
+    {
+        BLACK   = 0x00,
+        RED     = 0x40,
+        GREEN   = 0x20,
+        YELLOW  = 0x60,
+        BLUE    = 0x10,
+        MAGENTA = 0x50,
+        CYAN    = 0x30,
+        WHITE   = 0x70,
+        RESET   = BACKGROUND_COLOUR::BLACK,
+    };
+
+    enum class MODIFIER
+    {
+        BOLD      = BACKGROUND_INTENSITY,
+        REVERSE   = COMMON_LVB_REVERSE_VIDEO,
+        UNDERLINE = COMMON_LVB_UNDERSCORE,
+        NORMAL    = 0,
+        RESET     = NORMAL,
+    };
+#else
         enum class FOREGROUND_COLOUR
         {
                 BLACK   = 30,
@@ -52,6 +89,15 @@ namespace Console
                 OVERLINED = 53,
         };
 
+        static const Colour reset(
+            FOREGROUND_COLOUR::RESET,
+            MODIFIER::RESET,
+            BACKGROUND_COLOUR::RESET
+        );
+
+        void init() {}
+#endif
+
         struct Colour
         {
                 explicit Colour(FOREGROUND_COLOUR _fg,
@@ -77,8 +123,13 @@ namespace Console
 
                 friend std::ostream &operator <<(std::ostream &os, const Colour &colour)
                 {
+#if defined(_WIN64)
+                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), static_cast<int>(colour.fg) | static_cast<int>(colour.bg) | static_cast<int>(colour.mod));
+                    return os;
+#else
                         return os << "\033[" << static_cast<int>(colour.fg) << ';' << static_cast<int>(colour.bg)
                                   << ';' << static_cast<int>(colour.mod) << 'm';
+#endif
                 }
 
                 bool operator ==(const Colour &other) const
@@ -97,7 +148,7 @@ namespace Console
                 MODIFIER          mod;
         };
 
-        extern const Colour reset;
+        const Colour reset(FOREGROUND_COLOUR::RESET);
 
         template <typename T>
         inline void write(const T &message)

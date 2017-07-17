@@ -2,6 +2,11 @@
 
 #include <regex>
 
+#if defined(_WIN64)
+// Windows doesn't like not having this here apparently.
+#include <cctype>
+#endif
+
 #include "Tokens/Tokens.hpp"
 #include "LexHelper.hpp"
 

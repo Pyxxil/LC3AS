@@ -1,5 +1,6 @@
 #include "Configuration.hpp"
 
+#if !defined(_WIN64)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic push
@@ -8,47 +9,19 @@
 #include <utility>
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
+#endif
 
 #include "Diagnostics.hpp"
 
 struct Directory
 {
         // TODO: Probably move this somewhere else ... Maybe the Lexer?
-        explicit Directory(const std::string &_directory, std::string _name = "")
-                : directory(_directory), name(std::move(_name)), exists(boost::filesystem::exists(directory))
-                  , is_directory(boost::filesystem::is_directory(directory))
+        explicit Directory(std::string _directory, std::string _name = "")
+                : directory(std::move(_directory)), name(std::move(_name)), is_directory(false)
         { }
 
-        bool contains(const boost::filesystem::path &path)
-        {
-                (void) path;
-
-                if (!(exists && is_directory)) {
-                        if (Config::is_set(Config::VERBOSE)) {
-                                /*
-                                std::stringstream ss;
-                                ss << "Ignoring invalid directory \"" << name << '"';
-                                Console::write_line(ss.str());
-                                */
-                        }
-                        return false;
-                }
-
-                if (Config::is_set(Config::VERBOSE)) {
-                        /*
-                        std::stringstream ss;
-                        ss << "Searching \"" << name << '"';
-                        Console::write_line(ss.str());
-                        */
-                }
-
-                return false;
-        }
-
-        boost::filesystem::path directory;
-        std::string             name;
-
-        bool exists;
+        std::string name;
+	    std::string directory;
         bool is_directory;
 };
 
@@ -68,6 +41,7 @@ void Config::add_search_directory(const std::string &&directory, const std::stri
 
 std::string Config::find_path(const std::string &path)
 {
+/*
         // TODO: This should all be done in a different file (Config is the wrong place).
         const boost::filesystem::path p { path };
 
@@ -90,6 +64,6 @@ std::string Config::find_path(const std::string &path)
                         return s.string();
                 }
         }
-
+*/
         return std::string();
 }

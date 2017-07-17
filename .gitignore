@@ -1,3 +1,21 @@
+tests/
+
+# CLion
 .idea/
 cmake-build*
-tests/
+
+# Visual Studio/Windows
+.vs/
+*.vcxproj*
+*.dir/
+x64/
+Debug/
+*.sln
+*.psess
+*.vsp
+
+# CMake
+CMakeFiles/
+*/cmake_install*
+cmake_install.cmake
+CMakeCache.txt

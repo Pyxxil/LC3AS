@@ -1,6 +1,9 @@
 #include "Context.hpp"
 
 #include <iomanip>
+#if defined (_WIN64)
+#include <cctype>
+#endif
 
 #include "Diagnostics.hpp"
 
