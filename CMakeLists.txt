@@ -49,11 +49,14 @@ target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
 target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )
 
 if ( APPLE )
+        if ( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+                set ( Boost_USE_STATIC_LIBS ON )
+        endif ()
         find_package ( Boost REQUIRED COMPONENTS filesystem system )
         target_link_libraries ( LC3AS PUBLIC "${Boost_FILESYSTEM_LIBRARY}" "${Boost_SYSTEM_LIBRARY}" )
         target_include_directories ( LC3AS PUBLIC "${Boost_INCLUDE_DIR}" )
 elseif ( UNIX )
-        # GCC on linux requires this
+        # GCC on linux requires this to use experimental/filesystem
         target_link_libraries ( LC3AS PUBLIC stdc++fs )
 endif ()
 
