@@ -32,9 +32,9 @@ set ( ASSEMBLER_INCLUDE_DIRECTORIES "" )
 set ( DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -pg -pedantic )
 
 if ( NOT WIN32 )
-	set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion )
-	set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ -Wno-error=effc++ )
-	set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion )
+        set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion )
+        set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ -Wno-error=effc++ )
+        set ( DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion )
 endif ()
 
 set ( RELEASE_FLAGS ${COMPILE_FLAGS} -O3 -flto -mtune=native -march=native )
@@ -42,7 +42,7 @@ set ( RELEASE_FLAGS ${COMPILE_FLAGS} -O3 -flto -mtune=native -march=native )
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Lib" )
 add_subdirectory ( "${CMAKE_SOURCE_DIR}/Assembler" )
 
-add_executable ( LC3AS "${LIBRARY_SOURCE_FILES}" "${LIBRARY_HEADER_FILES}" "${ASSEMBLER_SOURCE_FILES}" "${ASSEMBLER_HEADER_FILES}")
+add_executable ( LC3AS "${LIBRARY_SOURCE_FILES}" "${LIBRARY_HEADER_FILES}" "${ASSEMBLER_SOURCE_FILES}" "${ASSEMBLER_HEADER_FILES}" )
 
 target_include_directories ( LC3AS PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}" "${ASSEMBLER_INCLUDE_DIRECTORIES}" )
 target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
@@ -52,6 +52,9 @@ if ( APPLE )
         find_package ( Boost REQUIRED COMPONENTS filesystem system )
         target_link_libraries ( LC3AS PUBLIC "${Boost_FILESYSTEM_LIBRARY}" "${Boost_SYSTEM_LIBRARY}" )
         target_include_directories ( LC3AS PUBLIC "${Boost_INCLUDE_DIR}" )
+elseif ( UNIX )
+        # GCC on linux requires this
+        target_link_libraries ( LC3AS PUBLIC stdc++fs )
 endif ()
 
 if ( ALLOW_EXTRAS )

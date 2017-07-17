@@ -187,7 +187,7 @@ void Assembler::Assembler::generate_machine_code()
  *
  * These checks are mostly for figuring out any small logic errors (if any) there are in the code,
  * e.g. A branch with an offset of 0 is superfluous, a branch with an offset of -1 is likely an
- * infitie loop, etc.
+ * infinite loop, etc.
  *
  * Some of these are just there in the case they're accidents, as some of them can be useful.
  *

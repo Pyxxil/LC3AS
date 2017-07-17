@@ -16,7 +16,7 @@ namespace Diagnostics
                         : information(var), colour(std::move(col))
                 { }
                 Variant(const Variant<T> &other) = default;
-                Variant(Variant<T> &&other)
+                Variant(Variant<T> &&other) noexcept
                         : information(other.information), colour(std::move(other.colour))
                 { }
                 Variant &operator =(const Variant<T> &rhs) = default;

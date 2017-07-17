@@ -51,8 +51,8 @@ struct Directory
                 return false;
         }
 
-        fs::path directory;
-        std::string             name;
+        fs::path    directory;
+        std::string name;
 
         bool exists;
         bool is_directory;

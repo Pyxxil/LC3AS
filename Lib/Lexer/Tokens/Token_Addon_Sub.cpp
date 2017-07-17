@@ -126,9 +126,9 @@ std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
                 return std::static_pointer_cast<Register>(tokens.at(1))->reg !=
                        std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg ? 5 : 3;
 
-        } else {
-                return -1;
         }
+
+        return -1;
 }
 
 void Sub::invalid_argument_count(size_t provided, size_t expected) const

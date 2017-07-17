@@ -154,8 +154,8 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
                                                 std::map<std::string, Symbol>                    _symbols;
 
                                                 Lexer lexer(
-                                                        this, file_with_path, tokenized_line.front()->at_line, tokenized_line[1]->at_column,
-                                                        tokenized_line[1]->token.length()
+                                                        this, file_with_path, tokenized_line.front()->at_line,
+                                                        tokenized_line[1]->at_column, tokenized_line[1]->token.length()
                                                 );
                                                 lexer.lex(_tokens, _symbols);
 
@@ -585,7 +585,8 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                                                         Diagnostics::Variant<size_t>(
                                                                 line_number
                                                         ),
-                                                        // Has to be index + 1 because otherwise it'll select the last character
+                                                        // Has to be index + 1 because otherwise it'll select the last
+                                                        // character
                                                         Diagnostics::Variant<size_t>(
                                                                 index + 1
                                                         )
@@ -670,7 +671,8 @@ Lexer::Lexer(const std::string &t_file)
 }
 
 Lexer::Lexer(Lexer *const t_parent, const std::string &t_file, size_t line, size_t col, size_t len)
-        : at_line(line), at_column(col), length(len), file_name(t_file), file(t_file), symbols(), parent(t_parent), tokens()
+        : at_line(line), at_column(col), length(len), file_name(t_file), file(t_file), symbols(), parent(t_parent)
+          , tokens()
 {
         open_files.emplace_back(file_name);
 }
