@@ -19,43 +19,43 @@ namespace fs = boost::filesystem;
 
 struct Directory
 {
-        // TODO: Probably move this somewhere else ... Maybe the Lexer?
-        explicit Directory(const std::string &_directory, std::string _name = "")
-                : directory(_directory), name(std::move(_name)), exists(fs::exists(directory))
-                  , is_directory(fs::is_directory(directory))
-        { }
+    // TODO: Probably move this somewhere else ... Maybe the Lexer?
+    explicit Directory(const std::string &_directory, std::string _name = "")
+        : directory(_directory), name(std::move(_name)), exists(fs::exists(directory)),
+          is_directory(fs::is_directory(directory))
+    {}
 
-        bool contains(const fs::path &path)
-        {
-                (void) path;
+    bool contains(const fs::path &path)
+    {
+        (void) path;
 
-                if (!(exists && is_directory)) {
-                        if (Config::is_set(Config::VERBOSE)) {
-                                /*
-                                std::stringstream ss;
-                                ss << "Ignoring invalid directory \"" << name << '"';
-                                Console::write_line(ss.str());
-                                */
-                        }
-                        return false;
-                }
-
-                if (Config::is_set(Config::VERBOSE)) {
-                        /*
-                        std::stringstream ss;
-                        ss << "Searching \"" << name << '"';
-                        Console::write_line(ss.str());
-                        */
-                }
-
-                return false;
+        if (!(exists && is_directory)) {
+            if (Config::is_set(Config::VERBOSE)) {
+                /*
+                std::stringstream ss;
+                ss << "Ignoring invalid directory \"" << name << '"';
+                Console::write_line(ss.str());
+                */
+            }
+            return false;
         }
 
-        fs::path    directory;
-        std::string name;
+        if (Config::is_set(Config::VERBOSE)) {
+            /*
+            std::stringstream ss;
+            ss << "Searching \"" << name << '"';
+            Console::write_line(ss.str());
+            */
+        }
 
-        bool exists;
-        bool is_directory;
+        return false;
+    }
+
+    fs::path directory;
+    std::string name;
+
+    bool exists;
+    bool is_directory;
 };
 
 static std::vector<Directory> search_directories;
@@ -64,38 +64,38 @@ size_t Config::configuration = 0;
 
 void Config::add_search_directory(const std::string &directory)
 {
-        search_directories.emplace_back(Directory(directory));
+    search_directories.emplace_back(Directory(directory));
 }
 
 void Config::add_search_directory(const std::string &&directory, const std::string &&name)
 {
-        search_directories.emplace_back(Directory(directory, name));
+    search_directories.emplace_back(Directory(directory, name));
 }
 
 std::string Config::find_path(const std::string &path)
 {
-        // TODO: This should all be done in a different file (Config is the wrong place).
-        const fs::path p { path };
+    // TODO: This should all be done in a different file (Config is the wrong place).
+    const fs::path p{path};
 
-        if (!fs::is_regular_file(p)) {
-                return std::string();
-        }
-
-        if (p.is_absolute() && fs::exists(p)) {
-                return path;
-        }
-
-        if (p.is_relative() && fs::exists(p)) {
-                const fs::path abs_path = fs::absolute(p);
-                return abs_path.string();
-        }
-
-        for (auto &&dir : search_directories) {
-                if (dir.contains(p)) {
-                        const fs::path s { fs::absolute(path) };
-                        return s.string();
-                }
-        }
-
+    if (!fs::is_regular_file(p)) {
         return std::string();
+    }
+
+    if (p.is_absolute() && fs::exists(p)) {
+        return path;
+    }
+
+    if (p.is_relative() && fs::exists(p)) {
+        const fs::path abs_path = fs::absolute(p);
+        return abs_path.string();
+    }
+
+    for (auto &&dir : search_directories) {
+        if (dir.contains(p)) {
+            const fs::path s{fs::absolute(path)};
+            return s.string();
+        }
+    }
+
+    return std::string();
 }

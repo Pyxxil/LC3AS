@@ -13,61 +13,50 @@ Hexadecimal::Hexadecimal(std::string &immediate,
                          std::string &t_file,
                          size_t line_number,
                          size_t column)
-        : Immediate(immediate, immediate_uppercase, t_file, line_number, column)
+    : Immediate(immediate, immediate_uppercase, t_file, line_number, column)
 {
-        if (immediate.length() > 6 || immediate.length() == 1 ||
-            (immediate.length() == 2 && std::toupper(immediate.at(1)) == 'X')) {
+    if (immediate.length() > 6 || immediate.length() == 1 ||
+        (immediate.length() == 2 && std::toupper(immediate.at(1)) == 'X')) {
+        is_valid = false;
+    }
+    else {
+
+        if (std::toupper(immediate.at(0)) == 'X') {
+            immediate.insert(0, 1, '0');
+        }
+
+        try {
+            size_t check = 0;
+            int v = std::stoi(immediate, &check, 16);
+            if (check != immediate.length() || v > std::numeric_limits<int16_t>::max() ||
+                v < std::numeric_limits<int16_t>::min()) {
                 is_valid = false;
-        } else {
-
-                if (std::toupper(immediate.at(0)) == 'X') {
-                        immediate.insert(0, 1, '0');
-                }
-
-                try {
-                        size_t check = 0;
-                        int    v     = std::stoi(immediate, &check, 16);
-                        if (check != immediate.length() || v > std::numeric_limits<int16_t>::max() ||
-                            v < std::numeric_limits<int16_t>::min()) {
-                                is_valid = false;
-                        } else {
-                                value = static_cast<std::int16_t>(v);
-                        }
-                } catch (const std::invalid_argument &e) {
-                        is_valid = false;
-                }
+            }
+            else {
+                value = static_cast<std::int16_t>(v);
+            }
         }
-
-        if (!is_valid) {
-                Diagnostics::Diagnostic diag(
-                        Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(file),
-                                Diagnostics::Variant<size_t>(at_line),
-                                Diagnostics::Variant<size_t>(at_column)
-                        ),
-                        "Invalid literal for 16 bit signed base 16 value",
-                        Diagnostics::INVALID_LITERAL,
-                        Diagnostics::ERROR
-                );
-
-                diag.provide_context(
-                        std::make_unique<Diagnostics::HighlightContext>(
-                                Diagnostics::SelectionContext(
-                                        Diagnostics::FileContext(
-                                                Diagnostics::Variant<std::string>(
-                                                        file
-                                                ),
-                                                Diagnostics::Variant<size_t>(
-                                                        at_line
-                                                ),
-                                                Diagnostics::Variant<size_t>(
-                                                        at_column
-                                                )
-                                        ), '^', "Found here", lexed_lines[file].at(at_line - 1)
-                                ), '~', token.length()
-                        )
-                );
-
-                Diagnostics::push(diag);
+        catch (const std::invalid_argument &e) {
+            is_valid = false;
         }
+    }
+
+    if (!is_valid) {
+        Diagnostics::Diagnostic diag(
+            Diagnostics::FileContext(file, at_line, at_column),
+            "Invalid literal for 16 bit signed base 16 value",
+            Diagnostics::INVALID_LITERAL, Diagnostics::ERROR
+        );
+
+        diag.provide_context(
+            std::make_unique<Diagnostics::HighlightContext>(
+                Diagnostics::SelectionContext(
+                    Diagnostics::FileContext(file, at_line, at_column),
+                    '^', "Found here", lexed_lines[file].at(at_line - 1)
+                ), '~', token.length()
+            )
+        );
+
+        Diagnostics::push(diag);
+    }
 }

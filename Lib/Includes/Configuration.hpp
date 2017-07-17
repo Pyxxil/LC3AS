@@ -5,32 +5,32 @@
 
 namespace Config
 {
-        enum CONFIG_OPTIONS
-        {
-                WARN_AS_ERROR     = 0x01,
-                STOP_ON_FIRST_ERR = 0x02,
-                VERBOSE           = 0x04,
-                BE_QUIET          = 0x08,
-                KEEP_GOING        = 0x10,
-        };
+enum CONFIG_OPTIONS
+{
+    WARN_AS_ERROR = 0x01,
+    STOP_ON_FIRST_ERR = 0x02,
+    VERBOSE = 0x04,
+    BE_QUIET = 0x08,
+    KEEP_GOING = 0x10,
+};
 
-        extern size_t configuration;
+extern size_t configuration;
 
-        inline bool is_set(size_t option)
-        {
-                return (configuration & option) != 0;
-        }
+inline bool is_set(size_t option)
+{
+    return (configuration & option) != 0;
+}
 
-        inline void set(size_t option)
-        {
-                configuration |= option;
-        }
+inline void set(size_t option)
+{
+    configuration |= option;
+}
 
-        void add_search_directory(const std::string &directory);
-        void add_search_directory(const std::string &&directory, const std::string &&name);
+void add_search_directory(const std::string &directory);
+void add_search_directory(const std::string &&directory, const std::string &&name);
 
-        // TODO: Make this return some sort of context, e.g. File that includes it
-        std::string find_path(const std::string &path);
+// TODO: Make this return some sort of context, e.g. File that includes it
+std::string find_path(const std::string &path);
 }
 
 #endif

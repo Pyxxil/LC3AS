@@ -3,13 +3,13 @@
 
 #include "Tokens/Token_Immediate.hpp"
 
-class Decimal : public Immediate
+class Decimal: public Immediate
 {
 public:
-        Decimal(std::string &immediate, std::string &t_file, size_t line_number, size_t column);
-        Decimal(std::string &&immediate, std::string &t_file, size_t line_number, size_t column)
-                : Decimal(immediate, t_file, line_number, column)
-        { }
+    Decimal(std::string &immediate, std::string &t_file, size_t line_number, size_t column);
+    Decimal(std::string &&immediate, std::string &t_file, size_t line_number, size_t column)
+        : Decimal(immediate, t_file, line_number, column)
+    {}
 };
 
 #endif // TOKEN_IMMEDIATE_DECIMAL_HPP

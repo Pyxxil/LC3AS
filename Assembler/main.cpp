@@ -2,5 +2,5 @@
 
 int main(int argc, char **argv)
 {
-        return Assembler::assemble(argc, argv);
+    return Assembler::assemble(argc, argv);
 }
