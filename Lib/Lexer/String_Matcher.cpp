@@ -1,6 +1,7 @@
 #include "Lib/Includes/String_Matcher.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 #include <limits>
 
 String_Matcher::String_Matcher()

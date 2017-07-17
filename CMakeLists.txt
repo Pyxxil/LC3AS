@@ -48,6 +48,12 @@ target_include_directories ( LC3AS PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}" "${AS
 target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>" )
 target_compile_options ( LC3AS PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>" )
 
+if ( APPLE )
+        find_package ( Boost REQUIRED COMPONENTS filesystem system )
+        target_link_libraries ( LC3AS PUBLIC "${Boost_FILESYSTEM_LIBRARY}" "${Boost_SYSTEM_LIBRARY}" )
+        target_include_directories ( LC3AS PUBLIC "${Boost_INCLUDE_DIR}" )
+endif ()
+
 if ( ALLOW_EXTRAS )
         target_compile_definitions ( LC3AS PUBLIC INCLUDE_ADDONS )
 endif ()

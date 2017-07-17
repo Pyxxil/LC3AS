@@ -1,194 +1,194 @@
-(0000) 3000 0011000000000000 (  29)                         .ORIG 0x3000	.\Examples\Compare.asm
-(3000) 5020 0101000000100000 (  32) INIT_REGISTERS          AND R0 R0 #0	.\Examples\Compare.asm
-(3001) 5260 0101001001100000 (  33)                         AND R1 R1 #0	.\Examples\Compare.asm
-(3002) 24BB 0010010010111011 (  37)                         LD R2 ZERO	.\Examples\Compare.asm
-(3003) 94BF 1001010010111111 (  38)                         NOT R2 R2	.\Examples\Compare.asm
-(3004) 14A1 0001010010100001 (  39)                         ADD R2 R2 #1	.\Examples\Compare.asm
-(3005) 56E0 0101011011100000 (  41)                         AND R3 R3 #0	.\Examples\Compare.asm
-(3006) 5920 0101100100100000 (  42)                         AND R4 R4 #0	.\Examples\Compare.asm
-(3007) EA98 1110101010011000 (  44)                         LEA R5 INPUT_STACK	.\Examples\Compare.asm
-(3008) 5DA0 0101110110100000 (  46)                         AND R6 R6 #0	.\Examples\Compare.asm
-(3009) 5FE0 0101111111100000 (  47)                         AND R7 R7 #0	.\Examples\Compare.asm
-(300A) 192A 0001100100101010 (  51) CREATE_NULL             ADD R4 R4 #10	.\Examples\Compare.asm
-(300B) 993F 1001100100111111 (  52)                         NOT R4 R4	.\Examples\Compare.asm
-(300C) 1921 0001100100100001 (  53)                         ADD R4 R4 #1	.\Examples\Compare.asm
-(300D) 16EA 0001011011101010 (  57) CREATE_STACK            ADD R3 R3 #10	.\Examples\Compare.asm
-(300E) 7740 0111011101000000 (  58)                         STR R3 R5 #0	.\Examples\Compare.asm
-(300F) 1B61 0001101101100001 (  59)                         ADD R5 R5 #1	.\Examples\Compare.asm
-(3010) F020 1111000000100000 (  63) GET_R1                  GETC	.\Examples\Compare.asm
-(3011) F021 1111000000100001 (  64)                         OUT	.\Examples\Compare.asm
-(3012) 56E0 0101011011100000 (  65)                         AND R3 R3 #0	.\Examples\Compare.asm
-(3013) 1604 0001011000000100 (  66)                         ADD R3 R0 R4	.\Examples\Compare.asm
-(3014) 0404 0000010000000100 (  67)                         BRz PROCESS_R1	.\Examples\Compare.asm
-(3015) 1002 0001000000000010 (  68)                         ADD R0 R0 R2	.\Examples\Compare.asm
-(3016) 7140 0111000101000000 (  69)                         STR R0 R5 #0	.\Examples\Compare.asm
-(3017) 1B61 0001101101100001 (  70)                         ADD R5 R5 #1	.\Examples\Compare.asm
-(3018) 0FF7 0000111111110111 (  71)                         BRnzp GET_R1	.\Examples\Compare.asm
-(3019) 1B7F 0001101101111111 (  75) PROCESS_R1              ADD R5 R5 #-1	.\Examples\Compare.asm
-(301A) 6740 0110011101000000 (  76)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(301B) 5020 0101000000100000 (  77)                         AND R0 R0 #0	.\Examples\Compare.asm
-(301C) 10F6 0001000011110110 (  78)                         ADD R0 R3 #-10	.\Examples\Compare.asm
-(301D) 0429 0000010000101001 (  79)                         BRz GET_R2	.\Examples\Compare.asm
-(301E) 5020 0101000000100000 (  80)                         AND R0 R0 #0	.\Examples\Compare.asm
-(301F) 10E0 0001000011100000 (  81)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3020) 0823 0000100000100011 (  84)                         BRn MAKE_R1_NEGATIVE	.\Examples\Compare.asm
-(3021) 1243 0001001001000011 (  85)                         ADD R1 R1 R3	.\Examples\Compare.asm
-(3022) 1B7F 0001101101111111 (  87)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(3023) 6740 0110011101000000 (  88)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(3024) 5020 0101000000100000 (  89)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3025) 10F6 0001000011110110 (  90)                         ADD R0 R3 #-10	.\Examples\Compare.asm
-(3026) 0420 0000010000100000 (  91)                         BRz GET_R2	.\Examples\Compare.asm
-(3027) 5020 0101000000100000 (  92)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3028) 10E0 0001000011100000 (  93)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3029) 10E0 0001000011100000 (  94)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(302A) 0819 0000100000011001 (  97)                         BRn MAKE_R1_NEGATIVE	.\Examples\Compare.asm
-(302B) EC79 1110110001111001 (  98)                         LEA R6 LookUp10	.\Examples\Compare.asm
-(302C) 1D83 0001110110000011 (  99)                         ADD R6 R6 R3	.\Examples\Compare.asm
-(302D) 5020 0101000000100000 ( 100)                         AND R0 R0 #0	.\Examples\Compare.asm
-(302E) 6180 0110000110000000 ( 101)                         LDR R0 R6 #0	.\Examples\Compare.asm
-(302F) 1240 0001001001000000 ( 102)                         ADD R1 R1 R0	.\Examples\Compare.asm
-(3030) 1B7F 0001101101111111 ( 104)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(3031) 6740 0110011101000000 ( 105)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(3032) 5020 0101000000100000 ( 106)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3033) 10F6 0001000011110110 ( 107)                         ADD R0 R3 #-10	.\Examples\Compare.asm
-(3034) 0412 0000010000010010 ( 108)                         BRz GET_R2	.\Examples\Compare.asm
-(3035) 5020 0101000000100000 ( 109)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3036) 10E0 0001000011100000 ( 110)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3037) 080C 0000100000001100 ( 113)                         BRn MAKE_R1_NEGATIVE	.\Examples\Compare.asm
-(3038) EC76 1110110001110110 ( 114)                         LEA R6 LookUp100	.\Examples\Compare.asm
-(3039) 1D83 0001110110000011 ( 115)                         ADD R6 R6 R3	.\Examples\Compare.asm
-(303A) 5020 0101000000100000 ( 116)                         AND R0 R0 #0	.\Examples\Compare.asm
-(303B) 6180 0110000110000000 ( 117)                         LDR R0 R6 #0	.\Examples\Compare.asm
-(303C) 1240 0001001001000000 ( 118)                         ADD R1 R1 R0	.\Examples\Compare.asm
-(303D) 1B7F 0001101101111111 ( 120)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(303E) 6740 0110011101000000 ( 121)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(303F) 5020 0101000000100000 ( 122)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3040) 10E0 0001000011100000 ( 123)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3041) 0802 0000100000000010 ( 126)                         BRn MAKE_R1_NEGATIVE	.\Examples\Compare.asm
-(3042) 0E04 0000111000000100 ( 127)                         BRnzp GET_R2	.\Examples\Compare.asm
-(3043) 1B61 0001101101100001 ( 128)                         ADD R5 R5 #1	.\Examples\Compare.asm
-(3044) 927F 1001001001111111 ( 132) MAKE_R1_NEGATIVE        NOT R1 R1	.\Examples\Compare.asm
-(3045) 1261 0001001001100001 ( 133)                         ADD R1 R1 #1	.\Examples\Compare.asm
-(3046) 7B40 0111101101000000 ( 134)                         STR R5 R5 #0	.\Examples\Compare.asm
-(3047) 1B61 0001101101100001 ( 138) GET_R2                  ADD R5 R5 #1	.\Examples\Compare.asm
-(3048) F020 1111000000100000 ( 143) GET_R2_LOOP             GETC	.\Examples\Compare.asm
-(3049) F021 1111000000100001 ( 144)                         OUT	.\Examples\Compare.asm
-(304A) 56E0 0101011011100000 ( 145)                         AND R3 R3 #0	.\Examples\Compare.asm
-(304B) 1604 0001011000000100 ( 146)                         ADD R3 R0 R4	.\Examples\Compare.asm
-(304C) 0404 0000010000000100 ( 147)                         BRz PROCESS_R2	.\Examples\Compare.asm
-(304D) 1002 0001000000000010 ( 148)                         ADD R0 R0 R2	.\Examples\Compare.asm
-(304E) 7140 0111000101000000 ( 149)                         STR R0 R5 #0	.\Examples\Compare.asm
-(304F) 1B61 0001101101100001 ( 150)                         ADD R5 R5 #1	.\Examples\Compare.asm
-(3050) 0FF7 0000111111110111 ( 151)                         BRnzp GET_R2_LOOP	.\Examples\Compare.asm
-(3051) 54A0 0101010010100000 ( 155) PROCESS_R2              AND R2 R2 #0	.\Examples\Compare.asm
-(3052) 1B7F 0001101101111111 ( 156)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(3053) 6740 0110011101000000 ( 157)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(3054) 5020 0101000000100000 ( 158)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3055) 10F6 0001000011110110 ( 159)                         ADD R0 R3 #-10	.\Examples\Compare.asm
-(3056) 0428 0000010000101000 ( 160)                         BRz CHECKING_LOOP	.\Examples\Compare.asm
-(3057) 5020 0101000000100000 ( 161)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3058) 10E0 0001000011100000 ( 162)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3059) 10E0 0001000011100000 ( 163)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(305A) 0821 0000100000100001 ( 166)                         BRn MAKE_R2_NEGATIVE	.\Examples\Compare.asm
-(305B) 1483 0001010010000011 ( 167)                         ADD R2 R2 R3	.\Examples\Compare.asm
-(305C) 1B7F 0001101101111111 ( 169)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(305D) 6740 0110011101000000 ( 170)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(305E) 5020 0101000000100000 ( 171)                         AND R0 R0 #0	.\Examples\Compare.asm
-(305F) 10F6 0001000011110110 ( 172)                         ADD R0 R3 #-10	.\Examples\Compare.asm
-(3060) 041E 0000010000011110 ( 173)                         BRz CHECKING_LOOP	.\Examples\Compare.asm
-(3061) 5020 0101000000100000 ( 174)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3062) 10E0 0001000011100000 ( 175)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3063) 10E0 0001000011100000 ( 176)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3064) 0817 0000100000010111 ( 179)                         BRn MAKE_R2_NEGATIVE	.\Examples\Compare.asm
-(3065) EC3F 1110110000111111 ( 180)                         LEA R6 LookUp10	.\Examples\Compare.asm
-(3066) 1D83 0001110110000011 ( 181)                         ADD R6 R6 R3	.\Examples\Compare.asm
-(3067) 5020 0101000000100000 ( 182)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3068) 6180 0110000110000000 ( 183)                         LDR R0 R6 #0	.\Examples\Compare.asm
-(3069) 1480 0001010010000000 ( 184)                         ADD R2 R2 R0	.\Examples\Compare.asm
-(306A) 1B7F 0001101101111111 ( 186)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(306B) 6740 0110011101000000 ( 187)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(306C) 5020 0101000000100000 ( 188)                         AND R0 R0 #0	.\Examples\Compare.asm
-(306D) 10F6 0001000011110110 ( 189)                         ADD R0 R3 #-10	.\Examples\Compare.asm
-(306E) 0410 0000010000010000 ( 190)                         BRz CHECKING_LOOP	.\Examples\Compare.asm
-(306F) 5020 0101000000100000 ( 191)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3070) 10E0 0001000011100000 ( 192)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(3071) 080A 0000100000001010 ( 195)                         BRn MAKE_R2_NEGATIVE	.\Examples\Compare.asm
-(3072) EC3C 1110110000111100 ( 196)                         LEA R6 LookUp100	.\Examples\Compare.asm
-(3073) 1D83 0001110110000011 ( 197)                         ADD R6 R6 R3	.\Examples\Compare.asm
-(3074) 5020 0101000000100000 ( 198)                         AND R0 R0 #0	.\Examples\Compare.asm
-(3075) 6180 0110000110000000 ( 199)                         LDR R0 R6 #0	.\Examples\Compare.asm
-(3076) 1480 0001010010000000 ( 200)                         ADD R2 R2 R0	.\Examples\Compare.asm
-(3077) 1B7F 0001101101111111 ( 202)                         ADD R5 R5 #-1	.\Examples\Compare.asm
-(3078) 6740 0110011101000000 ( 203)                         LDR R3 R5 #0	.\Examples\Compare.asm
-(3079) 5020 0101000000100000 ( 204)                         AND R0 R0 #0	.\Examples\Compare.asm
-(307A) 10E0 0001000011100000 ( 205)                         ADD R0 R3 #0	.\Examples\Compare.asm
-(307B) 0603 0000011000000011 ( 208)                         BRzp CHECKING_LOOP	.\Examples\Compare.asm
-(307C) 94BF 1001010010111111 ( 212) MAKE_R2_NEGATIVE        NOT R2 R2	.\Examples\Compare.asm
-(307D) 14A1 0001010010100001 ( 213)                         ADD R2 R2 #1	.\Examples\Compare.asm
-(307E) 7B40 0111101101000000 ( 214)                         STR R5 R5 #0	.\Examples\Compare.asm
-(307F) E039 1110000000111001 ( 218) CHECKING_LOOP           LEA R0 NEGATIVE_ONE	.\Examples\Compare.asm
-(3080) 1660 0001011001100000 ( 219)                         ADD R3 R1 #0	.\Examples\Compare.asm
-(3081) 0804 0000100000000100 ( 220)                         BRn R1_NEGATIVE	.\Examples\Compare.asm
-(3082) 56E0 0101011011100000 ( 221)                         AND R3 R3 #0	.\Examples\Compare.asm
-(3083) 16A0 0001011010100000 ( 222)                         ADD R3 R2 #0	.\Examples\Compare.asm
-(3084) 0806 0000100000000110 ( 223)                         BRn R1_POSITIVE_R2_NEGATIVE	.\Examples\Compare.asm
-(3085) 0E07 0000111000000111 ( 225)                         BRnzp R1_R2_SAME_SIGN	.\Examples\Compare.asm
-(3086) 56E0 0101011011100000 ( 230) R1_NEGATIVE             AND R3 R3 #0	.\Examples\Compare.asm
-(3087) 16A0 0001011010100000 ( 231)                         ADD R3 R2 #0	.\Examples\Compare.asm
-(3088) 0804 0000100000000100 ( 232)                         BRn R1_R2_SAME_SIGN	.\Examples\Compare.asm
-(3089) E02F 1110000000101111 ( 236) R1_NEGATIVE_R2_POSITIVE LEA R0 NEGATIVE_ONE	.\Examples\Compare.asm
-(308A) 480C 0100100000001100 ( 237)                         JSR PRINT	.\Examples\Compare.asm
-(308B) E030 1110000000110000 ( 241) R1_POSITIVE_R2_NEGATIVE LEA R0 POSITIVE_ONE	.\Examples\Compare.asm
-(308C) 480A 0100100000001010 ( 242)                         JSR PRINT	.\Examples\Compare.asm
-(308D) 94BF 1001010010111111 ( 246) R1_R2_SAME_SIGN         NOT R2 R2	.\Examples\Compare.asm
-(308E) 14A1 0001010010100001 ( 247)                         ADD R2 R2 #1	.\Examples\Compare.asm
-(308F) 56E0 0101011011100000 ( 248)                         AND R3 R3 #0	.\Examples\Compare.asm
-(3090) 1642 0001011001000010 ( 249)                         ADD R3 R1 R2	.\Examples\Compare.asm
-(3091) 0805 0000100000000101 ( 250)                         BRn PRINT	.\Examples\Compare.asm
-(3092) 56E0 0101011011100000 ( 251)                         AND R3 R3 #0	.\Examples\Compare.asm
-(3093) 1642 0001011001000010 ( 252)                         ADD R3 R1 R2	.\Examples\Compare.asm
-(3094) 0201 0000001000000001 ( 253)                         BRp POSITIVE	.\Examples\Compare.asm
-(3095) 1022 0001000000100010 ( 254)                         ADD R0 R0 #2	.\Examples\Compare.asm
-(3096) 1023 0001000000100011 ( 258) POSITIVE                ADD R0 R0 #3	.\Examples\Compare.asm
-(3097) F022 1111000000100010 ( 262) PRINT                   PUTS	.\Examples\Compare.asm
-(3098) 5020 0101000000100000 ( 266) SET_R0                  AND R0 R0 #0	.\Examples\Compare.asm
-(3099) 103F 0001000000111111 ( 267)                         ADD R0 R0 #-1	.\Examples\Compare.asm
-(309A) 16E0 0001011011100000 ( 268)                         ADD R3 R3 #0	.\Examples\Compare.asm
-(309B) 0803 0000100000000011 ( 269)                         BRn DONE	.\Examples\Compare.asm
-(309C) 0401 0000010000000001 ( 270)                         BRz SET_R0_ZERO	.\Examples\Compare.asm
-(309D) 1021 0001000000100001 ( 271)                         ADD R0 R0 #1	.\Examples\Compare.asm
-(309E) 1021 0001000000100001 ( 275) SET_R0_ZERO             ADD R0 R0 #1	.\Examples\Compare.asm
-(309F) F025 1111000000100101 ( 279) DONE                    HALT	.\Examples\Compare.asm
-(30A0) 0000 0000000000000000 ( 282) INPUT_STACK             .FILL 0x0000	.\Examples\Compare.asm
-(30A1) 0000 0000000000000000 ( 282)                         .FILL 0x0000	.\Examples\Compare.asm
-(30A2) 0000 0000000000000000 ( 282)                         .FILL 0x0000	.\Examples\Compare.asm
-(30A3) 0000 0000000000000000 ( 282)                         .FILL 0x0000	.\Examples\Compare.asm
-(30A4) 0000 0000000000000000 ( 282)                         .FILL 0x0000	.\Examples\Compare.asm
-(30A5) 0000 0000000000000000 ( 286) LookUp10                .FILL 0x0000	.\Examples\Compare.asm
-(30A6) 000A 0000000000001010 ( 287)                         .FILL 0x000A	.\Examples\Compare.asm
-(30A7) 0014 0000000000010100 ( 288)                         .FILL 0x0014	.\Examples\Compare.asm
-(30A8) 001E 0000000000011110 ( 289)                         .FILL 0x001E	.\Examples\Compare.asm
-(30A9) 0028 0000000000101000 ( 290)                         .FILL 0x0028	.\Examples\Compare.asm
-(30AA) 0032 0000000000110010 ( 291)                         .FILL 0x0032	.\Examples\Compare.asm
-(30AB) 003C 0000000000111100 ( 292)                         .FILL 0x003C	.\Examples\Compare.asm
-(30AC) 0046 0000000001000110 ( 293)                         .FILL 0x0046	.\Examples\Compare.asm
-(30AD) 0050 0000000001010000 ( 294)                         .FILL 0x0050	.\Examples\Compare.asm
-(30AE) 005A 0000000001011010 ( 295)                         .FILL 0x005A	.\Examples\Compare.asm
-(30AF) 0000 0000000000000000 ( 299) LookUp100               .FILL 0x0000	.\Examples\Compare.asm
-(30B0) 0064 0000000001100100 ( 300)                         .FILL 0x0064	.\Examples\Compare.asm
-(30B1) 00C8 0000000011001000 ( 301)                         .FILL 0x00C8	.\Examples\Compare.asm
-(30B2) 012C 0000000100101100 ( 302)                         .FILL 0x012C	.\Examples\Compare.asm
-(30B3) 0190 0000000110010000 ( 303)                         .FILL 0x0190	.\Examples\Compare.asm
-(30B4) 01F4 0000000111110100 ( 304)                         .FILL 0x01F4	.\Examples\Compare.asm
-(30B5) 0258 0000001001011000 ( 305)                         .FILL 0x0258	.\Examples\Compare.asm
-(30B6) 02BC 0000001010111100 ( 306)                         .FILL 0x02BC	.\Examples\Compare.asm
-(30B7) 0320 0000001100100000 ( 307)                         .FILL 0x0320	.\Examples\Compare.asm
-(30B8) 0384 0000001110000100 ( 308)                         .FILL 0x0384	.\Examples\Compare.asm
-(30B9) 002D 0000000000101101 ( 312) NEGATIVE_ONE            .FILL 0x2D00	.\Examples\Compare.asm
-(30BA) 3100 0000000000110001 ( 312)                         .FILL 0x0031	.\Examples\Compare.asm
-(30BB) 0000 0000000000000000 ( 312)                         .FILL 0x0000	.\Examples\Compare.asm
-(30BC) 0031 0000000000110001 ( 315) POSITIVE_ONE            .FILL 0x3100	.\Examples\Compare.asm
-(30BD) 0000 0000000000000000 ( 315)                         .FILL 0x0000	.\Examples\Compare.asm
-(30BE) 0030 0000000000110000 ( 318) ZERO                    .FILL 0x3000	.\Examples\Compare.asm
-(30BF) 0000 0000000000000000 ( 318)                         .FILL 0x0000	.\Examples\Compare.asm
-(30C0) 0000 0000000000000000 ( 320)                         .END	.\Examples\Compare.asm
+(0000) 3000 0011000000000000 (  29)                         .ORIG 0x3000	../Examples/Compare.asm
+(3000) 5020 0101000000100000 (  32) INIT_REGISTERS          AND R0 R0 #0	../Examples/Compare.asm
+(3001) 5260 0101001001100000 (  33)                         AND R1 R1 #0	../Examples/Compare.asm
+(3002) 24BB 0010010010111011 (  37)                         LD R2 ZERO	../Examples/Compare.asm
+(3003) 94BF 1001010010111111 (  38)                         NOT R2 R2	../Examples/Compare.asm
+(3004) 14A1 0001010010100001 (  39)                         ADD R2 R2 #1	../Examples/Compare.asm
+(3005) 56E0 0101011011100000 (  41)                         AND R3 R3 #0	../Examples/Compare.asm
+(3006) 5920 0101100100100000 (  42)                         AND R4 R4 #0	../Examples/Compare.asm
+(3007) EA98 1110101010011000 (  44)                         LEA R5 INPUT_STACK	../Examples/Compare.asm
+(3008) 5DA0 0101110110100000 (  46)                         AND R6 R6 #0	../Examples/Compare.asm
+(3009) 5FE0 0101111111100000 (  47)                         AND R7 R7 #0	../Examples/Compare.asm
+(300A) 192A 0001100100101010 (  51) CREATE_NULL             ADD R4 R4 #10	../Examples/Compare.asm
+(300B) 993F 1001100100111111 (  52)                         NOT R4 R4	../Examples/Compare.asm
+(300C) 1921 0001100100100001 (  53)                         ADD R4 R4 #1	../Examples/Compare.asm
+(300D) 16EA 0001011011101010 (  57) CREATE_STACK            ADD R3 R3 #10	../Examples/Compare.asm
+(300E) 7740 0111011101000000 (  58)                         STR R3 R5 #0	../Examples/Compare.asm
+(300F) 1B61 0001101101100001 (  59)                         ADD R5 R5 #1	../Examples/Compare.asm
+(3010) F020 1111000000100000 (  63) GET_R1                  GETC	../Examples/Compare.asm
+(3011) F021 1111000000100001 (  64)                         OUT	../Examples/Compare.asm
+(3012) 56E0 0101011011100000 (  65)                         AND R3 R3 #0	../Examples/Compare.asm
+(3013) 1604 0001011000000100 (  66)                         ADD R3 R0 R4	../Examples/Compare.asm
+(3014) 0404 0000010000000100 (  67)                         BRz PROCESS_R1	../Examples/Compare.asm
+(3015) 1002 0001000000000010 (  68)                         ADD R0 R0 R2	../Examples/Compare.asm
+(3016) 7140 0111000101000000 (  69)                         STR R0 R5 #0	../Examples/Compare.asm
+(3017) 1B61 0001101101100001 (  70)                         ADD R5 R5 #1	../Examples/Compare.asm
+(3018) 0FF7 0000111111110111 (  71)                         BRnzp GET_R1	../Examples/Compare.asm
+(3019) 1B7F 0001101101111111 (  75) PROCESS_R1              ADD R5 R5 #-1	../Examples/Compare.asm
+(301A) 6740 0110011101000000 (  76)                         LDR R3 R5 #0	../Examples/Compare.asm
+(301B) 5020 0101000000100000 (  77)                         AND R0 R0 #0	../Examples/Compare.asm
+(301C) 10F6 0001000011110110 (  78)                         ADD R0 R3 #-10	../Examples/Compare.asm
+(301D) 0429 0000010000101001 (  79)                         BRz GET_R2	../Examples/Compare.asm
+(301E) 5020 0101000000100000 (  80)                         AND R0 R0 #0	../Examples/Compare.asm
+(301F) 10E0 0001000011100000 (  81)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3020) 0823 0000100000100011 (  84)                         BRn MAKE_R1_NEGATIVE	../Examples/Compare.asm
+(3021) 1243 0001001001000011 (  85)                         ADD R1 R1 R3	../Examples/Compare.asm
+(3022) 1B7F 0001101101111111 (  87)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(3023) 6740 0110011101000000 (  88)                         LDR R3 R5 #0	../Examples/Compare.asm
+(3024) 5020 0101000000100000 (  89)                         AND R0 R0 #0	../Examples/Compare.asm
+(3025) 10F6 0001000011110110 (  90)                         ADD R0 R3 #-10	../Examples/Compare.asm
+(3026) 0420 0000010000100000 (  91)                         BRz GET_R2	../Examples/Compare.asm
+(3027) 5020 0101000000100000 (  92)                         AND R0 R0 #0	../Examples/Compare.asm
+(3028) 10E0 0001000011100000 (  93)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3029) 10E0 0001000011100000 (  94)                         ADD R0 R3 #0	../Examples/Compare.asm
+(302A) 0819 0000100000011001 (  97)                         BRn MAKE_R1_NEGATIVE	../Examples/Compare.asm
+(302B) EC79 1110110001111001 (  98)                         LEA R6 LookUp10	../Examples/Compare.asm
+(302C) 1D83 0001110110000011 (  99)                         ADD R6 R6 R3	../Examples/Compare.asm
+(302D) 5020 0101000000100000 ( 100)                         AND R0 R0 #0	../Examples/Compare.asm
+(302E) 6180 0110000110000000 ( 101)                         LDR R0 R6 #0	../Examples/Compare.asm
+(302F) 1240 0001001001000000 ( 102)                         ADD R1 R1 R0	../Examples/Compare.asm
+(3030) 1B7F 0001101101111111 ( 104)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(3031) 6740 0110011101000000 ( 105)                         LDR R3 R5 #0	../Examples/Compare.asm
+(3032) 5020 0101000000100000 ( 106)                         AND R0 R0 #0	../Examples/Compare.asm
+(3033) 10F6 0001000011110110 ( 107)                         ADD R0 R3 #-10	../Examples/Compare.asm
+(3034) 0412 0000010000010010 ( 108)                         BRz GET_R2	../Examples/Compare.asm
+(3035) 5020 0101000000100000 ( 109)                         AND R0 R0 #0	../Examples/Compare.asm
+(3036) 10E0 0001000011100000 ( 110)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3037) 080C 0000100000001100 ( 113)                         BRn MAKE_R1_NEGATIVE	../Examples/Compare.asm
+(3038) EC76 1110110001110110 ( 114)                         LEA R6 LookUp100	../Examples/Compare.asm
+(3039) 1D83 0001110110000011 ( 115)                         ADD R6 R6 R3	../Examples/Compare.asm
+(303A) 5020 0101000000100000 ( 116)                         AND R0 R0 #0	../Examples/Compare.asm
+(303B) 6180 0110000110000000 ( 117)                         LDR R0 R6 #0	../Examples/Compare.asm
+(303C) 1240 0001001001000000 ( 118)                         ADD R1 R1 R0	../Examples/Compare.asm
+(303D) 1B7F 0001101101111111 ( 120)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(303E) 6740 0110011101000000 ( 121)                         LDR R3 R5 #0	../Examples/Compare.asm
+(303F) 5020 0101000000100000 ( 122)                         AND R0 R0 #0	../Examples/Compare.asm
+(3040) 10E0 0001000011100000 ( 123)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3041) 0802 0000100000000010 ( 126)                         BRn MAKE_R1_NEGATIVE	../Examples/Compare.asm
+(3042) 0E04 0000111000000100 ( 127)                         BRnzp GET_R2	../Examples/Compare.asm
+(3043) 1B61 0001101101100001 ( 128)                         ADD R5 R5 #1	../Examples/Compare.asm
+(3044) 927F 1001001001111111 ( 132) MAKE_R1_NEGATIVE        NOT R1 R1	../Examples/Compare.asm
+(3045) 1261 0001001001100001 ( 133)                         ADD R1 R1 #1	../Examples/Compare.asm
+(3046) 7B40 0111101101000000 ( 134)                         STR R5 R5 #0	../Examples/Compare.asm
+(3047) 1B61 0001101101100001 ( 138) GET_R2                  ADD R5 R5 #1	../Examples/Compare.asm
+(3048) F020 1111000000100000 ( 143) GET_R2_LOOP             GETC	../Examples/Compare.asm
+(3049) F021 1111000000100001 ( 144)                         OUT	../Examples/Compare.asm
+(304A) 56E0 0101011011100000 ( 145)                         AND R3 R3 #0	../Examples/Compare.asm
+(304B) 1604 0001011000000100 ( 146)                         ADD R3 R0 R4	../Examples/Compare.asm
+(304C) 0404 0000010000000100 ( 147)                         BRz PROCESS_R2	../Examples/Compare.asm
+(304D) 1002 0001000000000010 ( 148)                         ADD R0 R0 R2	../Examples/Compare.asm
+(304E) 7140 0111000101000000 ( 149)                         STR R0 R5 #0	../Examples/Compare.asm
+(304F) 1B61 0001101101100001 ( 150)                         ADD R5 R5 #1	../Examples/Compare.asm
+(3050) 0FF7 0000111111110111 ( 151)                         BRnzp GET_R2_LOOP	../Examples/Compare.asm
+(3051) 54A0 0101010010100000 ( 155) PROCESS_R2              AND R2 R2 #0	../Examples/Compare.asm
+(3052) 1B7F 0001101101111111 ( 156)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(3053) 6740 0110011101000000 ( 157)                         LDR R3 R5 #0	../Examples/Compare.asm
+(3054) 5020 0101000000100000 ( 158)                         AND R0 R0 #0	../Examples/Compare.asm
+(3055) 10F6 0001000011110110 ( 159)                         ADD R0 R3 #-10	../Examples/Compare.asm
+(3056) 0428 0000010000101000 ( 160)                         BRz CHECKING_LOOP	../Examples/Compare.asm
+(3057) 5020 0101000000100000 ( 161)                         AND R0 R0 #0	../Examples/Compare.asm
+(3058) 10E0 0001000011100000 ( 162)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3059) 10E0 0001000011100000 ( 163)                         ADD R0 R3 #0	../Examples/Compare.asm
+(305A) 0821 0000100000100001 ( 166)                         BRn MAKE_R2_NEGATIVE	../Examples/Compare.asm
+(305B) 1483 0001010010000011 ( 167)                         ADD R2 R2 R3	../Examples/Compare.asm
+(305C) 1B7F 0001101101111111 ( 169)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(305D) 6740 0110011101000000 ( 170)                         LDR R3 R5 #0	../Examples/Compare.asm
+(305E) 5020 0101000000100000 ( 171)                         AND R0 R0 #0	../Examples/Compare.asm
+(305F) 10F6 0001000011110110 ( 172)                         ADD R0 R3 #-10	../Examples/Compare.asm
+(3060) 041E 0000010000011110 ( 173)                         BRz CHECKING_LOOP	../Examples/Compare.asm
+(3061) 5020 0101000000100000 ( 174)                         AND R0 R0 #0	../Examples/Compare.asm
+(3062) 10E0 0001000011100000 ( 175)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3063) 10E0 0001000011100000 ( 176)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3064) 0817 0000100000010111 ( 179)                         BRn MAKE_R2_NEGATIVE	../Examples/Compare.asm
+(3065) EC3F 1110110000111111 ( 180)                         LEA R6 LookUp10	../Examples/Compare.asm
+(3066) 1D83 0001110110000011 ( 181)                         ADD R6 R6 R3	../Examples/Compare.asm
+(3067) 5020 0101000000100000 ( 182)                         AND R0 R0 #0	../Examples/Compare.asm
+(3068) 6180 0110000110000000 ( 183)                         LDR R0 R6 #0	../Examples/Compare.asm
+(3069) 1480 0001010010000000 ( 184)                         ADD R2 R2 R0	../Examples/Compare.asm
+(306A) 1B7F 0001101101111111 ( 186)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(306B) 6740 0110011101000000 ( 187)                         LDR R3 R5 #0	../Examples/Compare.asm
+(306C) 5020 0101000000100000 ( 188)                         AND R0 R0 #0	../Examples/Compare.asm
+(306D) 10F6 0001000011110110 ( 189)                         ADD R0 R3 #-10	../Examples/Compare.asm
+(306E) 0410 0000010000010000 ( 190)                         BRz CHECKING_LOOP	../Examples/Compare.asm
+(306F) 5020 0101000000100000 ( 191)                         AND R0 R0 #0	../Examples/Compare.asm
+(3070) 10E0 0001000011100000 ( 192)                         ADD R0 R3 #0	../Examples/Compare.asm
+(3071) 080A 0000100000001010 ( 195)                         BRn MAKE_R2_NEGATIVE	../Examples/Compare.asm
+(3072) EC3C 1110110000111100 ( 196)                         LEA R6 LookUp100	../Examples/Compare.asm
+(3073) 1D83 0001110110000011 ( 197)                         ADD R6 R6 R3	../Examples/Compare.asm
+(3074) 5020 0101000000100000 ( 198)                         AND R0 R0 #0	../Examples/Compare.asm
+(3075) 6180 0110000110000000 ( 199)                         LDR R0 R6 #0	../Examples/Compare.asm
+(3076) 1480 0001010010000000 ( 200)                         ADD R2 R2 R0	../Examples/Compare.asm
+(3077) 1B7F 0001101101111111 ( 202)                         ADD R5 R5 #-1	../Examples/Compare.asm
+(3078) 6740 0110011101000000 ( 203)                         LDR R3 R5 #0	../Examples/Compare.asm
+(3079) 5020 0101000000100000 ( 204)                         AND R0 R0 #0	../Examples/Compare.asm
+(307A) 10E0 0001000011100000 ( 205)                         ADD R0 R3 #0	../Examples/Compare.asm
+(307B) 0603 0000011000000011 ( 208)                         BRzp CHECKING_LOOP	../Examples/Compare.asm
+(307C) 94BF 1001010010111111 ( 212) MAKE_R2_NEGATIVE        NOT R2 R2	../Examples/Compare.asm
+(307D) 14A1 0001010010100001 ( 213)                         ADD R2 R2 #1	../Examples/Compare.asm
+(307E) 7B40 0111101101000000 ( 214)                         STR R5 R5 #0	../Examples/Compare.asm
+(307F) E039 1110000000111001 ( 218) CHECKING_LOOP           LEA R0 NEGATIVE_ONE	../Examples/Compare.asm
+(3080) 1660 0001011001100000 ( 219)                         ADD R3 R1 #0	../Examples/Compare.asm
+(3081) 0804 0000100000000100 ( 220)                         BRn R1_NEGATIVE	../Examples/Compare.asm
+(3082) 56E0 0101011011100000 ( 221)                         AND R3 R3 #0	../Examples/Compare.asm
+(3083) 16A0 0001011010100000 ( 222)                         ADD R3 R2 #0	../Examples/Compare.asm
+(3084) 0806 0000100000000110 ( 223)                         BRn R1_POSITIVE_R2_NEGATIVE	../Examples/Compare.asm
+(3085) 0E07 0000111000000111 ( 225)                         BRnzp R1_R2_SAME_SIGN	../Examples/Compare.asm
+(3086) 56E0 0101011011100000 ( 230) R1_NEGATIVE             AND R3 R3 #0	../Examples/Compare.asm
+(3087) 16A0 0001011010100000 ( 231)                         ADD R3 R2 #0	../Examples/Compare.asm
+(3088) 0804 0000100000000100 ( 232)                         BRn R1_R2_SAME_SIGN	../Examples/Compare.asm
+(3089) E02F 1110000000101111 ( 236) R1_NEGATIVE_R2_POSITIVE LEA R0 NEGATIVE_ONE	../Examples/Compare.asm
+(308A) 480C 0100100000001100 ( 237)                         JSR PRINT	../Examples/Compare.asm
+(308B) E030 1110000000110000 ( 241) R1_POSITIVE_R2_NEGATIVE LEA R0 POSITIVE_ONE	../Examples/Compare.asm
+(308C) 480A 0100100000001010 ( 242)                         JSR PRINT	../Examples/Compare.asm
+(308D) 94BF 1001010010111111 ( 246) R1_R2_SAME_SIGN         NOT R2 R2	../Examples/Compare.asm
+(308E) 14A1 0001010010100001 ( 247)                         ADD R2 R2 #1	../Examples/Compare.asm
+(308F) 56E0 0101011011100000 ( 248)                         AND R3 R3 #0	../Examples/Compare.asm
+(3090) 1642 0001011001000010 ( 249)                         ADD R3 R1 R2	../Examples/Compare.asm
+(3091) 0805 0000100000000101 ( 250)                         BRn PRINT	../Examples/Compare.asm
+(3092) 56E0 0101011011100000 ( 251)                         AND R3 R3 #0	../Examples/Compare.asm
+(3093) 1642 0001011001000010 ( 252)                         ADD R3 R1 R2	../Examples/Compare.asm
+(3094) 0201 0000001000000001 ( 253)                         BRp POSITIVE	../Examples/Compare.asm
+(3095) 1022 0001000000100010 ( 254)                         ADD R0 R0 #2	../Examples/Compare.asm
+(3096) 1023 0001000000100011 ( 258) POSITIVE                ADD R0 R0 #3	../Examples/Compare.asm
+(3097) F022 1111000000100010 ( 262) PRINT                   PUTS	../Examples/Compare.asm
+(3098) 5020 0101000000100000 ( 266) SET_R0                  AND R0 R0 #0	../Examples/Compare.asm
+(3099) 103F 0001000000111111 ( 267)                         ADD R0 R0 #-1	../Examples/Compare.asm
+(309A) 16E0 0001011011100000 ( 268)                         ADD R3 R3 #0	../Examples/Compare.asm
+(309B) 0803 0000100000000011 ( 269)                         BRn DONE	../Examples/Compare.asm
+(309C) 0401 0000010000000001 ( 270)                         BRz SET_R0_ZERO	../Examples/Compare.asm
+(309D) 1021 0001000000100001 ( 271)                         ADD R0 R0 #1	../Examples/Compare.asm
+(309E) 1021 0001000000100001 ( 275) SET_R0_ZERO             ADD R0 R0 #1	../Examples/Compare.asm
+(309F) F025 1111000000100101 ( 279) DONE                    HALT	../Examples/Compare.asm
+(30A0) 0000 0000000000000000 ( 282) INPUT_STACK             .FILL 0x0000	../Examples/Compare.asm
+(30A1) 0000 0000000000000000 ( 282)                         .FILL 0x0000	../Examples/Compare.asm
+(30A2) 0000 0000000000000000 ( 282)                         .FILL 0x0000	../Examples/Compare.asm
+(30A3) 0000 0000000000000000 ( 282)                         .FILL 0x0000	../Examples/Compare.asm
+(30A4) 0000 0000000000000000 ( 282)                         .FILL 0x0000	../Examples/Compare.asm
+(30A5) 0000 0000000000000000 ( 286) LookUp10                .FILL 0x0000	../Examples/Compare.asm
+(30A6) 000A 0000000000001010 ( 287)                         .FILL 0x000A	../Examples/Compare.asm
+(30A7) 0014 0000000000010100 ( 288)                         .FILL 0x0014	../Examples/Compare.asm
+(30A8) 001E 0000000000011110 ( 289)                         .FILL 0x001E	../Examples/Compare.asm
+(30A9) 0028 0000000000101000 ( 290)                         .FILL 0x0028	../Examples/Compare.asm
+(30AA) 0032 0000000000110010 ( 291)                         .FILL 0x0032	../Examples/Compare.asm
+(30AB) 003C 0000000000111100 ( 292)                         .FILL 0x003C	../Examples/Compare.asm
+(30AC) 0046 0000000001000110 ( 293)                         .FILL 0x0046	../Examples/Compare.asm
+(30AD) 0050 0000000001010000 ( 294)                         .FILL 0x0050	../Examples/Compare.asm
+(30AE) 005A 0000000001011010 ( 295)                         .FILL 0x005A	../Examples/Compare.asm
+(30AF) 0000 0000000000000000 ( 299) LookUp100               .FILL 0x0000	../Examples/Compare.asm
+(30B0) 0064 0000000001100100 ( 300)                         .FILL 0x0064	../Examples/Compare.asm
+(30B1) 00C8 0000000011001000 ( 301)                         .FILL 0x00C8	../Examples/Compare.asm
+(30B2) 012C 0000000100101100 ( 302)                         .FILL 0x012C	../Examples/Compare.asm
+(30B3) 0190 0000000110010000 ( 303)                         .FILL 0x0190	../Examples/Compare.asm
+(30B4) 01F4 0000000111110100 ( 304)                         .FILL 0x01F4	../Examples/Compare.asm
+(30B5) 0258 0000001001011000 ( 305)                         .FILL 0x0258	../Examples/Compare.asm
+(30B6) 02BC 0000001010111100 ( 306)                         .FILL 0x02BC	../Examples/Compare.asm
+(30B7) 0320 0000001100100000 ( 307)                         .FILL 0x0320	../Examples/Compare.asm
+(30B8) 0384 0000001110000100 ( 308)                         .FILL 0x0384	../Examples/Compare.asm
+(30B9) 002D 0000000000101101 ( 312) NEGATIVE_ONE            .FILL 0x2D00	../Examples/Compare.asm
+(30BA) 3100 0000000000110001 ( 312)                         .FILL 0x0031	../Examples/Compare.asm
+(30BB) 0000 0000000000000000 ( 312)                         .FILL 0x0000	../Examples/Compare.asm
+(30BC) 0031 0000000000110001 ( 315) POSITIVE_ONE            .FILL 0x3100	../Examples/Compare.asm
+(30BD) 0000 0000000000000000 ( 315)                         .FILL 0x0000	../Examples/Compare.asm
+(30BE) 0030 0000000000110000 ( 318) ZERO                    .FILL 0x3000	../Examples/Compare.asm
+(30BF) 0000 0000000000000000 ( 318)                         .FILL 0x0000	../Examples/Compare.asm
+(30C0) 0000 0000000000000000 ( 320)                         .END	../Examples/Compare.asm

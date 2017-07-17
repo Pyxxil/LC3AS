@@ -664,13 +664,13 @@ void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
 }
 
 Lexer::Lexer(const std::string &t_file)
-        : at_line(0), at_column(0), length(0), file_name(t_file), file(t_file), symbols(), tokens(), parent(nullptr)
+        : at_line(0), at_column(0), length(0), file_name(t_file), file(t_file), symbols(), parent(nullptr), tokens()
 {
         open_files.emplace_back(file_name);
 }
 
 Lexer::Lexer(Lexer *const t_parent, const std::string &t_file, size_t line, size_t col, size_t len)
-        : at_line(line), at_column(col), length(len), file_name(t_file), file(t_file), symbols(), tokens(), parent(t_parent)
+        : at_line(line), at_column(col), length(len), file_name(t_file), file(t_file), symbols(), parent(t_parent), tokens()
 {
         open_files.emplace_back(file_name);
 }
