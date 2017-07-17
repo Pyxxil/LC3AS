@@ -38,9 +38,10 @@ std::int32_t Not::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(
-                static_cast<uint16_t>(0x903F |
-                                      ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
-                                      ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6))
+                static_cast<uint16_t>(
+                        0x903F | ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
+                                ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6)
+                )
         );
 
         return 1;

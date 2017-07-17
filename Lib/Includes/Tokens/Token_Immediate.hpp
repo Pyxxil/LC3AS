@@ -15,9 +15,9 @@ public:
 
         virtual Token::token_type type() const override;
         void requires_too_many_bits(int allowed_bits,
-                                            bool is_signed,
-                                            const Token *caller,
-                                            const std::map<std::string, Symbol> &symbols) override;
+                                    bool is_signed,
+                                    const Token *caller,
+                                    const std::map<std::string, Symbol> &symbols) override;
 
         std::int16_t value = 0;
 };

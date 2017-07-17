@@ -55,8 +55,8 @@ namespace Console
         struct Colour
         {
                 explicit Colour(FOREGROUND_COLOUR _fg,
-                       MODIFIER modifier = MODIFIER::NORMAL,
-                       BACKGROUND_COLOUR _bg = BACKGROUND_COLOUR::RESET)
+                                MODIFIER modifier = MODIFIER::NORMAL,
+                                BACKGROUND_COLOUR _bg = BACKGROUND_COLOUR::RESET)
                         : fg(_fg), bg(_bg), mod(modifier)
                 { }
                 Colour(const Colour &other) = default;

@@ -28,8 +28,9 @@ std::int32_t Jmp::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(
-                static_cast<uint16_t>(0xC000 |
-                                      (std::static_pointer_cast<Register>(tokens.at(1))->reg << 6))
+                static_cast<uint16_t>(
+                        0xC000 | (std::static_pointer_cast<Register>(tokens.at(1))->reg << 6)
+                )
         );
 
         return 1;

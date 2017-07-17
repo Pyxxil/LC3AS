@@ -28,8 +28,9 @@ std::int32_t Jsrr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(
-                static_cast<uint16_t>(0x4000 |
-                                      (std::static_pointer_cast<Register>(tokens.at(1))->reg << 5))
+                static_cast<uint16_t>(
+                        0x4000 | (std::static_pointer_cast<Register>(tokens.at(1))->reg << 5)
+                )
         );
 
         return 1;

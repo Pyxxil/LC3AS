@@ -82,7 +82,7 @@ bool Assembler::Assembler::configure(int argc, char **args)
         }
 
         if (0 != option_parser.count("include")) {
-                auto dirs = option_parser["include"].as<std::vector<std::string>>();
+                auto      dirs = option_parser["include"].as<std::vector<std::string>>();
                 for (auto &&dir : dirs) {
                         Config::add_search_directory(dir);
                 }
@@ -130,7 +130,7 @@ void Assembler::Assembler::assemble()
 
                 if (!Config::is_set(Config::CONFIG_OPTIONS::BE_QUIET)) {
                         Console::write(Diagnostics::Variant<std::string>(
-                                "--- ",Console::Colour(Console::FOREGROUND_COLOUR::RESET))
+                                "--- ", Console::Colour(Console::FOREGROUND_COLOUR::RESET))
                         );
                         Console::write(Diagnostics::Variant<std::string>(
                                 "Assembling file '" + file + "'", Console::Colour(Console::FOREGROUND_COLOUR::RESET))

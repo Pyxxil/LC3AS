@@ -61,8 +61,10 @@ std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         provided = tokens.at(1);
-        assembled.emplace_back(static_cast<uint16_t>(0x0000 |
-                static_cast<int>(N) << 11 | static_cast<int>(Z) << 10 | static_cast<int>(P) << 9 | (offset & 0x1FF)));
+        assembled.emplace_back(
+                static_cast<uint16_t>(
+                        0x0000 | static_cast<int>(N) << 11 | static_cast<int>(Z) << 10 |
+                        static_cast<int>(P) << 9 | (offset & 0x1FF)));
 
         return 1;
 }

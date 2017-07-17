@@ -63,7 +63,7 @@ Character::Character(std::string &character,
                                                         Diagnostics::Variant<size_t>(
                                                                 column
                                                         )
-                                                ), '^', "Found here",lexed_lines[file].at(line_number - 1)
+                                                ), '^', "Found here", lexed_lines[file].at(line_number - 1)
                                         ), '~', character.length()
                                 )
                         );

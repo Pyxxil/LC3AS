@@ -28,8 +28,9 @@ std::int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         }
 
         assembled.emplace_back(
-                static_cast<uint16_t>(0xF000 |
-                                      (std::static_pointer_cast<Immediate>(tokens.at(1))->value & 0xFF))
+                static_cast<uint16_t>(
+                        0xF000 | (std::static_pointer_cast<Immediate>(tokens.at(1))->value & 0xFF)
+                )
         );
 
         return 1;

@@ -85,10 +85,10 @@ namespace Diagnostics
                 std::string     message;
                 DIAGNOSTIC_TYPE d_type;
 
-                DIAGNOSTIC      d;
+                DIAGNOSTIC d;
 
                 std::vector<std::unique_ptr<Context>> context;
-                FileContext info;
+                FileContext                           info;
         };
 
         void push(Diagnostic &&message);

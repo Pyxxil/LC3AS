@@ -21,7 +21,7 @@ public:
         Lexer(Lexer &&other) = default;
 
         Lexer &operator =(const Lexer &rhs) = default;
-        Lexer &operator = (Lexer &&rhs) = default;
+        Lexer &operator =(Lexer &&rhs) = default;
 
         ~Lexer();
 
