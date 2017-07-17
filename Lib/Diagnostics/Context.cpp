@@ -1,6 +1,9 @@
 #include "Context.hpp"
 
 #include <iomanip>
+#if defined (_WIN64)
+#include <cctype>
+#endif
 
 #include "Diagnostics.hpp"
 
@@ -20,8 +23,12 @@ Diagnostics::Context::Context(Diagnostics::FileContext file,
                               std::string t_message,
                               std::string t_line,
                               Diagnostics::Context::CONTEXT_TYPE t_type)
+<<<<<<< HEAD
         : file_information(std::move(file)), message(std::move(t_message)), line(t_line), context_type(t_type)
           , empty_line()
+=======
+        : file_information(std::move(file)), message(std::move(t_message)), line(t_line), empty_line(), context_type(t_type)
+>>>>>>> windows
 {
         for (size_t i = 0; i < file.get_column().var(); ++i) {
                 empty_line += 0 != std::isspace(t_line[i]) ? t_line[i] : ' ';
