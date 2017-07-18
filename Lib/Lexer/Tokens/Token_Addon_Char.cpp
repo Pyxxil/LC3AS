@@ -39,7 +39,7 @@ Character::Character(std::string &character,
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(file, line_number, column),
-                        '^', "Found here", lexed_lines[file].at(line_number - 1)
+                        '^', "Found here", lexed_lines[file].at(line_number)
                     ), '~', character.length()
                 )
             );
@@ -59,7 +59,7 @@ Character::Character(std::string &character,
             std::make_unique<Diagnostics::SelectionContext>(
                 Diagnostics::FileContext(file, line_number, column),
                 '^', "Expected character, not empty sequence",
-                lexed_lines[file].at(line_number - 1)
+                lexed_lines[file].at(line_number)
             )
         );
 

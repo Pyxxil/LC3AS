@@ -87,7 +87,7 @@ public:
                                     int width) const;
 
     virtual void expected(const char *expects) const;
-    virtual void invalid_argument_count(size_t provided, size_t expected) const;
+    virtual void invalid_argument_count(size_t provided, size_t expected, size_t last_column) const;
     virtual void requires_too_many_bits(int allowed_bits,
                                         bool is_signed,
                                         const Token *const caller,

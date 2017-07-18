@@ -74,18 +74,9 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
         diag.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
-                    Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(
-                            file
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            at_line
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            at_column
-                        )
-                    ), '^', "No such label '" + token + "'; Did you mean '" + possible_match + "'?",
-                    lexed_lines[file].at(at_line - 1)
+                    Diagnostics::FileContext(file, at_line, at_column),
+                    '^', "No such label '" + token + "'; Did you mean '" + possible_match + "'?",
+                    lexed_lines[file].at(at_line)
                 ), '~', token.size(), possible_match
             )
         );
@@ -95,17 +86,11 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(
-                            sym->second.file
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            sym->second.line_number
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            sym->second.column
-                        )
+                        sym->second.file,
+                        sym->second.line_number,
+                        sym->second.column
                     ), '^', "'" + possible_match + "' declared here",
-                    lexed_lines[sym->second.file].at(sym->second.line_number - 1)
+                    lexed_lines[sym->second.file].at(sym->second.line_number)
                 ),
                 '~', sym->first.length()
             )
@@ -148,17 +133,8 @@ void Label::requires_too_many_bits(int allowed_bits,
     diag.provide_context(
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
-                Diagnostics::FileContext(
-                    Diagnostics::Variant<std::string>(
-                        file
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        at_line
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        at_column
-                    )
-                ), '^', ss.str(), lexed_lines[file].at(at_line - 1)
+                Diagnostics::FileContext(file, at_line, at_column),
+                '^', ss.str(), lexed_lines[file].at(at_line)
             ), '~', token.length()
         )
     );
@@ -168,17 +144,11 @@ void Label::requires_too_many_bits(int allowed_bits,
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(
-                    Diagnostics::Variant<std::string>(
-                        sym->second.file
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        sym->second.line_number
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        sym->second.column
-                    )
+                    sym->second.file,
+                    sym->second.line_number,
+                    sym->second.column
                 ), '^', "'" + sym->first + "' declared here",
-                lexed_lines[sym->second.file].at(sym->second.line_number - 1)
+                lexed_lines[sym->second.file].at(sym->second.line_number)
             ), '~', sym->first.length()
         )
     );

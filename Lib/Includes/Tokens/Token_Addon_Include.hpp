@@ -5,7 +5,6 @@
 
 #include <string>
 
-#ifdef INCLUDE_ADDONS
 class Include: public Token
 {
 public:
@@ -19,6 +18,5 @@ public:
 
     virtual token_type type() const override;
 };
-#endif
 
 #endif // TOKEN_ADDON_INCLUDE_HPP

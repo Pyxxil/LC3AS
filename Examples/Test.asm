@@ -20,4 +20,5 @@ ERRORS: 5               ; Current error count (this line complains twice)
         ADD R0, R10, R0 ; Expected register
         AND R0, R8, R0  ; Invalid register
         JMP R9          ; Invalid register
+        .STRINGZ "Here" "is a weird string"
 

@@ -23,7 +23,7 @@ Register::Register(std::string &which,
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
-                    '^', "A valid register lies between 0..7", lexed_lines[file].at(at_line - 1)
+                    '^', "A valid register lies between R0 and R7 (inclusive)", lexed_lines[file].at(at_line)
                 ), '~', token.length(), "R{0..7}"
             )
         );

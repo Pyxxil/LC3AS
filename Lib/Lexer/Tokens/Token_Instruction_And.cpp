@@ -60,7 +60,7 @@ std::int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool And::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 4) {
-        invalid_argument_count(tokens.size(), 3);
+        invalid_argument_count(tokens.size(), 3, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 

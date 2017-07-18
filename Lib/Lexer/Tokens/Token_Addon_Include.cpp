@@ -1,8 +1,6 @@
 #include "Tokens/Token.hpp"
 #include "Tokens/Token_Addon_Include.hpp"
 
-#ifdef INCLUDE_ADDONS
-
 Include::Include(std::string &t_token,
                  std::string &t_token_uppercase,
                  std::string &t_file,
@@ -16,7 +14,7 @@ Include::Include(std::string &t_token,
 bool Include::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 2) {
-        invalid_argument_count(tokens.size(), 1);
+        invalid_argument_count(tokens.size(), 1, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -32,4 +30,3 @@ Token::token_type Include::type() const
 {
     return Token::ADDON_INCLUDE;
 }
-#endif

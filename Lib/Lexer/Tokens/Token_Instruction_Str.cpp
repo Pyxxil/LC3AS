@@ -41,7 +41,7 @@ std::int32_t Str::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Str::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 4) {
-        invalid_argument_count(tokens.size(), 3);
+        invalid_argument_count(tokens.size(), 3, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 

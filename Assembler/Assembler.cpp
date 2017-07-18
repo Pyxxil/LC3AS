@@ -226,19 +226,11 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(
-                            Diagnostics::Variant<std::string>(
-                                tokenized_line.front()->file
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line.front()->at_line
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line.front()->at_column
-                            )
+                            tokenized_line.front()->file,
+                            tokenized_line.front()->at_line,
+                            tokenized_line.front()->at_column
                         ), '^', "This might mean this line is superfluous",
-                        lexed_lines[tokenized_line.front()->file].at(
-                            tokenized_line.front()->at_line - 1
-                        )
+                        lexed_lines[tokenized_line.front()->file].at(tokenized_line.front()->at_line)
                     ), '~', tokenized_line.front()->token.length()
                 )
             );
@@ -247,19 +239,11 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(
-                            Diagnostics::Variant<std::string>(
-                                tokens[i - 1].front()->file
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokens[i - 1].front()->at_line
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokens[i - 1].front()->at_column
-                            )
+                            tokens[i - 1].front()->file,
+                            tokens[i - 1].front()->at_line,
+                            tokens[i - 1].front()->at_column
                         ), '^', "Checks the same condition code as this line",
-                        lexed_lines[tokens[i - 1].front()->file].at(
-                            tokens[i - 1].front()->at_line - 1
-                        )
+                        lexed_lines[tokens[i - 1].front()->file].at(tokens[i - 1].front()->at_line)
                     ), '~', tokens[i - 1].front()->token.length()
                 )
             );
@@ -270,15 +254,9 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
         if (0 == (assembled_line & 0x1FF)) {
             Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(
-                    Diagnostics::Variant<std::string>(
-                        tokenized_line.front()->file
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        tokenized_line.front()->at_line
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        tokenized_line.front()->at_column
-                    )
+                    tokenized_line.front()->file,
+                    tokenized_line.front()->at_line,
+                    tokenized_line.front()->at_column
                 ), "Superfluous statement", Diagnostics::LOGIC, Diagnostics::WARNING
             );
 
@@ -286,20 +264,13 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(
-                            Diagnostics::Variant<std::string>(
-                                tokenized_line[1]->file
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line[1]->at_line
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line[1]->at_column
-                            )
+                            tokenized_line[1]->file,
+                            tokenized_line[1]->at_line,
+                            tokenized_line[1]->at_column
                         ),
                         '^',
-                        "Offset of 0 is superfluous -- simulator will go to next line no "
-                            "matter what",
-                        lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line - 1)
+                        "Offset of 0 is superfluous -- simulator will go to next line no matter what",
+                        lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line)
                     ), '~', tokenized_line[1]->token.length()
                 )
             );
@@ -310,17 +281,11 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                     std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                             Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(
-                                    sym->second.file
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    sym->second.line_number
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    sym->second.column
-                                )
+                                sym->second.file,
+                                sym->second.line_number,
+                                sym->second.column
                             ), '^', "Referred to label defined here",
-                            lexed_lines[sym->second.file].at(sym->second.line_number - 1)
+                            lexed_lines[sym->second.file].at(sym->second.line_number)
                         ), '~', sym->first.length()
                     )
                 );
@@ -357,7 +322,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                 tokenized_line[1]->at_column
                             )
                         ), '^', "Offset of -1 might cause an infinite loop",
-                        lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line - 1)
+                        lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line)
                     ), '~', tokenized_line[1]->token.length()
                 )
             );
@@ -368,17 +333,11 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                     std::make_unique<Diagnostics::HighlightContext>(
                         Diagnostics::SelectionContext(
                             Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(
-                                    sym->second.file
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    sym->second.line_number
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    sym->second.column
-                                )
+                                sym->second.file,
+                                sym->second.line_number,
+                                sym->second.column
                             ), '^', "Referred to label defined here",
-                            lexed_lines[sym->second.file].at(sym->second.line_number - 1)
+                            lexed_lines[sym->second.file].at(sym->second.line_number)
                         ), '~', sym->first.length()
                     )
                 );
@@ -392,29 +351,23 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
         if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
             Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(
-                        tokenized_line.front()->file,
-                        tokenized_line.front()->at_line,
-                        tokenized_line.front()->at_column
-                ),
-                "Possible illegal trap vector",
-                Diagnostics::LOGIC,
-                Diagnostics::WARNING
+                    tokenized_line.front()->file,
+                    tokenized_line.front()->at_line,
+                    tokenized_line.front()->at_column
+                ), "Possible illegal trap vector",
+                Diagnostics::LOGIC, Diagnostics::WARNING
             );
 
             diagnostic.provide_context(
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(
-                                tokenized_line[1]->file,
-                                tokenized_line[1]->at_line,
-                                tokenized_line[1]->at_column
-                        ),
-                        '^',
-                        "Trap vector not between 0x20 and 0x25 (inclusive) might cause"
-                            " an illegal trap vector exception",
-                        lexed_lines[tokenized_line[1]->file].at(
-                            tokenized_line[1]->at_line - 1
-                        )
+                            tokenized_line[1]->file,
+                            tokenized_line[1]->at_line,
+                            tokenized_line[1]->at_column
+                        ), '^', "Trap vector not between 0x20 and 0x25 (inclusive) might "
+                            "cause an illegal trap vector exception",
+                        lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line)
                     ), '~', tokenized_line[1]->token.length(), "0x2{0..5}"
                 )
             );
@@ -479,7 +432,7 @@ void Assembler::Assembler::write(const std::string &file)
 
     std::uint16_t pc = 0;
 
-    const std::string empty = " ";
+    const std::string empty;
 
     for (auto &&tokenized_line : tokens) {
         auto &&symbol = symbol_at(pc);

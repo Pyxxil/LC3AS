@@ -5,8 +5,6 @@
 
 #include "Tokens/Token_Register.hpp"
 
-#ifdef INCLUDE_ADDONS
-
 Set::Set(std::string &directive,
          std::string &directive_uppercase,
          std::string &t_file,
@@ -67,7 +65,7 @@ std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Set::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 3) {
-        invalid_argument_count(tokens.size(), 2);
+        invalid_argument_count(tokens.size(), 2, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -126,5 +124,3 @@ Token::token_type Set::type() const
 {
     return Token::ADDON_SET;
 }
-
-#endif

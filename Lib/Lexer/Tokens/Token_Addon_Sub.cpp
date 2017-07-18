@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "Tokens/Token_Register.hpp"
-
-#ifdef INCLUDE_ADDONS
+#include "Diagnostics.hpp"
+#include "LexHelper.hpp"
 
 Sub::Sub(std::string &directive,
          std::string &directive_uppercase,
@@ -80,7 +80,7 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() > 4 || tokens.size() == 1) {
-        invalid_argument_count(tokens.size(), 2);
+        invalid_argument_count(tokens.size(), 2, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -132,22 +132,31 @@ std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
     return -1;
 }
 
-void Sub::invalid_argument_count(size_t provided, size_t expected) const
+void Sub::invalid_argument_count(size_t provided, size_t expected, size_t last_column) const
 {
     (void) expected;
+    --provided;
 
-    provided -= 1;
+    std::stringstream error_string;
+    error_string << ".SUB expects 2 or 3 arguments, but " << provided << " arguments were provided";
 
-    // TODO: Turn this into a Diagnostics call
+    Diagnostics::Diagnostic diagnostic(
+        Diagnostics::FileContext(file, at_line, at_column),
+        error_string.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
+    );
 
-    std::cerr << "ERROR: ";
-
-    if (0u != at_line) {
-        std::cerr << "Line " << std::dec << at_line << ": ";
+    if (0u != provided) {
+        diagnostic.provide_context(
+            std::make_unique<Diagnostics::HighlightContext>(
+                Diagnostics::SelectionContext(
+                    Diagnostics::FileContext(file, at_line, at_column + token.length()),
+                    ' ', "Unexpected arguments found here", lexed_lines[file].at(at_line)
+                ), '~', last_column - (at_column + token.length())
+            )
+        );
     }
 
-    std::cerr << ".SUB expects 2 or 3 arguments, but " << provided
-              << (provided == 1 ? " argument was " : "arguments were ") << "provided.\n";
+    Diagnostics::push(diagnostic);
 }
 
 std::string Sub::disassemble(uint16_t &program_counter,
@@ -175,5 +184,3 @@ Token::token_type Sub::type() const
 {
     return Token::ADDON_SUB;
 }
-
-#endif

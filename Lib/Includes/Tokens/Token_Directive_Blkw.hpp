@@ -20,7 +20,7 @@ public:
                           uint16_t program_counter) override;
     std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
 
-    void invalid_argument_count(size_t provided, size_t expected) const override;
+    void invalid_argument_count(size_t provided, size_t expected, size_t last_column) const override;
 
     bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 

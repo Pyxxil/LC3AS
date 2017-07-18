@@ -126,19 +126,9 @@ void Parser::do_first_pass()
                         diag.provide_context(
                             std::make_unique<Diagnostics::SelectionContext>(
                                 Diagnostics::FileContext(
-                                    Diagnostics::Variant<std::string>(
-                                        symbol.second.file
-                                    ),
-                                    Diagnostics::Variant<size_t>(
-                                        symbol.second.line_number
-                                    ),
-                                    Diagnostics::Variant<size_t>(
-                                        symbol.second.column
-                                    )
+                                    symbol.second.file, symbol.second.line_number, symbol.second.column
                                 ), '^', "Previous label found here",
-                                lexed_lines[symbol.second.file].at(
-                                    symbol.second.line_number - 1
-                                )
+                                lexed_lines[symbol.second.file].at(symbol.second.line_number)
                             )
                         );
 
@@ -151,17 +141,10 @@ void Parser::do_first_pass()
                     auto &&sym = symbols.at(tokenized_line.front()->token);
                     Diagnostics::Diagnostic diag(
                         Diagnostics::FileContext(
-                            Diagnostics::Variant<std::string>(
-                                tokenized_line.front()->file
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line.front()->at_line
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line.front()->at_column
-                            )
-                        ),
-                        "Multiple definitions of label",
+                            tokenized_line.front()->file,
+                            tokenized_line.front()->at_line,
+                            tokenized_line.front()->at_column
+                        ), "Multiple definitions of label",
                         Diagnostics::MULTIPLE_DEFINITIONS,
                         Diagnostics::ERROR
                     );
@@ -169,36 +152,22 @@ void Parser::do_first_pass()
                     diag.provide_context(
                         std::make_unique<Diagnostics::SelectionContext>(
                             Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(
-                                    tokenized_line.front()->file
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    tokenized_line.front()->at_line
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    tokenized_line.front()->at_column
-                                )
+                                tokenized_line.front()->file,
+                                tokenized_line.front()->at_line,
+                                tokenized_line.front()->at_column
                             ), '^', "Redefinition of this label",
-                            lexed_lines[tokenized_line.front()->file].at(
-                                tokenized_line.front()->at_line - 1
-                            )
+                            lexed_lines[tokenized_line.front()->file].at(tokenized_line.front()->at_line)
                         )
                     );
 
                     diag.provide_context(
                         std::make_unique<Diagnostics::SelectionContext>(
                             Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(
-                                    sym.file
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    sym.line_number
-                                ),
-                                Diagnostics::Variant<size_t>(
+                                    sym.file,
+                                    sym.line_number,
                                     sym.column
-                                )
                             ), '^', "Previous definition found here",
-                            lexed_lines[sym.file].at(sym.line_number - 1)
+                            lexed_lines[sym.file].at(sym.line_number)
                         )
                     );
 

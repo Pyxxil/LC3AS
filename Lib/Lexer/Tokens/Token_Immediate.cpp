@@ -34,7 +34,7 @@ void Immediate::requires_too_many_bits(int allowed_bits,
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(file, at_line, at_column),
-                '^', ss.str(), lexed_lines[file].at(at_line - 1)
+                '^', ss.str(), lexed_lines[file].at(at_line)
             ), '~', token.length()
         )
     );

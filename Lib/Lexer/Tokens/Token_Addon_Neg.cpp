@@ -5,8 +5,6 @@
 
 #include "Tokens/Token_Immediate_Decimal.hpp"
 
-#ifdef INCLUDE_ADDONS
-
 Neg::Neg(std::string &directive,
          std::string &directive_uppercase,
          std::string &t_file,
@@ -50,7 +48,7 @@ std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Neg::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 2) {
-        invalid_argument_count(tokens.size(), 1);
+        invalid_argument_count(tokens.size(), 1, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -84,5 +82,3 @@ Token::token_type Neg::type() const
 {
     return Token::ADDON_NEG;
 }
-
-#endif

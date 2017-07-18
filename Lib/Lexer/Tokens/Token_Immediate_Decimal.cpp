@@ -43,7 +43,7 @@ Decimal::Decimal(std::string &immediate, std::string &t_file, size_t line_number
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
-                    '^', "Found here", lexed_lines[file].at(at_line - 1)
+                    '^', "Found here", lexed_lines[file].at(at_line)
                 ), '~', token.length()
             )
         );

@@ -30,7 +30,7 @@ public:
         uint16_t &program_counter,
         const std::string &symbol,
         int width) const override;
-    void invalid_argument_count(size_t provided, size_t expected) const override;
+    void invalid_argument_count(size_t provided, size_t expected, size_t last_column) const override;
 
 private:
     std::shared_ptr<And> set_zero;

@@ -74,7 +74,7 @@ void Token::expected(const char *const expects) const
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(file, at_line, at_column),
                 '^', "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
-                lexed_lines[file].at(at_line - 1)
+                lexed_lines[file].at(at_line)
             ), '~', token.length()
         )
     );
@@ -98,19 +98,34 @@ const std::vector<uint16_t> Token::as_assembled() const
     return assembled;
 }
 
-void Token::invalid_argument_count(size_t provided, size_t expected) const
+void Token::invalid_argument_count(size_t provided, size_t expected, size_t last_column) const
 {
-    provided -= 1;  // This is not the best idea, but because tokens.size() returns
-    // the number of arguments + the token itself, it's a little easier to do here.
-    std::cerr << "ERROR: In " << file.substr(file.find_last_of('/') + 1) << ' ';
+    // This is not the best idea, but because tokens.size() returns the number of
+    // arguments + the token itself, it's a little easier to do here.
+    --provided;
 
-    if (0u != at_line) {
-        std::cerr << "at line " << std::dec << at_line << ": ";
+    std::stringstream error_string;
+    error_string << token << " expects " << expected << " argument" << (expected == 1 ? "" : "'s")
+                 << ", but " << (provided < expected ? "only " : "") << provided << " argument"
+                 << (provided == 1 ? " was" : "'s were") << " provided";
+
+    Diagnostics::Diagnostic diagnostic(
+        Diagnostics::FileContext(file, at_line, at_column),
+        error_string.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
+    );
+
+    if (0u != provided) {
+        diagnostic.provide_context(
+            std::make_unique<Diagnostics::HighlightContext>(
+                Diagnostics::SelectionContext(
+                    Diagnostics::FileContext(file, at_line, at_column + token.length()),
+                    ' ', "Unexpected arguments found here", lexed_lines[file].at(at_line)
+                ), '~', last_column - (at_column + token.length())
+            )
+        );
     }
 
-    std::cerr << token << " expects " << expected << " argument" << (expected == 1 ? "" : "'s") << ", but "
-              << (provided < expected ? "only " : "") << provided << " argument"
-              << (provided == 1 ? " was" : "'s were") << " provided.\n";
+    Diagnostics::push(diagnostic);
 }
 
 bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)

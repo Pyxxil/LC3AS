@@ -34,7 +34,7 @@ std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Orig::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 2) {
-        invalid_argument_count(tokens.size(), 1);
+        invalid_argument_count(tokens.size(), 1, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 

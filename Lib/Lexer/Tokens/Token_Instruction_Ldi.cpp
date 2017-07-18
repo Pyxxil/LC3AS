@@ -59,7 +59,7 @@ std::int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Ldi::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 3) {
-        invalid_argument_count(tokens.size(), 2);
+        invalid_argument_count(tokens.size(), 2, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 

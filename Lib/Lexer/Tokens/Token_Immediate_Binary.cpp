@@ -57,7 +57,7 @@ Binary::Binary(std::string &immediate,
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
-                    '^', "Found here", lexed_lines[file].at(at_line - 1)
+                    '^', "Found here", lexed_lines[file].at(at_line)
                 ), '~', token.length()
             )
         );

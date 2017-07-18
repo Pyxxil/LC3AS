@@ -87,6 +87,7 @@ WARNING_THROWS:         ; All of the following should throw warnings with
 Br WARNING_STRING        ; Should complain about the offset of 0
 WARNING_STRING:
         .STRINGZ "\ "    ; Should throw a warning about the lone '\'
+        .STRINGZ "  " "Hello"           ; hello
 
 ; Uncomment the following for testing
 ;       Current Error Count = 38

@@ -12,12 +12,6 @@ set(LEXER_HEADER_FILES
 
 set(TOKENS_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Char.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Include.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Lshift.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Neg.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Set.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Sub.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Directive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Directive_Blkw.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Directive_End.cpp
@@ -61,11 +55,6 @@ set(TOKENS_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Symbol.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Char.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Include.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Lshift.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Neg.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Set.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Sub.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Directive.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Directive_Blkw.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Directive_End.hpp
@@ -105,6 +94,27 @@ set(TOKENS_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Trap_Putsp.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Tokens.hpp
     )
+
+if (ALLOW_EXTRAS)
+    set (TOKENS_SOURCE_FILES
+        "${TOKENS_SOURCE_FILES}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Char.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Include.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Lshift.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Neg.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Set.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Token_Addon_Sub.cpp
+        )
+
+    set (TOKENS_HEADER_FILES
+        "${TOKENS_HEADER_FILES}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Include.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Lshift.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Neg.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Set.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Sub.hpp
+        )
+endif ()
 
 set(PARSER_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Parser/Parser.cpp

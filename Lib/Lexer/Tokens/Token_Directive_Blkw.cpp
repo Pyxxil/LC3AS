@@ -5,6 +5,8 @@
 #include <bitset>
 
 #include "Tokens/Tokens.hpp"
+#include "Diagnostics.hpp"
+#include "LexHelper.hpp"
 
 Blkw::Blkw(std::string &directive,
            std::string &directive_uppercase,
@@ -54,7 +56,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() > 3 || tokens.size() == 1) {
-        invalid_argument_count(tokens.size(), 1);
+        invalid_argument_count(tokens.size(), 1, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -86,21 +88,32 @@ std::int32_t Blkw::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens
     return static_cast<std::int32_t>(is_valid) * std::static_pointer_cast<Immediate>(tokens.at(1))->value;
 }
 
-void Blkw::invalid_argument_count(size_t provided, size_t expected) const
+void Blkw::invalid_argument_count(size_t provided, size_t expected, size_t last_column) const
 {
     (void) expected;
 
-    // TODO: Turn this into a Diagnostics call
+    --provided;
 
-    provided -= 1;
+    std::stringstream error_string;
+    error_string << ".BLKW expects 1 or 2 arguments, but " << provided << " arguments were provided";
 
-    std::cerr << "ERROR: ";
+    Diagnostics::Diagnostic diagnostic(
+        Diagnostics::FileContext(file, at_line, at_column),
+        error_string.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
+    );
 
-    if (0u != at_line) {
-        std::cerr << "Line " << std::dec << at_line << ": ";
+    if (0u != provided) {
+        diagnostic.provide_context(
+            std::make_unique<Diagnostics::HighlightContext>(
+                Diagnostics::SelectionContext(
+                    Diagnostics::FileContext(file, at_line, at_column + token.length()),
+                    ' ', "Unexpected arguments found here", lexed_lines[file].at(at_line)
+                ), '~', last_column - (at_column + token.length())
+            )
+        );
     }
 
-    std::cerr << ".BLKW expects 1 or 2 arguments, but " << provided << " arguments were provided.\n";
+    Diagnostics::push(diagnostic);
 }
 
 // TODO: Change the parameters for this to:
