@@ -11,9 +11,7 @@ Lshift::Lshift(std::string &directive,
                size_t column)
     : Directive(directive, directive_uppercase, t_file, line_number, column),
       add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
-{
-
-}
+{}
 
 std::int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                               const std::map<std::string, Symbol> &symbols,

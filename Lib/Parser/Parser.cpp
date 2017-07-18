@@ -36,24 +36,24 @@ void Parser::do_first_pass()
 
         if (end_seen) {
             // TODO: Do we show the user where the .END directive was?
-            Diagnostics::push(
-                Diagnostics::Diagnostic(
-                    Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(
-                            token->file
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            token->at_line
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            token->at_column
-                        )
-                    ),
-                    "Token after .END directive, it will be ignored.",
-                    Diagnostics::SYNTAX,
-                    Diagnostics::WARNING
+            Diagnostics::Diagnostic diagnostic(
+                Diagnostics::FileContext(token->file, token->at_line, token->at_column),
+                "Token after .END directive, it will be ignored.",
+                Diagnostics::SYNTAX, Diagnostics::WARNING
+            );
+
+            diagnostic.provide_context(
+                std::make_unique<Diagnostics::HighlightContext>(
+                    Diagnostics::SelectionContext(
+                        Diagnostics::FileContext(
+                            end->file, end->at_line, end->at_column
+                        ), '^', ".END directive defined here",
+                        lexed_lines[end->file].at(end->at_line)
+                    ), '~', end->token.length()
                 )
             );
+
+            Diagnostics::push(diagnostic);
             return 0;
         }
 
@@ -71,29 +71,31 @@ void Parser::do_first_pass()
         switch (tokenized_line.front()->type()) {
         case Token::DIR_ORIG:
             if (origin_seen) {
-                Diagnostics::Diagnostic diag(
+                Diagnostics::Diagnostic diagnostic(
                     Diagnostics::FileContext(
-                        Diagnostics::Variant<std::string>(
-                            tokenized_line.front()->file
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            tokenized_line.front()->at_line
-                        ),
-                        Diagnostics::Variant<size_t>(
-                            tokenized_line.front()->at_column
-                        )
-                    ),
-                    "Redefinition of Origin memory address.",
-                    Diagnostics::MULTIPLE_DEFINITIONS,
-                    Diagnostics::WARNING
+                        tokenized_line.front()->file,
+                        tokenized_line.front()->at_line,
+                        tokenized_line.front()->at_column
+                    ), "Redefinition of Origin memory address",
+                    Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::WARNING
                 );
 
-                // TODO: Do we try to find the original definition?
+                diagnostic.provide_context(
+                    std::make_unique<Diagnostics::HighlightContext>(
+                        Diagnostics::SelectionContext(
+                            Diagnostics::FileContext(
+                                origin->file, origin->at_line, origin->at_column
+                            ), '^', "Previous definition found here",
+                            lexed_lines[origin->file].at(origin->at_line)
+                        ), '~', origin->token.length()
+                    )
+                );
 
-                Diagnostics::push(diag);
+                Diagnostics::push(diagnostic);
                 break;
             }
             origin_seen = true;
+            origin = tokenized_line.front();
             memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
             if (memory_required > -1) {
                 internal_program_counter += static_cast<uint16_t>(memory_required);
@@ -106,33 +108,27 @@ void Parser::do_first_pass()
 
                 for (const auto &symbol : symbols) {
                     if (symbol.second.address == internal_program_counter) {
-                        Diagnostics::Diagnostic diag(
+                        Diagnostics::Diagnostic diagnostic(
                             Diagnostics::FileContext(
-                                Diagnostics::Variant<std::string>(
-                                    tokenized_line.front()->file
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    tokenized_line.front()->at_line
-                                ),
-                                Diagnostics::Variant<size_t>(
-                                    tokenized_line.front()->at_column
-                                )
-                            ),
-                            "Multiple labels found for address",
-                            Diagnostics::MULTIPLE_DEFINITIONS,
-                            Diagnostics::ERROR
+                                tokenized_line.front()->file,
+                                tokenized_line.front()->at_line,
+                                tokenized_line.front()->at_column
+                            ), "Multiple labels found for address",
+                            Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::ERROR
                         );
 
-                        diag.provide_context(
+                        diagnostic.provide_context(
                             std::make_unique<Diagnostics::SelectionContext>(
                                 Diagnostics::FileContext(
-                                    symbol.second.file, symbol.second.line_number, symbol.second.column
+                                    symbol.second.file,
+                                    symbol.second.line_number,
+                                    symbol.second.column
                                 ), '^', "Previous label found here",
                                 lexed_lines[symbol.second.file].at(symbol.second.line_number)
                             )
                         );
 
-                        Diagnostics::push(diag);
+                        Diagnostics::push(diagnostic);
                         break;
                     }
                 }
@@ -156,7 +152,9 @@ void Parser::do_first_pass()
                                 tokenized_line.front()->at_line,
                                 tokenized_line.front()->at_column
                             ), '^', "Redefinition of this label",
-                            lexed_lines[tokenized_line.front()->file].at(tokenized_line.front()->at_line)
+                            lexed_lines[tokenized_line.front()->file].at(
+                                tokenized_line.front()->at_line
+                            )
                         )
                     );
 
@@ -176,8 +174,12 @@ void Parser::do_first_pass()
 
                 symbols.insert(std::pair<std::string, Symbol>(
                     tokenized_line.front()->token,
-                    Symbol(internal_program_counter, tokenized_line.front()->at_line,
-                           tokenized_line.front()->at_column, tokenized_line.front()->file))
+                    Symbol(
+                        internal_program_counter,
+                        tokenized_line.front()->at_line,
+                        tokenized_line.front()->at_column,
+                        tokenized_line.front()->file
+                    ))
                 );
 
                 longest_symbol_length = std::max(
@@ -188,7 +190,34 @@ void Parser::do_first_pass()
                 internal_program_counter += static_cast<uint16_t>(memory_required);
             }
             break;
-        case Token::DIR_END:end_seen = true;
+        case Token::DIR_END:
+            if (end_seen) {
+                Diagnostics::Diagnostic diagnostic(
+                    Diagnostics::FileContext(
+                        tokenized_line.front()->file,
+                        tokenized_line.front()->at_line,
+                        tokenized_line.front()->at_column
+                    ), "Extra .END directive",
+                    Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::WARNING
+                );
+
+                diagnostic.provide_context(
+                    std::make_unique<Diagnostics::HighlightContext>(
+                        Diagnostics::SelectionContext(
+                            Diagnostics::FileContext(
+                                end->file, end->at_line, end->at_column
+                            ), '^', "Previous definition found here",
+                            lexed_lines[end->file].at(end->at_line)
+                        ), '~', end->token.length()
+                    )
+                );
+
+                Diagnostics::push(diagnostic);
+            }
+            else {
+                end = tokenized_line.front();
+                end_seen = true;
+            }
             break;
         default:memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
             if (memory_required > -1) {
@@ -251,7 +280,7 @@ int Parser::parse()
 
     do_second_pass();
 
-    // Tell the caller whether or not there were errors on the second pass, or not (in which case, the caller
+    // Tell the caller whether there were errors on the second pass, or not (in which case, the caller
     // can continue the assembly).
     return static_cast<int>(Diagnostics::critical());
 }

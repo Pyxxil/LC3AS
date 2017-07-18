@@ -5,9 +5,7 @@
 
 Halt::Halt(std::string &trap, std::string &trap_uppercase, std::string &t_file, size_t line_number, size_t column)
     : Instruction(trap, trap_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,

@@ -9,9 +9,7 @@ Immediate::Immediate(std::string &immediate,
                      size_t line_number,
                      size_t column)
     : Token(immediate, immediate_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 void Immediate::requires_too_many_bits(int allowed_bits,
                                        bool is_signed,
@@ -21,25 +19,25 @@ void Immediate::requires_too_many_bits(int allowed_bits,
     (void) symbols;
     (void) caller;
 
-    Diagnostics::Diagnostic diag(
+    Diagnostics::Diagnostic diagnostic(
         Diagnostics::FileContext(file, at_line, at_column),
         "Address too far away.", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
     );
 
-    std::stringstream ss;
-    ss << "Immediate value '" << token << "' can not be represented as a "
-       << allowed_bits << " bit " << (is_signed ? "signed" : "unsigned") << " value.";
+    std::stringstream error_string;
+    error_string << "Immediate value '" << token << "' can not be represented as a "
+                 << allowed_bits << " bit " << (is_signed ? "signed" : "unsigned") << " value";
 
-    diag.provide_context(
+    diagnostic.provide_context(
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(file, at_line, at_column),
-                '^', ss.str(), lexed_lines[file].at(at_line)
+                '^', error_string.str(), lexed_lines[file].at(at_line)
             ), '~', token.length()
         )
     );
 
-    Diagnostics::push(diag);
+    Diagnostics::push(diagnostic);
 }
 
 Token::token_type Immediate::type() const

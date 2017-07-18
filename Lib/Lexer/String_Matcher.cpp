@@ -6,15 +6,11 @@
 
 String_Matcher::String_Matcher()
     : m_string(), best{std::numeric_limits<long>::max(), ""}
-{
-
-}
+{}
 
 String_Matcher::String_Matcher(const std::string &t_string)
     : m_string(t_string), best{std::numeric_limits<long>::max(), ""}
-{
-
-}
+{}
 
 std::string String_Matcher::best_match() const
 {

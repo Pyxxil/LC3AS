@@ -7,9 +7,7 @@ Include::Include(std::string &t_token,
                  size_t line,
                  size_t column)
     : Token(t_token, t_token_uppercase, t_file, line, column)
-{
-
-}
+{}
 
 bool Include::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {

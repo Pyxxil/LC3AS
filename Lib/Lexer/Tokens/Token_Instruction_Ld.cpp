@@ -14,9 +14,7 @@ Ld::Ld(std::string &instruction,
        size_t line_number,
        size_t column)
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 Ld::Ld(std::string &&instruction,
        std::string &&instruction_uppercase,
@@ -24,9 +22,7 @@ Ld::Ld(std::string &&instruction,
        size_t line_number,
        size_t column)
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                           const std::map<std::string, Symbol> &symbols,

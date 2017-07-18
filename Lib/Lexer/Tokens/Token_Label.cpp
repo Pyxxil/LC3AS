@@ -6,9 +6,7 @@
 
 Label::Label(std::string &name, std::string &t_file, size_t line_number, size_t column)
     : Token(name, name, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                              const std::map<std::string, Symbol> &symbols,
@@ -61,17 +59,14 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
 
     auto &&possible_match = matcher.best_match();
 
-    Diagnostics::Diagnostic diag(
-        Diagnostics::FileContext(
-            Diagnostics::Variant<std::string>(file),
-            Diagnostics::Variant<size_t>(at_line),
-            Diagnostics::Variant<size_t>(at_column)
-        ), "Invalid label", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
+    Diagnostics::Diagnostic diagnostic(
+        Diagnostics::FileContext(file, at_line ,at_column),
+        "Invalid label", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
     );
 
     if (!possible_match.empty()) {
         auto &&sym = match_candidates.find(possible_match);
-        diag.provide_context(
+        diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
@@ -82,7 +77,7 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
         );
 
         // TODO: Fix match candidates to provide file, and column.
-        diag.provide_context(
+        diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(
@@ -97,7 +92,7 @@ void Label::not_found(const std::map<std::string, Symbol> &match_candidates)
         );
     }
 
-    Diagnostics::push(diag);
+    Diagnostics::push(diagnostic);
 }
 
 std::string Label::disassemble(uint16_t &program_counter,
@@ -118,29 +113,26 @@ void Label::requires_too_many_bits(int allowed_bits,
 {
     (void) caller;
 
-    Diagnostics::Diagnostic diag(
-        Diagnostics::FileContext(
-            Diagnostics::Variant<std::string>(file),
-            Diagnostics::Variant<size_t>(at_line),
-            Diagnostics::Variant<size_t>(at_column)
-        ), "Address too far away.", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
+    Diagnostics::Diagnostic diagnostic(
+        Diagnostics::FileContext(file, at_line, at_column),
+        "Address too far away.", Diagnostics::INVALID_LABEL, Diagnostics::ERROR
     );
 
-    std::stringstream ss;
-    ss << "Address of '" << token << "' requires offset which can't be represented in a "
-       << allowed_bits << " bit " << (is_signed ? "signed" : "unsigned") << " PC offset.";
+    std::stringstream error_string;
+    error_string << "Address of '" << token << "' requires offset which can't be represented in a "
+                 << allowed_bits << " bit " << (is_signed ? "signed" : "unsigned") << " PC offset";
 
-    diag.provide_context(
+    diagnostic.provide_context(
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(file, at_line, at_column),
-                '^', ss.str(), lexed_lines[file].at(at_line)
+                '^', error_string.str(), lexed_lines[file].at(at_line)
             ), '~', token.length()
         )
     );
 
-    auto &&sym = symbols.find(token);
-    diag.provide_context(
+    const auto sym = symbols.find(token);
+    diagnostic.provide_context(
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(
@@ -153,7 +145,7 @@ void Label::requires_too_many_bits(int allowed_bits,
         )
     );
 
-    Diagnostics::push(diag);
+    Diagnostics::push(diagnostic);
 }
 
 Token::token_type Label::type() const

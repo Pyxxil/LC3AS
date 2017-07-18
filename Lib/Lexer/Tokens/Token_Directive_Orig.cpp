@@ -10,9 +10,7 @@ Orig::Orig(std::string &directive,
            size_t line_number,
            size_t column)
     : Directive(directive, directive_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Orig::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,

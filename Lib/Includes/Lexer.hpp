@@ -25,7 +25,7 @@ public:
     ~Lexer();
 
     void lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens, std::map<std::string, Symbol> &t_symbols);
-    std::shared_ptr<Token> tokenize(std::string &word, size_t line_number, size_t column);
+    std::shared_ptr<Token> tokenize(std::string word, size_t line_number, size_t column);
     void tokenizeLine(std::string line, size_t line_number, std::vector<std::shared_ptr<Token>> &into);
     void addToken(std::string &token,
                   std::vector<std::shared_ptr<Token>> &to,

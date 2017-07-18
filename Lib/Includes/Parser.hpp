@@ -53,6 +53,9 @@ private:
 
     std::vector<std::vector<std::shared_ptr<Token>>> tokens;
 
+    std::shared_ptr<Token> origin;
+    std::shared_ptr<Token> end;
+
     void do_first_pass();
     void do_second_pass();
 };

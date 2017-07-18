@@ -19,9 +19,7 @@ Set::Set(std::string &directive,
       decimal_zero(std::make_shared<Decimal>("#0", t_file, line_number, column)),
       decimal_one(std::make_shared<Decimal>("#1", t_file, line_number, column)),
       decimal_negative_two(std::make_shared<Decimal>("#-2", t_file, line_number, column))
-{
-
-}
+{}
 
 std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,

@@ -18,9 +18,7 @@ Sub::Sub(std::string &directive,
       decimal_zero(std::make_shared<Decimal>("#0", t_file, line_number, column)),
       neg1(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column)),
       neg2(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
-{
-
-}
+{}
 
 std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
@@ -79,7 +77,7 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
 bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
-    if (tokens.size() > 4 || tokens.size() == 1) {
+    if (tokens.size() > 4 || tokens.size() < 3) {
         invalid_argument_count(tokens.size(), 2, tokens.back()->at_column + tokens.back()->token.length());
         return (is_valid = false);
     }

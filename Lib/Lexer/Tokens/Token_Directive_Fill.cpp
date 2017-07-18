@@ -13,9 +13,7 @@ Fill::Fill(std::string &directive,
            size_t line_number,
            size_t column)
     : Directive(directive, directive_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 Fill::Fill(std::string &&directive,
            std::string &&directive_uppercase,
@@ -23,9 +21,7 @@ Fill::Fill(std::string &&directive,
            size_t line_number,
            size_t column)
     : Directive(directive, directive_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,

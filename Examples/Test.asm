@@ -6,7 +6,8 @@ NO_WARNINGS_OR_ERRORS:
         ADD R0, R0, R0  ; Shouldn't warn or err
         AND R0, R0, R0  ; Shouldn't warn or err
 
-WARNINGS:: :            ; Extraneous colons (warning count = 11)
+WARNINGS:: :            ; Extraneous colons (warning count = 14)
+.ORIG 0x3001
         ADD R0,, R0, R0 ; Extraneous comma
         AND R0, R0, ,R0 ; Extraneous comma
         NOT R4 , , R5   ; Extraneous comma
@@ -16,9 +17,13 @@ WARNINGS:: :            ; Extraneous colons (warning count = 11)
         BRn #1          ; Checks same CC
         BRp #-1         ; Infinite loop
 
-ERRORS: 5               ; Current error count (this line complains twice)
+ERRORS: 7               ; Current error count (this line complains twice)
         ADD R0, R10, R0 ; Expected register
         AND R0, R8, R0  ; Invalid register
         JMP R9          ; Invalid register
         .STRINGZ "Here" "is a weird string"
+
+.END
+WARNING_LABEL
+.END
 

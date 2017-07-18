@@ -10,9 +10,7 @@ Ret::Ret(std::string &instruction,
          size_t line_number,
          size_t column)
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Ret::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,

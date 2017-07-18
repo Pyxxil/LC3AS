@@ -43,7 +43,7 @@ bool Assembler::Assembler::configure(int argc, char **args)
                           "DIRECTORY")
                          ("s,stop", "Stop on the first error")
                          ("e,error", "Report warnings as errors")
-                         ("w,warn", "Choose warning type") // TODO: Fix this
+                         ("w,warn", "Choose warning type <Not implemented>") // TODO: Fix this
                          ("files", "Files to assemble", cxxopts::value<std::vector<std::string>>())
                          ("q,quiet", "Be quiet")
                          ("keep-going", "Keep going despite errors (mostly used for testing. Doesn't write "
@@ -117,7 +117,7 @@ bool Assembler::Assembler::configure(int argc, char **args)
  */
 void Assembler::Assembler::assemble()
 {
-    for (auto &&file : files_to_assemble) {
+    for (auto &file : files_to_assemble) {
         std::ifstream f(file);
 
         if (f.fail()) {
@@ -173,7 +173,7 @@ void Assembler::Assembler::assemble()
 void Assembler::Assembler::generate_machine_code()
 {
     for (size_t i = 0; i < tokens.size(); ++i) {
-        auto &&tokenized_line = tokens[i];
+        const auto &tokenized_line = tokens[i];
 
         for (const auto &assembled_line : tokenized_line.front()->as_assembled()) {
             if (!Config::is_set(Config::CONFIG_OPTIONS::BE_QUIET)) {
@@ -207,19 +207,11 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
             ((assembled_line & 0xFE00) == (assembled.back() & 0xFE00))) {
             Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(
-                    Diagnostics::Variant<std::string>(
-                        tokenized_line.front()->file
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        tokenized_line.front()->at_line
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        tokenized_line.front()->at_column
-                    )
-                ),
-                "Statement before this one checks for the same condition code.",
-                Diagnostics::LOGIC,
-                Diagnostics::WARNING
+                    tokenized_line.front()->file,
+                    tokenized_line.front()->at_line,
+                    tokenized_line.front()->at_column
+                ), "Statement before this one checks for the same condition code.",
+                Diagnostics::LOGIC, Diagnostics::WARNING
             );
 
             diagnostic.provide_context(
@@ -296,31 +288,20 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
         else if ((assembled_line & 0x1FF) == 0x1FF) {
             Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(
-                    Diagnostics::Variant<std::string>(
-                        tokenized_line.front()->file
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        tokenized_line.front()->at_line
-                    ),
-                    Diagnostics::Variant<size_t>(
-                        tokenized_line.front()->at_column
-                    )
-                ), "Possible infinite loop", Diagnostics::LOGIC, Diagnostics::WARNING
+                    tokenized_line.front()->file,
+                    tokenized_line.front()->at_line,
+                    tokenized_line.front()->at_column
+                ), "Possible infinite loop",
+                Diagnostics::LOGIC, Diagnostics::WARNING
             );
 
             diagnostic.provide_context(
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(
-                            Diagnostics::Variant<std::string>(
-                                tokenized_line[1]->file
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line[1]->at_line
-                            ),
-                            Diagnostics::Variant<size_t>(
-                                tokenized_line[1]->at_column
-                            )
+                            tokenized_line[1]->file,
+                            tokenized_line[1]->at_line,
+                            tokenized_line[1]->at_column
                         ), '^', "Offset of -1 might cause an infinite loop",
                         lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->at_line)
                     ), '~', tokenized_line[1]->token.length()
@@ -346,8 +327,7 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
             Diagnostics::push(diagnostic);
         }
     }
-
-    if (tokenized_line.front()->type() == Token::OP_TRAP) {
+    else if (tokenized_line.front()->type() == Token::OP_TRAP) {
         if ((assembled_line & 0x00FF) > 0x0025 || (assembled_line & 0x00FF) < 0x0020) {
             Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(
@@ -413,7 +393,7 @@ void Assembler::Assembler::write(const std::string &file)
                 << std::setw(symbol_padding) << "Symbol Name" << " Page Address\n//\t"
                 << std::setfill('-') << std::setw(symbol_padding) << '-' << " ------------\n";
 
-    for (auto &&symbol : symbols) {
+    for (const auto &symbol : symbols) {
         symbol_file << "//\t" << std::setfill(' ') << std::setw(symbol_padding)
                     << symbol.first << ' ' << std::uppercase << std::hex << std::setfill('0')
                     << std::setw(4) << symbol.second.address << '\n';
@@ -434,8 +414,8 @@ void Assembler::Assembler::write(const std::string &file)
 
     const std::string empty;
 
-    for (auto &&tokenized_line : tokens) {
-        auto &&symbol = symbol_at(pc);
+    for (const auto &tokenized_line : tokens) {
+        const auto &symbol = symbol_at(pc);
 
         // TODO: Should the file name be removed from the lst file?
         lst_file << tokenized_line.front()->disassemble(

@@ -13,9 +13,7 @@ Neg::Neg(std::string &directive,
     : Directive(directive, directive_uppercase, t_file, line_number, column),
       neg(std::make_shared<Not>("NOT", "NOT", t_file, line_number, column)),
       add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
-{
-
-}
+{}
 
 Neg::Neg(std::string &&directive,
          std::string &&directive_uppercase,
@@ -23,9 +21,7 @@ Neg::Neg(std::string &&directive,
          size_t line_number,
          size_t column)
     : Neg(directive, directive_uppercase, t_file, line_number, column)
-{
-
-}
+{}
 
 std::int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,

@@ -6,6 +6,4 @@ Instruction::Instruction(std::string &instruction,
                          size_t line_number,
                          size_t column)
     : Token(instruction, instruction_uppercase, t_file, line_number, column)
-{
-
-}
+{}

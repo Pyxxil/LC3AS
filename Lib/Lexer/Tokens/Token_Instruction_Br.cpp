@@ -16,9 +16,7 @@ Br::Br(std::string &instruction,
        bool z,
        bool p)
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p)
-{
-
-}
+{}
 
 Br::Br(std::string &&instruction,
        std::string &&instruction_uppercase,
@@ -29,9 +27,7 @@ Br::Br(std::string &&instruction,
        bool z,
        bool p)
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column), N(n), Z(z), P(p)
-{
-
-}
+{}
 
 std::int32_t Br::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                           const std::map<std::string, Symbol> &symbols,

@@ -56,7 +56,7 @@ static size_t hash(const std::string &string)
 
     size_t _hash{37};
 
-    for (const auto &character : string) {
+    for (const auto character : string) {
         _hash = (_hash * hashed_letters[(static_cast<size_t>(character) - 0x41u) % 26]) ^
             (static_cast<size_t>(string.at(0)) *
                 hashed_letters[(static_cast<size_t>(character) - 0x41u) % 26]);
@@ -83,7 +83,7 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
     std::vector<std::shared_ptr<Token>> tokenized_line;
     size_t line_number = 0;
 
-    for (auto &&line_entry : lexed_lines[file_name]) {
+    for (const auto &line_entry : lexed_lines[file_name]) {
         tokenizeLine(line_entry, line_number, tokenized_line);
 
         if (!tokenized_line.empty()) {
@@ -165,10 +165,12 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
  *
  * @return A shared pointer containing everything needed to know about the token
  */
-std::shared_ptr<Token> Lexer::tokenize(std::string &word, size_t line_number, size_t column)
+std::shared_ptr<Token> Lexer::tokenize(std::string word, size_t line_number, size_t column)
 {
     std::string copy = word;
     std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
+
+    column -= word.length();
 
     // TODO: While this makes it a bit more efficient, is it worth double checking that
     // TODO: the strings are the same after comparing the hash's? Just as a precautionary
@@ -280,8 +282,8 @@ void Lexer::addToken(std::string &token,
                      size_t col)
 {
     if (!token.empty()) {
-        to.push_back(tokenize(token, line_number, col - token.length()));
-        token.erase();
+        // This effectively erases the token too, which saves a call to token.erase()
+        to.push_back(tokenize(std::move(token), line_number, col));
     }
 }
 
@@ -329,13 +331,9 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
             addToken(current, into, line_number, col);
         }
 
-        if (character == ';') {
-            // We've hit a comment, so skip to the end of the line.
-            break;
-        }
-
-        if (character == '\r') {
-            // getline doesn't consume '\r' (at least on OSX)
+        if (character == ';' || character == '\r') {
+            // For ';', it means we've hit a comment, and
+            // std::getline doesn't consume '\r' (at least on OSX)
             break;
         }
 
@@ -344,20 +342,21 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
             if (index + 1 >= line.length() || line.at(index + 1) != '/') {
                 // It seems easiest to treat it as a comment anyways, as '/' can't be used for anything.
                 Diagnostics::Diagnostic diagnostic(
-                    Diagnostics::FileContext(file_name, static_cast<size_t>(line_number), index),
+                    Diagnostics::FileContext(file_name, line_number, index),
                     "Treating this as a comment", Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
                     Diagnostics::DIAGNOSTIC::WARNING
                 );
 
                 diagnostic.provide_context(
                     std::make_unique<Diagnostics::SelectionContext>(
-                        Diagnostics::FileContext(file_name, static_cast<size_t>(line_number), index),
+                        Diagnostics::FileContext(file_name, line_number, index),
                         '^', "Found unexpected '/'; Did you mean '//'?", line, "//"
                     )
                 );
 
                 Diagnostics::push(diagnostic);
             }
+
             break;
         }
 
@@ -379,6 +378,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                 Diagnostics::push(diagnostic);
                 terminated_by = ',';
             }
+
             addToken(current, into, line_number, index);
         }
         else if (':' == character) {
@@ -398,16 +398,17 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
                 Diagnostics::push(diagnostic);
                 terminated_by = ':';
             }
+
             addToken(current, into, line_number, index);
         }
 #ifdef INCLUDE_ADDONS
         else if ('"' == character || '\'' == character) {
 #else
-            else if (character == '"') {
+        else if (character == '"') {
 #endif
             addToken(current, into, line_number, index);
 
-            char terminator{character};
+            const char terminator{character};
             while (index + 1 < line.length()) {
                 character = line.at(++index);
                 if (character == '\\' && line.length() > index + 1 &&
@@ -475,16 +476,7 @@ void Lexer::tokenizeLine(std::string line, size_t line_number, std::vector<std::
         ++index;
     }
 
-    const auto any_valid_characters = std::any_of(
-        current.cbegin(), current.cend(), [](unsigned char chr) -> bool
-        {
-            return 0 == std::isspace(chr) && chr != ',' && chr != ':';
-        }
-    );
-
-    if (any_valid_characters) {
-        addToken(current, into, line_number, index);
-    }
+    addToken(current, into, line_number, index);
 }
 
 void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic)
