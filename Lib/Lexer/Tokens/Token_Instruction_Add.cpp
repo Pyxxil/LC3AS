@@ -23,7 +23,7 @@ Add::Add(std::string &&instruction,
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {}
 
-std::int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
                            uint16_t program_counter)
 {
@@ -79,7 +79,7 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     if (tokens.at(3)->type() == Token::IMMEDIATE) {
         if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 15 ||
             std::static_pointer_cast<Immediate>(tokens.at(3))->value < -16) {
-            tokens.at(3)->requires_too_many_bits(5, false, this, std::map<std::string, Symbol>());
+            tokens.at(3)->requires_too_many_bits(5, SIGNED, this, std::map<std::string, Symbol>());
             return (is_valid = false);
         }
     }
@@ -89,10 +89,10 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
 }
 
-std::int32_t Add::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Add::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     (void) tokens;
-    return static_cast<std::int32_t>(is_valid);
+    return static_cast<uint16_t>(is_valid);
 }
 
 std::string Add::disassemble(uint16_t &program_counter,

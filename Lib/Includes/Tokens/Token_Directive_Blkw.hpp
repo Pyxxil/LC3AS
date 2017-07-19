@@ -15,10 +15,10 @@ public:
 
     Token::token_type type() const override;
 
-    std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
+    int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
                           const std::map<std::string, Symbol> &symbols,
                           uint16_t program_counter) override;
-    std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
+    uint16_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
 
     void invalid_argument_count(size_t provided, size_t expected, size_t last_column) const override;
 

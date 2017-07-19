@@ -41,17 +41,17 @@ void String_Matcher::consider(const std::string &str)
     }
 }
 
-std::int32_t String_Matcher::levenshtein_distance(const std::string &string, const std::string &target) const
+int32_t String_Matcher::levenshtein_distance(const std::string &string, const std::string &target) const
 {
     const size_t string_length = string.length();
     const size_t target_length = target.length();
 
     if (string_length == 0) {
-        return static_cast<std::int32_t>(target_length);
+        return static_cast<int32_t>(target_length);
     }
 
     if (target_length == 0) {
-        return static_cast<std::int32_t>(string_length);
+        return static_cast<int32_t>(string_length);
     }
 
     std::vector<size_t> matrix0(string_length + 1);
@@ -79,5 +79,5 @@ std::int32_t String_Matcher::levenshtein_distance(const std::string &string, con
         }
     }
 
-    return static_cast<std::int32_t>(matrix1[string_length]);
+    return static_cast<int32_t>(matrix1[string_length]);
 }

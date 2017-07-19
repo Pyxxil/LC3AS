@@ -21,7 +21,7 @@ Set::Set(std::string &directive,
       decimal_negative_two(std::make_shared<Decimal>("#-2", t_file, line_number, column))
 {}
 
-std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
                            uint16_t program_counter)
 {
@@ -57,7 +57,7 @@ std::int32_t Set::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         assembled.emplace_back(ld->assembled.front());
     }
 
-    return static_cast<std::int32_t>(assembled.size());
+    return static_cast<int32_t>(assembled.size());
 }
 
 bool Set::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
@@ -88,15 +88,20 @@ bool Set::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-std::int32_t Set::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Set::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     if (!is_valid) {
-        return -1;
+        return 0;
     }
 
     const std::int16_t value = std::static_pointer_cast<Immediate>(tokens.at(2))->value;
 
-    return (value > 15 || value < -16) ? 3 : 2;
+    if (value > 15 || value < -16) {
+        return static_cast<uint16_t>(3);
+    }
+
+    return static_cast<uint16_t>(2);
+
 }
 
 std::string Set::disassemble(uint16_t &program_counter,

@@ -12,7 +12,7 @@ Stringz::Stringz(std::string &directive,
     : Directive(directive, directive_uppercase, t_file, line_number, column)
 {}
 
-std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                                const std::map<std::string, Symbol> &symbols,
                                uint16_t program_counter)
 {
@@ -25,7 +25,7 @@ std::int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
     assembled = tokens.at(1)->assembled;
 
-    return static_cast<std::int32_t>(assembled.size());
+    return static_cast<int32_t>(assembled.size());
 }
 
 bool Stringz::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
@@ -47,9 +47,9 @@ bool Stringz::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-std::int32_t Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-    return static_cast<std::int32_t>(is_valid) * static_cast<std::int32_t>(tokens.at(1)->assembled.size());
+    return static_cast<uint16_t>(is_valid) * static_cast<uint16_t>(tokens.at(1)->assembled.size());
 }
 
 std::string Stringz::disassemble(uint16_t &program_counter,

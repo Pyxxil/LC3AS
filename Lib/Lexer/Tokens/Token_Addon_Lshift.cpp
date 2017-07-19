@@ -13,7 +13,7 @@ Lshift::Lshift(std::string &directive,
       add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
 {}
 
-std::int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                               const std::map<std::string, Symbol> &symbols,
                               uint16_t program_counter)
 {
@@ -28,7 +28,7 @@ std::int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                      machine_instruction
     );
 
-    return static_cast<std::int32_t>(assembled.size());
+    return static_cast<int32_t>(assembled.size());
 }
 
 bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
@@ -65,13 +65,13 @@ bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-std::int32_t Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     if (!is_valid) {
         return 0;
     }
 
-    return std::static_pointer_cast<Immediate>(tokens.at(2))->value;
+    return static_cast<uint16_t>(std::static_pointer_cast<Immediate>(tokens.at(2))->value);
 }
 
 std::string Lshift::disassemble(uint16_t &program_counter,

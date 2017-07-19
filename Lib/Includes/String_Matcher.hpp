@@ -14,7 +14,7 @@ public:
     void consider(const std::string &str);
 
 private:
-    std::int32_t levenshtein_distance(const std::string &string, const std::string &target) const;
+    int32_t levenshtein_distance(const std::string &string, const std::string &target) const;
 
     std::string m_string;
 

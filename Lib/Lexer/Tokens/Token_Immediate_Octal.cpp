@@ -26,14 +26,14 @@ Octal::Octal(std::string &immediate, std::string &t_file, size_t line_number, si
     }
 
     if (!is_valid) {
-        // TODO: Provide helpful fixits here if possible (e.g. think of changing to base 10/16, etc.)
-        Diagnostics::Diagnostic diag(
+        // TODO: Provide helpful fix-its here if possible (e.g. think of changing to base 10/16, etc.)
+        Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(file, at_line, at_column),
             "Invalid literal for 16 bit signed base 8 value",
             Diagnostics::INVALID_LITERAL, Diagnostics::ERROR
         );
 
-        diag.provide_context(
+        diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
@@ -42,6 +42,6 @@ Octal::Octal(std::string &immediate, std::string &t_file, size_t line_number, si
             )
         );
 
-        Diagnostics::push(diag);
+        Diagnostics::push(diagnostic);
     }
 }

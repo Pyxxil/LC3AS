@@ -23,7 +23,7 @@ Fill::Fill(std::string &&directive,
     : Directive(directive, directive_uppercase, t_file, line_number, column)
 {}
 
-std::int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Fill::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,
                             uint16_t program_counter)
 {
@@ -68,10 +68,10 @@ bool Fill::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-std::int32_t Fill::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Fill::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     (void) tokens;
-    return static_cast<std::int32_t>(is_valid);
+    return static_cast<uint16_t>(is_valid);
 }
 
 std::string Fill::disassemble(

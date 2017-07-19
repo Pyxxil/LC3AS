@@ -16,7 +16,7 @@ Blkw::Blkw(std::string &directive,
     : Directive(directive, directive_uppercase, t_file, line_number, column)
 {}
 
-std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,
                             uint16_t program_counter)
 {
@@ -48,7 +48,7 @@ std::int32_t Blkw::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         fill
     );
 
-    return static_cast<std::int32_t>(assembled.size());
+    return static_cast<int32_t>(assembled.size());
 }
 
 bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
@@ -81,9 +81,9 @@ bool Blkw::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-std::int32_t Blkw::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Blkw::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-    return static_cast<std::int32_t>(is_valid) * std::static_pointer_cast<Immediate>(tokens.at(1))->value;
+    return static_cast<uint16_t>(is_valid) * std::static_pointer_cast<Immediate>(tokens.at(1))->value;
 }
 
 void Blkw::invalid_argument_count(size_t provided, size_t expected, size_t last_column) const
@@ -113,10 +113,6 @@ void Blkw::invalid_argument_count(size_t provided, size_t expected, size_t last_
 
     Diagnostics::push(diagnostic);
 }
-
-// TODO: Change the parameters for this to:
-// std::vector<std::shared_ptr<Token>> &tokens,uint16_t &program_counter,
-// const std::string &symbol, int width, const std::map<std::string, Symbol) &symbols
 
 std::string Blkw::disassemble(uint16_t &program_counter,
                               const std::string &symbol,

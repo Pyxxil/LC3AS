@@ -16,7 +16,9 @@ class Token
 {
 public:
     Token() = default;
-    Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column);
+    Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column)
+        : at_line(line), at_column(column), file(t_file), token(t_token), token_uppercase(t_token_uppercase)
+    {}
     Token(const Token &other) = default;
     Token(Token &&other) noexcept = default;
 
@@ -24,16 +26,6 @@ public:
     Token &operator=(Token &&rhs) noexcept = default;
 
     virtual ~Token() = default;
-
-    std::string token;
-    std::string token_uppercase;
-    std::string file;
-
-    std::vector<uint16_t> assembled{};
-
-    size_t at_line = 0;
-    size_t at_column = 0;
-    bool is_valid = true;
 
     enum token_type
     {
@@ -79,15 +71,43 @@ public:
 #endif
     };
 
-    virtual Token::token_type type() const;
+    virtual token_type type() const
+    {
+        return Token::NONE;
+    }
 
     std::string deduce_type() const;
-    virtual std::string disassemble(uint16_t &program_counter,
-                                    const std::string &symbol,
-                                    int width) const;
 
-    virtual void expected(const char *expects) const;
+    virtual int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                                  const std::map<std::string, Symbol> &symbols,
+                                  uint16_t program_counter);
+
+    virtual void expected(const std::string &expects) const;
     virtual void invalid_argument_count(size_t provided, size_t expected, size_t last_column) const;
+
+    virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
+    {
+        (void) tokens;
+        expected("one of: Instruction, Label, or Directive");
+        return false;
+    }
+
+    virtual uint16_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+    {
+        (void) tokens;
+        expected("one of: Instruction, Label, or Directive");
+        return 0;
+    }
+
+    virtual std::string disassemble(uint16_t &program_counter, const std::string &symbol, int width) const
+    {
+        (void) program_counter;
+        (void) symbol;
+        (void) width;
+        expected("one of: Instruction, Label, or Directive");
+        return std::string();
+    }
+
     virtual void requires_too_many_bits(int allowed_bits,
                                         bool is_signed,
                                         const Token *const caller,
@@ -99,14 +119,21 @@ public:
         (void) symbols;
     }
 
-    virtual std::int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                                  const std::map<std::string, Symbol> &symbols,
-                                  uint16_t program_counter);
-    virtual std::int32_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const;
+    inline const std::vector<uint16_t> &as_assembled() const
+    {
+        return assembled;
+    }
 
-    virtual const std::vector<uint16_t> as_assembled() const;
+    size_t at_line{};
+    size_t at_column{};
 
-    virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens);
+    std::string file;
+    std::string token;
+    std::string token_uppercase;
+
+    bool is_valid = true;
+
+    std::vector<uint16_t> assembled{};
 };
 
 #endif // TOKEN_HPP

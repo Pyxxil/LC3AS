@@ -17,7 +17,7 @@
  */
 void Parser::do_first_pass()
 {
-    int memory_required = 0;
+    uint16_t memory_required = 0;
 
     /**
      * Make our best guess at how much memory a line requires.
@@ -27,11 +27,11 @@ void Parser::do_first_pass()
      *
      * @returns The best guess we have for how much memory the line requires.
      */
-    const auto &memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> std::int32_t
+    const auto &memory_requirement_of = [this](const auto &token, auto &&t_tokens) -> size_t
     {
         if (!origin_seen) {
             token->expected(".ORIG statement");
-            return -1;
+            return 0;
         }
 
         if (end_seen) {
@@ -61,7 +61,7 @@ void Parser::do_first_pass()
             return token->guess_memory_size(t_tokens);
         }
 
-        return -1;
+        return 0;
     };
 
     // TODO: As it is, if there is no .ORIG directive as the first instruction in the file,
@@ -97,12 +97,10 @@ void Parser::do_first_pass()
             origin_seen = true;
             origin = tokenized_line.front();
             memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
-            if (memory_required > -1) {
-                internal_program_counter += static_cast<uint16_t>(memory_required);
-            }
+            internal_program_counter += memory_required;
             break;
         case Token::LABEL:memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
-            if (memory_required > -1) {
+            if (memory_required <= static_cast<uint16_t>(std::numeric_limits<uint16_t>::max())) {
                 std::static_pointer_cast<Label>(tokenized_line.front())->address =
                     internal_program_counter;
 
@@ -135,7 +133,7 @@ void Parser::do_first_pass()
 
                 if (0u != symbols.count(tokenized_line.front()->token)) {
                     auto &&sym = symbols.at(tokenized_line.front()->token);
-                    Diagnostics::Diagnostic diag(
+                    Diagnostics::Diagnostic diagnostic(
                         Diagnostics::FileContext(
                             tokenized_line.front()->file,
                             tokenized_line.front()->at_line,
@@ -145,7 +143,7 @@ void Parser::do_first_pass()
                         Diagnostics::ERROR
                     );
 
-                    diag.provide_context(
+                    diagnostic.provide_context(
                         std::make_unique<Diagnostics::SelectionContext>(
                             Diagnostics::FileContext(
                                 tokenized_line.front()->file,
@@ -158,7 +156,7 @@ void Parser::do_first_pass()
                         )
                     );
 
-                    diag.provide_context(
+                    diagnostic.provide_context(
                         std::make_unique<Diagnostics::SelectionContext>(
                             Diagnostics::FileContext(
                                     sym.file,
@@ -169,7 +167,7 @@ void Parser::do_first_pass()
                         )
                     );
 
-                    Diagnostics::push(diag);
+                    Diagnostics::push(diagnostic);
                 }
 
                 symbols.insert(std::pair<std::string, Symbol>(
@@ -187,7 +185,7 @@ void Parser::do_first_pass()
                     static_cast<int>(tokenized_line.front()->token.length())
                 );
 
-                internal_program_counter += static_cast<uint16_t>(memory_required);
+                internal_program_counter += memory_required;
             }
             break;
         case Token::DIR_END:
@@ -220,9 +218,7 @@ void Parser::do_first_pass()
             }
             break;
         default:memory_required = memory_requirement_of(tokenized_line.front(), tokenized_line);
-            if (memory_required > -1) {
-                internal_program_counter += static_cast<uint16_t>(memory_required);
-            }
+                internal_program_counter += memory_required;
             break;
         }
     }

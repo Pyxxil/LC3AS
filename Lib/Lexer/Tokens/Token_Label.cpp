@@ -8,7 +8,7 @@ Label::Label(std::string &name, std::string &t_file, size_t line_number, size_t 
     : Token(name, name, t_file, line_number, column)
 {}
 
-std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                              const std::map<std::string, Symbol> &symbols,
                              uint16_t program_counter)
 {
@@ -22,7 +22,7 @@ std::int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 
     std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
 
-    const std::int32_t ret = vec.front()->assemble(vec, symbols, program_counter);
+    const int32_t ret = vec.front()->assemble(vec, symbols, program_counter);
 
     assembled = vec.front()->assembled;
     return ret;
@@ -39,7 +39,7 @@ bool Label::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return true;
 }
 
-std::int32_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     if (tokens.size() > 1) {
         std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());

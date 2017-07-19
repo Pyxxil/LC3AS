@@ -20,7 +20,7 @@ Sub::Sub(std::string &directive,
       neg2(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
 {}
 
-std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
                            uint16_t program_counter)
 {
@@ -28,7 +28,7 @@ std::int32_t Sub::assemble(std::vector<std::shared_ptr<Token>> &tokens,
         return 0;
     }
 
-    std::int32_t ret = 0;
+    int32_t ret = 0;
 
     size_t first_register_index = 1;
     size_t second_register_index = 2;
@@ -106,7 +106,7 @@ bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return (is_valid = tokens.at(1)->is_valid && tokens.at(2)->is_valid);
 }
 
-std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     if (is_valid) {
         size_t first_register_index = 1;
@@ -119,15 +119,19 @@ std::int32_t Sub::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens)
 
         if (std::static_pointer_cast<Register>(tokens.at(first_register_index))->reg ==
             std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
-            return 1;
+            return 1u;
         }
 
-        return std::static_pointer_cast<Register>(tokens.at(1))->reg !=
-            std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg ? 5 : 3;
+        if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
+            std::static_pointer_cast<Register>(tokens.at(second_register_index))->reg) {
+            return static_cast<uint16_t>(5);
+        }
+
+        return static_cast<uint16_t>(3);
 
     }
 
-    return -1;
+    return 0;
 }
 
 void Sub::invalid_argument_count(size_t provided, size_t expected, size_t last_column) const

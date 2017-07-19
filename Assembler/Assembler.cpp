@@ -201,6 +201,10 @@ void Assembler::Assembler::check_and_mark_warnings(const std::vector<std::shared
                                                    uint16_t assembled_line,
                                                    size_t i)
 {
+    // TODO: Move this to it's own place, and add more checks.
+
+    // TODO: Add a .BLKW warning for taking up a lot of memory.
+
     if (tokenized_line.front()->type() == Token::OP_BR ||
         tokenized_line.front()->type() == Token::OP_JSR) {
         if (tokenized_line.front()->type() == Token::OP_BR &&

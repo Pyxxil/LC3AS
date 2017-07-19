@@ -15,7 +15,7 @@ Ldr::Ldr(std::string &instruction,
     : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
 {}
 
-std::int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                            const std::map<std::string, Symbol> &symbols,
                            uint16_t program_counter)
 {
@@ -65,17 +65,17 @@ bool Ldr::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 
     if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 31 ||
         std::static_pointer_cast<Immediate>(tokens.at(3))->value < -32) {
-        tokens.at(3)->requires_too_many_bits(6, false, this, std::map<std::string, Symbol>());
+        tokens.at(3)->requires_too_many_bits(6, SIGNED, this, std::map<std::string, Symbol>());
         return (is_valid = false);
     }
 
     return is_valid;
 }
 
-std::int32_t Ldr::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Ldr::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     (void) tokens;
-    return static_cast<std::int32_t>(is_valid);
+    return static_cast<uint16_t>(is_valid);
 }
 
 std::string Ldr::disassemble(uint16_t &program_counter,

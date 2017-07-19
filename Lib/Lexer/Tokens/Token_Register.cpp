@@ -14,12 +14,12 @@ Register::Register(std::string &which,
     if (reg > 7 || reg < 0) {
         // TODO: Use Diagnostics here for a better error message
         // TODO: Use a highlight context, with the fix_it being "R{0..7}"
-        Diagnostics::Diagnostic diag(
+        Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(file, at_line, at_column),
             "Invalid register", Diagnostics::SPELLING, Diagnostics::ERROR
         );
 
-        diag.provide_context(
+        diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
@@ -28,7 +28,7 @@ Register::Register(std::string &which,
             )
         );
 
-        Diagnostics::push(diag);
+        Diagnostics::push(diagnostic);
     }
 }
 

@@ -42,13 +42,13 @@ Hexadecimal::Hexadecimal(std::string &immediate,
     }
 
     if (!is_valid) {
-        Diagnostics::Diagnostic diag(
+        Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(file, at_line, at_column),
             "Invalid literal for 16 bit signed base 16 value",
             Diagnostics::INVALID_LITERAL, Diagnostics::ERROR
         );
 
-        diag.provide_context(
+        diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
                     Diagnostics::FileContext(file, at_line, at_column),
@@ -57,6 +57,6 @@ Hexadecimal::Hexadecimal(std::string &immediate,
             )
         );
 
-        Diagnostics::push(diag);
+        Diagnostics::push(diagnostic);
     }
 }

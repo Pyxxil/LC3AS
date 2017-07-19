@@ -12,9 +12,7 @@ namespace Assembler
 class Assembler
 {
 public:
-    Assembler()
-        : symbol_padding(0)
-    {}
+    Assembler() = default;
 
     // TODO: Options:
     //      --include/-I[=]Directory:
@@ -32,6 +30,8 @@ public:
     //                                      TODO:   If so, add enum options for config (VERBOSE_LEVEL_ONE,
     //                                              VERBOSE_LEVEL_TWO, etc.)
     //                                      TODO: Decide if this relates to diagnostics too
+    //      -O                              Perform peephole optimisations (if possible)
+    //                                      TODO: Look into doing this.
     bool configure(int argc, char **args);
 
     void assemble();

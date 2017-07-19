@@ -28,14 +28,14 @@ Character::Character(std::string &character,
         else {
             is_valid = false;
 
-            Diagnostics::Diagnostic diag(
+            Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(file, line_number, column),
                 "Invalid character literal",
                 Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
                 Diagnostics::DIAGNOSTIC::ERROR
             );
 
-            diag.provide_context(
+            diagnostic.provide_context(
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(file, line_number, column),
@@ -44,18 +44,18 @@ Character::Character(std::string &character,
                 )
             );
 
-            Diagnostics::push(diag);
+            Diagnostics::push(diagnostic);
         }
     }
     else if (0u == character.length()) {
-        Diagnostics::Diagnostic diag(
+        Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(file, line_number, column),
             "Invalid character literal",
             Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
             Diagnostics::DIAGNOSTIC::ERROR
         );
 
-        diag.provide_context(
+        diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
                 Diagnostics::FileContext(file, line_number, column),
                 '^', "Expected character, not empty sequence",
@@ -63,7 +63,7 @@ Character::Character(std::string &character,
             )
         );
 
-        Diagnostics::push(diag);
+        Diagnostics::push(diagnostic);
     }
     else {
         value = static_cast<std::int16_t>(character.at(0));

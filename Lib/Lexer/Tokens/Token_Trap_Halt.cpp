@@ -7,7 +7,7 @@ Halt::Halt(std::string &trap, std::string &trap_uppercase, std::string &t_file, 
     : Instruction(trap, trap_uppercase, t_file, line_number, column)
 {}
 
-std::int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Halt::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                             const std::map<std::string, Symbol> &symbols,
                             uint16_t program_counter)
 {
@@ -34,10 +34,10 @@ bool Halt::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-std::int32_t Halt::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t Halt::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
     (void) tokens;
-    return static_cast<std::int32_t>(is_valid);
+    return static_cast<uint16_t>(is_valid);
 }
 
 std::string Halt::disassemble(uint16_t &program_counter,

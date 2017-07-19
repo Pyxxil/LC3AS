@@ -1,19 +1,13 @@
 #include "Tokens/Token.hpp"
 
-#include <map>
 #include <Lib/Includes/LexHelper.hpp>
 
 #include "Diagnostics.hpp"
 
-Token::Token(std::string &t_token, std::string &t_token_uppercase, std::string &t_file, size_t line, size_t column)
-    : token(t_token), token_uppercase(t_token_uppercase), file(t_file), at_line(line), at_column(column)
-{}
-
-Token::token_type Token::type() const
-{
-    return Token::NONE;
-}
-
+/*! Used in reporting errors (to give type information).
+ *
+ * @return The type string
+ */
 std::string Token::deduce_type() const
 {
     switch (type()) {
@@ -60,14 +54,14 @@ std::string Token::deduce_type() const
     }
 }
 
-void Token::expected(const char *const expects) const
+void Token::expected(const std::string &expects) const
 {
-    Diagnostics::Diagnostic diag(
+    Diagnostics::Diagnostic diagnostic(
         Diagnostics::FileContext(file, at_line, at_column),
-        "Expected " + std::string(expects), Diagnostics::SYNTAX, Diagnostics::ERROR
+        "Expected " + expects, Diagnostics::SYNTAX, Diagnostics::ERROR
     );
 
-    diag.provide_context(
+    diagnostic.provide_context(
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
                 Diagnostics::FileContext(file, at_line, at_column),
@@ -77,10 +71,10 @@ void Token::expected(const char *const expects) const
         )
     );
 
-    Diagnostics::push(diag);
+    Diagnostics::push(diagnostic);
 }
 
-std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                              const std::map<std::string, Symbol> &symbols,
                              uint16_t program_counter)
 {
@@ -91,11 +85,19 @@ std::int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
     return -1;
 }
 
-const std::vector<uint16_t> Token::as_assembled() const
-{
-    return assembled;
-}
-
+/*! All instructions take a specific number of arguments.
+ *
+ * For now, this handles the cases of too many arguments, as well as too few arguments. In future,
+ * I plan to allow, pretty much all, instructions to be put one after another, e.g.
+ *
+ * .ORIG 0x3000 ADD R1, R2, R3 AND R2, R4, R5 .END
+ *
+ * This is to give better compatability with the original assembler.
+ *
+ * @param provided The number of arguments provided for the instruction (+1, explained below)
+ * @param expected The number of expected arguments.
+ * @param last_column The final column used for highlighting.
+ */
 void Token::invalid_argument_count(size_t provided, size_t expected, size_t last_column) const
 {
     // This is not the best idea, but because tokens.size() returns the number of
@@ -112,7 +114,7 @@ void Token::invalid_argument_count(size_t provided, size_t expected, size_t last
         error_string.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
     );
 
-    if (0u != provided) {
+    if (0u != provided) {  // To avoid printing the beginning token itself.
         diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
@@ -124,27 +126,4 @@ void Token::invalid_argument_count(size_t provided, size_t expected, size_t last
     }
 
     Diagnostics::push(diagnostic);
-}
-
-bool Token::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
-{
-    (void) tokens;
-    expected("one of: Instruction, Label, or Directive");
-    return false;
-}
-
-std::int32_t Token::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
-{
-    std::cerr << tokens.front()->token << ".guess_memory_size() not implemented\n";
-    return -1;
-}
-
-std::string Token::disassemble(uint16_t &program_counter,
-                               const std::string &symbol,
-                               int width) const
-{
-    (void) program_counter;
-    (void) symbol;
-    (void) width;
-    return token + " has no disassemble (" + deduce_type() + ")\n";
 }
