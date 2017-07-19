@@ -5,16 +5,14 @@
 
 #include <string>
 
-class Include: public Token
+class Include : public Token
 {
 public:
-    Include(std::string &t_token,
-            std::string &t_token_uppercase,
-            std::string &t_file,
-            size_t line,
-            size_t column);
+    Include(std::string &t_token, std::string &t_token_uppercase,
+            std::string &t_file, size_t line, size_t column);
 
-    virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
+    virtual bool
+    valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 
     virtual token_type type() const override;
 };

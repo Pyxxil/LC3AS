@@ -4,38 +4,46 @@
 
 #include "Diagnostics.hpp"
 
-String::String(std::string &string, std::string &t_file, size_t line_number, size_t column)
+String::String(std::string &string, std::string &t_file, size_t line_number,
+               size_t column)
     : Token(string, string, t_file, line_number, column)
 {
     for (size_t index = 0; index < string.size(); ++index) {
         if (string.at(index) == '\\') {
             switch (string.at(index + 1)) {
-            case 'n':++index;
+            case 'n':
+                ++index;
                 assembled.emplace_back('\n');
                 break;
-            case 't':++index;
+            case 't':
+                ++index;
                 assembled.emplace_back('\t');
                 break;
-            case 'v':++index;
+            case 'v':
+                ++index;
                 assembled.emplace_back('\v');
                 break;
-            case '"':++index;
+            case '"':
+                ++index;
                 assembled.emplace_back('"');
                 break;
-            case '\\':assembled.emplace_back('\\');
+            case '\\':
+                assembled.emplace_back('\\');
                 break;
-            default:std::stringstream ss;
-                ss << "Invalid character escape sequence ('\\" << string.at(index + 1)
-                   << "'). Ignoring the '\\'.";
-                // TODO: Fix this, requires all things to know the 'column' in which they were found.
+            default:
+                std::stringstream ss;
+                ss << "Invalid character escape sequence ('\\"
+                   << string.at(index + 1) << "'). Ignoring the '\\'.";
+                // TODO: Fix this, requires all things to know the 'column' in
+                // which they were found.
                 /*Logging::logger->LOG(
-                        Logging::WARNING, line_number, t_file, ss.str(), Logging::WARNING_TYPE::SYNTAX
+                        Logging::WARNING, line_number, t_file, ss.str(),
+                Logging::WARNING_TYPE::SYNTAX
                 );*/
                 assembled.emplace_back(string.at(index + 1));
                 break;
             }
-        }
-        else {
+        } else {
             assembled.emplace_back(static_cast<uint16_t>(string.at(index)));
         }
     }
@@ -43,7 +51,4 @@ String::String(std::string &string, std::string &t_file, size_t line_number, siz
     assembled.emplace_back('\0');
 }
 
-Token::token_type String::type() const
-{
-    return Token::_STRING;
-}
+Token::token_type String::type() const { return Token::_STRING; }

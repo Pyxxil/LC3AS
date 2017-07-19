@@ -57,16 +57,16 @@ std::string Token::deduce_type() const
 void Token::expected(const std::string &expects) const
 {
     Diagnostics::Diagnostic diagnostic(
-        Diagnostics::FileContext(file, at_line, at_column),
+        Diagnostics::FileContext(file, line, column),
         "Expected " + expects, Diagnostics::SYNTAX, Diagnostics::ERROR
     );
 
     diagnostic.provide_context(
         std::make_unique<Diagnostics::HighlightContext>(
             Diagnostics::SelectionContext(
-                Diagnostics::FileContext(file, at_line, at_column),
+                Diagnostics::FileContext(file, line, column),
                 '^', "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
-                lexed_lines[file].at(at_line)
+                lexed_lines[file].at(line)
             ), '~', token.length()
         )
     );
@@ -110,7 +110,7 @@ void Token::invalid_argument_count(size_t provided, size_t expected, size_t last
                  << (provided == 1 ? " was" : "'s were") << " provided";
 
     Diagnostics::Diagnostic diagnostic(
-        Diagnostics::FileContext(file, at_line, at_column),
+        Diagnostics::FileContext(file, line, column),
         error_string.str(), Diagnostics::SYNTAX, Diagnostics::ERROR
     );
 
@@ -118,9 +118,9 @@ void Token::invalid_argument_count(size_t provided, size_t expected, size_t last
         diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
-                    Diagnostics::FileContext(file, at_line, at_column + token.length()),
-                    ' ', "Unexpected arguments found here", lexed_lines[file].at(at_line)
-                ), '~', last_column - (at_column + token.length())
+                    Diagnostics::FileContext(file, line, column + token.length()),
+                    ' ', "Unexpected arguments found here", lexed_lines[file].at(line)
+                ), '~', last_column - (column + token.length())
             )
         );
     }

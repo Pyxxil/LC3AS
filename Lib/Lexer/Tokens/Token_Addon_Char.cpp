@@ -3,69 +3,63 @@
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
-Character::Character(std::string &character,
-                     std::string &t_file,
-                     size_t line_number,
-                     size_t column)
+Character::Character(std::string &character, std::string &t_file,
+                     size_t line_number, size_t column)
     : Immediate(character, character, t_file, line_number, column)
 {
     if (character.length() > 1) {
         if (character.length() == 2 && character.at(0) == '\\') {
             switch (character.at(1)) {
-            case '\\':value = '\\';
+            case '\\':
+                value = '\\';
                 return;
-            case 'n':value = '\n';
+            case 'n':
+                value = '\n';
                 return;
-            case 't':value = '\t';
+            case 't':
+                value = '\t';
                 return;
-            case '\'':value = '\'';
+            case '\'':
+                value = '\'';
                 return;
-            case '0':value = 0;
+            case '0':
+                value = 0;
                 break;
-            default:break;
+            default:
+                break;
             }
-        }
-        else {
+        } else {
             is_valid = false;
 
             Diagnostics::Diagnostic diagnostic(
                 Diagnostics::FileContext(file, line_number, column),
                 "Invalid character literal",
                 Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
-                Diagnostics::DIAGNOSTIC::ERROR
-            );
+                Diagnostics::DIAGNOSTIC::ERROR);
 
             diagnostic.provide_context(
                 std::make_unique<Diagnostics::HighlightContext>(
                     Diagnostics::SelectionContext(
                         Diagnostics::FileContext(file, line_number, column),
-                        '^', "Found here", lexed_lines[file].at(line_number)
-                    ), '~', character.length()
-                )
-            );
+                        '^', "Found here", lexed_lines[file].at(line_number)),
+                    '~', character.length()));
 
             Diagnostics::push(diagnostic);
         }
-    }
-    else if (0u == character.length()) {
+    } else if (0u == character.length()) {
         Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(file, line_number, column),
-            "Invalid character literal",
-            Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
-            Diagnostics::DIAGNOSTIC::ERROR
-        );
+            "Invalid character literal", Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+            Diagnostics::DIAGNOSTIC::ERROR);
 
         diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
-                Diagnostics::FileContext(file, line_number, column),
-                '^', "Expected character, not empty sequence",
-                lexed_lines[file].at(line_number)
-            )
-        );
+                Diagnostics::FileContext(file, line_number, column), '^',
+                "Expected character, not empty sequence",
+                lexed_lines[file].at(line_number)));
 
         Diagnostics::push(diagnostic);
-    }
-    else {
+    } else {
         value = static_cast<std::int16_t>(character.at(0));
     }
 }

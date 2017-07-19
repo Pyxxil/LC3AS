@@ -3,10 +3,11 @@
 
 #include "Token.hpp"
 
-class String: public Token
+class String : public Token
 {
 public:
-    String(std::string &string, std::string &t_file, size_t line_number, size_t column);
+    String(std::string &string, std::string &t_file, size_t line_number,
+           size_t column);
 
     virtual Token::token_type type() const override;
 };

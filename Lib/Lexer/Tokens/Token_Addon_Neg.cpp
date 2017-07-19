@@ -5,32 +5,29 @@
 
 #include "Tokens/Token_Immediate_Decimal.hpp"
 
-Neg::Neg(std::string &directive,
-         std::string &directive_uppercase,
-         std::string &t_file,
-         size_t line_number,
-         size_t column)
+Neg::Neg(std::string &directive, std::string &directive_uppercase,
+         std::string &t_file, size_t line_number, size_t column)
     : Directive(directive, directive_uppercase, t_file, line_number, column),
       neg(std::make_shared<Not>("NOT", "NOT", t_file, line_number, column)),
       add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
-{}
+{
+}
 
-Neg::Neg(std::string &&directive,
-         std::string &&directive_uppercase,
-         std::string &t_file,
-         size_t line_number,
-         size_t column)
+Neg::Neg(std::string &&directive, std::string &&directive_uppercase,
+         std::string &t_file, size_t line_number, size_t column)
     : Neg(directive, directive_uppercase, t_file, line_number, column)
-{}
+{
+}
 
 int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                           const std::map<std::string, Symbol> &symbols,
-                           uint16_t program_counter)
+                      const std::map<std::string, Symbol> &symbols,
+                      uint16_t program_counter)
 {
     std::vector<std::shared_ptr<Token>> vec = {neg, tokens.at(1), tokens.at(1)};
 
     neg->assemble(vec, symbols, program_counter);
-    vec = {add, tokens.at(1), tokens.at(1), std::make_shared<Decimal>("#1", file, at_line, at_column)};
+    vec = {add, tokens.at(1), tokens.at(1),
+           std::make_shared<Decimal>("#1", file, line, column)};
     add->assemble(vec, symbols, program_counter);
 
     assembled = neg->assembled;
@@ -44,7 +41,9 @@ int32_t Neg::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Neg::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 2) {
-        invalid_argument_count(tokens.size(), 1, tokens.back()->at_column + tokens.back()->token.length());
+        invalid_argument_count(tokens.size(), 1,
+                               tokens.back()->column
+                                   + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -56,15 +55,15 @@ bool Neg::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-uint16_t Neg::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t
+Neg::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-    (void) tokens;
+    (void)tokens;
     return static_cast<uint16_t>(static_cast<uint16_t>(is_valid) * 2);
 }
 
 std::string Neg::disassemble(uint16_t &program_counter,
-                             const std::string &symbol,
-                             int width) const
+                             const std::string &symbol, int width) const
 {
     std::stringstream stream;
 
@@ -74,7 +73,4 @@ std::string Neg::disassemble(uint16_t &program_counter,
     return stream.str();
 }
 
-Token::token_type Neg::type() const
-{
-    return Token::ADDON_NEG;
-}
+Token::token_type Neg::type() const { return Token::ADDON_NEG; }

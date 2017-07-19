@@ -3,28 +3,25 @@
 
 #include "Tokens/Token_Instruction.hpp"
 
-class Jmp: public Instruction
+class Jmp : public Instruction
 {
 public:
-    Jmp(std::string &instruction,
-        std::string &instruction_uppercase,
-        std::string &t_file,
-        size_t line_number,
-        size_t column);
+    Jmp(std::string &instruction, std::string &instruction_uppercase,
+        std::string &t_file, size_t line_number, size_t column);
 
     Token::token_type type() const override;
 
     int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                          const std::map<std::string, Symbol> &symbols,
-                          uint16_t program_counter) override;
-    uint16_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
+                     const std::map<std::string, Symbol> &symbols,
+                     uint16_t program_counter) override;
+    uint16_t guess_memory_size(
+        std::vector<std::shared_ptr<Token>> &tokens) const override;
 
     bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 
-    std::string disassemble(
-        uint16_t &program_counter,
-        const std::string &symbol,
-        int width) const override;
+    std::string disassemble(uint16_t &program_counter,
+                            const std::string &symbol,
+                            int width) const override;
 };
 
 #endif // TOKEN_OPERATOR_JMP_HPP

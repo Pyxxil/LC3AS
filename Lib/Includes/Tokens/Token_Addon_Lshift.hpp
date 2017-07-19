@@ -4,21 +4,19 @@
 #include "Tokens/Token_Directive.hpp"
 #include "Tokens/Token_Instruction_Add.hpp"
 
-class Lshift: public Directive
+class Lshift : public Directive
 {
 public:
-    Lshift(std::string &directive,
-           std::string &directive_uppercase,
-           std::string &t_file,
-           size_t line_number,
-           size_t column);
+    Lshift(std::string &directive, std::string &directive_uppercase,
+           std::string &t_file, size_t line_number, size_t column);
 
     token_type type() const override;
 
     int32_t assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                          const std::map<std::string, Symbol> &symbols,
-                          uint16_t program_counter) override;
-    uint16_t guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const override;
+                     const std::map<std::string, Symbol> &symbols,
+                     uint16_t program_counter) override;
+    uint16_t guess_memory_size(
+        std::vector<std::shared_ptr<Token>> &tokens) const override;
 
     bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) override;
 

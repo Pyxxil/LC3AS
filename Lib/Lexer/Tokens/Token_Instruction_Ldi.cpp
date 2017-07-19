@@ -1,24 +1,23 @@
 #include "Tokens/Token_Instruction_Ldi.hpp"
 
+#include <bitset>
 #include <iomanip>
 #include <sstream>
-#include <bitset>
 
 #include "Tokens/Token_Immediate.hpp"
-#include "Tokens/Token_Register.hpp"
 #include "Tokens/Token_Label.hpp"
+#include "Tokens/Token_Register.hpp"
 
-Ldi::Ldi(std::string &instruction,
-         std::string &instruction_uppercase,
-         std::string &t_file,
-         size_t line_number,
-         size_t column)
-    : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
-{}
+Ldi::Ldi(std::string &instruction, std::string &instruction_uppercase,
+         std::string &t_file, size_t line_number, size_t column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  column)
+{
+}
 
 int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                           const std::map<std::string, Symbol> &symbols,
-                           uint16_t program_counter)
+                      const std::map<std::string, Symbol> &symbols,
+                      uint16_t program_counter)
 {
     if (!is_valid) {
         return 0;
@@ -32,10 +31,10 @@ int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens,
             return -1;
         }
 
-        offset = static_cast<int>(symbols.find(tokens.at(2)->token)->second.address) -
-            (static_cast<int>(program_counter) + 1);
-    }
-    else {
+        offset = static_cast<int>(
+                     symbols.find(tokens.at(2)->token)->second.address)
+                 - (static_cast<int>(program_counter) + 1);
+    } else {
         offset = std::static_pointer_cast<Immediate>(tokens.at(2))->value;
     }
 
@@ -45,11 +44,10 @@ int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens,
     }
 
     provided = tokens.at(2);
-    assembled.emplace_back(
-        static_cast<uint16_t>(0xA000 |
-            ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
-            (offset & 0x1FF))
-    );
+    assembled.emplace_back(static_cast<uint16_t>(
+        0xA000
+        | ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9)
+        | (offset & 0x1FF)));
 
     return 1;
 }
@@ -57,7 +55,9 @@ int32_t Ldi::assemble(std::vector<std::shared_ptr<Token>> &tokens,
 bool Ldi::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
 {
     if (tokens.size() != 3) {
-        invalid_argument_count(tokens.size(), 2, tokens.back()->at_column + tokens.back()->token.length());
+        invalid_argument_count(tokens.size(), 2,
+                               tokens.back()->column
+                                   + tokens.back()->token.length());
         return (is_valid = false);
     }
 
@@ -66,7 +66,8 @@ bool Ldi::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
         return (is_valid = false);
     }
 
-    if (tokens.at(2)->type() != Token::LABEL && tokens.at(2)->type() != Token::IMMEDIATE) {
+    if (tokens.at(2)->type() != Token::LABEL
+        && tokens.at(2)->type() != Token::IMMEDIATE) {
         tokens.at(2)->expected("label or immediate value");
         return (is_valid = false);
     }
@@ -78,28 +79,35 @@ bool Ldi::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens)
     return is_valid;
 }
 
-uint16_t Ldi::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
+uint16_t
+Ldi::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const
 {
-    (void) tokens;
+    (void)tokens;
     return static_cast<uint16_t>(is_valid);
 }
 
 std::string Ldi::disassemble(uint16_t &program_counter,
-                             const std::string &symbol,
-                             int width) const
+                             const std::string &symbol, int width) const
 {
     std::stringstream stream;
     stream
         // Address in memory
-        << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << program_counter << ')'
+        << '(' << std::hex << std::uppercase << std::setfill('0')
+        << std::setw(4) << program_counter
+        << ')'
         // Hexadecimal representation of instruction
-        << ' ' << std::hex << std::setfill('0') << std::setw(4) << assembled.front()
+        << ' ' << std::hex << std::setfill('0') << std::setw(4)
+        << assembled.front()
         // Binary representation of instruction
-        << ' ' << std::bitset<16>(assembled.front())
+        << ' '
+        << std::bitset<16>(assembled.front())
         // Line the instruction is on
-        << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4) << at_line << ')'
+        << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
+        << line
+        << ')'
         // Label at the current address (if any)
-        << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
+        << ' ' << std::left << std::setfill(' ') << std::setw(width)
+        << symbol
         // Instruction itself
         << " LDI R" << ((assembled.front() & 0x0E00) >> 9 & 7) << ' ';
 
@@ -107,10 +115,11 @@ std::string Ldi::disassemble(uint16_t &program_counter,
 
     if (provided->type() == Token::LABEL) {
         stream << provided->token;
-    }
-    else {
-        const auto offset = std::static_pointer_cast<Immediate>(provided)->value;
-        stream << "0x" << std::hex << std::setfill('0') << std::setw(4) << (offset + program_counter);
+    } else {
+        const auto offset
+            = std::static_pointer_cast<Immediate>(provided)->value;
+        stream << "0x" << std::hex << std::setfill('0') << std::setw(4)
+               << (offset + program_counter);
     }
 
 #ifdef INCLUDE_ADDONS
@@ -121,7 +130,4 @@ std::string Ldi::disassemble(uint16_t &program_counter,
     return stream.str();
 }
 
-Token::token_type Ldi::type() const
-{
-    return Token::token_type::OP_LDI;
-}
+Token::token_type Ldi::type() const { return Token::token_type::OP_LDI; }

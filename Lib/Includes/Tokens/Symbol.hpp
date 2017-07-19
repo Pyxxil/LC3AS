@@ -4,12 +4,11 @@
 #include <cstdint>
 #include <cstdlib>
 
-struct Symbol
-{
-    Symbol(uint16_t addr, size_t line, size_t t_column, const std::string &t_file)
+struct Symbol {
+    Symbol(uint16_t addr, size_t line, size_t t_column,
+           const std::string &t_file)
         : address(addr), line_number(line), column(t_column), file(t_file)
     {
-
     }
 
     uint16_t address;
@@ -18,4 +17,4 @@ struct Symbol
     std::string file;
 };
 
-#endif //PROJECT_SYMBOL_HPP
+#endif // PROJECT_SYMBOL_HPP
