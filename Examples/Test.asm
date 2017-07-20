@@ -22,6 +22,8 @@ ERRORS: 7               ; Current error count (this line complains twice)
         AND R0, R8, R0  ; Invalid register
         JMP R9          ; Invalid register
         .STRINGZ "Here" "is a weird string"
+        .FILL 0b0000101010101000101
+        .FILL #99999
 
 .END
 WARNING_LABEL

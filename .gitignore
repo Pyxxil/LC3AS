@@ -6,6 +6,7 @@ tests/
 *.hex
 build/
 .clang-format
+*.sublime*
 
 # CLion
 .idea/

@@ -24,6 +24,7 @@ enum DIAGNOSTIC_TYPE
   MULTIPLE_DEFINITIONS,
   INVALID_LITERAL,
   LOGIC,
+  INVALID_FILE,
 };
 
 struct diagnostic_type

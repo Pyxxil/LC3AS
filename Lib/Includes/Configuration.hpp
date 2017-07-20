@@ -11,21 +11,16 @@ enum CONFIG_OPTIONS
   VERBOSE = 0x04,
   BE_QUIET = 0x08,
   KEEP_GOING = 0x10,
+  NO_COLOUR = 0x20,
 };
 
 extern size_t configuration;
 
-inline bool
-is_set(size_t option)
-{
-  return (configuration & option) != 0;
-}
+bool
+is_set(size_t option);
 
-inline void
-set(size_t option)
-{
-  configuration |= option;
-}
+void
+set(size_t option);
 
 void
 add_search_directory(const std::string& directory);

@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Diagnostics.hpp"
+#include "Extra.hpp"
 #include "Tokens/Token.hpp"
 
 class Lexer
@@ -13,8 +14,8 @@ public:
   explicit Lexer(const std::string& t_file);
   Lexer(Lexer* t_parent,
         const std::string& t_file,
-        size_t line,
-        size_t col,
+        size_t t_line,
+        size_t t_col,
         size_t len);
   explicit Lexer(Lexer* const other)
     : line(other->line)
@@ -42,10 +43,25 @@ public:
   void tokenizeLine(std::string line,
                     size_t line_number,
                     std::vector<std::shared_ptr<Token>>& into);
-  void addToken(std::string& token,
-                std::vector<std::shared_ptr<Token>>& to,
-                size_t line_number,
-                size_t col);
+
+  /*! Add a token to the current line's tokens.
+   *
+   * @param token The string containing the token.
+   * @param to The current tokens in the line.
+   * @param line_number The line number (only relevant for working with files).
+   * @param col The column in the file that the token was found at
+   */
+  ALWAYS_INLINE void addToken(std::string& token,
+                              std::vector<std::shared_ptr<Token>>& to,
+                              size_t line_number,
+                              size_t col)
+  {
+    if (!token.empty()) {
+      // This effectively erases the token too, which saves a call to
+      // token.erase()
+      to.push_back(tokenize(std::move(token), line_number, col));
+    }
+  }
 
   inline const auto& get_tokens() const { return tokens; }
 
@@ -62,6 +78,8 @@ private:
   std::ifstream file;
   std::map<std::string, Symbol> symbols;
   Lexer* const parent;
+
+  bool is_fail = false;
 
   std::vector<std::vector<std::shared_ptr<Token>>> tokens;
 };

@@ -16,6 +16,7 @@ namespace fs = boost::filesystem;
 #endif
 
 #include "Diagnostics.hpp"
+#include "Extra.hpp"
 
 struct Directory
 {
@@ -63,6 +64,20 @@ struct Directory
 static std::vector<Directory> search_directories;
 
 size_t Config::configuration = 0;
+
+ALWAYS_INLINE
+bool
+Config::is_set(size_t option)
+{
+  return (configuration & option) != 0;
+}
+
+ALWAYS_INLINE
+void
+Config::set(size_t option)
+{
+  configuration |= option;
+}
 
 void
 Config::add_search_directory(const std::string& directory)

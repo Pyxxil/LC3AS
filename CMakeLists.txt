@@ -9,6 +9,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif ()
 
 option(ALLOW_EXTRAS OFF)
+option(OPTIMIZE OFF)
 
 ### Populated by Lib/CMakeLists.txt
 set(LIBRARY_SOURCE_FILES "")
@@ -28,7 +29,11 @@ if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion)
 endif ()
 
-set(RELEASE_FLAGS ${COMPILE_FLAGS} -O3 -flto -mtune=native -march=native)
+set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto)
+if (OPTIMIZE)
+    # Just for fun
+    set(RELEASE_FLAGS ${RELEASE_FLAGS} -mtune=native -march=native)
+endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/Lib")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Assembler")

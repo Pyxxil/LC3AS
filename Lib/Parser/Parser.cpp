@@ -210,7 +210,7 @@ Parser::do_first_pass()
   }
 }
 
-/*! Assemble the program
+/*! Perform assembly of the file
  *
  * For each line we have, generate the assembled version of that line. Each line
  * stores its own assembled code, which can be accessed by getting it's

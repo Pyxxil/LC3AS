@@ -84,15 +84,14 @@ Assembler::Assembler::configure(int argc, char** args)
     return false;
   }
 
-  auto files = option_parser["files"].as<std::vector<std::string>>();
-
-  for (auto&& file : files) {
+  const auto& files = option_parser["files"].as<std::vector<std::string>>();
+  for (const auto& file : files) {
     files_to_assemble.emplace_back(file);
   }
 
   if (0 != option_parser.count("include")) {
-    auto dirs = option_parser["include"].as<std::vector<std::string>>();
-    for (auto&& dir : dirs) {
+    const auto& dirs = option_parser["include"].as<std::vector<std::string>>();
+    for (const auto& dir : dirs) {
       Config::add_search_directory(dir);
     }
   }
@@ -152,7 +151,8 @@ Assembler::Assembler::assemble()
 
     Parser parser(file);
     if ((0 == parser.parse()) || Config::is_set(Config::KEEP_GOING)) {
-      // No errors, so let's write to the associated files.
+      // No errors (or user wants us to proceed), so let's write to the
+      // associated files.
       tokens = parser.parsed_tokens();
       symbols = parser.parsed_symbols();
 
@@ -161,6 +161,8 @@ Assembler::Assembler::assemble()
       generate_machine_code();
 
       if (!Diagnostics::critical()) {
+        // Only ever write if there were no errors (even if the user passed
+        // --keep-going)
         write(file);
       }
 

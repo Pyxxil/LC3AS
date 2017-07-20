@@ -75,13 +75,17 @@ void
 Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
            std::map<std::string, Symbol>& t_symbols)
 {
-  std::string line;
+  if (is_fail) {
+    return;
+  }
+
+  std::string t_line;
 
   lexed_lines.insert(std::make_pair<std::string, std::vector<std::string>>(
     std::string(file_name), { std::string() }));
 
-  while (std::getline(file, line)) {
-    lexed_lines[file_name].emplace_back(line);
+  while (std::getline(file, t_line)) {
+    lexed_lines[file_name].emplace_back(t_line);
   }
 
   std::vector<std::shared_ptr<Token>> tokenized_line;
@@ -94,8 +98,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
 #ifdef INCLUDE_ADDONS
       if (tokenized_line.front()->type() == Token::ADDON_INCLUDE) {
         if (tokenized_line.front()->valid_arguments(tokenized_line)) {
-          // TODO: Fix these
-          const std::string& file_with_path =
+          const auto&& file_with_path =
             file_name.substr(0, file_name.find_last_of('/') + 1) +
             tokenized_line.back()->token;
 
@@ -132,10 +135,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
           } else {
             std::vector<std::vector<std::shared_ptr<Token>>> _tokens;
             std::map<std::string, Symbol> _symbols;
-            // TODO: Move the code to check if the file can be
-            // opened into the
-            // TODO: lexer's constructor (only for constructors
-            // given with a parent)
+
             Lexer lexer(this,
                         file_with_path,
                         tokenized_line.front()->line,
@@ -172,84 +172,86 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
  * @return A shared pointer containing everything needed to know about the token
  */
 std::shared_ptr<Token>
-Lexer::tokenize(std::string word, size_t line_number, size_t column)
+Lexer::tokenize(std::string word, size_t line_number, size_t t_column)
 {
   std::string copy = word;
   std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
-  column -= word.length();
+  t_column -= word.length();
 
   // TODO: While this makes it a bit more efficient, is it worth double
-  // checking that
-  // TODO: the strings are the same after comparing the hash's? Just as a
-  // precautionary
-  // TODO: measure.
-  const size_t hashed =
-    hash(copy); // This is non-zero if the string contains some letters.
+  // TODO: checking that the strings are the same after comparing the hash's?
+  // TODO: Just as a precautionary measure.
+
+  // This is non-zero if the string contains some letters.
+  const size_t hashed = hash(copy);
 
   if (0u != hashed) {
     switch (hashed) {
       case hash("ADD", 3):
         return std::make_shared<Add>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("AND", 3):
         return std::make_shared<And>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("NOT", 3):
         return std::make_shared<Not>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("JSR", 3):
         return std::make_shared<Jsr>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("JSRR", 4):
         return std::make_shared<Jsrr>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("JMP", 3):
         return std::make_shared<Jmp>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("RET", 3):
         return std::make_shared<Ret>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("ST", 2):
-        return std::make_shared<St>(word, copy, file_name, line_number, column);
+        return std::make_shared<St>(
+          word, copy, file_name, line_number, t_column);
       case hash("STR", 3):
         return std::make_shared<Str>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("STI", 3):
         return std::make_shared<Sti>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("LD", 2):
-        return std::make_shared<Ld>(word, copy, file_name, line_number, column);
+        return std::make_shared<Ld>(
+          word, copy, file_name, line_number, t_column);
       case hash("LEA", 3):
         return std::make_shared<Lea>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("LDI", 3):
         return std::make_shared<Ldi>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("LDR", 3):
         return std::make_shared<Ldr>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("PUTS", 4):
         return std::make_shared<Puts>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("PUTSP", 5):
         return std::make_shared<Putsp>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("HALT", 4):
         return std::make_shared<Halt>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("TRAP", 4):
         return std::make_shared<Trap>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("GETC", 4):
         return std::make_shared<Getc>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("OUT", 3): // FALLTHROUGH
       case hash("PUTC", 4):
         return std::make_shared<Out>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash("IN", 2):
-        return std::make_shared<In>(word, copy, file_name, line_number, column);
+        return std::make_shared<In>(
+          word, copy, file_name, line_number, t_column);
       case hash("BR", 2):    // FALLTHROUGH
       case hash("BRNZP", 5): // FALLTHROUGH
       case hash("BRNPZ", 5): // FALLTHROUGH
@@ -258,59 +260,59 @@ Lexer::tokenize(std::string word, size_t line_number, size_t column)
       case hash("BRPNZ", 5): // FALLTHROUGH
       case hash("BRPZN", 5):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, true, true, true);
+          word, copy, file_name, line_number, t_column, true, true, true);
       case hash("BRN", 3):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, true, false, false);
+          word, copy, file_name, line_number, t_column, true, false, false);
       case hash("BRZ", 3):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, false, true, false);
+          word, copy, file_name, line_number, t_column, false, true, false);
       case hash("BRP", 3):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, false, false, true);
+          word, copy, file_name, line_number, t_column, false, false, true);
       case hash("BRNZ", 4): // FALLTHROUGH
       case hash("BRZN", 4):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, true, true, false);
+          word, copy, file_name, line_number, t_column, true, true, false);
       case hash("BRNP", 4): // FALLTHROUGH
       case hash("BRPN", 4):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, true, false, true);
+          word, copy, file_name, line_number, t_column, true, false, true);
       case hash("BRZP", 4): // FALLTHROUGH
       case hash("BRPZ", 4):
         return std::make_shared<Br>(
-          word, copy, file_name, line_number, column, false, true, true);
+          word, copy, file_name, line_number, t_column, false, true, true);
       case hash(".ORIG", 5):
         return std::make_shared<Orig>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".END", 4):
         return std::make_shared<End>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".FILL", 5):
         return std::make_shared<Fill>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".BLKW", 5):
         return std::make_shared<Blkw>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".STRINGZ", 8):
         return std::make_shared<Stringz>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
 #ifdef INCLUDE_ADDONS
       case hash(".NEG", 4):
         return std::make_shared<Neg>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".SUB", 4):
         return std::make_shared<Sub>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".SET", 4):
         return std::make_shared<Set>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".LSHIFT", 7):
         return std::make_shared<Lshift>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
       case hash(".INCLUDE", 8):
         return std::make_shared<Include>(
-          word, copy, file_name, line_number, column);
+          word, copy, file_name, line_number, t_column);
 #endif
       default:
         break;
@@ -329,54 +331,35 @@ Lexer::tokenize(std::string word, size_t line_number, size_t column)
 
   if (std::regex_match(word, _register)) {
     return std::make_shared<Register>(
-      word, copy, file_name, line_number, column);
+      word, copy, file_name, line_number, t_column);
   }
 
   if (std::regex_match(word, decimal)) {
-    return std::make_shared<Decimal>(word, file_name, line_number, column);
+    return std::make_shared<Decimal>(word, file_name, line_number, t_column);
   }
 
   if (std::regex_match(word, binary)) {
-    return std::make_shared<Binary>(word, copy, file_name, line_number, column);
+    return std::make_shared<Binary>(
+      word, copy, file_name, line_number, t_column);
   }
 
   if (std::regex_match(word, hexadecimal)) {
     return std::make_shared<Hexadecimal>(
-      word, copy, file_name, line_number, column);
+      word, copy, file_name, line_number, t_column);
   }
 
   if (std::regex_match(word, octal)) {
-    return std::make_shared<Octal>(word, file_name, line_number, column);
+    return std::make_shared<Octal>(word, file_name, line_number, t_column);
   }
 
   if (std::regex_match(word, label)) {
-    return std::make_shared<Label>(word, file_name, line_number, column);
+    return std::make_shared<Label>(word, file_name, line_number, t_column);
   }
 
   std::shared_ptr<Token> token =
-    std::make_shared<Token>(word, copy, file_name, line_number, column);
+    std::make_shared<Token>(word, copy, file_name, line_number, t_column);
   token->is_valid = false;
   return token;
-}
-
-/*! Add a token to the current line's tokens.
- *
- * @param token The string containing the token.
- * @param to The current tokens in the line.
- * @param line_number The line number (only relevant for working with files).
- * @param col The column in the file that the token was found at
- */
-void
-Lexer::addToken(std::string& token,
-                std::vector<std::shared_ptr<Token>>& to,
-                size_t line_number,
-                size_t col)
-{
-  if (!token.empty()) {
-    // This effectively erases the token too, which saves a call to
-    // token.erase()
-    to.push_back(tokenize(std::move(token), line_number, col));
-  }
 }
 
 /*! Tokenize a single line from the file
@@ -394,7 +377,7 @@ Lexer::addToken(std::string& token,
  * @param into The vector to tokenize the line into
  */
 void
-Lexer::tokenizeLine(std::string line,
+Lexer::tokenizeLine(std::string t_line,
                     size_t line_number,
                     std::vector<std::shared_ptr<Token>>& into)
 {
@@ -403,16 +386,16 @@ Lexer::tokenizeLine(std::string line,
   char terminated_by{ 0 };
   size_t index{ 0 };
 
-  for (; index < line.length();) {
-    char character{ line.at(index) };
+  for (; index < t_line.length();) {
+    char character{ t_line.at(index) };
 
     // We don't care about space characters.
     if (0 != std::isspace(character)) {
       terminated_by = ' ';
 
       const size_t col = index;
-      while (line.length() > index + 1 && 0 != std::isspace(character)) {
-        character = line.at(++index);
+      while (t_line.length() > index + 1 && 0 != std::isspace(character)) {
+        character = t_line.at(++index);
       }
 
       if (0u != current.length()) {
@@ -436,7 +419,7 @@ Lexer::tokenizeLine(std::string line,
 
     if (character == '/') {
       // '//' is a comment as well.
-      if (index + 1 >= line.length() || line.at(index + 1) != '/') {
+      if (index + 1 >= t_line.length() || t_line.at(index + 1) != '/') {
         // It seems easiest to treat it as a comment anyways, as '/'
         // can't be used for anything.
         Diagnostics::Diagnostic diagnostic(
@@ -450,7 +433,7 @@ Lexer::tokenizeLine(std::string line,
             Diagnostics::FileContext(file_name, line_number, index),
             '^',
             "Found unexpected '/'; Did you mean '//'?",
-            line,
+            t_line,
             "//"));
 
         Diagnostics::push(diagnostic);
@@ -474,7 +457,7 @@ Lexer::tokenizeLine(std::string line,
             Diagnostics::FileContext(file_name, line_number, index),
             '^',
             "Found here",
-            line));
+            t_line));
 
         Diagnostics::push(diagnostic);
         terminated_by = ',';
@@ -494,7 +477,7 @@ Lexer::tokenizeLine(std::string line,
             Diagnostics::FileContext(file_name, line_number, index),
             '^',
             "Found here",
-            line));
+            t_line));
 
         Diagnostics::push(diagnostic);
         terminated_by = ':';
@@ -510,11 +493,11 @@ Lexer::tokenizeLine(std::string line,
       addToken(current, into, line_number, index);
 
       const char terminator{ character };
-      while (index + 1 < line.length()) {
-        character = line.at(++index);
-        if (character == '\\' && line.length() > index + 1 &&
-            line.at(index + 1) == terminator) {
-          character = line.at(++index);
+      while (index + 1 < t_line.length()) {
+        character = t_line.at(++index);
+        if (character == '\\' && t_line.length() > index + 1 &&
+            t_line.at(index + 1) == terminator) {
+          character = t_line.at(++index);
         } else if (character == terminator) {
           break;
         }
@@ -547,7 +530,7 @@ Lexer::tokenizeLine(std::string line,
             '^',
             "Expected '" + std::string({ terminator }) +
               "' before end of line.",
-            line,
+            t_line,
             std::string({ terminator })));
 
         Diagnostics::push(diagnostic);
@@ -603,11 +586,11 @@ Lexer::Lexer(const std::string& t_file)
 
 Lexer::Lexer(Lexer* const t_parent,
              const std::string& t_file,
-             size_t line,
-             size_t col,
+             size_t t_line,
+             size_t t_col,
              size_t len)
-  : line(line)
-  , column(col)
+  : line(t_line)
+  , column(t_col)
   , length(len)
   , file_name(t_file)
   , file(t_file)
@@ -615,6 +598,19 @@ Lexer::Lexer(Lexer* const t_parent,
   , parent(t_parent)
   , tokens()
 {
+  if (file.fail()) {
+    is_fail = true;
+    Diagnostics::Diagnostic diagnostic(
+      Diagnostics::FileContext(file_name, line, t_col),
+      "Unable to open file",
+      Diagnostics::INVALID_FILE,
+      Diagnostics::ERROR);
+
+    provide_context(diagnostic);
+
+    Diagnostics::push(diagnostic);
+  }
+
   open_files.emplace_back(file_name);
 }
 
