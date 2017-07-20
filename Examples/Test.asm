@@ -17,7 +17,7 @@ WARNINGS:: :            ; Extraneous colons (warning count = 14)
         BRn #1          ; Checks same CC
         BRp #-1         ; Infinite loop
 
-ERRORS: 7               ; Current error count (this line complains twice)
+ERRORS: 9               ; Current error count (this line complains twice)
         ADD R0, R10, R0 ; Expected register
         AND R0, R8, R0  ; Invalid register
         JMP R9          ; Invalid register

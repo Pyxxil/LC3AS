@@ -11,6 +11,8 @@
 #undef ERROR
 #endif
 
+#include "Configuration.hpp"
+
 namespace Console {
 #if defined(_WIN64)
 enum class FOREGROUND_COLOUR
@@ -116,17 +118,20 @@ struct Colour
 
   friend std::ostream& operator<<(std::ostream& os, const Colour& colour)
   {
+    if (!Config::is_set(Config::NO_COLOUR)) {
 #if defined(_WIN64)
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
-                            static_cast<int>(colour.fg) |
-                              static_cast<int>(colour.bg) |
-                              static_cast<int>(colour.mod));
-    return os;
+      SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+                              static_cast<int>(colour.fg) |
+                                static_cast<int>(colour.bg) |
+                                static_cast<int>(colour.mod));
 #else
-    return os << "\033[" << static_cast<int>(colour.fg) << ';'
-              << static_cast<int>(colour.bg) << ';'
-              << static_cast<int>(colour.mod) << 'm';
+      return os << "\033[" << static_cast<int>(colour.fg) << ';'
+                << static_cast<int>(colour.bg) << ';'
+                << static_cast<int>(colour.mod) << 'm';
 #endif
+    }
+
+    return os;
   }
 
   bool operator==(const Colour& other) const

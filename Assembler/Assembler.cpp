@@ -50,7 +50,8 @@ Assembler::Assembler::configure(int argc, char** args)
         "keep-going",
         "Keep going despite errors (mostly used for "
         "testing. Doesn't write "
-        "to files unless no errors occurred)");
+        "to files unless no errors occurred)")("no-colour",
+                                               "Disable coloured output");
 
     // TODO: Add a --attempt-fix. Basically, assume that a problem is meant
     // to be fixed to what we
@@ -114,6 +115,10 @@ Assembler::Assembler::configure(int argc, char** args)
 
   if (0 != option_parser.count("keep-going")) {
     Config::set(Config::KEEP_GOING);
+  }
+
+  if (0 != option_parser.count("no-colour")) {
+    Config::set(Config::NO_COLOUR);
   }
 
   return true;
