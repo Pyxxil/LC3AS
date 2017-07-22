@@ -1,11 +1,11 @@
-#include "Lib/Includes/String_Matcher.hpp"
+#include "String_Matcher.hpp"
 
 #include <algorithm>
 #include <cstdlib>
 #include <limits>
 
 String_Matcher::String_Matcher()
-  : m_string()
+  : m_string{}
   , best{ std::numeric_limits<long>::max(), "" }
 {}
 
@@ -23,18 +23,19 @@ String_Matcher::best_match() const
 void
 String_Matcher::consider(const std::string& str)
 {
-  auto length_difference =
-    std::abs(static_cast<int>(str.length() - m_string.length()));
+  auto length_difference{ std::abs(
+    static_cast<int>(str.length() - m_string.length())) };
   if (length_difference > best.first) {
     return;
   }
 
-  auto cutoff = static_cast<int>(std::max(m_string.length(), str.length())) / 2;
+  auto cutoff{ static_cast<int>(std::max(m_string.length(), str.length())) /
+               2 };
   if (length_difference > cutoff) {
     return;
   }
 
-  auto distance = static_cast<int>(levenshtein_distance(m_string, str));
+  auto distance{ static_cast<int>(levenshtein_distance(m_string, str)) };
   if (distance <= best.first || (str.length() > m_string.length() &&
                                  best.second.length() < m_string.length())) {
     /* The second half of this if statement should help in cases where we
@@ -50,8 +51,8 @@ int32_t
 String_Matcher::levenshtein_distance(const std::string& string,
                                      const std::string& target) const
 {
-  const size_t string_length = string.length();
-  const size_t target_length = target.length();
+  const size_t string_length{ string.length() };
+  const size_t target_length{ target.length() };
 
   if (string_length == 0) {
     return static_cast<int32_t>(target_length);
@@ -72,11 +73,11 @@ String_Matcher::levenshtein_distance(const std::string& string,
     matrix1[0] = i + 1;
 
     for (size_t j = 0; j < string_length; j++) {
-      const size_t cost = (string[j] == target[i] ? 0 : 1);
-      const size_t deletion = matrix1[j] + 1;
-      const size_t insertion = matrix0[j + 1] + 1;
-      const size_t substitution = matrix0[j] + cost;
-      size_t cheapest = std::min(deletion, insertion);
+      const size_t cost = string[j] == target[i] ? 0 : 1;
+      const size_t deletion{ matrix1[j] + 1 };
+      const size_t insertion{ matrix0[j + 1] + 1 };
+      const size_t substitution{ matrix0[j] + cost };
+      size_t cheapest{ std::min(deletion, insertion) };
       cheapest = std::min(cheapest, substitution);
       matrix1[j + 1] = cheapest;
     }

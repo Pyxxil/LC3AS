@@ -1,7 +1,7 @@
 #ifndef TOKEN_ADDON_INCLUDE_HPP
 #define TOKEN_ADDON_INCLUDE_HPP
 
-#include "Token.hpp"
+#include "Tokens/Token.hpp"
 
 #include <string>
 

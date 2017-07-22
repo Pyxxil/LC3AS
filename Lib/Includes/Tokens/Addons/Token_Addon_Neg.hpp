@@ -1,9 +1,9 @@
 #ifndef TOKEN_ADDON_NEG_HPP
 #define TOKEN_ADDON_NEG_HPP
 
+#include "Tokens/Instructions/Token_Instruction_Add.hpp"
+#include "Tokens/Instructions/Token_Instruction_Not.hpp"
 #include "Tokens/Token_Directive.hpp"
-#include "Tokens/Token_Instruction_Add.hpp"
-#include "Tokens/Token_Instruction_Not.hpp"
 
 class Neg : public Directive
 {

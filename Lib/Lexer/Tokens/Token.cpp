@@ -1,6 +1,6 @@
 #include "Tokens/Token.hpp"
 
-#include <Lib/Includes/LexHelper.hpp>
+#include "LexHelper.hpp"
 
 #include "Diagnostics.hpp"
 

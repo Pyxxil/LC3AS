@@ -219,7 +219,7 @@ Parser::do_first_pass()
 void
 Parser::do_second_pass()
 {
-  int memory_required = 0;
+  int memory_required{ 0 };
 
   for (auto&& tokenized_line : tokens) {
     if (tokenized_line.front()->type() == Token::DIR_END) {

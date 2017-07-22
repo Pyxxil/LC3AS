@@ -48,23 +48,19 @@ Assembler::Assembler::configure(int argc, char** args)
        "Files to assemble",
        cxxopts::value<std::vector<std::string>>())("q,quiet", "Be quiet")(
         "keep-going",
-        "Keep going despite errors (mostly used for "
-        "testing. Doesn't write "
+        "Keep going despite errors (mostly used for testing). Doesn't write "
         "to files unless no errors occurred)")("no-colour",
                                                "Disable coloured output");
 
     // TODO: Add a --attempt-fix. Basically, assume that a problem is meant
-    // to be fixed to what we
-    // TODO: think it should, e.g. when we encounter a single '/', the
-    // assembler keeps going because
-    // TODO: it assumes that it was meant to be a double '//', indication a
-    // comment. Do the same thing
-    // TODO: for character literals and strings -- basically, anything left
-    // on that line will be treated
-    // TODO: as a string/character (which, of course, would lead to problems
-    // with character literals).
+    // TODO: to be fixed to what we think it should, e.g. when we encounter a
+    // TODO: single '/', the assembler keeps going because it assumes that it
+    // TODO: was meant to be a double '//', indication a comment. Do the same
+    // TODO: thing for character literals and strings -- basically, anything
+    // TODO: left on that line will be treated as a string/character (which, of
+    // TODO: course, would lead to problems with character literals).
     // TODO:    - Maybe only use 1 character for character literals, and
-    // anything else as extra?
+    // TODO: anything else as extra?
 
     option_parser.parse_positional("files");
     option_parser.parse(argc, args);
@@ -131,7 +127,7 @@ void
 Assembler::Assembler::assemble()
 {
   for (auto& file : files_to_assemble) {
-    std::ifstream f(file);
+    std::ifstream f{ file };
 
     if (f.fail()) {
       // We can't do anything with a file that failed to open for some
@@ -189,7 +185,7 @@ void
 Assembler::Assembler::generate_machine_code()
 {
   for (size_t i = 0; i < tokens.size(); ++i) {
-    const auto& tokenized_line = tokens[i];
+    const auto& tokenized_line{ tokens[i] };
 
     for (const auto& assembled_line : tokenized_line.front()->as_assembled()) {
       if (!Config::is_set(Config::CONFIG_OPTIONS::BE_QUIET)) {

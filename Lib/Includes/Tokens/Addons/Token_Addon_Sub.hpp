@@ -3,10 +3,10 @@
 
 #include "Tokens/Token_Directive.hpp"
 
-#include "Tokens/Token_Addon_Neg.hpp"
-#include "Tokens/Token_Immediate_Decimal.hpp"
-#include "Tokens/Token_Instruction_Add.hpp"
-#include "Tokens/Token_Instruction_And.hpp"
+#include "Tokens/Addons/Token_Addon_Neg.hpp"
+#include "Tokens/Immediates/Token_Immediate_Decimal.hpp"
+#include "Tokens/Instructions/Token_Instruction_Add.hpp"
+#include "Tokens/Instructions/Token_Instruction_And.hpp"
 
 class Sub : public Directive
 {

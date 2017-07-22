@@ -3,12 +3,12 @@
 
 #include "Tokens/Token_Directive.hpp"
 
-#include "Tokens/Token_Directive_Fill.hpp"
-#include "Tokens/Token_Immediate_Decimal.hpp"
-#include "Tokens/Token_Instruction_Add.hpp"
-#include "Tokens/Token_Instruction_And.hpp"
-#include "Tokens/Token_Instruction_Br.hpp"
-#include "Tokens/Token_Instruction_Ld.hpp"
+#include "Tokens/Directives/Token_Directive_Fill.hpp"
+#include "Tokens/Immediates/Token_Immediate_Decimal.hpp"
+#include "Tokens/Instructions/Token_Instruction_Add.hpp"
+#include "Tokens/Instructions/Token_Instruction_And.hpp"
+#include "Tokens/Instructions/Token_Instruction_Br.hpp"
+#include "Tokens/Instructions/Token_Instruction_Ld.hpp"
 
 class Set : public Directive
 {

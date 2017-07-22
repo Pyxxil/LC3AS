@@ -89,7 +89,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
   }
 
   std::vector<std::shared_ptr<Token>> tokenized_line;
-  size_t line_number = 0;
+  size_t line_number{ 0 };
 
   for (const auto& line_entry : lexed_lines[file_name]) {
     tokenizeLine(line_entry, line_number, tokenized_line);
@@ -174,7 +174,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
 std::shared_ptr<Token>
 Lexer::tokenize(std::string word, size_t line_number, size_t t_column)
 {
-  std::string copy = word;
+  std::string copy{ word };
   std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
   t_column -= word.length();
@@ -356,7 +356,7 @@ Lexer::tokenize(std::string word, size_t line_number, size_t t_column)
     return std::make_shared<Label>(word, file_name, line_number, t_column);
   }
 
-  std::shared_ptr<Token> token =
+  auto&& token =
     std::make_shared<Token>(word, copy, file_name, line_number, t_column);
   token->is_valid = false;
   return token;
@@ -398,159 +398,166 @@ Lexer::tokenizeLine(std::string t_line,
         character = t_line.at(++index);
       }
 
-      if (0u != current.length()) {
+      if (!current.empty()) {
         // We terminated with something, so we want to remember that.
         // This helps in cases like this:
         // ADD R0 , R0 , R1
         // Which, without this, would make 2 warnings (one for each
         // comma)
         terminated_by = 1;
+        addToken(current, into, line_number, col);
       }
-
-      // However, it does mean we want to check what we just got.
-      addToken(current, into, line_number, col);
     }
 
-    if (character == ';' || character == '\r') {
-      // For ';', it means we've hit a comment, and
-      // std::getline doesn't consume '\r' (at least on OSX)
-      break;
-    }
-
-    if (character == '/') {
-      // '//' is a comment as well.
-      if (index + 1 >= t_line.length() || t_line.at(index + 1) != '/') {
-        // It seems easiest to treat it as a comment anyways, as '/'
-        // can't be used for anything.
-        Diagnostics::Diagnostic diagnostic(
-          Diagnostics::FileContext(file_name, line_number, index),
-          "Treating this as a comment",
-          Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
-          Diagnostics::DIAGNOSTIC::WARNING);
-
-        diagnostic.provide_context(
-          std::make_unique<Diagnostics::SelectionContext>(
+    switch (character) {
+      case ';': {
+        // Hit a comment
+        goto end_of_line;
+      }
+      case '\r': {
+        // std::getline doesn't consume '\r' (at least on OSX)
+        goto end_of_line;
+      }
+      case '/': {
+        // '//' is a comment as well.
+        if (index + 1 >= t_line.length() || t_line.at(index + 1) != '/') {
+          // It seems easiest to treat it as a comment anyways, as '/'
+          // can't be used for anything.
+          Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(file_name, line_number, index),
-            '^',
-            "Found unexpected '/'; Did you mean '//'?",
-            t_line,
-            "//"));
+            "Treating this as a comment",
+            Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+            Diagnostics::DIAGNOSTIC::WARNING);
 
-        Diagnostics::push(diagnostic);
-      }
+          diagnostic.provide_context(
+            std::make_unique<Diagnostics::SelectionContext>(
+              Diagnostics::FileContext(file_name, line_number, index),
+              '^',
+              "Found unexpected '/'; Did you mean '//'?",
+              t_line,
+              "//"));
 
-      break;
-    }
-
-    if (',' == character) {
-      if (into.empty() ||
-          (' ' != terminated_by && 0 != terminated_by && 1 != terminated_by) ||
-          (0u == current.length() && terminated_by != 1)) {
-        Diagnostics::Diagnostic diagnostic(
-          Diagnostics::FileContext(file_name, line_number, index),
-          "Extraneous comma",
-          Diagnostics::SYNTAX,
-          Diagnostics::WARNING);
-
-        diagnostic.provide_context(
-          std::make_unique<Diagnostics::SelectionContext>(
-            Diagnostics::FileContext(file_name, line_number, index),
-            '^',
-            "Found here",
-            t_line));
-
-        Diagnostics::push(diagnostic);
-        terminated_by = ',';
-      }
-
-      addToken(current, into, line_number, index);
-    } else if (':' == character) {
-      if (!into.empty() || 0u == current.length() || 0 != terminated_by) {
-        Diagnostics::Diagnostic diagnostic(
-          Diagnostics::FileContext(file_name, line_number, index),
-          "Extraneous colon",
-          Diagnostics::SYNTAX,
-          Diagnostics::WARNING);
-
-        diagnostic.provide_context(
-          std::make_unique<Diagnostics::SelectionContext>(
-            Diagnostics::FileContext(file_name, line_number, index),
-            '^',
-            "Found here",
-            t_line));
-
-        Diagnostics::push(diagnostic);
-        terminated_by = ':';
-      }
-
-      addToken(current, into, line_number, index);
-    }
-#ifdef INCLUDE_ADDONS
-    else if ('"' == character || '\'' == character) {
-#else
-    else if (character == '"') {
-#endif
-      addToken(current, into, line_number, index);
-
-      const char terminator{ character };
-      while (index + 1 < t_line.length()) {
-        character = t_line.at(++index);
-        if (character == '\\' && t_line.length() > index + 1 &&
-            t_line.at(index + 1) == terminator) {
-          character = t_line.at(++index);
-        } else if (character == terminator) {
-          break;
+          Diagnostics::push(diagnostic);
         }
-        current += character;
-      }
 
-      if (character != terminator) {
-        // TODO: Use Diagnostics here
-        std::stringstream stream;
+        goto end_of_line;
+      }
+      case ',': {
+        if (into.empty() ||
+            (' ' != terminated_by && 0 != terminated_by &&
+             1 != terminated_by) ||
+            (0u == current.length() && terminated_by != 1)) {
+          Diagnostics::Diagnostic diagnostic(
+            Diagnostics::FileContext(file_name, line_number, index),
+            "Extraneous comma",
+            Diagnostics::SYNTAX,
+            Diagnostics::WARNING);
+
+          diagnostic.provide_context(
+            std::make_unique<Diagnostics::SelectionContext>(
+              Diagnostics::FileContext(file_name, line_number, index),
+              '^',
+              "Found here",
+              t_line));
+
+          Diagnostics::push(diagnostic);
+          terminated_by = ',';
+        }
+
+        addToken(current, into, line_number, index);
+        break;
+      }
+      case ':': {
+        if (!into.empty() || 0u == current.length() || 0 != terminated_by) {
+          Diagnostics::Diagnostic diagnostic(
+            Diagnostics::FileContext(file_name, line_number, index),
+            "Extraneous colon",
+            Diagnostics::SYNTAX,
+            Diagnostics::WARNING);
+
+          diagnostic.provide_context(
+            std::make_unique<Diagnostics::SelectionContext>(
+              Diagnostics::FileContext(file_name, line_number, index),
+              '^',
+              "Found here",
+              t_line));
+
+          Diagnostics::push(diagnostic);
+          terminated_by = ':';
+        }
+
+        addToken(current, into, line_number, index);
+        break;
+      }
 #ifdef INCLUDE_ADDONS
-        stream << "Unterminated "
-               << (terminator == '\'' ? "character" : "string");
+      case '\'':
+#endif
+      case '"': {
+        addToken(current, into, line_number, index);
+
+        const char terminator{ character };
+        while (index + 1 < t_line.length()) {
+          character = t_line.at(++index);
+          if (character == '\\' && t_line.length() > index + 1 &&
+              t_line.at(index + 1) == terminator) {
+            character = t_line.at(++index);
+          } else if (character == terminator) {
+            break;
+          }
+          current += character;
+        }
+
+        if (character != terminator) {
+          // TODO: Use Diagnostics here
+          std::stringstream stream;
+#ifdef INCLUDE_ADDONS
+          stream << "Unterminated "
+                 << (terminator == '\'' ? "character" : "string");
 #else
-        stream << "Unterminated string";
+          stream << "Unterminated string";
 #endif
-        into.clear();
+          into.clear();
 
-        Diagnostics::Diagnostic diagnostic(
-          Diagnostics::FileContext(
-            file_name, line_number, index - current.size()),
-          stream.str(),
-          Diagnostics::SYNTAX,
-          Diagnostics::ERROR);
+          Diagnostics::Diagnostic diagnostic(
+            Diagnostics::FileContext(
+              file_name, line_number, index - current.size()),
+            stream.str(),
+            Diagnostics::SYNTAX,
+            Diagnostics::ERROR);
 
-        diagnostic.provide_context(
-          std::make_unique<Diagnostics::SelectionContext>(
-            // Has to be index + 1 because otherwise it'll select
-            // the last character
-            Diagnostics::FileContext(file_name, line_number, index + 1),
-            '^',
-            "Expected '" + std::string({ terminator }) +
-              "' before end of line.",
-            t_line,
-            std::string({ terminator })));
+          diagnostic.provide_context(
+            std::make_unique<Diagnostics::SelectionContext>(
+              // Has to be index + 1 because otherwise it'll select
+              // the last character
+              Diagnostics::FileContext(file_name, line_number, index + 1),
+              '^',
+              "Expected '" + std::string({ terminator }) +
+                "' before end of line.",
+              t_line,
+              std::string({ terminator })));
 
-        Diagnostics::push(diagnostic);
+          Diagnostics::push(diagnostic);
 #ifdef INCLUDE_ADDONS
-      } else if ('\'' == terminator) {
-        into.push_back(std::make_shared<Character>(
-          current, file_name, line_number, index - current.length()));
+        } else if ('\'' == terminator) {
+          into.push_back(std::make_shared<Character>(
+            current, file_name, line_number, index - current.length()));
 #endif
-      } else {
-        into.push_back(std::make_shared<String>(
-          current, file_name, line_number, index - current.length()));
+        } else {
+          into.push_back(std::make_shared<String>(
+            current, file_name, line_number, index - current.length()));
+        }
+        current.erase();
+        break;
       }
-      current.erase();
-    } else {
-      current += character;
-      terminated_by = 0;
+      default: {
+        current += character;
+        terminated_by = 0;
+        break;
+      }
     }
     ++index;
   }
-
+end_of_line:
   addToken(current, into, line_number, index);
 }
 

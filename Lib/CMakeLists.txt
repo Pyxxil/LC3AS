@@ -107,12 +107,12 @@ if (ALLOW_EXTRAS)
 
     set (TOKENS_HEADER_FILES
         "${TOKENS_HEADER_FILES}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Char.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Include.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Lshift.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Neg.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Set.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Token_Addon_Sub.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Char.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Include.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Lshift.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Neg.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Set.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Sub.hpp
         )
 endif ()
 
