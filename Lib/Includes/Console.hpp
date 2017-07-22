@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(_WIN32)
 #define NOMINMAX
 #include <Windows.h>
 #undef ERROR
@@ -14,7 +14,7 @@
 #include "Configuration.hpp"
 
 namespace Console {
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(_WIN32)
 enum class FOREGROUND_COLOUR
 {
   BLACK = 0,
@@ -119,7 +119,7 @@ struct Colour
   friend std::ostream& operator<<(std::ostream& os, const Colour& colour)
   {
     if (!Config::is_set(Config::NO_COLOUR)) {
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(_WIN32)
       SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                               static_cast<int>(colour.fg) |
                                 static_cast<int>(colour.bg) |
