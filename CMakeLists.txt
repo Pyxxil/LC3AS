@@ -21,7 +21,7 @@ set(ASSEMBLER_SOURCE_FILES "")
 set(ASSEMBLER_HEADER_FILES "")
 set(ASSEMBLER_INCLUDE_DIRECTORIES "")
 
-set(DEBUG_FLAGS ${COMPILE_FLAGS} -O0 -g -pg -pedantic)
+set(DEBUG_FLAGS ${COMPILE_FLAGS} -Og -g -pg -pedantic)
 
 if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion)
@@ -35,17 +35,20 @@ if (OPTIMIZE)
     set(RELEASE_FLAGS ${RELEASE_FLAGS} -mtune=native -march=native)
 endif()
 
+if (NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE "Release")
+endif()
+
 add_subdirectory("${CMAKE_SOURCE_DIR}/Lib")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Assembler")
 
 add_executable(LC3AS
-    "${LIBRARY_SOURCE_FILES}"
     "${LIBRARY_HEADER_FILES}"
     "${ASSEMBLER_SOURCE_FILES}"
     "${ASSEMBLER_HEADER_FILES}"
     )
 
-add_library(LC3
+add_library(LC3 STATIC
     "${LIBRARY_SOURCE_FILES}"
     "${LIBRARY_HEADER_FILES}"
     )
@@ -53,6 +56,7 @@ add_library(LC3
 target_include_directories(LC3AS PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}" "${ASSEMBLER_INCLUDE_DIRECTORIES}")
 target_compile_options(LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
 target_compile_options(LC3AS PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
+target_link_libraries(LC3AS PUBLIC LC3)
 
 target_include_directories(LC3 PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}")
 target_compile_options(LC3 PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
@@ -64,13 +68,10 @@ if (APPLE AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         set(Boost_USE_STATIC_LIBS ON)
     endif ()
     find_package(Boost REQUIRED COMPONENTS filesystem system)
-    target_link_libraries(LC3AS PUBLIC "${Boost_FILESYSTEM_LIBRARY}" "${Boost_SYSTEM_LIBRARY}")
     target_link_libraries(LC3 PUBLIC "${Boost_FILESYSTEM_LIBRARY}" "${Boost_SYSTEM_LIBRARY}")
-    target_include_directories(LC3AS PUBLIC "${Boost_INCLUDE_DIR}")
     target_include_directories(LC3 PUBLIC "${Boost_INCLUDE_DIR}")
 elseif (UNIX)
     # GCC on linux requires this to use experimental/filesystem
-    target_link_libraries(LC3AS PUBLIC stdc++fs)
     target_link_libraries(LC3 PUBLIC stdc++fs)
 endif ()
 

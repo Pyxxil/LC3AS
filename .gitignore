@@ -8,6 +8,7 @@ build/
 .clang-format
 *.sublime*
 .tags*
+*.gch
 
 # CLion
 .idea/

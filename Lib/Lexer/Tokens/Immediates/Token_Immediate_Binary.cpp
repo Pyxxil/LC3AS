@@ -1,6 +1,6 @@
 #include "Tokens/Immediates/Token_Immediate_Binary.hpp"
 
-#if defined(_WIN64) || defined(_WIN32)
+#if defined(_MSC_VER)
 #include <cctype>
 #endif
 

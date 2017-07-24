@@ -219,20 +219,15 @@ Parser::do_first_pass()
 void
 Parser::do_second_pass()
 {
-  int memory_required{ 0 };
-
   for (auto&& tokenized_line : tokens) {
     if (tokenized_line.front()->type() == Token::DIR_END) {
       end_seen = true;
       break;
     }
 
-    memory_required = tokenized_line.front()->assemble(
-      tokenized_line, symbols, internal_program_counter);
-
-    if (memory_required >= 0) {
-      internal_program_counter += static_cast<uint16_t>(memory_required);
-    }
+    internal_program_counter +=
+      static_cast<uint16_t>(tokenized_line.front()->assemble(
+        tokenized_line, symbols, internal_program_counter));
   }
 }
 

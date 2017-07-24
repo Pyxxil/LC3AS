@@ -2,7 +2,7 @@
 
 #include <regex>
 
-#if defined(_WIN64) || defined(_WIN32)
+#if defined(_MSC_VER)
 // Windows doesn't like not having this here apparently.
 #include <cctype>
 #endif

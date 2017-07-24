@@ -1,7 +1,7 @@
 #include "Tokens/Immediates/Token_Immediate_Hexadecimal.hpp"
 
 #include <limits>
-#if defined(_WIN64) || defined(_WIN32)
+#if defined(_MSC_VER)
 #include <cctype>
 #endif
 

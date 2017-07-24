@@ -1,7 +1,7 @@
 #include "Context.hpp"
 
 #include <iomanip>
-#if defined(_WIN64) || defined(_WIN32)
+#if defined(_MSC_VER)
 #include <cctype>
 #endif
 

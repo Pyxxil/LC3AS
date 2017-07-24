@@ -34,88 +34,88 @@ Assembler::assemble(int argc, char** args)
 bool
 Assembler::Assembler::configure(int argc, char** args)
 {
-    cxxopts::Options option_parser("LC3AS", "LC-3 Assembly Language Assembler");
-    try {
-        option_parser.positional_help("<assembly files>");
-        option_parser.add_options()("h,help", "Print this help message")(
-            "I,include",
-            "Add a directory to search for .INCLUDE directives",
-            cxxopts::value<std::vector<std::string>>(),
-            "DIRECTORY")("s,stop", "Stop on the first error")(
-                "e,error", "Report warnings as errors")(
-                    "w,warn", "Choose warning type <Not implemented>") // TODO: Fix this
-                    ("files",
-                        "Files to assemble",
-                        cxxopts::value<std::vector<std::string>>())("q,quiet", "Be quiet")(
-                            "keep-going",
-                            "Keep going despite errors (mostly used for testing). Doesn't write "
-                            "to files unless no errors occurred)")("no-colour",
-                                "Disable coloured output (synonymous to no-color)");
+  cxxopts::Options option_parser("LC3AS", "LC-3 Assembly Language Assembler");
+  try {
+    option_parser.positional_help("<assembly files>");
+    option_parser.add_options()("h,help", "Print this help message")(
+      "I,include",
+      "Add a directory to search for .INCLUDE directives",
+      cxxopts::value<std::vector<std::string>>(),
+      "DIRECTORY")("s,stop", "Stop on the first error")(
+      "e,error", "Report warnings as errors")(
+      "w,warn", "Choose warning type <Not implemented>") // TODO: Fix this
+      ("files",
+       "Files to assemble",
+       cxxopts::value<std::vector<std::string>>())("q,quiet", "Be quiet")(
+        "keep-going",
+        "Keep going despite errors (mostly used for testing). Doesn't write "
+        "to files unless no errors occurred)")(
+        "no-colour", "Disable coloured output (synonymous to no-color)");
 
-        // TODO: Add a --attempt-fix. Basically, assume that a problem is meant
-        // TODO: to be fixed to what we think it should, e.g. when we encounter a
-        // TODO: single '/', the assembler keeps going because it assumes that it
-        // TODO: was meant to be a double '//', indication a comment. Do the same
-        // TODO: thing for character literals and strings -- basically, anything
-        // TODO: left on that line will be treated as a string/character (which, of
-        // TODO: course, would lead to problems with character literals).
-        // TODO:    - Maybe only use 1 character for character literals, and
-        // TODO: anything else as extra?
+    // TODO: Add a --attempt-fix. Basically, assume that a problem is meant
+    // TODO: to be fixed to what we think it should, e.g. when we encounter a
+    // TODO: single '/', the assembler keeps going because it assumes that it
+    // TODO: was meant to be a double '//', indication a comment. Do the same
+    // TODO: thing for character literals and strings -- basically, anything
+    // TODO: left on that line will be treated as a string/character (which, of
+    // TODO: course, would lead to problems with character literals).
+    // TODO:    - Maybe only use 1 character for character literals, and
+    // TODO: anything else as extra?
 
-        option_parser.parse_positional("files");
-        option_parser.parse(argc, args);
+    option_parser.parse_positional("files");
+    option_parser.parse(argc, args);
+  } catch (const cxxopts::OptionException& e) {
+    std::cout << "LC3AS Command Line Error: " << e.what() << '\n';
+    return false;
+  }
+
+  Config::add_search_directory(".", "Current Running Directory");
+
+  if (0 != option_parser.count("help")) {
+    std::cout << option_parser.help() << '\n';
+    return false;
+  }
+
+  if (0 == option_parser.count("files")) {
+    std::cout << "LC3AS: No input files.\n";
+    return false;
+  }
+
+  const auto& files = option_parser["files"].as<std::vector<std::string>>();
+  for (const auto& file : files) {
+    files_to_assemble.emplace_back(file);
+  }
+
+  if (0 != option_parser.count("include")) {
+    const auto& dirs = option_parser["include"].as<std::vector<std::string>>();
+    for (const auto& dir : dirs) {
+      Config::add_search_directory(dir);
     }
-    catch (const cxxopts::OptionException& e) {
-        std::cout << "LC3AS Command Line Error: " << e.what() << '\n';
-        return false;
-    }
+  }
 
-    Config::add_search_directory(".", "Current Running Directory");
+  if (0 != option_parser.count("stop")) {
+    Config::set(Config::CONFIG_OPTIONS::STOP_ON_FIRST_ERR);
+  }
 
-    if (0 != option_parser.count("help")) {
-        std::cout << option_parser.help() << '\n';
-        return false;
-    }
+  if (0 != option_parser.count("error")) {
+    Config::set(Config::CONFIG_OPTIONS::WARN_AS_ERROR);
+  }
 
-    if (0 == option_parser.count("files")) {
-        std::cout << "LC3AS: No input files.\n";
-        return false;
-    }
+  if (0 != option_parser.count("warn")) {
+    // TODO: Implement (as above).
+  }
 
-    const auto& files = option_parser["files"].as<std::vector<std::string>>();
-    for (const auto& file : files) {
-        files_to_assemble.emplace_back(file);
-    }
+  if (0 != option_parser.count("quiet")) {
+    Config::set(Config::CONFIG_OPTIONS::BE_QUIET);
+  }
 
-    if (0 != option_parser.count("include")) {
-        const auto& dirs = option_parser["include"].as<std::vector<std::string>>();
-        for (const auto& dir : dirs) {
-            Config::add_search_directory(dir);
-        }
-    }
+  if (0 != option_parser.count("keep-going")) {
+    Config::set(Config::KEEP_GOING);
+  }
 
-    if (0 != option_parser.count("stop")) {
-        Config::set(Config::CONFIG_OPTIONS::STOP_ON_FIRST_ERR);
-    }
-
-    if (0 != option_parser.count("error")) {
-        Config::set(Config::CONFIG_OPTIONS::WARN_AS_ERROR);
-    }
-
-    if (0 != option_parser.count("warn")) {
-        // TODO: Implement (as above).
-    }
-
-    if (0 != option_parser.count("quiet")) {
-        Config::set(Config::CONFIG_OPTIONS::BE_QUIET);
-    }
-
-    if (0 != option_parser.count("keep-going")) {
-        Config::set(Config::KEEP_GOING);
-    }
-
-    if (0 != option_parser.count("no-colour") || 0 != option_parser.count("no-color")) {
-      Config::set(Config::NO_COLOUR);
+  if (0 != option_parser.count("no-colour") ||
+      0 != option_parser.count("no-color")) {
+    Config::set(Config::NO_COLOUR);
   }
 
   return true;
