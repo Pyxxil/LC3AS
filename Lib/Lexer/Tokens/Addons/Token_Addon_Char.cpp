@@ -9,27 +9,38 @@ Character::Character(std::string& character,
                      size_t column)
   : Immediate(character, character, t_file, line_number, column)
 {
+  bool is_signed = false;
+
+  if ('-' == character.at(0)) {
+    character.erase(0, 1);
+    is_signed = true;
+  }
+
   if (character.length() > 1) {
     if (character.length() == 2 && character.at(0) == '\\') {
       switch (character.at(1)) {
         case '\\':
           value = '\\';
-          return;
+          break;
         case 'n':
           value = '\n';
-          return;
+          break;
         case 't':
           value = '\t';
-          return;
+          break;
         case '\'':
           value = '\'';
-          return;
+          break;
         case '0':
           value = 0;
           break;
         default:
           break;
       }
+      if (is_signed) {
+        value = -value;
+      }
+      return;
     } else {
       is_valid = false;
 
@@ -67,5 +78,8 @@ Character::Character(std::string& character,
     Diagnostics::push(diagnostic);
   } else {
     value = static_cast<std::int16_t>(character.at(0));
+    if (is_signed) {
+      value = -value;
+    }
   }
 }

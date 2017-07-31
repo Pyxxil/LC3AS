@@ -11,7 +11,7 @@ public:
             std::string& immediate_uppercase,
             std::string& t_file,
             size_t line_number,
-            size_t column);
+            size_t t_column);
 
   virtual Token::token_type type() const override;
   void requires_too_many_bits(

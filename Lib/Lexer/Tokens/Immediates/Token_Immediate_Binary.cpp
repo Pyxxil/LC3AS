@@ -11,8 +11,8 @@ Binary::Binary(std::string& immediate,
                std::string& immediate_uppercase,
                std::string& t_file,
                size_t line_number,
-               size_t column)
-  : Immediate(immediate, immediate_uppercase, t_file, line_number, column)
+               size_t t_column)
+  : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column)
 {
   bool negative = false;
 
@@ -35,14 +35,14 @@ Binary::Binary(std::string& immediate,
 
   if (!is_valid) {
     Diagnostics::Diagnostic diagnostic(
-      Diagnostics::FileContext(file, line, column),
+      Diagnostics::FileContext(file, line, t_column),
       "Invalid literal for 16 bit signed base 2 value",
       Diagnostics::INVALID_LITERAL,
       Diagnostics::ERROR);
 
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
       Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, column),
+        Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
         lexed_lines[file].at(line)),
@@ -51,6 +51,6 @@ Binary::Binary(std::string& immediate,
 
     Diagnostics::push(diagnostic);
   } else if (negative) {
-    value = -value;
+    value = static_cast<int16_t>(-value);
   }
 }

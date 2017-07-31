@@ -11,7 +11,7 @@ public:
               std::string& instruction_uppercase,
               std::string& t_file,
               size_t line_number,
-              size_t column);
+              size_t t_column);
 };
 
 #endif // TOKEN_INSTRUCTION_HPP

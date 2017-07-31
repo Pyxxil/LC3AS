@@ -25,6 +25,8 @@ ERRORS: 9               ; Current error count (this line complains twice)
         .FILL 0b0000101010101000101
         .FILL #99999
 
+        JSR jdjdjjsjdsfkljsljfkjdsfkjlsdkjfksjdfkjsdkljf
+
 .END
 WARNING_LABEL
 .END

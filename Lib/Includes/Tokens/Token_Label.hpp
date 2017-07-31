@@ -9,7 +9,7 @@ public:
   Label(std::string& label,
         std::string& t_file,
         size_t line_number,
-        size_t column);
+        size_t t_column);
 
   Token::token_type type() const override;
 

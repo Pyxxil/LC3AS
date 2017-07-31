@@ -64,11 +64,9 @@ Parser::do_first_pass()
   };
 
   // TODO: As it is, if there is no .ORIG directive as the first instruction
-  // in the file,
-  // TODO: we still look at the rest of the file. Is it smarter to stop if we
-  // don't see it
-  // TODO: first? Or should we just default to setting the memory address to
-  // 0x3000?
+  // TODO: in the file, we still look at the rest of the file. Is it smarter to
+  // TODO: stop if we don't see it first? Or should we just default to setting
+  // TODO: the memory address to 0x3000?
   for (auto&& tokenized_line : tokens) {
     switch (tokenized_line.front()->type()) {
       case Token::DIR_ORIG: {

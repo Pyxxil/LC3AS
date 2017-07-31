@@ -10,7 +10,7 @@ public:
      std::string& instruction_uppercase,
      std::string& t_file,
      size_t line_number,
-     size_t column,
+     size_t t_column,
      bool n,
      bool z,
      bool p);
@@ -19,7 +19,7 @@ public:
      std::string&& instruction_uppercase,
      std::string& t_file,
      size_t line_number,
-     size_t column,
+     size_t t_column,
      bool n,
      bool z,
      bool p);

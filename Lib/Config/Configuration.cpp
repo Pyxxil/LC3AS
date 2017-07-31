@@ -65,14 +65,12 @@ static std::vector<Directory> search_directories;
 
 size_t Config::configuration = 0;
 
-ALWAYS_INLINE
 bool
 Config::is_set(size_t option)
 {
   return (configuration & option) != 0;
 }
 
-ALWAYS_INLINE
 void
 Config::set(size_t option)
 {

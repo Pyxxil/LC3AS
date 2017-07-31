@@ -2,7 +2,6 @@
 
 #include <bitset>
 #include <iomanip>
-#include <sstream>
 
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
@@ -12,9 +11,10 @@ Blkw::Blkw(std::string& directive,
            std::string& directive_uppercase,
            std::string& t_file,
            size_t line_number,
-           size_t column)
-  : Directive(directive, directive_uppercase, t_file, line_number, column)
-{}
+           size_t t_column)
+  : Directive(directive, directive_uppercase, t_file, line_number, t_column)
+{
+}
 
 int32_t
 Blkw::assemble(std::vector<std::shared_ptr<Token>>& tokens,
@@ -137,21 +137,16 @@ Blkw::disassemble(uint16_t& program_counter,
   stream
     // Address in memory
     << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-    << program_counter
-    << ')'
+    << program_counter << ')'
     // Hexadecimal representation of instruction
-    << ' ' << std::hex << std::setfill('0') << std::setw(4)
-    << value
+    << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
     // Binary representation of instruction
-    << ' '
-    << std::bitset<16>(static_cast<unsigned long long>(value))
+    << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
     // Line the instruction is on
     << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-    << line
-    << ')'
+    << line << ')'
     // Label at the current address (if any)
-    << ' ' << std::left << std::setfill(' ') << std::setw(width)
-    << symbol
+    << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
     // Instruction itself
     << " .FILL 0x" << std::right << std::hex << std::setfill('0')
     << std::setw(4) << value
@@ -166,21 +161,16 @@ Blkw::disassemble(uint16_t& program_counter,
     stream
       // Address in memory
       << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-      << program_counter
-      << ')'
+      << program_counter << ')'
       // Hexadecimal representation of instruction
-      << ' ' << std::hex << std::setfill('0') << std::setw(4)
-      << value
+      << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
       // Binary representation of instruction
-      << ' '
-      << std::bitset<16>(static_cast<unsigned long long>(value))
+      << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
       // Line the instruction is on
       << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-      << line
-      << ')'
+      << line << ')'
       // Label at the current address (if any)
-      << ' ' << std::setfill(' ') << std::setw(width)
-      << ' '
+      << ' ' << std::setfill(' ') << std::setw(width) << ' '
       // Instruction itself
       << " .FILL 0x" << std::right << std::hex << std::setfill('0')
       << std::setw(4) << value

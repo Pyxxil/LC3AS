@@ -18,7 +18,8 @@ Sub::Sub(std::string& directive,
   , decimal_zero(std::make_shared<Decimal>("#0", t_file, line_number, column))
   , neg1(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
   , neg2(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
-{}
+{
+}
 
 int32_t
 Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,

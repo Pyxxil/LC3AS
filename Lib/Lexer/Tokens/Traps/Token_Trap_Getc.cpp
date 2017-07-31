@@ -7,8 +7,8 @@ Getc::Getc(std::string& trap,
            std::string& trap_uppercase,
            std::string& t_file,
            size_t line_number,
-           size_t column)
-  : Instruction(trap, trap_uppercase, t_file, line_number, column)
+           size_t t_column)
+  : Instruction(trap, trap_uppercase, t_file, line_number, t_column)
 {}
 
 int32_t

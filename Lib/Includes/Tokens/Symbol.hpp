@@ -11,7 +11,8 @@ struct Symbol
     , line_number(line)
     , column(t_column)
     , file(t_file)
-  {}
+  {
+  }
 
   uint16_t address;
   size_t line_number;

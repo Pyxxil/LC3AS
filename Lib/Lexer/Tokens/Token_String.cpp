@@ -7,8 +7,8 @@
 String::String(std::string& string,
                std::string& t_file,
                size_t line_number,
-               size_t column)
-  : Token(string, string, t_file, line_number, column)
+               size_t t_column)
+  : Token(string, string, t_file, line_number, t_column)
 {
   for (size_t index = 0; index < string.size(); ++index) {
     if (string.at(index) == '\\') {

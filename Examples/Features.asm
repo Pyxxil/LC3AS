@@ -3,6 +3,7 @@
                         ; supplying it with an immediate value so that the
                         ; simulator (and the assembler) know what the beginning
                         ; address is.
+.STRINGZ -"jjs"
 
 .BLKW 0x10              ; Create 0x10 blocks of memory, all set to 0.
                         ; address of the label 'addr'
@@ -81,13 +82,14 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         .LSHIFT R0, 13
         .LSHIFT R0, 14
         .LSHIFT R0, 15
+.FILL -'\n'
 
 ; End of warnings
         RET
 Br WARNING_STRING        ; Should complain about the offset of 0
 WARNING_STRING:
         .STRINGZ "\ "    ; Should throw a warning about the lone '\'
-        .STRINGZ "  " "Hello"           ; hello
+;        .STRINGZ "  " "Hello"           ; hello
 
 ; Uncomment the following for testing
 ;       Current Error Count = 38

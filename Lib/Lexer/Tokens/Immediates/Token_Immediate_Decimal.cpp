@@ -1,15 +1,13 @@
 #include "Tokens/Immediates/Token_Immediate_Decimal.hpp"
 
-#include <limits>
-
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
 Decimal::Decimal(std::string& immediate,
                  std::string& t_file,
                  size_t line_number,
-                 size_t column)
-  : Immediate(immediate, immediate, t_file, line_number, column)
+                 size_t t_column)
+  : Immediate(immediate, immediate, t_file, line_number, t_column)
 {
   if (immediate.length() > 7) {
     is_valid = false;
@@ -30,14 +28,14 @@ Decimal::Decimal(std::string& immediate,
 
   if (!is_valid) {
     Diagnostics::Diagnostic diagnostic(
-      Diagnostics::FileContext(file, line, column),
+      Diagnostics::FileContext(file, line, t_column),
       "Invalid literal for 16 bit signed base 10 value",
       Diagnostics::INVALID_LITERAL,
       Diagnostics::ERROR);
 
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
       Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, column),
+        Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
         lexed_lines[file].at(line)),

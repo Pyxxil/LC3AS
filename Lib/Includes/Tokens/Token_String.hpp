@@ -9,7 +9,7 @@ public:
   String(std::string& string,
          std::string& t_file,
          size_t line_number,
-         size_t column);
+         size_t t_column);
 
   virtual Token::token_type type() const override;
 };

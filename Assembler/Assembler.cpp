@@ -382,7 +382,7 @@ Assembler::Assembler::check_and_mark_warnings(
 void
 Assembler::Assembler::write(const std::string& file)
 {
-  const std::string prefix = file.substr(0, file.find_last_of('.'));
+  auto&& prefix = file.substr(0, file.find_last_of('.'));
 
   std::ofstream object_file(prefix + ".obj", std::ofstream::binary);
   std::ofstream binary_file(prefix + ".bin");

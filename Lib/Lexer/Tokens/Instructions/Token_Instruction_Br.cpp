@@ -11,28 +11,38 @@ Br::Br(std::string& instruction,
        std::string& instruction_uppercase,
        std::string& t_file,
        size_t line_number,
-       size_t column,
+       size_t t_column,
        bool n,
        bool z,
        bool p)
-  : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
+  : Instruction(instruction,
+                instruction_uppercase,
+                t_file,
+                line_number,
+                t_column)
   , N(n)
   , Z(z)
   , P(p)
+  , provided()
 {}
 
 Br::Br(std::string&& instruction,
        std::string&& instruction_uppercase,
        std::string& t_file,
        size_t line_number,
-       size_t column,
+       size_t t_column,
        bool n,
        bool z,
        bool p)
-  : Instruction(instruction, instruction_uppercase, t_file, line_number, column)
+  : Instruction(instruction,
+                instruction_uppercase,
+                t_file,
+                line_number,
+                t_column)
   , N(n)
   , Z(z)
   , P(p)
+  , provided()
 {}
 
 int32_t

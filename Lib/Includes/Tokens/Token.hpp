@@ -19,14 +19,15 @@ public:
   Token(std::string& t_token,
         std::string& t_token_uppercase,
         std::string& t_file,
-        size_t line,
-        size_t column)
-    : line(line)
-    , column(column)
+        size_t t_line,
+        size_t t_column)
+    : line(t_line)
+    , column(t_column)
     , file(t_file)
     , token(t_token)
     , token_uppercase(t_token_uppercase)
-  {}
+  {
+  }
   Token(const Token& other) = default;
   Token(Token&& other) noexcept = default;
 

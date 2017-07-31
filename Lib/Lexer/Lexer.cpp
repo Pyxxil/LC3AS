@@ -493,8 +493,20 @@ Lexer::tokenizeLine(std::string t_line,
       case '\'':
 #endif
       case '"': {
-        addToken(current, into, line_number, index);
-
+        // TODO: This should actually just throw an error
+        // TODO: Note that we will have to push am invalid token to into
+        // TODO: just simply so that .STRINGZ won't compile :: complaining about
+        // TODO: too many tokens
+        if (!current.empty()) {
+#ifdef INCLUDE_ADDONS
+          if (!('\'' == character && current.length() == 1 &&
+                '-' == current.at(0))) {
+#endif
+            addToken(current, into, line_number, index);
+#ifdef INCLUDE_ADDONS
+          }
+#endif
+        }
         const char terminator{ character };
         while (index + 1 < t_line.length()) {
           character = t_line.at(++index);
@@ -508,7 +520,6 @@ Lexer::tokenizeLine(std::string t_line,
         }
 
         if (character != terminator) {
-          // TODO: Use Diagnostics here
           std::stringstream stream;
 #ifdef INCLUDE_ADDONS
           stream << "Unterminated "

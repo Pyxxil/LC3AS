@@ -1,6 +1,5 @@
 #include "Tokens/Immediates/Token_Immediate_Hexadecimal.hpp"
 
-#include <limits>
 #if defined(_MSC_VER)
 #include <cctype>
 #endif
@@ -12,8 +11,8 @@ Hexadecimal::Hexadecimal(std::string& immediate,
                          std::string& immediate_uppercase,
                          std::string& t_file,
                          size_t line_number,
-                         size_t column)
-  : Immediate(immediate, immediate_uppercase, t_file, line_number, column)
+                         size_t t_column)
+  : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column)
 {
   if (immediate.length() > 6 || immediate.length() == 1 ||
       (immediate.length() == 2 && std::toupper(immediate.at(1)) == 'X')) {
@@ -36,14 +35,14 @@ Hexadecimal::Hexadecimal(std::string& immediate,
 
   if (!is_valid) {
     Diagnostics::Diagnostic diagnostic(
-      Diagnostics::FileContext(file, line, column),
+      Diagnostics::FileContext(file, line, t_column),
       "Invalid literal for 16 bit signed base 16 value",
       Diagnostics::INVALID_LITERAL,
       Diagnostics::ERROR);
 
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
       Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, column),
+        Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
         lexed_lines[file].at(line)),

@@ -7,8 +7,9 @@
 Label::Label(std::string& name,
              std::string& t_file,
              size_t line_number,
-             size_t column)
-  : Token(name, name, t_file, line_number, column)
+             size_t t_column)
+  : Token(name, name, t_file, line_number, t_column)
+  , instruction()
 {}
 
 int32_t
@@ -94,6 +95,16 @@ Label::not_found(const std::map<std::string, Symbol>& match_candidates)
         lexed_lines[sym->second.file].at(sym->second.line_number)),
       '~',
       sym->first.length()));
+  } else {
+    diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+      Diagnostics::SelectionContext(
+        Diagnostics::FileContext(file, line, column),
+        '^',
+        "Label found here",
+        lexed_lines[file].at(line)),
+      '~',
+      token.size(),
+      possible_match));
   }
 
   Diagnostics::push(diagnostic);

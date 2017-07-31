@@ -20,6 +20,8 @@ public:
     , longest_symbol_length(20)
     , symbols()
     , tokens()
+    , origin()
+    , end()
   {}
 
   int parse();
