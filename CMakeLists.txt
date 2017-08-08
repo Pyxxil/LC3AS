@@ -21,6 +21,12 @@ set(ASSEMBLER_SOURCE_FILES "")
 set(ASSEMBLER_HEADER_FILES "")
 set(ASSEMBLER_INCLUDE_DIRECTORIES "")
 
+### Populated by Editor/CMakeLists.txt
+set (EDITOR_UI_FILES "")
+set (EDITOR_INCLUDE_FILES "")
+set (EDITOR_INCLUDE_DIRS "")
+set (EDITOR_SOURCE_FILES "")
+
 set(DEBUG_FLAGS ${COMPILE_FLAGS} -g -pg -pedantic)
 
 if (NOT WIN32)
@@ -41,6 +47,7 @@ endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/Lib")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Assembler")
+add_subdirectory("${CMAKE_SOURCE_DIR}/Editor")
 
 add_executable(LC3AS
     "${LIBRARY_HEADER_FILES}"
@@ -53,6 +60,21 @@ add_library(LC3 STATIC
     "${LIBRARY_HEADER_FILES}"
     )
 
+set (CMAKE_AUTOMOC ON)
+
+add_executable(LC3EDIT
+    "${EDITOR_SOURCE_FILES}"
+    "${EDITOR_INCLUDE_FILES}"
+    "${EDITOR_UI_FILES}"
+    )
+
+if (APPLE)
+    find_package(Qt5Widgets REQUIRED PATHS "/usr/local/Cellar/qt5/5.9.1/lib/cmake/")
+    find_package(Qt5Gui REQUIRED PATHS "/usr/local/Cellar/qt5/5.9.1/lib/cmake/")
+else ()
+    find_package(Qt5Widgets)
+endif()
+
 target_include_directories(LC3AS PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}" "${ASSEMBLER_INCLUDE_DIRECTORIES}")
 target_compile_options(LC3AS PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
 target_compile_options(LC3AS PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
@@ -61,6 +83,11 @@ target_link_libraries(LC3AS PUBLIC LC3)
 target_include_directories(LC3 PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}")
 target_compile_options(LC3 PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
 target_compile_options(LC3 PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
+
+target_include_directories(LC3EDIT PUBLIC "${EDITOR_INCLUDE_DIRS}")
+target_compile_options(LC3EDIT PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
+target_compile_options(LC3EDIT PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
+target_link_libraries(LC3EDIT Qt5::Widgets Qt5::Gui)
 
 if (APPLE AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     # Clang is the only compiler I've used that doesn't have std::experimental::filesystem yet (on OSX, anyways)

@@ -1,0 +1,20 @@
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Source")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Includes")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/UI")
+
+set(EDITOR_SOURCE_FILES
+    "${EDITOR_SOURCEn_FILES}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+    PARENT_SCOPE
+    )
+
+set(EDITOR_INCLUDE_DIRS
+    "${EDITOR_INCLUDE_DIRS}"
+    "${EDITOR_INCLUDE_DIRS}/Includes"
+    PARENT_SCOPE
+    )
+
+set (EDITOR_INCLUDE_FILES
+    "${EDITOR_INCLUDE_FILES}"
+    PARENT_SCOPE
+    )
