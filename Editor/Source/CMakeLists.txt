@@ -1,0 +1,6 @@
+
+set (EDITOR_SOURCE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/Editor.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ColourScheme.cpp"
+    PARENT_SCOPE
+    )
