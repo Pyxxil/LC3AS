@@ -8,6 +8,7 @@
 #endif
 
 #include "LexHelper.hpp"
+#include "Line.hpp"
 #include "Tokens/Tokens.hpp"
 
 std::map<std::string, std::vector<std::string>> lexed_lines;
@@ -55,7 +56,7 @@ hash(const std::string& string)
   // Basically, we don't really want something that's likely to be an
   // immediate value, or a label (less likely to be caught here, but may as
   // well try).
-  if (string.at(0) != '.' && (std::isprint(string.at(0)) == 0)) {
+  if (string.at(0) != '.' && (std::isprint(string.front()) == 0)) {
     return 0;
   }
 
@@ -71,11 +72,74 @@ hash(const std::string& string)
   return _hash;
 }
 
+/*! Include a given file (via token) into the current tokens
+ *
+ * @param t_line The tokens relevant to the include file.
+ */
+void
+Lexer::include_file(std::vector<std::shared_ptr<Token>>& t_line)
+{
+  if (t_line.front()->valid_arguments(t_line)) {
+    const auto&& file_with_path =
+      file_name.substr(0, file_name.find_last_of('/') + 1) +
+      t_line.back()->token;
+
+    const bool file_is_already_open =
+      std::find_if(open_files.cbegin(),
+                   open_files.cend(),
+                   [&file_with_path](const auto& _file) -> bool {
+                     return _file == file_with_path;
+                   }) != open_files.cend();
+
+    if (file_is_already_open) {
+      Diagnostics::Diagnostic diagnostic(
+        Diagnostics::FileContext(
+          file_name, t_line.front()->line, t_line[1]->column),
+        "Recursive include detected.",
+        Diagnostics::LOGIC,
+        Diagnostics::ERROR);
+
+      diagnostic.provide_context(
+        std::make_unique<Diagnostics::HighlightContext>(
+          Diagnostics::SelectionContext(
+            Diagnostics::FileContext(
+              file_name, t_line.front()->line, t_line[1]->column),
+            '^',
+            "In include directive found here",
+            lexed_lines[file_name].at(t_line.front()->line)),
+          '~',
+          t_line[1]->token.length()));
+
+      provide_context(diagnostic);
+      Diagnostics::push(diagnostic);
+    } else {
+      std::vector<std::vector<std::shared_ptr<Token>>> _tokens;
+      std::map<std::string, Symbol> _symbols;
+
+      Lexer lexer(this,
+                  file_with_path,
+                  t_line.front()->line,
+                  t_line[1]->column,
+                  t_line[1]->token.length());
+      lexer.lex(_tokens, _symbols);
+
+      tokens.insert(tokens.end(), _tokens.begin(), _tokens.end());
+      symbols.insert(_symbols.begin(), _symbols.end());
+    }
+  }
+}
+
+/*! Lex this lexers file into a stream of tokens
+ *
+ * @param t_tokens The stream to lex the tokens into.
+ * @param t_symbols The stream to lex any symbols found into.
+ */
 void
 Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
            std::map<std::string, Symbol>& t_symbols)
 {
   if (is_fail) {
+    // Don't bother continuing if there have been errors already.
     return;
   }
 
@@ -97,56 +161,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
     if (!tokenized_line.empty()) {
 #ifdef INCLUDE_ADDONS
       if (tokenized_line.front()->type() == Token::ADDON_INCLUDE) {
-        if (tokenized_line.front()->valid_arguments(tokenized_line)) {
-          const auto&& file_with_path =
-            file_name.substr(0, file_name.find_last_of('/') + 1) +
-            tokenized_line.back()->token;
-
-          auto&& file_is_already_open =
-            std::find_if(open_files.cbegin(),
-                         open_files.cend(),
-                         [&file_with_path](const auto& _file) -> bool {
-                           return _file == file_with_path;
-                         }) != open_files.cend();
-
-          if (file_is_already_open) {
-            Diagnostics::Diagnostic diagnostic(
-              Diagnostics::FileContext(file_name,
-                                       tokenized_line.front()->line,
-                                       tokenized_line[1]->column),
-              "Recursive include detected.",
-              Diagnostics::LOGIC,
-              Diagnostics::ERROR);
-
-            diagnostic.provide_context(
-              std::make_unique<Diagnostics::HighlightContext>(
-                Diagnostics::SelectionContext(
-                  Diagnostics::FileContext(file_name,
-                                           tokenized_line.front()->line,
-                                           tokenized_line[1]->column),
-                  '^',
-                  "In include directive found here",
-                  lexed_lines[file_name].at(tokenized_line.front()->line)),
-                '~',
-                tokenized_line[1]->token.length()));
-
-            provide_context(diagnostic);
-            Diagnostics::push(diagnostic);
-          } else {
-            std::vector<std::vector<std::shared_ptr<Token>>> _tokens;
-            std::map<std::string, Symbol> _symbols;
-
-            Lexer lexer(this,
-                        file_with_path,
-                        tokenized_line.front()->line,
-                        tokenized_line[1]->column,
-                        tokenized_line[1]->token.length());
-            lexer.lex(_tokens, _symbols);
-
-            tokens.insert(tokens.end(), _tokens.begin(), _tokens.end());
-            symbols.insert(_symbols.begin(), _symbols.end());
-          }
-        }
+        include_file(tokenized_line);
       } else {
         tokens.emplace_back(tokenized_line);
       }
@@ -172,7 +187,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
  * @return A shared pointer containing everything needed to know about the token
  */
 std::shared_ptr<Token>
-Lexer::tokenize(std::string word, size_t line_number, size_t t_column)
+Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
 {
   std::string copy{ word };
   std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
@@ -313,6 +328,16 @@ Lexer::tokenize(std::string word, size_t line_number, size_t t_column)
       case hash(".INCLUDE", 8):
         return std::make_shared<Include>(
           word, copy, file_name, line_number, t_column);
+      case hash("R0", 2): // FALLTHROUGH
+      case hash("R1", 2): // FALLTHROUGH
+      case hash("R2", 2): // FALLTHROUGH
+      case hash("R3", 2): // FALLTHROUGH
+      case hash("R4", 2): // FALLTHROUGH
+      case hash("R5", 2): // FALLTHROUGH
+      case hash("R6", 2): // FALLTHROUGH
+      case hash("R7", 2):
+        return std::make_shared<Register>(
+          word, copy, file_name, line_number, t_column);
 #endif
       default:
         break;
@@ -324,15 +349,9 @@ Lexer::tokenize(std::string word, size_t line_number, size_t t_column)
                                  std::regex_constants::optimize);
   static const std::regex hexadecimal("0?[xX][\\da-fA-F]+",
                                       std::regex_constants::optimize);
-  static const std::regex octal("\\\\[0-7]+", std::regex_constants::optimize);
-  static const std::regex _register("[rR]\\d", std::regex_constants::optimize);
+  static const std::regex octal("\\\\0[0-7]+", std::regex_constants::optimize);
   static const std::regex label("\\.?[\\da-zA-Z_]+",
                                 std::regex_constants::optimize);
-
-  if (std::regex_match(word, _register)) {
-    return std::make_shared<Register>(
-      word, copy, file_name, line_number, t_column);
-  }
 
   if (std::regex_match(word, decimal)) {
     return std::make_shared<Decimal>(word, file_name, line_number, t_column);
@@ -384,18 +403,22 @@ Lexer::tokenizeLine(std::string t_line,
   std::string current;
 
   char terminated_by{ 0 };
-  size_t index{ 0 };
 
-  for (; index < t_line.length();) {
-    char character{ t_line.at(index) };
+  Line current_line(t_line);
+
+  while (!current_line.at_end()) {
+    char character = current_line.next();
 
     // We don't care about space characters.
     if (0 != std::isspace(character)) {
       terminated_by = ' ';
 
-      const size_t col = index;
-      while (t_line.length() > index + 1 && 0 != std::isspace(character)) {
-        character = t_line.at(++index);
+      const size_t col = current_line.index() - 1;
+      current_line.skip_if(
+        [](const auto&& c) -> bool { return std::isspace(c) != 0; });
+      current_line >> character;
+      if (0 == character) {
+        break;
       }
 
       if (!current.empty()) {
@@ -409,9 +432,10 @@ Lexer::tokenizeLine(std::string t_line,
       }
     }
 
+    // std::cout << "Working with " << character << '\n';
+
     switch (character) {
-      case ';': {
-        // Hit a comment
+      case ';': { // Hit a comment
         goto end_of_line;
       }
       case '\r': {
@@ -420,18 +444,20 @@ Lexer::tokenizeLine(std::string t_line,
       }
       case '/': {
         // '//' is a comment as well.
-        if (index + 1 >= t_line.length() || t_line.at(index + 1) != '/') {
+        if (current_line.peek() != '/') {
           // It seems easiest to treat it as a comment anyways, as '/'
           // can't be used for anything.
           Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(file_name, line_number, index),
+            Diagnostics::FileContext(
+              file_name, line_number, current_line.index() - 1),
             "Treating this as a comment",
             Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
             Diagnostics::DIAGNOSTIC::WARNING);
 
           diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
-              Diagnostics::FileContext(file_name, line_number, index),
+              Diagnostics::FileContext(
+                file_name, line_number, current_line.index() - 1),
               '^',
               "Found unexpected '/'; Did you mean '//'?",
               t_line,
@@ -448,14 +474,16 @@ Lexer::tokenizeLine(std::string t_line,
              1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(file_name, line_number, index),
+            Diagnostics::FileContext(
+              file_name, line_number, current_line.index() - 1),
             "Extraneous comma",
             Diagnostics::SYNTAX,
             Diagnostics::WARNING);
 
           diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
-              Diagnostics::FileContext(file_name, line_number, index),
+              Diagnostics::FileContext(
+                file_name, line_number, current_line.index() - 1),
               '^',
               "Found here",
               t_line));
@@ -464,20 +492,22 @@ Lexer::tokenizeLine(std::string t_line,
           terminated_by = ',';
         }
 
-        addToken(current, into, line_number, index);
+        addToken(current, into, line_number, current_line.index() - 1);
         break;
       }
       case ':': {
         if (!into.empty() || 0u == current.length() || 0 != terminated_by) {
           Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(file_name, line_number, index),
+            Diagnostics::FileContext(
+              file_name, line_number, current_line.index() - 1),
             "Extraneous colon",
             Diagnostics::SYNTAX,
             Diagnostics::WARNING);
 
           diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
-              Diagnostics::FileContext(file_name, line_number, index),
+              Diagnostics::FileContext(
+                file_name, line_number, current_line.index() - 1),
               '^',
               "Found here",
               t_line));
@@ -486,7 +516,7 @@ Lexer::tokenizeLine(std::string t_line,
           terminated_by = ':';
         }
 
-        addToken(current, into, line_number, index);
+        addToken(current, into, line_number, current_line.index() - 1);
         break;
       }
 #ifdef INCLUDE_ADDONS
@@ -495,43 +525,37 @@ Lexer::tokenizeLine(std::string t_line,
       case '"': {
         // TODO: This should actually just throw an error
         // TODO: Note that we will have to push am invalid token to into
-        // TODO: just simply so that .STRINGZ won't compile :: complaining about
-        // TODO: too many tokens
+        // TODO: just simply so that .STRINGZ won't compile
+        // TODO: :: complaining about too many tokens
         if (!current.empty()) {
 #ifdef INCLUDE_ADDONS
           if (!('\'' == character && current.length() == 1 &&
                 '-' == current.at(0))) {
-#endif
-            addToken(current, into, line_number, index);
-#ifdef INCLUDE_ADDONS
+            addToken(current, into, line_number, current_line.index());
           }
+#else
+          addToken(current, into, line_number, current_line.index());
 #endif
-        }
-        const char terminator{ character };
-        while (index + 1 < t_line.length()) {
-          character = t_line.at(++index);
-          if (character == '\\' && t_line.length() > index + 1 &&
-              t_line.at(index + 1) == terminator) {
-            character = t_line.at(++index);
-          } else if (character == terminator) {
-            break;
-          }
-          current += character;
         }
 
-        if (character != terminator) {
+        const auto begin = current_line.index();
+        // TODO: Fix this. It isn't aware of escaped terminators.
+        current_line.ignore(Line::ESCAPE_SEQUENCE);
+        const auto end = current_line.find_next(character);
+        current_line.ignore(Line::RESET);
+
+        if (-1u == end) {
           std::stringstream stream;
 #ifdef INCLUDE_ADDONS
           stream << "Unterminated "
-                 << (terminator == '\'' ? "character" : "string");
+                 << (character == '\'' ? "character" : "string");
 #else
           stream << "Unterminated string";
 #endif
           into.clear();
 
           Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(
-              file_name, line_number, index - current.size()),
+            Diagnostics::FileContext(file_name, line_number, begin - 1),
             stream.str(),
             Diagnostics::SYNTAX,
             Diagnostics::ERROR);
@@ -540,22 +564,27 @@ Lexer::tokenizeLine(std::string t_line,
             std::make_unique<Diagnostics::SelectionContext>(
               // Has to be index + 1 because otherwise it'll select
               // the last character
-              Diagnostics::FileContext(file_name, line_number, index + 1),
+              Diagnostics::FileContext(file_name, line_number, begin - 1),
               '^',
-              "Expected '" + std::string({ terminator }) +
-                "' before end of line.",
-              t_line,
-              std::string({ terminator })));
-
+              "Expected " + std::string({ character }) + " to match this one",
+              t_line));
           Diagnostics::push(diagnostic);
 #ifdef INCLUDE_ADDONS
-        } else if ('\'' == terminator) {
-          into.push_back(std::make_shared<Character>(
-            current, file_name, line_number, index - current.length()));
+        } else if ('\'' == character) {
+          current = current_line.substr(begin, end - 1);
+          into.push_back(std::make_shared<Character>(current,
+                                                     file_name,
+                                                     line_number,
+                                                     current_line.index() -
+                                                       current.length() - 1));
 #endif
         } else {
-          into.push_back(std::make_shared<String>(
-            current, file_name, line_number, index - current.length()));
+          current = current_line.substr(begin, end - 1);
+          into.push_back(std::make_shared<String>(current,
+                                                  file_name,
+                                                  line_number,
+                                                  current_line.index() -
+                                                    current.length() - 1));
         }
         current.erase();
         break;
@@ -566,10 +595,9 @@ Lexer::tokenizeLine(std::string t_line,
         break;
       }
     }
-    ++index;
   }
 end_of_line:
-  addToken(current, into, line_number, index);
+  addToken(current, into, line_number, current_line.index());
 }
 
 void

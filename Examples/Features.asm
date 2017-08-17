@@ -3,7 +3,7 @@
                         ; supplying it with an immediate value so that the
                         ; simulator (and the assembler) know what the beginning
                         ; address is.
-.STRINGZ -"jjs"
+.STRINGZ "jjs\""
 
 .BLKW 0x10              ; Create 0x10 blocks of memory, all set to 0.
                         ; address of the label 'addr'
@@ -39,7 +39,7 @@ EXTRA_FEATURES:         ; Some additional features not actually present in the
         .SUB R1, R2, R1
         .SUB R1, R2, R3
 
-oct     .FILL \700      ; Octal values are also acceptable
+oct     .FILL \0700     ; Octal values are also acceptable
         ;oct .FILL \600 ; This should throw an error about multiple definitions
                         ; of a label.
         .FILL 'A'
@@ -53,8 +53,8 @@ cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
 
         .LSHIFT R2, #2
 
-JSR INCLUDED_LABEL      ; This should work, assuming addons are enabled
-        .INCLUDE "include.h"
+;JSR INCLUDED_LABEL      ; This should work, assuming addons are enabled
+;        .INCLUDE "include.h"
 
         JSR WARNING_THROWS
 WARNING_THROWS:         ; All of the following should throw warnings with
@@ -82,13 +82,18 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         .LSHIFT R0, 13
         .LSHIFT R0, 14
         .LSHIFT R0, 15
+
+.INCLUDE "include.h"
+
+        .NEG R1
+
 .FILL -'\n'
 
 ; End of warnings
         RET
 Br WARNING_STRING        ; Should complain about the offset of 0
 WARNING_STRING:
-        .STRINGZ "\ "    ; Should throw a warning about the lone '\'
+        .STRINGZ "\ \ \ \ \ "    ; Should throw a warning about the lone '\'
 ;        .STRINGZ "  " "Hello"           ; hello
 
 ; Uncomment the following for testing

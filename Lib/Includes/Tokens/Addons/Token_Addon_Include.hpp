@@ -5,6 +5,13 @@
 
 #include <string>
 
+/**
+ * Include looks like so:
+ * .INCLUDE <string>
+ * The string is taken to be a file name, the contents of which (assumong it
+ * exists) will also be lexed into the current stream.
+ */
+
 class Include : public Token
 {
 public:
@@ -15,9 +22,9 @@ public:
           size_t column);
 
   virtual bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) override;
+    std::vector<std::shared_ptr<Token>>& tokens) override final;
 
-  virtual token_type type() const override;
+  virtual token_type type() const override final;
 };
 
 #endif // TOKEN_ADDON_INCLUDE_HPP

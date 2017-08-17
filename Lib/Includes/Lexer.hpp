@@ -37,7 +37,7 @@ public:
 
   void lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
            std::map<std::string, Symbol>& t_symbols);
-  std::shared_ptr<Token> tokenize(std::string word,
+  std::shared_ptr<Token> tokenize(std::string&& word,
                                   size_t line_number,
                                   size_t column);
   void tokenizeLine(std::string line,
@@ -59,7 +59,9 @@ public:
     if (!token.empty()) {
       // This effectively erases the token too, which saves a call to
       // token.erase()
+      // std::cout << token << '\n';
       to.push_back(tokenize(std::move(token), line_number, col));
+      token = std::string();
     }
   }
 
@@ -82,6 +84,7 @@ private:
   bool is_fail = false;
 
   std::vector<std::vector<std::shared_ptr<Token>>> tokens;
+  void include_file(std::vector<std::shared_ptr<Token>>& t_line);
 };
 
 #endif

@@ -26,8 +26,7 @@ public:
     , file(t_file)
     , token(t_token)
     , token_uppercase(t_token_uppercase)
-  {
-  }
+  {}
   Token(const Token& other) = default;
   Token(Token&& other) noexcept = default;
 

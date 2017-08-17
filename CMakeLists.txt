@@ -21,7 +21,7 @@ set(ASSEMBLER_SOURCE_FILES "")
 set(ASSEMBLER_HEADER_FILES "")
 set(ASSEMBLER_INCLUDE_DIRECTORIES "")
 
-set(DEBUG_FLAGS ${COMPILE_FLAGS} -Og -g -pg -pedantic)
+set(DEBUG_FLAGS ${COMPILE_FLAGS} -g -pg -pedantic)
 
 if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion)
@@ -29,7 +29,7 @@ if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion)
 endif ()
 
-set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto)
+set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto )
 if (OPTIMIZE)
     # Just for fun
     set(RELEASE_FLAGS ${RELEASE_FLAGS} -mtune=native -march=native)

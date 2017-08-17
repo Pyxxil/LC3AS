@@ -70,7 +70,7 @@ Stringz::disassemble(uint16_t& program_counter,
     << program_counter
     << ')'
     // Hexadecimal representation of instruction
-    << ' ' << std::hex << std::setfill('0') << std::setw(4)
+    << ' ' << std::hex << std::setfill('0') << std::setw(4) << std::right
     << assembled.front()
     // Binary representation of instruction
     << ' '
@@ -84,7 +84,7 @@ Stringz::disassemble(uint16_t& program_counter,
     << symbol
     // Instruction itself
     << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4)
-    << assembled.front()
+    << std::right << assembled.front()
 #ifdef INCLUDE_ADDONS
     << '\t' << file
 #endif

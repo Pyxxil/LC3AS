@@ -9,6 +9,10 @@ build/
 *.sublime*
 .tags*
 *.gch
+GRTAGS
+GTAGS
+GPATH
+*.plist
 
 # CLion
 .idea/

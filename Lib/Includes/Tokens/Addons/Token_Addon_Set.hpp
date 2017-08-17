@@ -10,6 +10,15 @@
 #include "Tokens/Instructions/Token_Instruction_Br.hpp"
 #include "Tokens/Instructions/Token_Instruction_Ld.hpp"
 
+/**
+ * Set looks like this:
+ * .SET <register>, <imm16>
+ * The register can be any of the normal 8 registers. The imm6 value is a value
+ * from -2^15 to 2^15 - 1.
+ *
+ * Set will set the value of the register to the value given.
+ */
+
 class Set : public Directive
 {
 public:
@@ -19,19 +28,20 @@ public:
       size_t line_number,
       size_t column);
 
-  token_type type() const override;
+  token_type type() const override final;
 
   int32_t assemble(std::vector<std::shared_ptr<Token>>& tokens,
                    const std::map<std::string, Symbol>& symbols,
-                   uint16_t program_counter) override;
+                   uint16_t program_counter) override final;
   uint16_t guess_memory_size(
-    std::vector<std::shared_ptr<Token>>& tokens) const override;
+    std::vector<std::shared_ptr<Token>>& tokens) const override final;
 
-  bool valid_arguments(std::vector<std::shared_ptr<Token>>& tokens) override;
+  bool valid_arguments(
+    std::vector<std::shared_ptr<Token>>& tokens) override final;
 
   std::string disassemble(uint16_t& program_counter,
                           const std::string& symbol,
-                          int width) const override;
+                          int width) const override final;
 
 private:
   std::shared_ptr<And> _and;
