@@ -6,9 +6,9 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Jmp::Jmp(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+Jmp::Jmp(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,
@@ -31,7 +31,7 @@ Jmp::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0xC000 | (std::static_pointer_cast<Register>(tokens.at(1))->reg << 6)));
+    0xC000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 6)));
 
   return 1;
 }
@@ -45,12 +45,12 @@ Jmp::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 

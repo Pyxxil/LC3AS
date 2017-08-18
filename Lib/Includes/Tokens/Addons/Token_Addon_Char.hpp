@@ -17,7 +17,7 @@ class Character : public Immediate
 public:
   Character() = default;
   Character(std::string& character,
-            std::string& t_file,
+            const std::string& t_file,
             size_t line_number,
             size_t column);
 };

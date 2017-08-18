@@ -48,7 +48,7 @@ Parser::do_first_pass()
             Diagnostics::FileContext(end->file, end->line, end->column),
             '^',
             ".END directive defined here",
-            lexed_lines[end->file].at(end->line)),
+            lexed_lines[end->file][end->line]),
           '~',
           end->token.length()));
 
@@ -86,7 +86,7 @@ Parser::do_first_pass()
                   origin->file, origin->line, origin->column),
                 '^',
                 "Previous definition found here",
-                lexed_lines[origin->file].at(origin->line)),
+                lexed_lines[origin->file][origin->line]),
               '~',
               origin->token.length()));
 
@@ -122,7 +122,7 @@ Parser::do_first_pass()
                                          symbol.second.column),
                 '^',
                 "Previous label found here",
-                lexed_lines[symbol.second.file].at(symbol.second.line_number)));
+                lexed_lines[symbol.second.file][symbol.second.line_number]));
 
             Diagnostics::push(diagnostic);
             break;
@@ -146,15 +146,15 @@ Parser::do_first_pass()
                                        tokenized_line.front()->column),
               '^',
               "Redefinition of this label",
-              lexed_lines[tokenized_line.front()->file].at(
-                tokenized_line.front()->line)));
+              lexed_lines[tokenized_line.front()->file]
+                         [tokenized_line.front()->line]));
 
           diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
               Diagnostics::FileContext(sym.file, sym.line_number, sym.column),
               '^',
               "Previous definition found here",
-              lexed_lines[sym.file].at(sym.line_number)));
+              lexed_lines[sym.file][sym.line_number]));
 
           Diagnostics::push(diagnostic);
         }
@@ -189,7 +189,7 @@ Parser::do_first_pass()
                 Diagnostics::FileContext(end->file, end->line, end->column),
                 '^',
                 "Previous definition found here",
-                lexed_lines[end->file].at(end->line)),
+                lexed_lines[end->file][end->line]),
               '~',
               end->token.length()));
 

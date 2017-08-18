@@ -7,9 +7,9 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Ldr::Ldr(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+Ldr::Ldr(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,
@@ -33,9 +33,9 @@ Ldr::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   assembled.emplace_back(static_cast<uint16_t>(
     0x6000 |
-    ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
-    ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6) |
-    (std::static_pointer_cast<Immediate>(tokens.at(3))->value & 0x3F)));
+    ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+    ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
+    (std::static_pointer_cast<Immediate>(tokens[3])->value & 0x3F)));
 
   return 1;
 }
@@ -49,29 +49,29 @@ Ldr::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(2)->type() != Token::REGISTER) {
-    tokens.at(2)->expected("register");
+  if (tokens[2]->type() != Token::REGISTER) {
+    tokens[2]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(3)->type() != Token::IMMEDIATE) {
-    tokens.at(3)->expected("immediate value");
+  if (tokens[3]->type() != Token::IMMEDIATE) {
+    tokens[3]->expected("immediate value");
     return (is_valid = false);
   }
 
-  if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid &&
-        tokens.at(3)->is_valid)) {
+  if (!(tokens[1]->is_valid && tokens[2]->is_valid &&
+        tokens[3]->is_valid)) {
     return (is_valid = false);
   }
 
-  if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 31 ||
-      std::static_pointer_cast<Immediate>(tokens.at(3))->value < -32) {
-    tokens.at(3)->requires_too_many_bits(
+  if (std::static_pointer_cast<Immediate>(tokens[3])->value > 31 ||
+      std::static_pointer_cast<Immediate>(tokens[3])->value < -32) {
+    tokens[3]->requires_too_many_bits(
       6, SIGNED, this, std::map<std::string, Symbol>());
     return (is_valid = false);
   }

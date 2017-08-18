@@ -7,9 +7,9 @@ class Instruction : public Token
 {
 public:
   Instruction() = default;
-  Instruction(std::string& instruction,
-              std::string& instruction_uppercase,
-              std::string& t_file,
+  Instruction(const std::string& instruction,
+              const std::string& instruction_uppercase,
+              const std::string& t_file,
               size_t line_number,
               size_t t_column);
 };

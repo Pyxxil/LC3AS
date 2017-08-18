@@ -8,18 +8,18 @@
 #include "LexHelper.hpp"
 
 Hexadecimal::Hexadecimal(std::string& immediate,
-                         std::string& immediate_uppercase,
-                         std::string& t_file,
+                         const std::string& immediate_uppercase,
+                         const std::string& t_file,
                          size_t line_number,
                          size_t t_column)
   : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column)
 {
   if (immediate.length() > 6 || immediate.length() == 1 ||
-      (immediate.length() == 2 && std::toupper(immediate.at(1)) == 'X')) {
+      (immediate.length() == 2 && std::toupper(immediate[1]) == 'X')) {
     is_valid = false;
   } else {
 
-    if (std::toupper(immediate.at(0)) == 'X') {
+    if (std::toupper(immediate.front()) == 'X') {
       immediate.insert(0, 1, '0');
     }
 
@@ -45,7 +45,7 @@ Hexadecimal::Hexadecimal(std::string& immediate,
         Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.length()));
 

@@ -242,8 +242,8 @@ Assembler::Assembler::check_and_mark_warnings(
                                      tokenized_line.front()->column),
             '^',
             "This might mean this line is superfluous",
-            lexed_lines[tokenized_line.front()->file].at(
-              tokenized_line.front()->line)),
+            lexed_lines[tokenized_line.front()->file][
+              tokenized_line.front()->line]),
           '~',
           tokenized_line.front()->token.length()));
 
@@ -255,8 +255,8 @@ Assembler::Assembler::check_and_mark_warnings(
                                      tokens[i - 1].front()->column),
             '^',
             "Checks the same condition code as this line",
-            lexed_lines[tokens[i - 1].front()->file].at(
-              tokens[i - 1].front()->line)),
+            lexed_lines[tokens[i - 1].front()->file][
+              tokens[i - 1].front()->line]),
           '~',
           tokens[i - 1].front()->token.length()));
 
@@ -281,7 +281,7 @@ Assembler::Assembler::check_and_mark_warnings(
             '^',
             "Offset of 0 is superfluous -- simulator will go to "
             "next line no matter what",
-            lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->line)),
+            lexed_lines[tokenized_line[1]->file][tokenized_line[1]->line]),
           '~',
           tokenized_line[1]->token.length()));
 
@@ -294,7 +294,7 @@ Assembler::Assembler::check_and_mark_warnings(
                 sym->second.file, sym->second.line_number, sym->second.column),
               '^',
               "Referred to label defined here",
-              lexed_lines[sym->second.file].at(sym->second.line_number)),
+              lexed_lines[sym->second.file][sym->second.line_number]),
             '~',
             sym->first.length()));
       }
@@ -317,7 +317,7 @@ Assembler::Assembler::check_and_mark_warnings(
                                      tokenized_line[1]->column),
             '^',
             "Offset of -1 might cause an infinite loop",
-            lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->line)),
+            lexed_lines[tokenized_line[1]->file][tokenized_line[1]->line]),
           '~',
           tokenized_line[1]->token.length()));
 
@@ -330,7 +330,7 @@ Assembler::Assembler::check_and_mark_warnings(
                 sym->second.file, sym->second.line_number, sym->second.column),
               '^',
               "Referred to label defined here",
-              lexed_lines[sym->second.file].at(sym->second.line_number)),
+              lexed_lines[sym->second.file][sym->second.line_number]),
             '~',
             sym->first.length()));
       }
@@ -357,7 +357,7 @@ Assembler::Assembler::check_and_mark_warnings(
             '^',
             "Trap vector not between 0x20 and 0x25 (inclusive) might "
             "cause an illegal trap vector exception",
-            lexed_lines[tokenized_line[1]->file].at(tokenized_line[1]->line)),
+            lexed_lines[tokenized_line[1]->file][tokenized_line[1]->line]),
           '~',
           tokenized_line[1]->token.length(),
           "0x2{0..5}"));

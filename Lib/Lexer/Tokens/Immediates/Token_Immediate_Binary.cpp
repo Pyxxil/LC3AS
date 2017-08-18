@@ -8,22 +8,22 @@
 #include "LexHelper.hpp"
 
 Binary::Binary(std::string& immediate,
-               std::string& immediate_uppercase,
-               std::string& t_file,
+               const std::string& immediate_uppercase,
+               const std::string& t_file,
                size_t line_number,
                size_t t_column)
   : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column)
 {
   bool negative = false;
 
-  if (immediate.at(0) == '-') {
+  if (immediate.front() == '-') {
     negative = true;
     immediate.erase(0, 1);
   }
 
-  if (immediate.length() > 2 && std::toupper(immediate.at(1)) == 'B') {
+  if (immediate.length() > 2 && std::toupper(immediate[1]) == 'B') {
     immediate.erase(0, 2);
-  } else if (std::toupper(immediate.at(0)) == 'B') {
+  } else if (std::toupper(immediate.front()) == 'B') {
     immediate.erase(0, 1);
   }
 
@@ -45,7 +45,7 @@ Binary::Binary(std::string& immediate,
         Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.length()));
 

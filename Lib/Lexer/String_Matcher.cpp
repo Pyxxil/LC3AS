@@ -23,19 +23,19 @@ String_Matcher::best_match() const
 void
 String_Matcher::consider(const std::string& str)
 {
-  auto length_difference{ std::abs(
+  const int length_difference{ std::abs(
     static_cast<int>(str.length() - m_string.length())) };
   if (length_difference > best.first) {
     return;
   }
 
-  auto cutoff{ static_cast<int>(std::max(m_string.length(), str.length())) /
+  const int cutoff{ static_cast<int>(std::max(m_string.length(), str.length())) /
                2 };
   if (length_difference > cutoff) {
     return;
   }
 
-  auto distance{ static_cast<int>(levenshtein_distance(m_string, str)) };
+  const int distance{ static_cast<int>(levenshtein_distance(m_string, str)) };
   if (distance <= best.first || (str.length() > m_string.length() &&
                                  best.second.length() < m_string.length())) {
     /* The second half of this if statement should help in cases where we

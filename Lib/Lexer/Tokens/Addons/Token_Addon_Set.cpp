@@ -5,9 +5,9 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Set::Set(std::string& directive,
-         std::string& directive_uppercase,
-         std::string& t_file,
+Set::Set(const std::string& directive,
+         const std::string& directive_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t column)
   : Directive(directive, directive_uppercase, t_file, line_number, column)
@@ -21,8 +21,7 @@ Set::Set(std::string& directive,
   , decimal_one(std::make_shared<Decimal>("#1", t_file, line_number, column))
   , decimal_negative_two(
       std::make_shared<Decimal>("#-2", t_file, line_number, column))
-{
-}
+{}
 
 int32_t
 Set::assemble(std::vector<std::shared_ptr<Token>>& tokens,
@@ -34,9 +33,9 @@ Set::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   const std::shared_ptr<Register> reg =
-    std::static_pointer_cast<Register>(tokens.at(1));
+    std::static_pointer_cast<Register>(tokens[1]);
   const std::shared_ptr<Immediate> offset =
-    std::static_pointer_cast<Immediate>(tokens.at(2));
+    std::static_pointer_cast<Immediate>(tokens[2]);
 
   if (offset->value > -16 && offset->value < 15) {
     std::vector<std::shared_ptr<Token>> vec = { _and, reg, reg, decimal_zero };
@@ -74,21 +73,21 @@ Set::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 
-  if (tokens.at(2)->type() != Token::IMMEDIATE) {
-    tokens.at(2)->expected("immediate value");
+  if (tokens[2]->type() != Token::IMMEDIATE) {
+    tokens[2]->expected("immediate value");
     return (is_valid = false);
   }
 
-  if (!tokens.at(2)->is_valid) {
+  if (!tokens[2]->is_valid) {
     return (is_valid = false);
   }
 
@@ -103,7 +102,7 @@ Set::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
   }
 
   const std::int16_t value =
-    std::static_pointer_cast<Immediate>(tokens.at(2))->value;
+    std::static_pointer_cast<Immediate>(tokens[2])->value;
 
   if (value > 15 || value < -16) {
     return static_cast<uint16_t>(3);

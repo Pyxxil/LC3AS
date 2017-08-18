@@ -4,9 +4,9 @@
 #include <iomanip>
 #include <sstream>
 
-Orig::Orig(std::string& directive,
-           std::string& directive_uppercase,
-           std::string& t_file,
+Orig::Orig(const std::string& directive,
+           const std::string& directive_uppercase,
+           const std::string& t_file,
            size_t line_number,
            size_t t_column)
   : Directive(directive, directive_uppercase, t_file, line_number, t_column)
@@ -25,7 +25,7 @@ Orig::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   origin = static_cast<uint16_t>(
-    std::static_pointer_cast<Immediate>(tokens.at(1))->value);
+    std::static_pointer_cast<Immediate>(tokens[1])->value);
   assembled.emplace_back(origin);
 
   return origin;
@@ -40,12 +40,12 @@ Orig::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::IMMEDIATE) {
-    tokens.at(1)->expected("immediate value");
+  if (tokens[1]->type() != Token::IMMEDIATE) {
+    tokens[1]->expected("immediate value");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 
@@ -57,7 +57,7 @@ Orig::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
 {
   if (is_valid) {
     return static_cast<uint16_t>(static_cast<uint16_t>(
-      std::static_pointer_cast<Immediate>(tokens.at(1))->value));
+      std::static_pointer_cast<Immediate>(tokens[1])->value));
   }
 
   return static_cast<uint16_t>(0);

@@ -76,7 +76,7 @@ Token::expected(const std::string& expects) const
                                   '^',
                                   "Found '" + token +
                                     "' ( Type: " + deduce_type() + " ) instead",
-                                  lexed_lines[file].at(line)),
+                                  lexed_lines[file][line]),
     '~',
     token.length()));
 
@@ -138,7 +138,7 @@ Token::invalid_argument_count(size_t provided,
         Diagnostics::FileContext(file, line, column + token.length()),
         ' ',
         "Unexpected arguments found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       last_column - (column + token.length())));
   }

@@ -3,14 +3,13 @@
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
-Immediate::Immediate(std::string& immediate,
-                     std::string& immediate_uppercase,
-                     std::string& t_file,
+Immediate::Immediate(const std::string& immediate,
+                     const std::string& immediate_uppercase,
+                     const std::string& t_file,
                      size_t line_number,
                      size_t t_column)
   : Token(immediate, immediate_uppercase, t_file, line_number, t_column)
-{
-}
+{}
 
 void
 Immediate::requires_too_many_bits(int allowed_bits,
@@ -36,7 +35,7 @@ Immediate::requires_too_many_bits(int allowed_bits,
     Diagnostics::SelectionContext(Diagnostics::FileContext(file, line, column),
                                   '^',
                                   error_string.str(),
-                                  lexed_lines[file].at(line)),
+                                  lexed_lines[file][line]),
     '~',
     token.length()));
 

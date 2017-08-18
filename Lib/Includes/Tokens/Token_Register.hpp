@@ -6,13 +6,13 @@
 class Register : public Token
 {
 public:
-  Register(std::string& which,
-           std::string& which_uppercase,
-           std::string& t_file,
+  Register(const std::string& which,
+           const std::string& which_uppercase,
+           const std::string& t_file,
            size_t line_number,
            size_t t_column);
 
-  virtual Token::token_type type() const override;
+  virtual Token::token_type type() const final;
 
   char reg;
 };

@@ -7,14 +7,13 @@
 #include "LexHelper.hpp"
 #include "Tokens/Tokens.hpp"
 
-Blkw::Blkw(std::string& directive,
-           std::string& directive_uppercase,
-           std::string& t_file,
+Blkw::Blkw(const std::string& directive,
+           const std::string& directive_uppercase,
+           const std::string& t_file,
            size_t line_number,
            size_t t_column)
   : Directive(directive, directive_uppercase, t_file, line_number, t_column)
-{
-}
+{}
 
 int32_t
 Blkw::assemble(std::vector<std::shared_ptr<Token>>& tokens,
@@ -30,22 +29,22 @@ Blkw::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   uint16_t fill = 0;
 
   if (tokens.size() == 3) {
-    if (tokens.at(2)->type() == Token::IMMEDIATE) {
+    if (tokens[2]->type() == Token::IMMEDIATE) {
       fill = static_cast<uint16_t>(
-        std::static_pointer_cast<Immediate>(tokens.at(2))->value);
-    } else if (tokens.at(2)->type() == Token::LABEL) {
-      if (0u == symbols.count(tokens.at(2)->token)) {
-        std::static_pointer_cast<Label>(tokens.at(2))->not_found(symbols);
+        std::static_pointer_cast<Immediate>(tokens[2])->value);
+    } else if (tokens[2]->type() == Token::LABEL) {
+      if (0u == symbols.count(tokens[2]->token)) {
+        std::static_pointer_cast<Label>(tokens[2])->not_found(symbols);
         return -1;
       }
 
-      fill = symbols.find(tokens.at(2)->token)->second.address;
+      fill = symbols.find(tokens[2]->token)->second.address;
     }
   }
 
   assembled.insert(assembled.end(),
                    static_cast<size_t>(
-                     std::static_pointer_cast<Immediate>(tokens.at(1))->value),
+                     std::static_pointer_cast<Immediate>(tokens[1])->value),
                    fill);
 
   return static_cast<int32_t>(assembled.size());
@@ -60,23 +59,23 @@ Blkw::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::IMMEDIATE) {
-    tokens.at(1)->expected("immediate value");
+  if (tokens[1]->type() != Token::IMMEDIATE) {
+    tokens[1]->expected("immediate value");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 
   if (tokens.size() == 3) {
-    if (tokens.at(2)->type() != Token::IMMEDIATE &&
-        tokens.at(2)->type() != Token::LABEL) {
-      tokens.at(2)->expected("label or immediate value");
+    if (tokens[2]->type() != Token::IMMEDIATE &&
+        tokens[2]->type() != Token::LABEL) {
+      tokens[2]->expected("label or immediate value");
       return (is_valid = false);
     }
 
-    if (!tokens.at(2)->is_valid) {
+    if (!tokens[2]->is_valid) {
       return (is_valid = false);
     }
   }
@@ -89,7 +88,7 @@ Blkw::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
 {
   return static_cast<uint16_t>(is_valid) *
          static_cast<uint16_t>(
-           std::static_pointer_cast<Immediate>(tokens.at(1))->value);
+           std::static_pointer_cast<Immediate>(tokens[1])->value);
 }
 
 void
@@ -117,7 +116,7 @@ Blkw::invalid_argument_count(size_t provided,
         Diagnostics::FileContext(file, line, column + token.length()),
         ' ',
         "Unexpected arguments found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       last_column - (column + token.length())));
   }
@@ -137,16 +136,21 @@ Blkw::disassemble(uint16_t& program_counter,
   stream
     // Address in memory
     << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-    << program_counter << ')'
+    << program_counter
+    << ')'
     // Hexadecimal representation of instruction
-    << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
+    << ' ' << std::hex << std::setfill('0') << std::setw(4)
+    << value
     // Binary representation of instruction
-    << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
+    << ' '
+    << std::bitset<16>(static_cast<unsigned long long>(value))
     // Line the instruction is on
     << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-    << line << ')'
+    << line
+    << ')'
     // Label at the current address (if any)
-    << ' ' << std::left << std::setfill(' ') << std::setw(width) << symbol
+    << ' ' << std::left << std::setfill(' ') << std::setw(width)
+    << symbol
     // Instruction itself
     << " .FILL 0x" << std::right << std::hex << std::setfill('0')
     << std::setw(4) << value
@@ -161,16 +165,21 @@ Blkw::disassemble(uint16_t& program_counter,
     stream
       // Address in memory
       << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-      << program_counter << ')'
+      << program_counter
+      << ')'
       // Hexadecimal representation of instruction
-      << ' ' << std::hex << std::setfill('0') << std::setw(4) << value
+      << ' ' << std::hex << std::setfill('0') << std::setw(4)
+      << value
       // Binary representation of instruction
-      << ' ' << std::bitset<16>(static_cast<unsigned long long>(value))
+      << ' '
+      << std::bitset<16>(static_cast<unsigned long long>(value))
       // Line the instruction is on
       << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-      << line << ')'
+      << line
+      << ')'
       // Label at the current address (if any)
-      << ' ' << std::setfill(' ') << std::setw(width) << ' '
+      << ' ' << std::setfill(' ') << std::setw(width)
+      << ' '
       // Instruction itself
       << " .FILL 0x" << std::right << std::hex << std::setfill('0')
       << std::setw(4) << value

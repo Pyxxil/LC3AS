@@ -6,9 +6,9 @@
 
 #include "Tokens/Token_Immediate.hpp"
 
-Trap::Trap(std::string& instruction,
-           std::string& instruction_uppercase,
-           std::string& t_file,
+Trap::Trap(const std::string& instruction,
+           const std::string& instruction_uppercase,
+           const std::string& t_file,
            size_t line_number,
            size_t t_column)
   : Instruction(instruction,
@@ -32,7 +32,7 @@ Trap::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   assembled.emplace_back(static_cast<uint16_t>(
     0xF000 |
-    (std::static_pointer_cast<Immediate>(tokens.at(1))->value & 0xFF)));
+    (std::static_pointer_cast<Immediate>(tokens[1])->value & 0xFF)));
 
   return 1;
 }
@@ -46,17 +46,17 @@ Trap::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::IMMEDIATE) {
-    tokens.at(1)->expected("valid trap vector");
+  if (tokens[1]->type() != Token::IMMEDIATE) {
+    tokens[1]->expected("valid trap vector");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 
-  if (std::static_pointer_cast<Immediate>(tokens.at(1))->value > 0xFF) {
-    tokens.at(1)->requires_too_many_bits(
+  if (std::static_pointer_cast<Immediate>(tokens[1])->value > 0xFF) {
+    tokens[1]->requires_too_many_bits(
       8, UNSIGNED, this, std::map<std::string, Symbol>());
     return (is_valid = false);
   }

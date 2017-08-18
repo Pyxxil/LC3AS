@@ -10,33 +10,11 @@ public:
     : m_line(t_line)
   {}
 
-  Line(const Line& other)
-    : m_line(other.m_line)
-    , m_index(other.m_index)
-    , m_ignores(other.m_ignores)
-  {}
+  Line(const Line& other) = default;
+  Line(Line&& other) noexcept = default;
 
-  Line(Line&& other)
-    : m_line(other.m_line)
-    , m_index(other.m_index)
-    , m_ignores(other.m_ignores)
-  {}
-
-  Line& operator=(const Line& other)
-  {
-    m_line = other.m_line;
-    m_index = other.m_index;
-    m_ignores = other.m_ignores;
-    return *this;
-  }
-
-  Line& operator=(Line&& other)
-  {
-    m_line = other.m_line;
-    m_index = other.m_index;
-    m_ignores = other.m_ignores;
-    return *this;
-  }
+  Line& operator=(const Line& other) = default;
+  Line& operator=(Line&& other) noexcept = default;
 
   ~Line() = default;
 
@@ -65,7 +43,7 @@ public:
       return 0;
     }
 
-    return m_line.at(m_index);
+    return m_line[m_index];
   }
 
   /*! Retrieve the next character from the string
@@ -75,22 +53,24 @@ public:
    */
   char next()
   {
-    if (at_end()) {
-      return 0;
+    const auto c = peek();
+    if (0 != c) {
+      ++m_index;
     }
-
-    const char c = peek();
-    ++m_index;
     return c;
   }
 
-  void skip() { ++m_index; }
+  /*! Skip the next character
+   *
+   */
+  inline void skip() { ++m_index; }
 
   /*! Keep advancing until pred becomes false.
    *
    * @param pred The function to call to check if we should stop.
    */
-  void skip_if(std::function<bool(const char)>&& pred)
+  template<typename Func>
+  void skip_if(Func&& pred)
   {
     while (!at_end()) {
       if (!pred(peek())) {
@@ -113,7 +93,9 @@ public:
         // TODO: Make this a little nicer somehow.
         if (0u == (m_ignores & ESCAPE_SEQUENCE)) {
           return ++m_index;
-        } else if ('\\' != m_line.at(m_index - 1)) {
+        }
+
+        if ('\\' != m_line[m_index - 1]) {
           return ++m_index;
         }
       }
@@ -124,13 +106,21 @@ public:
     return -1u;
   }
 
-  size_t find_if(std::function<bool(char)>&& pred)
+  /*! Keep searching until pred becomes true
+   *
+   * @param pred The function to call to see if the current character matches
+   * some condition
+   *
+   * @returns The index of the character if pred is ever true, -1 otherwise.
+   */
+  template<typename Func>
+  size_t find_if(Func&& pred)
   {
     while (!at_end()) {
       if (pred(peek())) {
         return m_index;
       }
-      next();
+      ++m_index;
     }
 
     // Didn't work
@@ -139,6 +129,10 @@ public:
 
   /*! Grab a sub string from within the string
    *
+   * @param begin The beginning column of the string
+   * @param end The end column for the string
+   *
+   * @return The substring in the line.
    */
   std::string substr(size_t begin, size_t end) const
   {

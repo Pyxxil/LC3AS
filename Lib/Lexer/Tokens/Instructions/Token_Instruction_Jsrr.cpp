@@ -6,9 +6,9 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Jsrr::Jsrr(std::string& instruction,
-           std::string& instruction_uppercase,
-           std::string& t_file,
+Jsrr::Jsrr(const std::string& instruction,
+           const std::string& instruction_uppercase,
+           const std::string& t_file,
            size_t line_number,
            size_t t_column)
   : Instruction(instruction,
@@ -31,7 +31,7 @@ Jsrr::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0x4000 | (std::static_pointer_cast<Register>(tokens.at(1))->reg << 5)));
+    0x4000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 5)));
 
   return 1;
 }
@@ -45,8 +45,8 @@ Jsrr::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::LABEL) {
-    tokens.at(1)->expected("label");
+  if (tokens[1]->type() != Token::LABEL) {
+    tokens[1]->expected("label");
     return (is_valid = false);
   }
 

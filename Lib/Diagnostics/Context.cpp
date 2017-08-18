@@ -9,7 +9,7 @@
 
 static const Console::Colour HIGHLIGHTER(Console::FOREGROUND_COLOUR::MAGENTA);
 
-Diagnostics::FileContext::FileContext(std::string name,
+Diagnostics::FileContext::FileContext(const std::string& name,
                                       size_t t_line,
                                       size_t t_col)
   : file_name(name)
@@ -86,7 +86,7 @@ Diagnostics::HighlightContext::write_to(std::ostream& os) const
 Diagnostics::SelectionContext::SelectionContext(Diagnostics::FileContext file,
                                                 char t_selector,
                                                 std::string t_message,
-                                                std::string t_line,
+                                                const std::string& t_line,
                                                 std::string changer)
   : Context(std::move(file), std::move(t_message), t_line, SELECTOR)
   , selector(t_selector)

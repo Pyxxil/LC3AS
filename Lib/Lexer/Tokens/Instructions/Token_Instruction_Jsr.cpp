@@ -7,9 +7,9 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Label.hpp"
 
-Jsr::Jsr(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+Jsr::Jsr(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,
@@ -31,25 +31,25 @@ Jsr::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   int offset = 0;
 
-  if (tokens.at(1)->type() == Token::LABEL) {
-    if (0u == symbols.count(tokens.at(1)->token)) {
-      std::static_pointer_cast<Label>(tokens.at(1))->not_found(symbols);
+  if (tokens[1]->type() == Token::LABEL) {
+    if (0u == symbols.count(tokens[1]->token)) {
+      std::static_pointer_cast<Label>(tokens[1])->not_found(symbols);
       return -1;
     }
 
     offset =
-      static_cast<int>(symbols.find(tokens.at(1)->token)->second.address) -
+      static_cast<int>(symbols.find(tokens[1]->token)->second.address) -
       (static_cast<int>(program_counter) + 1);
   } else {
-    offset = std::static_pointer_cast<Immediate>(tokens.at(1))->value;
+    offset = std::static_pointer_cast<Immediate>(tokens[1])->value;
   }
 
   if (offset > 1023 || offset < -1024) {
-    tokens.at(1)->requires_too_many_bits(11, SIGNED, this, symbols);
+    tokens[1]->requires_too_many_bits(11, SIGNED, this, symbols);
     return -1;
   }
 
-  provided = tokens.at(1);
+  provided = tokens[1];
   assembled.emplace_back(0x4800 | static_cast<uint16_t>(offset & 0x7FF));
 
   return 1;
@@ -64,9 +64,9 @@ Jsr::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::LABEL &&
-      tokens.at(1)->type() != Token::IMMEDIATE) {
-    tokens.at(1)->expected("label or value");
+  if (tokens[1]->type() != Token::LABEL &&
+      tokens[1]->type() != Token::IMMEDIATE) {
+    tokens[1]->expected("label or value");
     return (is_valid = false);
   }
 

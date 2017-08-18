@@ -4,8 +4,8 @@
 #include "LexHelper.hpp"
 #include "String_Matcher.hpp"
 
-Label::Label(std::string& name,
-             std::string& t_file,
+Label::Label(const std::string& name,
+             const std::string& t_file,
              size_t line_number,
              size_t t_column)
   : Token(name, name, t_file, line_number, t_column)
@@ -37,7 +37,7 @@ bool
 Label::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 {
   if (tokens.size() > 1) {
-    instruction = tokens.at(1);
+    instruction = tokens[1];
     std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
     return instruction->valid_arguments(vec);
   }
@@ -80,7 +80,7 @@ Label::not_found(const std::map<std::string, Symbol>& match_candidates)
         Diagnostics::FileContext(file, line, column),
         '^',
         "No such label '" + token + "'; Did you mean '" + possible_match + "'?",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.size(),
       possible_match));
@@ -92,7 +92,7 @@ Label::not_found(const std::map<std::string, Symbol>& match_candidates)
           sym->second.file, sym->second.line_number, sym->second.column),
         '^',
         "'" + possible_match + "' declared here",
-        lexed_lines[sym->second.file].at(sym->second.line_number)),
+        lexed_lines[sym->second.file][sym->second.line_number]),
       '~',
       sym->first.length()));
   } else {
@@ -101,7 +101,7 @@ Label::not_found(const std::map<std::string, Symbol>& match_candidates)
         Diagnostics::FileContext(file, line, column),
         '^',
         "Label found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.size(),
       possible_match));
@@ -146,7 +146,7 @@ Label::requires_too_many_bits(int allowed_bits,
     Diagnostics::SelectionContext(Diagnostics::FileContext(file, line, column),
                                   '^',
                                   error_string.str(),
-                                  lexed_lines[file].at(line)),
+                                  lexed_lines[file][line]),
     '~',
     token.length()));
 
@@ -157,7 +157,7 @@ Label::requires_too_many_bits(int allowed_bits,
         sym->second.file, sym->second.line_number, sym->second.column),
       '^',
       "'" + sym->first + "' declared here",
-      lexed_lines[sym->second.file].at(sym->second.line_number)),
+      lexed_lines[sym->second.file][sym->second.line_number]),
     '~',
     sym->first.length()));
 

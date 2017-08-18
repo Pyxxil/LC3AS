@@ -5,37 +5,41 @@
 
 #include "Tokens/Immediates/Token_Immediate_Decimal.hpp"
 
-Neg::Neg(std::string& directive,
-         std::string& directive_uppercase,
-         std::string& t_file,
+Neg::Neg(const std::string& directive,
+         const std::string& directive_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t column)
   : Directive(directive, directive_uppercase, t_file, line_number, column)
   , neg(std::make_shared<Not>("NOT", "NOT", t_file, line_number, column))
   , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
-{
-}
+{}
 
 Neg::Neg(std::string&& directive,
          std::string&& directive_uppercase,
-         std::string& t_file,
+         const std::string& t_file,
          size_t line_number,
          size_t column)
-  : Neg(directive, directive_uppercase, t_file, line_number, column)
-{
-}
+  : Directive(std::move(directive),
+              std::move(directive_uppercase),
+              t_file,
+              line_number,
+              column)
+  , neg(std::make_shared<Not>("NOT", "NOT", t_file, line_number, column))
+  , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
+{}
 
 int32_t
 Neg::assemble(std::vector<std::shared_ptr<Token>>& tokens,
               const std::map<std::string, Symbol>& symbols,
               uint16_t program_counter)
 {
-  std::vector<std::shared_ptr<Token>> vec = { neg, tokens.at(1), tokens.at(1) };
+  std::vector<std::shared_ptr<Token>> vec = { neg, tokens[1], tokens[1] };
 
   neg->assemble(vec, symbols, program_counter);
   vec = { add,
-          tokens.at(1),
-          tokens.at(1),
+          tokens[1],
+          tokens[1],
           std::make_shared<Decimal>("#1", file, line, column) };
   add->assemble(vec, symbols, program_counter);
 
@@ -56,8 +60,8 @@ Neg::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 

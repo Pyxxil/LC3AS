@@ -4,9 +4,9 @@
 #include <iomanip>
 #include <sstream>
 
-Ret::Ret(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+Ret::Ret(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,

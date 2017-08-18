@@ -9,8 +9,8 @@ class Binary : public Immediate
 {
 public:
   Binary(std::string& immediate,
-         std::string& immediate_uppercase,
-         std::string& t_file,
+         const std::string& immediate_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column);
 };

@@ -3,13 +3,13 @@
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
-Register::Register(std::string& which,
-                   std::string& which_uppercase,
-                   std::string& t_file,
+Register::Register(const std::string& which,
+                   const std::string& which_uppercase,
+                   const std::string& t_file,
                    size_t line_number,
                    size_t t_column)
   : Token(which, which_uppercase, t_file, line_number, t_column)
-  , reg(which.at(1) - '0')
+  , reg(which[1] - '0')
 {
   // Valid registers are R0, R1, R2, R3, R4, R5, R6, and R7
   if (reg > 7 || reg < 0) {
@@ -24,7 +24,7 @@ Register::Register(std::string& which,
         Diagnostics::FileContext(file, line, t_column),
         '^',
         "A valid register lies between R0 and R7 (inclusive)",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.length(),
       "R{0..7}"));

@@ -24,9 +24,9 @@
 class Sub : public Directive
 {
 public:
-  Sub(std::string& directive,
-      std::string& directive_uppercase,
-      std::string& t_file,
+  Sub(const std::string& directive,
+      const std::string& directive_uppercase,
+      const std::string& t_file,
       size_t line_number,
       size_t column);
 

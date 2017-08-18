@@ -6,12 +6,12 @@
 class String : public Token
 {
 public:
-  String(std::string& string,
-         std::string& t_file,
+  String(const std::string& string,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column);
 
-  virtual Token::token_type type() const override;
+  virtual Token::token_type type() const final;
 };
 
 #endif // TOKEN_STRING_HPP

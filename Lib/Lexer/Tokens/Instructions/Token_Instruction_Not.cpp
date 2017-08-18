@@ -6,9 +6,9 @@
 
 #include "Tokens/Token_Register.hpp"
 
-Not::Not(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+Not::Not(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,
@@ -20,11 +20,11 @@ Not::Not(std::string& instruction,
 
 Not::Not(std::string&& instruction,
          std::string&& instruction_uppercase,
-         std::string& t_file,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
+  : Instruction(std::move(instruction),
+                std::move(instruction_uppercase),
                 t_file,
                 line_number,
                 t_column)
@@ -44,8 +44,8 @@ Not::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   assembled.emplace_back(static_cast<uint16_t>(
     0x903F |
-    ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 0x7) << 9) |
-    ((std::static_pointer_cast<Register>(tokens.at(2))->reg & 0x7) << 6)));
+    ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+    ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6)));
 
   return 1;
 }
@@ -59,17 +59,17 @@ Not::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(2)->type() != Token::REGISTER) {
-    tokens.at(2)->expected("register");
+  if (tokens[2]->type() != Token::REGISTER) {
+    tokens[2]->expected("register");
     return (is_valid = false);
   }
 
-  if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid)) {
+  if (!(tokens[1]->is_valid && tokens[2]->is_valid)) {
     return (is_valid = false);
   }
 

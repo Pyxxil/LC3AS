@@ -8,9 +8,9 @@
 #include "Tokens/Token_Label.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Sti::Sti(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+Sti::Sti(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,
@@ -32,29 +32,29 @@ Sti::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   int offset = 0;
 
-  if (tokens.at(2)->type() == Token::LABEL) {
-    if (0u == symbols.count(tokens.at(2)->token)) {
-      std::static_pointer_cast<Label>(tokens.at(2))->not_found(symbols);
+  if (tokens[2]->type() == Token::LABEL) {
+    if (0u == symbols.count(tokens[2]->token)) {
+      std::static_pointer_cast<Label>(tokens[2])->not_found(symbols);
       return -1;
     }
 
     offset =
-      static_cast<int>(symbols.find(tokens.at(2)->token)->second.address) -
+      static_cast<int>(symbols.find(tokens[2]->token)->second.address) -
       (static_cast<int>(program_counter) + 1);
   } else {
-    offset = std::static_pointer_cast<Immediate>(tokens.at(2))->value;
+    offset = std::static_pointer_cast<Immediate>(tokens[2])->value;
   }
 
   if (offset > 255 || offset < -256) {
-    tokens.at(2)->requires_too_many_bits(9, SIGNED, this, symbols);
+    tokens[2]->requires_too_many_bits(9, SIGNED, this, symbols);
     return -1;
   }
 
-  provided = tokens.at(2);
+  provided = tokens[2];
 
   assembled.emplace_back(static_cast<uint16_t>(
     0xB000 |
-    ((std::static_pointer_cast<Register>(tokens.at(1))->reg & 7) << 9) |
+    ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
     (offset & 0x1FF)));
 
   return 1;
@@ -69,18 +69,18 @@ Sti::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(2)->type() != Token::LABEL &&
-      tokens.at(2)->type() != Token::IMMEDIATE) {
-    tokens.at(2)->expected("label or immediate value");
+  if (tokens[2]->type() != Token::LABEL &&
+      tokens[2]->type() != Token::IMMEDIATE) {
+    tokens[2]->expected("label or immediate value");
     return (is_valid = false);
   }
 
-  if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid)) {
+  if (!(tokens[1]->is_valid && tokens[2]->is_valid)) {
     return (is_valid = false);
   }
 

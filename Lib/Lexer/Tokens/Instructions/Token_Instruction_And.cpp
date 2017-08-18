@@ -7,9 +7,9 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-And::And(std::string& instruction,
-         std::string& instruction_uppercase,
-         std::string& t_file,
+And::And(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
   : Instruction(instruction,
@@ -21,11 +21,11 @@ And::And(std::string& instruction,
 
 And::And(std::string&& instruction,
          std::string&& instruction_uppercase,
-         std::string& t_file,
+         const std::string& t_file,
          size_t line_number,
          size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
+  : Instruction(std::move(instruction),
+                std::move(instruction_uppercase),
                 t_file,
                 line_number,
                 t_column)
@@ -44,16 +44,16 @@ And::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0x5000 | (std::static_pointer_cast<Register>(tokens.at(1))->reg << 9) |
-    (std::static_pointer_cast<Register>(tokens.at(2))->reg) << 6));
+    0x5000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 9) |
+    (std::static_pointer_cast<Register>(tokens[2])->reg) << 6));
 
-  if (tokens.at(3)->type() == Token::REGISTER) {
+  if (tokens[3]->type() == Token::REGISTER) {
     assembled.front() |= static_cast<uint16_t>(
-      std::static_pointer_cast<Register>(tokens.at(3))->reg);
+      std::static_pointer_cast<Register>(tokens[3])->reg);
   } else {
     assembled.front() |=
       0x20u | (static_cast<uint16_t>(
-                 std::static_pointer_cast<Immediate>(tokens.at(3))->value) &
+                 std::static_pointer_cast<Immediate>(tokens[3])->value) &
                0x1Fu);
   }
 
@@ -69,33 +69,33 @@ And::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(2)->type() != Token::REGISTER) {
-    tokens.at(2)->expected("register");
+  if (tokens[2]->type() != Token::REGISTER) {
+    tokens[2]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(3)->type() != Token::REGISTER &&
-      tokens.at(3)->type() != Token::IMMEDIATE) {
-    tokens.at(3)->expected("register or immediate value");
+  if (tokens[3]->type() != Token::REGISTER &&
+      tokens[3]->type() != Token::IMMEDIATE) {
+    tokens[3]->expected("register or immediate value");
     return (is_valid = false);
   }
 
-  if (tokens.at(3)->type() == Token::IMMEDIATE) {
-    if (std::static_pointer_cast<Immediate>(tokens.at(3))->value > 15 ||
-        std::static_pointer_cast<Immediate>(tokens.at(3))->value < -16) {
-      tokens.at(3)->requires_too_many_bits(
+  if (tokens[3]->type() == Token::IMMEDIATE) {
+    if (std::static_pointer_cast<Immediate>(tokens[3])->value > 15 ||
+        std::static_pointer_cast<Immediate>(tokens[3])->value < -16) {
+      tokens[3]->requires_too_many_bits(
         5, SIGNED, this, std::map<std::string, Symbol>());
       return (is_valid = false);
     }
   }
 
-  if (!(tokens.at(1)->is_valid && tokens.at(2)->is_valid &&
-        tokens.at(3)->is_valid)) {
+  if (!(tokens[1]->is_valid && tokens[2]->is_valid &&
+        tokens[3]->is_valid)) {
     return (is_valid = false);
   }
 

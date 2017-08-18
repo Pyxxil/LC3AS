@@ -32,12 +32,13 @@ static constexpr size_t
 hash(const char* const string, size_t length)
 {
   size_t _hash{ 37 };
+  const size_t first_character = static_cast<size_t>(*string);
 
   for (size_t index = 0; index < length; ++index) {
     _hash =
       (_hash *
        hashed_letters[(static_cast<size_t>(string[index]) - 0x41u) % 26]) ^
-      (static_cast<size_t>(*string) *
+      (first_character *
        hashed_letters[(static_cast<size_t>(string[index]) - 0x41u) % 26]);
   }
 
@@ -53,10 +54,11 @@ hash(const char* const string, size_t length)
 static size_t
 hash(const std::string& string)
 {
-  // Basically, we don't really want something that's likely to be an
-  // immediate value, or a label (less likely to be caught here, but may as
-  // well try).
-  if (string.at(0) != '.' && (std::isprint(string.front()) == 0)) {
+  const size_t first_character = static_cast<size_t>(string.front());
+  if (first_character != '.' && (std::isprint(first_character) == 0)) {
+    // Basically, we don't really want something that's likely to be an
+    // immediate value, or a label (less likely to be caught here, but may as
+    // well try).
     return 0;
   }
 
@@ -65,7 +67,7 @@ hash(const std::string& string)
   for (const auto character : string) {
     _hash =
       (_hash * hashed_letters[(static_cast<size_t>(character) - 0x41u) % 26]) ^
-      (static_cast<size_t>(string.at(0)) *
+      (first_character *
        hashed_letters[(static_cast<size_t>(character) - 0x41u) % 26]);
   }
 
@@ -106,7 +108,7 @@ Lexer::include_file(std::vector<std::shared_ptr<Token>>& t_line)
               file_name, t_line.front()->line, t_line[1]->column),
             '^',
             "In include directive found here",
-            lexed_lines[file_name].at(t_line.front()->line)),
+            lexed_lines[file_name][t_line.front()->line]),
           '~',
           t_line[1]->token.length()));
 
@@ -312,6 +314,16 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
       case hash(".STRINGZ", 8):
         return std::make_shared<Stringz>(
           word, copy, file_name, line_number, t_column);
+      case hash("R0", 2): // FALLTHROUGH
+      case hash("R1", 2): // FALLTHROUGH
+      case hash("R2", 2): // FALLTHROUGH
+      case hash("R3", 2): // FALLTHROUGH
+      case hash("R4", 2): // FALLTHROUGH
+      case hash("R5", 2): // FALLTHROUGH
+      case hash("R6", 2): // FALLTHROUGH
+      case hash("R7", 2):
+        return std::make_shared<Register>(
+          word, copy, file_name, line_number, t_column);
 #ifdef INCLUDE_ADDONS
       case hash(".NEG", 4):
         return std::make_shared<Neg>(
@@ -328,18 +340,9 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
       case hash(".INCLUDE", 8):
         return std::make_shared<Include>(
           word, copy, file_name, line_number, t_column);
-      case hash("R0", 2): // FALLTHROUGH
-      case hash("R1", 2): // FALLTHROUGH
-      case hash("R2", 2): // FALLTHROUGH
-      case hash("R3", 2): // FALLTHROUGH
-      case hash("R4", 2): // FALLTHROUGH
-      case hash("R5", 2): // FALLTHROUGH
-      case hash("R6", 2): // FALLTHROUGH
-      case hash("R7", 2):
-        return std::make_shared<Register>(
-          word, copy, file_name, line_number, t_column);
 #endif
       default:
+        // TODO: Is this always a label?
         break;
     }
   }
@@ -401,9 +404,7 @@ Lexer::tokenizeLine(std::string t_line,
                     std::vector<std::shared_ptr<Token>>& into)
 {
   std::string current;
-
   char terminated_by{ 0 };
-
   Line current_line(t_line);
 
   while (!current_line.at_end()) {
@@ -469,9 +470,8 @@ Lexer::tokenizeLine(std::string t_line,
         goto end_of_line;
       }
       case ',': {
-        if (into.empty() ||
-            (' ' != terminated_by && 0 != terminated_by &&
-             1 != terminated_by) ||
+        if (into.empty() || (' ' != terminated_by && 0 != terminated_by &&
+                             1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(
@@ -530,7 +530,7 @@ Lexer::tokenizeLine(std::string t_line,
         if (!current.empty()) {
 #ifdef INCLUDE_ADDONS
           if (!('\'' == character && current.length() == 1 &&
-                '-' == current.at(0))) {
+                '-' == current.front())) {
             addToken(current, into, line_number, current_line.index());
           }
 #else
@@ -609,7 +609,7 @@ Lexer::provide_context(Diagnostics::Diagnostic& diagnostic)
         Diagnostics::FileContext(parent->file_name, line, column),
         '^',
         "In file included from here",
-        lexed_lines[parent->file_name].at(line)),
+        lexed_lines[parent->file_name][line]),
       '~',
       length));
 

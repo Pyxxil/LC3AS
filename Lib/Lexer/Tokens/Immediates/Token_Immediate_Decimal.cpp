@@ -4,7 +4,7 @@
 #include "LexHelper.hpp"
 
 Decimal::Decimal(std::string& immediate,
-                 std::string& t_file,
+                 const std::string& t_file,
                  size_t line_number,
                  size_t t_column)
   : Immediate(immediate, immediate, t_file, line_number, t_column)
@@ -12,7 +12,7 @@ Decimal::Decimal(std::string& immediate,
   if (immediate.length() > 7) {
     is_valid = false;
   } else {
-    if (immediate.at(0) == '#') {
+    if (immediate.front() == '#') {
       immediate.erase(0, 1);
     }
 
@@ -38,7 +38,7 @@ Decimal::Decimal(std::string& immediate,
         Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.length()));
 

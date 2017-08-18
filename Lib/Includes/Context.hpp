@@ -23,7 +23,7 @@ public:
     , colour(std::move(other.colour))
   {}
   Variant& operator=(const Variant<T>& rhs) = default;
-  Variant& operator=(Variant<T>&& rhs) = default;
+  Variant& operator=(Variant<T>&& rhs) noexcept = default;
 
   ~Variant() = default;
 
@@ -42,7 +42,7 @@ private:
 class FileContext
 {
 public:
-  FileContext(std::string name, size_t t_line, size_t t_col);
+  FileContext(const std::string &name, size_t t_line, size_t t_col);
   FileContext(Variant<std::string> name,
               Variant<size_t> t_line,
               Variant<size_t> t_col);
@@ -110,7 +110,7 @@ public:
   SelectionContext(FileContext file,
                    char t_selector,
                    std::string t_message,
-                   std::string t_line,
+                   const std::string& t_line,
                    std::string changer = std::string());
   SelectionContext(const SelectionContext& other) = default;
   SelectionContext(SelectionContext&& other) = default;

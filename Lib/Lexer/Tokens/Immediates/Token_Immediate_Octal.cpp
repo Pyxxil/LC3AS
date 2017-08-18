@@ -4,7 +4,7 @@
 #include "LexHelper.hpp"
 
 Octal::Octal(std::string& immediate,
-             std::string& t_file,
+             const std::string& t_file,
              size_t line_number,
              size_t t_column)
   : Immediate(immediate, immediate, t_file, line_number, t_column)
@@ -34,7 +34,7 @@ Octal::Octal(std::string& immediate,
         Diagnostics::FileContext(file, line, t_column),
         '^',
         "Found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       token.length()));
 

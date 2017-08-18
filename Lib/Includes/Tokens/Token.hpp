@@ -9,16 +9,19 @@
 
 #include "Symbol.hpp"
 
-#define SIGNED true
-#define UNSIGNED false
+enum Signedness : bool
+{
+  UNSIGNED = false,
+  SIGNED = true,
+};
 
 class Token
 {
 public:
   Token() = default;
-  Token(std::string& t_token,
-        std::string& t_token_uppercase,
-        std::string& t_file,
+  Token(const std::string& t_token,
+        const std::string& t_token_uppercase,
+        const std::string& t_file,
         size_t t_line,
         size_t t_column)
     : line(t_line)

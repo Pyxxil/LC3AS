@@ -7,9 +7,9 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Tokens.hpp"
 
-Br::Br(std::string& instruction,
-       std::string& instruction_uppercase,
-       std::string& t_file,
+Br::Br(const std::string& instruction,
+       const std::string& instruction_uppercase,
+       const std::string& t_file,
        size_t line_number,
        size_t t_column,
        bool n,
@@ -28,14 +28,14 @@ Br::Br(std::string& instruction,
 
 Br::Br(std::string&& instruction,
        std::string&& instruction_uppercase,
-       std::string& t_file,
+       const std::string& t_file,
        size_t line_number,
        size_t t_column,
        bool n,
        bool z,
        bool p)
-  : Instruction(instruction,
-                instruction_uppercase,
+  : Instruction(std::move(instruction),
+                std::move(instruction_uppercase),
                 t_file,
                 line_number,
                 t_column)
@@ -56,25 +56,25 @@ Br::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   int offset = 0;
 
-  if (tokens.at(1)->type() == Token::LABEL) {
-    if (0u == symbols.count(tokens.at(1)->token)) {
-      std::static_pointer_cast<Label>(tokens.at(1))->not_found(symbols);
+  if (tokens[1]->type() == Token::LABEL) {
+    if (0u == symbols.count(tokens[1]->token)) {
+      std::static_pointer_cast<Label>(tokens[1])->not_found(symbols);
       return -1;
     }
 
     offset =
-      static_cast<int>(symbols.find(tokens.at(1)->token)->second.address) -
+      static_cast<int>(symbols.find(tokens[1]->token)->second.address) -
       (static_cast<int>(program_counter) + 1);
   } else {
-    offset = std::static_pointer_cast<Immediate>(tokens.at(1))->value;
+    offset = std::static_pointer_cast<Immediate>(tokens[1])->value;
   }
 
   if (offset > 255 || offset < -256) {
-    tokens.at(1)->requires_too_many_bits(9, SIGNED, this, symbols);
+    tokens[1]->requires_too_many_bits(9, SIGNED, this, symbols);
     return -1;
   }
 
-  provided = tokens.at(1);
+  provided = tokens[1];
   assembled.emplace_back(static_cast<uint16_t>(
     0x0000 | static_cast<int>(N) << 11 | static_cast<int>(Z) << 10 |
     static_cast<int>(P) << 9 | (offset & 0x1FF)));
@@ -92,13 +92,13 @@ Br::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::LABEL &&
-      tokens.at(1)->type() != Token::IMMEDIATE) {
-    tokens.at(1)->expected("label or immediate value");
+  if (tokens[1]->type() != Token::LABEL &&
+      tokens[1]->type() != Token::IMMEDIATE) {
+    tokens[1]->expected("label or immediate value");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 

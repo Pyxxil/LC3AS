@@ -7,9 +7,9 @@
 #include "LexHelper.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Sub::Sub(std::string& directive,
-         std::string& directive_uppercase,
-         std::string& t_file,
+Sub::Sub(const std::string& directive,
+         const std::string& directive_uppercase,
+         const std::string& t_file,
          size_t line_number,
          size_t column)
   : Directive(directive, directive_uppercase, t_file, line_number, column)
@@ -18,8 +18,7 @@ Sub::Sub(std::string& directive,
   , decimal_zero(std::make_shared<Decimal>("#0", t_file, line_number, column))
   , neg1(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
   , neg2(std::make_shared<Neg>(".NEG", ".NEG", t_file, line_number, column))
-{
-}
+{}
 
 int32_t
 Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,
@@ -40,12 +39,12 @@ Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     ++second_register_index;
   }
 
-  if (std::static_pointer_cast<Register>(tokens.at(first_register_index))
+  if (std::static_pointer_cast<Register>(tokens[first_register_index])
         ->reg ==
-      std::static_pointer_cast<Register>(tokens.at(second_register_index))
+      std::static_pointer_cast<Register>(tokens[second_register_index])
         ->reg) {
     std::vector<std::shared_ptr<Token>> vec = {
-      set_zero, tokens.at(1), tokens.at(first_register_index), decimal_zero
+      set_zero, tokens[1], tokens[first_register_index], decimal_zero
     };
 
     set_zero->assemble(vec, symbols, program_counter);
@@ -54,14 +53,14 @@ Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     ret = 1;
   } else {
     std::vector<std::shared_ptr<Token>> vec = {
-      neg1, tokens.at(second_register_index)
+      neg1, tokens[second_register_index]
     };
     ret += neg1->assemble(vec, symbols, program_counter);
 
     vec = { add,
-            tokens.at(1),
-            tokens.at(first_register_index),
-            tokens.at(second_register_index) };
+            tokens[1],
+            tokens[first_register_index],
+            tokens[second_register_index] };
     ret += add->assemble(vec, symbols, program_counter);
 
     assembled = neg1->assembled;
@@ -69,10 +68,10 @@ Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,
       assembled.emplace_back(as_assembled);
     }
 
-    if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
-        std::static_pointer_cast<Register>(tokens.at(second_register_index))
+    if (std::static_pointer_cast<Register>(tokens[1])->reg !=
+        std::static_pointer_cast<Register>(tokens[second_register_index])
           ->reg) {
-      vec = { neg2, tokens.at(second_register_index) };
+      vec = { neg2, tokens[second_register_index] };
       ret += neg2->assemble(vec, symbols, program_counter);
 
       for (const auto& as_assembled : neg2->assembled) {
@@ -93,28 +92,28 @@ Sub::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::REGISTER) {
-    tokens.at(1)->expected("register");
+  if (tokens[1]->type() != Token::REGISTER) {
+    tokens[1]->expected("register");
     return (is_valid = false);
   }
 
-  if (tokens.at(2)->type() != Token::REGISTER) {
-    tokens.at(2)->expected("register");
+  if (tokens[2]->type() != Token::REGISTER) {
+    tokens[2]->expected("register");
     return (is_valid = false);
   }
 
   if (tokens.size() == 4) {
-    if (tokens.at(3)->type() != Token::REGISTER) {
-      tokens.at(3)->expected("register");
+    if (tokens[3]->type() != Token::REGISTER) {
+      tokens[3]->expected("register");
       return (is_valid = false);
     }
 
-    if (!tokens.at(3)->is_valid) {
+    if (!tokens[3]->is_valid) {
       return (is_valid = false);
     }
   }
 
-  return (is_valid = tokens.at(1)->is_valid && tokens.at(2)->is_valid);
+  return (is_valid = tokens[1]->is_valid && tokens[2]->is_valid);
 }
 
 uint16_t
@@ -129,15 +128,15 @@ Sub::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
       ++second_register_index;
     }
 
-    if (std::static_pointer_cast<Register>(tokens.at(first_register_index))
+    if (std::static_pointer_cast<Register>(tokens[first_register_index])
           ->reg ==
-        std::static_pointer_cast<Register>(tokens.at(second_register_index))
+        std::static_pointer_cast<Register>(tokens[second_register_index])
           ->reg) {
       return 1u;
     }
 
-    if (std::static_pointer_cast<Register>(tokens.at(1))->reg !=
-        std::static_pointer_cast<Register>(tokens.at(second_register_index))
+    if (std::static_pointer_cast<Register>(tokens[1])->reg !=
+        std::static_pointer_cast<Register>(tokens[second_register_index])
           ->reg) {
       return static_cast<uint16_t>(5);
     }
@@ -172,7 +171,7 @@ Sub::invalid_argument_count(size_t provided,
         Diagnostics::FileContext(file, line, column + token.length()),
         ' ',
         "Unexpected arguments found here",
-        lexed_lines[file].at(line)),
+        lexed_lines[file][line]),
       '~',
       last_column - (column + token.length())));
   }

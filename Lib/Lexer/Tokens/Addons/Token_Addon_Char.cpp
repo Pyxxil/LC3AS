@@ -4,21 +4,21 @@
 #include "LexHelper.hpp"
 
 Character::Character(std::string& character,
-                     std::string& t_file,
+                     const std::string& t_file,
                      size_t line_number,
                      size_t column)
   : Immediate(character, character, t_file, line_number, column)
 {
   bool is_signed = false;
 
-  if ('-' == character.at(0)) {
+  if ('-' == character.front()) {
     character.erase(0, 1);
     is_signed = true;
   }
 
   if (character.length() > 1) {
-    if (character.length() == 2 && character.at(0) == '\\') {
-      switch (character.at(1)) {
+    if (character.length() == 2 && character.front() == '\\') {
+      switch (character[1]) {
         case '\\':
           value = '\\';
           break;
@@ -56,7 +56,7 @@ Character::Character(std::string& character,
             Diagnostics::FileContext(file, line_number, column),
             '^',
             "Found here",
-            lexed_lines[file].at(line_number)),
+            lexed_lines[file][line_number]),
           '~',
           character.length()));
 
@@ -73,11 +73,11 @@ Character::Character(std::string& character,
       Diagnostics::FileContext(file, line_number, column),
       '^',
       "Expected character, not empty sequence",
-      lexed_lines[file].at(line_number)));
+      lexed_lines[file][line_number]));
 
     Diagnostics::push(diagnostic);
   } else {
-    value = static_cast<std::int16_t>(character.at(0));
+    value = static_cast<std::int16_t>(character.front());
     if (is_signed) {
       value = -value;
     }

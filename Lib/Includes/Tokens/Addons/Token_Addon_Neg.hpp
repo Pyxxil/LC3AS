@@ -21,14 +21,14 @@
 class Neg : public Directive
 {
 public:
-  Neg(std::string& directive,
-      std::string& directive_uppercase,
-      std::string& t_file,
+  Neg(const std::string& directive,
+      const std::string& directive_uppercase,
+      const std::string& t_file,
       size_t line_number,
       size_t column);
   Neg(std::string&& directive,
       std::string&& directive_uppercase,
-      std::string& t_file,
+      const std::string& t_file,
       size_t line_number,
       size_t column);
 

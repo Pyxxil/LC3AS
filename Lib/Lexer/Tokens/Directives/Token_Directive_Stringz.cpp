@@ -4,9 +4,9 @@
 #include <iomanip>
 #include <sstream>
 
-Stringz::Stringz(std::string& directive,
-                 std::string& directive_uppercase,
-                 std::string& t_file,
+Stringz::Stringz(const std::string& directive,
+                 const std::string& directive_uppercase,
+                 const std::string& t_file,
                  size_t line_number,
                  size_t t_column)
   : Directive(directive, directive_uppercase, t_file, line_number, t_column)
@@ -24,7 +24,7 @@ Stringz::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     return -1;
   }
 
-  assembled = tokens.at(1)->assembled;
+  assembled = tokens[1]->assembled;
 
   return static_cast<int32_t>(assembled.size());
 }
@@ -38,12 +38,12 @@ Stringz::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (tokens.at(1)->type() != Token::_STRING) {
-    tokens.at(1)->expected("string literal");
+  if (tokens[1]->type() != Token::_STRING) {
+    tokens[1]->expected("string literal");
     return (is_valid = false);
   }
 
-  if (!tokens.at(1)->is_valid) {
+  if (!tokens[1]->is_valid) {
     return (is_valid = false);
   }
 
@@ -54,7 +54,7 @@ uint16_t
 Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
 {
   return static_cast<uint16_t>(is_valid) *
-         static_cast<uint16_t>(tokens.at(1)->assembled.size());
+         static_cast<uint16_t>(tokens[1]->assembled.size());
 }
 
 std::string
@@ -100,10 +100,10 @@ Stringz::disassemble(uint16_t& program_counter,
       << ')'
       // Hexadecimal representation of instruction
       << ' ' << std::hex << std::setfill('0') << std::setw(4)
-      << assembled.at(index)
+      << assembled[index]
       // Binary representation of instruction
       << ' '
-      << std::bitset<16>(static_cast<unsigned long long>(assembled.at(index)))
+      << std::bitset<16>(static_cast<unsigned long long>(assembled[index]))
       // Line the instruction is on
       << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
       << line
@@ -113,7 +113,7 @@ Stringz::disassemble(uint16_t& program_counter,
       << ' '
       // Instruction itself
       << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4)
-      << assembled.at(index)
+      << assembled[index]
 #ifdef INCLUDE_ADDONS
       << '\t' << file
 #endif
