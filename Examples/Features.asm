@@ -53,8 +53,8 @@ cheat   .BLKW b1 addr   ; Create a single block of memory initialised to the
 
         .LSHIFT R2, #2
 
-;JSR INCLUDED_LABEL      ; This should work, assuming addons are enabled
-;        .INCLUDE "include.h"
+JSR INCLUDED_LABEL      ; This should work, assuming addons are enabled
+        .INCLUDE "include.h"
 
         JSR WARNING_THROWS
 WARNING_THROWS:         ; All of the following should throw warnings with
@@ -82,8 +82,6 @@ WARNING_THROWS:         ; All of the following should throw warnings with
         .LSHIFT R0, 13
         .LSHIFT R0, 14
         .LSHIFT R0, 15
-
-.INCLUDE "include.h"
 
         .NEG R1
 

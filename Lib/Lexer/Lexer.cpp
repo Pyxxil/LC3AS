@@ -470,8 +470,9 @@ Lexer::tokenizeLine(std::string t_line,
         goto end_of_line;
       }
       case ',': {
-        if (into.empty() || (' ' != terminated_by && 0 != terminated_by &&
-                             1 != terminated_by) ||
+        if (into.empty() ||
+            (' ' != terminated_by && 0 != terminated_by &&
+             1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(

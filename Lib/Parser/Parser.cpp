@@ -130,6 +130,10 @@ Parser::do_first_pass()
         }
 
         if (0u != symbols.count(tokenized_line.front()->token)) {
+          // TODO: Fix the way these are handled. At the moment, any errors
+          // TODO: thrown here from labels that have been included (from the
+          // TODO: same file) won't actually be useful due to the fact that it
+          // TODO: doesn't tell the user where the .include was found.
           auto&& sym = symbols.at(tokenized_line.front()->token);
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(tokenized_line.front()->file,
