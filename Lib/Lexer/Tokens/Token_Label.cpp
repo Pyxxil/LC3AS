@@ -10,7 +10,8 @@ Label::Label(const std::string& name,
              size_t t_column)
   : Token(name, name, t_file, line_number, t_column)
   , instruction()
-{}
+{
+}
 
 int32_t
 Label::assemble(std::vector<std::shared_ptr<Token>>& tokens,
@@ -65,7 +66,7 @@ Label::not_found(const std::map<std::string, Symbol>& match_candidates)
     matcher.consider(symbol.first);
   }
 
-  auto&& possible_match = matcher.best_match();
+  auto&& possible_match = std::move(matcher.best_match());
 
   Diagnostics::Diagnostic diagnostic(
     Diagnostics::FileContext(file, line, column),

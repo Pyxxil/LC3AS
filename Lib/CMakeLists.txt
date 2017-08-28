@@ -9,6 +9,7 @@ set(LEXER_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Line.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/String_Matcher.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/LexHelper.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Extra.hpp
     )
 
 set(TOKENS_SOURCE_FILES

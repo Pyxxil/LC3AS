@@ -16,18 +16,20 @@ public:
     Console::Colour col = Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
     : information(var)
     , colour(std::move(col))
-  {}
+  {
+  }
   Variant(const Variant<T>& other) = default;
   Variant(Variant<T>&& other) noexcept
     : information(other.information)
     , colour(std::move(other.colour))
-  {}
+  {
+  }
   Variant& operator=(const Variant<T>& rhs) = default;
   Variant& operator=(Variant<T>&& rhs) noexcept = default;
 
   ~Variant() = default;
 
-  const T& var() const { return information; }
+  inline const T& var() const { return information; }
 
   std::ostream& write_to(std::ostream& os) const
   {
@@ -42,7 +44,7 @@ private:
 class FileContext
 {
 public:
-  FileContext(const std::string &name, size_t t_line, size_t t_col);
+  FileContext(const std::string& name, size_t t_line, size_t t_col);
   FileContext(Variant<std::string> name,
               Variant<size_t> t_line,
               Variant<size_t> t_col);

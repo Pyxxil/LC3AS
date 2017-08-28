@@ -1,6 +1,8 @@
 #ifndef LINE_HPP
 #define LINE_HPP
 
+#include <array>
+#include <functional>
 #include <string>
 
 class Line
@@ -8,15 +10,8 @@ class Line
 public:
   explicit Line(const std::string& t_line)
     : m_line(t_line)
-  {}
-
-  Line(const Line& other) = default;
-  Line(Line&& other) noexcept = default;
-
-  Line& operator=(const Line& other) = default;
-  Line& operator=(Line&& other) noexcept = default;
-
-  ~Line() = default;
+  {
+  }
 
   enum IGNORES
   {
@@ -24,7 +19,7 @@ public:
     ESCAPE_SEQUENCE = 1,
   };
 
-  /*! Ignore specifc things about the file while finding something
+  /*! Ignore specific things about the file while finding something
    *
    * @param to_ignore The things to ignore.
    */
@@ -95,7 +90,7 @@ public:
           return ++m_index;
         }
 
-        if ('\\' != m_line[m_index - 1]) {
+        if (ignores[m_ignores](needle)) {
           return ++m_index;
         }
       }
@@ -123,7 +118,7 @@ public:
       ++m_index;
     }
 
-    // Didn't work
+    // Didn't find it
     return -1u;
   }
 
@@ -143,7 +138,15 @@ public:
    *
    * @return true if we have reached the end of the string, otherwise false.
    */
-  bool at_end() const { return m_index >= m_line.length(); }
+  inline bool at_end() const { return m_index >= m_line.length(); }
+
+  /*! Return the character at a specified index (doesn't do bounds checking)
+   *
+   * @param index The index of the character
+   *
+   * @return The character at the index
+   */
+  inline char at(size_t index) const { return m_line[index]; }
 
   const Line& operator>>(char& c)
   {
@@ -151,12 +154,18 @@ public:
     return *this;
   }
 
-  size_t index() const { return m_index; }
+  inline size_t index() const { return m_index; }
 
 private:
   std::string m_line;
   size_t m_index = 0;
   size_t m_ignores = 0;
+
+  const std::array<std::function<bool(char)>, 2> ignores{
+    // Not strictly needed, but it doesn't hurt.
+    [this](char) -> bool { return true; },
+    [this](char current) -> bool { return at(index() - 1) != '\\'; }
+  };
 };
 
 #endif

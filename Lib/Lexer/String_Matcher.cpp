@@ -7,12 +7,14 @@
 String_Matcher::String_Matcher()
   : m_string{}
   , best{ std::numeric_limits<long>::max(), "" }
-{}
+{
+}
 
 String_Matcher::String_Matcher(const std::string& t_string)
   : m_string(t_string)
   , best{ std::numeric_limits<long>::max(), "" }
-{}
+{
+}
 
 std::string
 String_Matcher::best_match() const
@@ -29,8 +31,9 @@ String_Matcher::consider(const std::string& str)
     return;
   }
 
-  const int cutoff{ static_cast<int>(std::max(m_string.length(), str.length())) /
-               2 };
+  const int cutoff{
+    static_cast<int>(std::max(m_string.length(), str.length())) / 2
+  };
   if (length_difference > cutoff) {
     return;
   }

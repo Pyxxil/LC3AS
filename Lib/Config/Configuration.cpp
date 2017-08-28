@@ -26,7 +26,8 @@ struct Directory
     , name(std::move(_name))
     , exists(fs::exists(directory))
     , is_directory(fs::is_directory(directory))
-  {}
+  {
+  }
 
   bool contains(const fs::path& path)
   {

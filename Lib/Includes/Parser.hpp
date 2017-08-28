@@ -22,7 +22,8 @@ public:
     , tokens()
     , origin()
     , end()
-  {}
+  {
+  }
 
   int parse();
 

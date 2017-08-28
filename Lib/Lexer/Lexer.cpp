@@ -47,6 +47,11 @@ hash(const char* const string, size_t length)
 
 /*! The same as above, just at run time and with std::string objects
  *
+ * It should be relatively safe in regards to repeat hashes, as it reduces the
+ * number of things that are valid with the two if statements. However, I'm
+ * still unsure whether it's smarter to also check if they're the same thing
+ * afterwards.
+ *
  * @param string The string to hash
  *
  * @return The hash of the string
@@ -55,10 +60,17 @@ static size_t
 hash(const std::string& string)
 {
   const size_t first_character = static_cast<size_t>(string.front());
-  if (first_character != '.' && (std::isprint(first_character) == 0)) {
+  if (first_character != '.' &&
+      (0 == std::isprint(static_cast<int>(first_character)))) {
     // Basically, we don't really want something that's likely to be an
     // immediate value, or a label (less likely to be caught here, but may as
     // well try).
+    return 0;
+  }
+
+  if (string.length() > 8 || string.length() < 2) {
+    // There are no registers, directives, or instructions which are longer than
+    // 8 characters or less than 2, so this string itsn't one of them.
     return 0;
   }
 
@@ -470,9 +482,8 @@ Lexer::tokenizeLine(std::string t_line,
         goto end_of_line;
       }
       case ',': {
-        if (into.empty() ||
-            (' ' != terminated_by && 0 != terminated_by &&
-             1 != terminated_by) ||
+        if (into.empty() || (' ' != terminated_by && 0 != terminated_by &&
+                             1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(
@@ -530,8 +541,8 @@ Lexer::tokenizeLine(std::string t_line,
         // TODO: :: complaining about too many tokens
         if (!current.empty()) {
 #ifdef INCLUDE_ADDONS
-          if (!('\'' == character && current.length() == 1 &&
-                '-' == current.front())) {
+          if ('\'' != character || current.length() != 1 ||
+              '-' != current.front()) {
             addToken(current, into, line_number, current_line.index());
           }
 #else
@@ -542,7 +553,7 @@ Lexer::tokenizeLine(std::string t_line,
         const auto begin = current_line.index();
         // TODO: Fix this. It isn't aware of escaped terminators.
         current_line.ignore(Line::ESCAPE_SEQUENCE);
-        const auto end = current_line.find_next(character);
+        const auto end = current_line.find_next(character) - 1;
         current_line.ignore(Line::RESET);
 
         if (-1u == end) {
@@ -572,7 +583,7 @@ Lexer::tokenizeLine(std::string t_line,
           Diagnostics::push(diagnostic);
 #ifdef INCLUDE_ADDONS
         } else if ('\'' == character) {
-          current = current_line.substr(begin, end - 1);
+          current = current_line.substr(begin, end);
           into.push_back(std::make_shared<Character>(current,
                                                      file_name,
                                                      line_number,
@@ -580,7 +591,7 @@ Lexer::tokenizeLine(std::string t_line,
                                                        current.length() - 1));
 #endif
         } else {
-          current = current_line.substr(begin, end - 1);
+          current = current_line.substr(begin, end);
           into.push_back(std::make_shared<String>(current,
                                                   file_name,
                                                   line_number,

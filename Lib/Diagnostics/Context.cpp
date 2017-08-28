@@ -15,7 +15,8 @@ Diagnostics::FileContext::FileContext(const std::string& name,
   : file_name(name)
   , column(t_col)
   , line(t_line)
-{}
+{
+}
 
 Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> name,
                                       Diagnostics::Variant<size_t> t_line,
@@ -23,7 +24,8 @@ Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> name,
   : file_name(std::move(name))
   , column(std::move(t_col))
   , line(std::move(t_line))
-{}
+{
+}
 
 Diagnostics::Context::Context(Diagnostics::FileContext file,
                               std::string t_message,
@@ -60,7 +62,8 @@ Diagnostics::HighlightContext::HighlightContext(SelectionContext t_selector,
   , highlight_length(t_highlight_length - 1)
   , selector(t_selector)
   , fix_it(std::move(changer))
-{}
+{
+}
 
 std::ostream&
 Diagnostics::HighlightContext::write_to(std::ostream& os) const
@@ -91,7 +94,8 @@ Diagnostics::SelectionContext::SelectionContext(Diagnostics::FileContext file,
   : Context(std::move(file), std::move(t_message), t_line, SELECTOR)
   , selector(t_selector)
   , fix_it(std::move(changer))
-{}
+{
+}
 
 std::ostream&
 Diagnostics::SelectionContext::write_to(std::ostream& os) const

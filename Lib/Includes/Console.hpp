@@ -99,7 +99,8 @@ struct Colour
     : fg(_fg)
     , bg(_bg)
     , mod(modifier)
-  {}
+  {
+  }
   Colour(const Colour& other) = default;
   Colour(Colour&& other) = default;
   Colour& operator=(const Colour& other) = default;
@@ -167,16 +168,14 @@ template<typename T>
 void
 write_line(const T& message)
 {
-  write(message);
-  std::cout << '\n';
+  message.write_to(std::cout) << '\n';
 }
 
 template<typename T>
 void
 write_line(const T&& message)
 {
-  write(message);
-  std::cout << '\n';
+  message.write_to(std::cout) << '\n';
 }
 }
 

@@ -26,7 +26,8 @@ public:
     , symbols(other->symbols)
     , parent(other)
     , tokens(other->tokens)
-  {}
+  {
+  }
   Lexer(const Lexer& other) = default;
   Lexer(Lexer&& other) = default;
 

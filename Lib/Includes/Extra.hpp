@@ -8,9 +8,9 @@
 
 #if !defined(_MSC_VER)
 #if __has_attribute(always_inline)
-#define ALWAYS_INLINE __attribute__((always_inline))
+#define ALWAYS_INLINE __attribute__((always_inline)) inline
 #else
-#define ALWAYS_INLINE
+#define ALWAYS_INLINE inline
 #endif
 #else
 // MSVC doesn't have __has_attribute, nor __attribute__((always_inline))

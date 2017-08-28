@@ -242,8 +242,8 @@ Assembler::Assembler::check_and_mark_warnings(
                                      tokenized_line.front()->column),
             '^',
             "This might mean this line is superfluous",
-            lexed_lines[tokenized_line.front()->file][
-              tokenized_line.front()->line]),
+            lexed_lines[tokenized_line.front()->file]
+                       [tokenized_line.front()->line]),
           '~',
           tokenized_line.front()->token.length()));
 
@@ -255,8 +255,8 @@ Assembler::Assembler::check_and_mark_warnings(
                                      tokens[i - 1].front()->column),
             '^',
             "Checks the same condition code as this line",
-            lexed_lines[tokens[i - 1].front()->file][
-              tokens[i - 1].front()->line]),
+            lexed_lines[tokens[i - 1].front()->file]
+                       [tokens[i - 1].front()->line]),
           '~',
           tokens[i - 1].front()->token.length()));
 
