@@ -29,7 +29,7 @@ if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion)
 endif ()
 
-set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto )
+set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto)
 if (OPTIMIZE)
     # Just for fun
     set(RELEASE_FLAGS ${RELEASE_FLAGS} -mtune=native -march=native)

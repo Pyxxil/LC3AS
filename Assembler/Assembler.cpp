@@ -230,7 +230,7 @@ Assembler::Assembler::check_and_mark_warnings(
         Diagnostics::FileContext(tokenized_line.front()->file,
                                  tokenized_line.front()->line,
                                  tokenized_line.front()->column),
-        "Statement before this one checks for the same condition code.",
+        "Statement before this one checks for the same condition code",
         Diagnostics::LOGIC,
         Diagnostics::WARNING);
 

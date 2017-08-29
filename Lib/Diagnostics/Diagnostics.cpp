@@ -35,9 +35,9 @@ Diagnostics::push(Diagnostic&& message)
 }
 
 void
-Diagnostics::push(Diagnostic& message)
+Diagnostics::push(Diagnostic message)
 {
-  diagnostics_log.emplace_back(message);
+  diagnostics_log.emplace_back(std::move(message));
 }
 
 bool

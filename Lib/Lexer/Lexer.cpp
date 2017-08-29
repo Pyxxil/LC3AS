@@ -399,7 +399,7 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
 /*! Tokenize a single line from the file
  *
  * Go through each string (terminated by ',', space character (as defined by
- * std::isspace), or a comment (denoted by ';', "//"), and tokenize it, adding
+ * std::isspace), or a comment (denoted by ';', "//")), and tokenize it, adding
  * it to a vector until the end of the line is reached. The end of a line is
  * determined when either a comment is hit, or the end of the line is reached
  * (that is, when the current index into the string is >= to the length of the
@@ -482,8 +482,9 @@ Lexer::tokenizeLine(std::string t_line,
         goto end_of_line;
       }
       case ',': {
-        if (into.empty() || (' ' != terminated_by && 0 != terminated_by &&
-                             1 != terminated_by) ||
+        if (into.empty() ||
+            (' ' != terminated_by && 0 != terminated_by &&
+             1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(
@@ -553,7 +554,7 @@ Lexer::tokenizeLine(std::string t_line,
         const auto begin = current_line.index();
         // TODO: Fix this. It isn't aware of escaped terminators.
         current_line.ignore(Line::ESCAPE_SEQUENCE);
-        const auto end = current_line.find_next(character) - 1;
+        const auto end = current_line.find_next(character);
         current_line.ignore(Line::RESET);
 
         if (-1u == end) {
@@ -583,7 +584,7 @@ Lexer::tokenizeLine(std::string t_line,
           Diagnostics::push(diagnostic);
 #ifdef INCLUDE_ADDONS
         } else if ('\'' == character) {
-          current = current_line.substr(begin, end);
+          current = std::move(current_line.substr(begin, end - 1));
           into.push_back(std::make_shared<Character>(current,
                                                      file_name,
                                                      line_number,
@@ -591,7 +592,7 @@ Lexer::tokenizeLine(std::string t_line,
                                                        current.length() - 1));
 #endif
         } else {
-          current = current_line.substr(begin, end);
+          current = std::move(current_line.substr(begin, end - 1));
           into.push_back(std::make_shared<String>(current,
                                                   file_name,
                                                   line_number,

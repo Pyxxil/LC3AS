@@ -32,6 +32,11 @@ public:
     }
   }
 
+  /*! Take a look at the next character in the line.
+   *
+   * @return The next character in the line, unless we're at the end of the
+   * line, in which case 0.
+   */
   char peek() const
   {
     if (at_end()) {
@@ -164,7 +169,7 @@ private:
   const std::array<std::function<bool(char)>, 2> ignores{
     // Not strictly needed, but it doesn't hurt.
     [this](char) -> bool { return true; },
-    [this](char current) -> bool { return at(index() - 1) != '\\'; }
+    [this](char) -> bool { return at(index() - 1) != '\\'; }
   };
 };
 
