@@ -24,6 +24,7 @@ ERRORS: 9               ; Current error count (this line complains twice)
         .STRINGZ "Here" "is a weird string"
         .FILL 0b0000101010101000101
         .FILL #99999
+        .STRINGZ "Unterminated string
 
         JSR jdjdjjsjdsfkljsljfkjdsfkjlsdkjfksjdfkjsdkljf
 

@@ -31,10 +31,11 @@ public:
   //                                      TODO:   If so, add enum options for
   //                                      config (VERBOSE_LEVEL_ONE,
   //                                              VERBOSE_LEVEL_TWO, etc.)
-  //                                      TODO: Decide if this relates to
-  //                                      diagnostics too
+  //                                      At verbose 1 Diagnostics should also
+  //                                      relay their type (e.g. LOGIC, Syntax,
+  //                                      etc.)
   //      -O                              Perform peephole optimisations (if
-  //      possible)
+  //                                      possible)
   //                                      TODO: Look into doing this.
   bool configure(int argc, char** args);
 
