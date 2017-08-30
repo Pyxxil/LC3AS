@@ -1,15 +1,13 @@
-#include "Editor/Includes/Editor.hpp"
-
 #include <QFont>
 #include <QtWidgets>
 
-#include "Editor/Includes/ColourScheme.hpp"
+#include "Editor.hpp"
 
 Editor::Editor(QWidget* parent)
   : QPlainTextEdit(parent)
-  , lineNumberArea(new LineNumbering(this))
-  , m_highlighter(new ColourScheme(this))
 {
+  lineNumberArea = new LineNumberArea(this);
+
   connect(this,
           SIGNAL(blockCountChanged(int)),
           this,
@@ -18,10 +16,18 @@ Editor::Editor(QWidget* parent)
           SIGNAL(updateRequest(QRect, int)),
           this,
           SLOT(updateLineNumberArea(QRect, int)));
+  connect(
+    this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+  connect(
+    this, SIGNAL(modificationChanged(bool)), this, SLOT(textModified(bool)));
+
+  setFont(
+    QFont(QFontDatabase::systemFont(QFontDatabase::FixedFont).family(), 20));
+
+  setStyleSheet("font-family: Monospace; font-size: 20px;m");
 
   updateLineNumberAreaWidth(0);
-  setFont(
-    QFont(QFontDatabase::systemFont(QFontDatabase::FixedFont).family(), 14));
+  highlightCurrentLine();
 }
 
 int
@@ -34,9 +40,9 @@ Editor::lineNumberAreaWidth()
     ++digits;
   }
 
-  const int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+  int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
 
-  return qMax(space, minWidth());
+  return space;
 }
 
 void
@@ -48,15 +54,13 @@ Editor::updateLineNumberAreaWidth(int /* newBlockCount */)
 void
 Editor::updateLineNumberArea(const QRect& rect, int dy)
 {
-  if (0 != dy) {
+  if (dy)
     lineNumberArea->scroll(0, dy);
-  } else {
+  else
     lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
-  }
 
-  if (rect.contains(viewport()->rect())) {
+  if (rect.contains(viewport()->rect()))
     updateLineNumberAreaWidth(0);
-  }
 }
 
 void
@@ -97,14 +101,12 @@ Editor::lineNumberAreaPaintEvent(QPaintEvent* event)
 
   QTextBlock block = firstVisibleBlock();
   int blockNumber = block.blockNumber();
-  int top = static_cast<int>(
-    blockBoundingGeometry(block).translated(contentOffset()).top());
-  int bottom = top + static_cast<int>(blockBoundingRect(block).height());
+  int top = (int)blockBoundingGeometry(block).translated(contentOffset()).top();
+  int bottom = top + (int)blockBoundingRect(block).height();
 
   while (block.isValid() && top <= event->rect().bottom()) {
     if (block.isVisible() && bottom >= event->rect().top()) {
-      const QString number = QString("%1").arg(
-        blockNumber + 1, lineNumberArea->width(), 10, QChar(' '));
+      QString number = QString::number(blockNumber + 1);
       painter.setPen(Qt::black);
       painter.drawText(0,
                        top,
@@ -116,7 +118,7 @@ Editor::lineNumberAreaPaintEvent(QPaintEvent* event)
 
     block = block.next();
     top = bottom;
-    bottom = top + static_cast<int>(blockBoundingRect(block).height());
+    bottom = top + (int)blockBoundingRect(block).height();
     ++blockNumber;
   }
 }

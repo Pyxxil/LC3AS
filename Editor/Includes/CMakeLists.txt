@@ -2,11 +2,13 @@
 set (EDITOR_INCLUDE_FILES
     "${EDITOR_INCLUDE_FILES}"
     "${CMAKE_CURRENT_SOURCE_DIR}/Editor.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ColourScheme.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MainWindow.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SyntaxHighlighter.hpp"
     PARENT_SCOPE
     )
 
 set (EDITOR_INCLUDE_DIRS
     "${EDITOR_INCLUDE_DIRS}"
+    "${CMAKE_CURRENT_SOURCE_DIR}"
     PARENT_SCOPE
     )

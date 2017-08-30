@@ -1,18 +1,18 @@
-#ifndef COLOUR_SCHEME_HPP
-#define COLOUR_SCHEME_HPP
-
-#include "Editor/Includes/Editor.hpp"
+#ifndef SYNTAX_HIGHLIGHTER_HPP
+#define SYNTAX_HIGHLIGHTER_HPP
 
 #include <QRegularExpression>
 #include <QSyntaxHighlighter>
+#include <QTextCharFormat>
 
-class ColourScheme : public QSyntaxHighlighter
+class QTextDocument;
+
+class SyntaxHighlighter : public QSyntaxHighlighter
 {
-public:
-  ColourScheme(Editor* t_editor);
+  Q_OBJECT
 
-public slots:
-  void changed() { highlightBlock(editor->toPlainText()); }
+public:
+  SyntaxHighlighter(QTextDocument* parent = 0);
 
 protected:
   void highlightBlock(const QString& text) override;
@@ -29,13 +29,11 @@ private:
   QRegularExpression commentEndExpression;
 
   QTextCharFormat keywordFormat;
-  QTextCharFormat classFormat;
   QTextCharFormat singleLineCommentFormat;
-  QTextCharFormat multiLineCommentFormat;
   QTextCharFormat quotationFormat;
-  QTextCharFormat functionFormat;
-
-  Editor* editor;
+  QTextCharFormat registerFormat;
+  QTextCharFormat labelFormat;
+  QTextCharFormat immediateValueFormat;
 };
 
-#endif
+#endif // HIGHLIGHTER_H

@@ -1,15 +1,14 @@
 
 #include <QtWidgets>
 
-#include "Editor/Includes/Editor.hpp"
+#include "MainWindow.hpp"
 
 int
 main(int argc, char** argv)
 {
   QApplication app(argc, argv);
-  Editor editor;
-  editor.setWindowTitle(QObject::tr("Editor Example"));
-  editor.show();
+  MainWindow window;
+  window.show();
 
   return app.exec();
 }
