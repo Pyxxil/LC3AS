@@ -4,6 +4,7 @@ set (EDITOR_INCLUDE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/Editor.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/MainWindow.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/SyntaxHighlighter.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Console.hpp"
     PARENT_SCOPE
     )
 

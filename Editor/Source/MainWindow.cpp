@@ -8,8 +8,21 @@ MainWindow::MainWindow(QWidget* parent)
   setupMenus();
 
   setupEditor();
+  setupConsole();
 
-  setCentralWidget(editor);
+  QVBoxLayout* layout = new QVBoxLayout;
+  layout->addWidget(editor);
+  layout->setStretch(0, 1);
+  layout->addWidget(console);
+  layout->setContentsMargins(5, 5, 5, 5);
+
+  QWidget* window = new QWidget();
+  window->setLayout(layout);
+
+  setCentralWidget(window);
+
+  connect(this, &MainWindow::run, this, [this]() { console->run(editor); });
+
   setWindowTitle(tr("LC3Edit"));
 }
 
@@ -27,6 +40,7 @@ void
 MainWindow::setupMenus()
 {
   setupFileMenu();
+  setupBuildMenu();
   setupHelpMenu();
 }
 
@@ -48,22 +62,20 @@ MainWindow::newFile()
         editor->open_file = QString();
         editor->clear();
         emit editor->modificationChanged(false);
-        // Don't Save was clicked
         break;
       case QMessageBox::Cancel:
-        // Cancel was clicked
         break;
       default:
-        // should never be reached
         break;
     }
   } else {
     editor->open_file = QString();
     editor->clear();
+    console->clear();
   }
 }
 
-void
+bool
 MainWindow::save()
 {
   if (!editor->open_file.isEmpty()) {
@@ -71,13 +83,16 @@ MainWindow::save()
     if (file.open(QFile::WriteOnly | QFile::Text)) {
       QTextStream out(&file);
       out << editor->document()->toPlainText();
+      return true;
     }
   } else {
-    saveAs();
+    return saveAs();
   }
+
+  return false;
 }
 
-void
+bool
 MainWindow::saveAs(const QString& path)
 {
   QString filename = path;
@@ -90,9 +105,12 @@ MainWindow::saveAs(const QString& path)
       if (file.open(QFile::WriteOnly | QFile::Text)) {
         QTextStream out(&file);
         out << editor->document()->toPlainText();
+        return true;
       }
     }
   }
+
+  return false;
 }
 
 void
@@ -111,13 +129,10 @@ MainWindow::openFile(const QString& path)
         save();
       case QMessageBox::Discard:
         editor->open_file = QString();
-        // Don't Save was clicked
         break;
       case QMessageBox::Cancel:
-        // Cancel was clicked
         break;
       default:
-        // should never be reached
         break;
     }
   }
@@ -133,6 +148,7 @@ MainWindow::openFile(const QString& path)
     if (file.open(QFile::ReadOnly | QFile::Text)) {
       editor->setPlainText(file.readAll());
       editor->open_file = fileName;
+      console->clear();
     }
   }
 }
@@ -143,16 +159,26 @@ MainWindow::setupEditor()
   QFont font;
   font.setFamily("Courier");
   font.setFixedPitch(true);
-  font.setPointSize(10);
+  font.setPointSize(14);
 
   editor = new Editor;
   editor->setFont(font);
 
   highlighter = new SyntaxHighlighter(editor->document());
+}
 
-  QFile file("mainwindow.h");
-  if (file.open(QFile::ReadOnly | QFile::Text))
-    editor->setPlainText(file.readAll());
+void
+MainWindow::setupConsole()
+{
+  QFont font;
+  font.setFamily("Courier");
+  font.setFixedPitch(true);
+  font.setPointSize(14);
+
+  console = new Console;
+  console->setFont(font);
+
+  connect(console, SIGNAL(saveFirst()), this, SLOT(save()));
 }
 
 void
@@ -168,6 +194,16 @@ MainWindow::setupFileMenu()
   fileMenu->addAction(
     tr("Save As"), this, SLOT(saveAs()), QKeySequence::SaveAs);
   fileMenu->addAction(tr("E&xit"), qApp, SLOT(quit()), QKeySequence::Quit);
+}
+
+void
+MainWindow::setupBuildMenu()
+{
+  QMenu* buildMenu = new QMenu(tr("&Build"), this);
+  menuBar()->addMenu(buildMenu);
+
+  buildMenu->addAction(
+    tr("&Build"), this, SIGNAL(run()), QKeySequence(Qt::CTRL + Qt::Key_B));
 }
 
 void

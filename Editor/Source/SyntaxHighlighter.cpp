@@ -12,7 +12,7 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
     highlightingRules.append(rule);
     */
 
-  keywordFormat.setForeground(Qt::magenta);
+  keywordFormat.setForeground(QColor(0xC7, 0x95, 0xAE));
   keywordFormat.setFontWeight(QFont::Bold);
   QStringList keywordPatterns;
   keywordPatterns << "\\b[aA][dD]{2}\\b"
@@ -46,23 +46,37 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
     highlightingRules.append(rule);
   }
 
+  trapKeywordFormat.setForeground(QColor(0xAE, 0x95, 0xC7));
+  QStringList trapPatterns;
+  trapPatterns << "\\b[pP][uU][tT][sScC]\\b"
+               << "\\b[gG][eE][tT][cC]\\b"
+               << "\\b[oO][uU][tT]\\b"
+               << "\\b[iI][nN]\\b"
+               << "\\b[hH][aA][lL][tT]\\b";
+
+  foreach (const QString& pattern, trapPatterns) {
+    rule.pattern = QRegularExpression(pattern);
+    rule.format = trapKeywordFormat;
+    highlightingRules.append(rule);
+  }
+
   QStringList immediateValuePatterns;
-  immediateValuePatterns << "#?-?\\d+"
-                         << "0?[xX][\\da-fA-F]+"
-                         << "0?[bB][01]+"
+  immediateValuePatterns << "(\\s|,)#?-?\\d+"
+                         << "(\\s|,)0?[xX][\\da-fA-F]+"
+                         << "(\\s|,)0?[bB][01]+"
 #ifdef INCLUDE_ADDONS
                          << "\\\\\\d+"
 #endif
     ;
 
-  immediateValueFormat.setForeground(Qt::red);
+  immediateValueFormat.setForeground(QColor(0xC7, 0xAE, 0x95));
   foreach (const QString& pattern, immediateValuePatterns) {
     rule.pattern = QRegularExpression(pattern);
     rule.format = immediateValueFormat;
     highlightingRules.append(rule);
   }
 
-  quotationFormat.setForeground(Qt::darkGreen);
+  quotationFormat.setForeground(QColor(0x95, 0xC7, 0xAE));
   rule.pattern = QRegularExpression("\".*\"");
   rule.format = quotationFormat;
   highlightingRules.append(rule);
@@ -72,14 +86,14 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
   highlightingRules.append(rule);
 #endif
 
-  registerFormat.setForeground(Qt::blue);
-  rule.pattern = QRegularExpression("[rR][0-7]");
+  registerFormat.setForeground(QColor(0x95, 0xAE, 0xC7));
+  rule.pattern = QRegularExpression("(\\s|,)[rR][0-7]");
   rule.format = registerFormat;
   highlightingRules.append(rule);
 
   // This needs to be last, otherwise if a match occurs inside a comment it'll
   // be coloured incorrectly.
-  singleLineCommentFormat.setForeground(Qt::darkGray);
+  singleLineCommentFormat.setForeground(QColor(0xAD, 0xB3, 0xBA));
   rule.pattern = QRegularExpression("(//|;)[^\n]*");
   rule.format = singleLineCommentFormat;
   highlightingRules.append(rule);

@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "Console.hpp"
 #include "Editor.hpp"
 #include "SyntaxHighlighter.hpp"
 
@@ -18,17 +19,23 @@ public:
 public slots:
   void about();
   void newFile();
-  void save();
-  void saveAs(const QString& path = QString());
+  bool save();
+  bool saveAs(const QString& path = QString());
   void openFile(const QString& path = QString());
+
+signals:
+  void run();
 
 private:
   void setupEditor();
+  void setupConsole();
   void setupMenus();
   void setupFileMenu();
+  void setupBuildMenu();
   void setupHelpMenu();
 
   Editor* editor;
+  Console* console;
   SyntaxHighlighter* highlighter;
 };
 
