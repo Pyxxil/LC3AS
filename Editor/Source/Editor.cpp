@@ -44,7 +44,7 @@ Editor::lineNumberAreaWidth()
     ++digits;
   }
 
-  int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+  const int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
 
   return space;
 }
@@ -58,13 +58,15 @@ Editor::updateLineNumberAreaWidth(int /* newBlockCount */)
 void
 Editor::updateLineNumberArea(const QRect& rect, int dy)
 {
-  if (dy)
+  if (dy) {
     lineNumberArea->scroll(0, dy);
-  else
+  } else {
     lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
+  }
 
-  if (rect.contains(viewport()->rect()))
+  if (rect.contains(viewport()->rect())) {
     updateLineNumberAreaWidth(0);
+  }
 }
 
 void
@@ -72,7 +74,7 @@ Editor::resizeEvent(QResizeEvent* e)
 {
   QPlainTextEdit::resizeEvent(e);
 
-  QRect cr = contentsRect();
+  const QRect cr = contentsRect();
   lineNumberArea->setGeometry(
     QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
@@ -111,7 +113,7 @@ Editor::lineNumberAreaPaintEvent(QPaintEvent* event)
 
   while (block.isValid() && top <= event->rect().bottom()) {
     if (block.isVisible() && bottom >= event->rect().top()) {
-      QString number = QString::number(blockNumber + 1);
+      const QString number = QString::number(blockNumber + 1);
       painter.setPen(QColor(0xDF, 0xE2, 0xE5));
       painter.drawText(0,
                        top,

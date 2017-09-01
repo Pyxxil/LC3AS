@@ -105,6 +105,7 @@ MainWindow::saveAs(const QString& path)
       if (file.open(QFile::WriteOnly | QFile::Text)) {
         QTextStream out(&file);
         out << editor->document()->toPlainText();
+        editor->open_file = filename;
         return true;
       }
     }
@@ -193,7 +194,10 @@ MainWindow::setupFileMenu()
   fileMenu->addAction(tr("&Save"), this, SLOT(save()), QKeySequence::Save);
   fileMenu->addAction(
     tr("Save As"), this, SLOT(saveAs()), QKeySequence::SaveAs);
-  fileMenu->addAction(tr("E&xit"), qApp, SLOT(quit()), QKeySequence::Quit);
+
+  QMenu* exitMenu = new QMenu(tr("Exit"), this);
+  menuBar()->addMenu(exitMenu);
+  exitMenu->addAction(tr("E&xit"), this, SLOT(close()), QKeySequence::Quit);
 }
 
 void
@@ -214,4 +218,33 @@ MainWindow::setupHelpMenu()
 
   helpMenu->addAction(tr("&About"), this, SLOT(about()));
   helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
+}
+
+void
+MainWindow::closeEvent(QCloseEvent* event)
+{
+  // Ensure that, if the user has changed something, that they really do want to
+  // close the window. If they do, check if they want to save the file.
+  if (editor->hasBeenModified()) {
+    QMessageBox msgBox;
+    msgBox.setText("This document has been modified.");
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard |
+                              QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    int ret = msgBox.exec();
+    switch (ret) {
+      case QMessageBox::Save:
+        save();
+      case QMessageBox::Discard:
+        event->accept();
+        break;
+      case QMessageBox::Cancel:
+        event->ignore();
+      default:
+        break;
+    }
+  } else {
+    event->accept();
+  }
 }

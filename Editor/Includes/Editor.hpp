@@ -42,25 +42,24 @@ private:
 class LineNumberArea : public QWidget
 {
 public:
-  LineNumberArea(Editor* editor)
-    : QWidget(editor)
-  {
-    Editor = editor;
-  }
+  LineNumberArea(Editor* t_editor)
+    : QWidget(t_editor)
+    , editor(t_editor)
+  {}
 
   QSize sizeHint() const override
   {
-    return QSize(Editor->lineNumberAreaWidth(), 0);
+    return QSize(editor->lineNumberAreaWidth(), 0);
   }
 
 protected:
   void paintEvent(QPaintEvent* event) override
   {
-    Editor->lineNumberAreaPaintEvent(event);
+    editor->lineNumberAreaPaintEvent(event);
   }
 
 private:
-  Editor* Editor;
+  Editor* editor;
 };
 
 #endif
