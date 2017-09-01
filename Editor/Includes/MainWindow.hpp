@@ -34,6 +34,8 @@ private:
   void setupBuildMenu();
   void setupHelpMenu();
 
+  void closeEvent(QCloseEvent* event) override;
+
   Editor* editor;
   Console* console;
   SyntaxHighlighter* highlighter;

@@ -16,6 +16,11 @@ Console::Console(QWidget* parent)
   setReadOnly(true);
 }
 
+/*! Run the assembler on the currently open file (saving it first)
+ *
+ * If there is no currently open file (i.e. a new file has been created and not
+ * saved yet), then we will get the user to 'Save As' it first.
+ */
 void
 Console::run(Editor* editor)
 {
@@ -24,6 +29,9 @@ Console::run(Editor* editor)
     if (!emit saveFirst()) {
       return;
     }
+  } else if (editor->hasBeenModified()) {
+    // Save the currently open file
+    emit saveFirst();
   }
 
   // For now, this is just how it has to be ... at some point I hope to actually
@@ -31,14 +39,10 @@ Console::run(Editor* editor)
   // path to the assembler (probably more likely).
   process->start("./LC3AS",
                  QStringList() << "--no-colour" << editor->open_file);
-
-  if (!process->waitForReadyRead()) {
-    return;
-  }
 }
 
 void
 Console::updateOutput()
 {
-  appendPlainText(process->readAllStandardOutput());
+  document()->setPlainText(process->readAllStandardOutput());
 }

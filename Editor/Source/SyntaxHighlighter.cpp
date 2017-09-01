@@ -12,37 +12,48 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
     highlightingRules.append(rule);
     */
 
-  keywordFormat.setForeground(QColor(0xC7, 0x95, 0xAE));
-  keywordFormat.setFontWeight(QFont::Bold);
+  instructionFormat.setForeground(QColor(0xC7, 0x95, 0xAE));
+  instructionFormat.setFontWeight(QFont::Bold);
   QStringList keywordPatterns;
-  keywordPatterns << "\\b[aA][dD]{2}\\b"
-                  << "\\b[aA][nN][dD]\\b"
-                  << "\\b[nN][oO][tT]\\b"
-                  << "\\b[tT][rR][aA][pP]\\b"
-                  << "\\b[jJ][sS][rR]{1,2}\\b"
-                  << "\\b[rR][eE][tT]\\b"
-                  << "\\b[jJ][mM][pP]\\b"
-                  << "\\b[lL][dD][iIrR]?\\b"
-                  << "\\b[lL][eE][aA]\\b"
-                  << "\\b[sS][tT][rRiI]?\\b"
-                  << "\\b[bB][rR][nNzZpP]{0,3}"
-                  << "(?=\\W)\\.[oO][rR][iI][gG]\\b"
-                  << "(?=\\W)\\.[eE][nN][dD]\\b"
-                  << "(?=\\W)\\.[bB][lL][kK][wW]\\b"
-                  << "(?=\\W)\\.[fF][iI][lL]{2}\\b"
-                  << "(?=\\W)\\.[sS][tT][rR][iI][nN][gG][zZ]\\b"
-#ifdef INCLUDE_ADDONS
-                  << "(?=\\W)\\.[sS][eE][tT]\\b"
-                  << "(?=\\W)\\.[lL][sS][hH][iI][fF][tT]\\b"
-                  << "(?=\\W)\\.[iI][nN][cC][lL][uU][dD][eE]\\b"
-                  << "(?=\\W)\\.[nN][eE][gG]\\b"
-                  << "(?=\\W)\\.[sS][uU][bB]\\b"
-#endif
-    ;
+  keywordPatterns
+    << "\\b[aA][dD]{2}\\b"
+    << "\\b[aA][nN][dD]\\b"
+    << "\\b[nN][oO][tT]\\b"
+    << "\\b[tT][rR][aA][pP]\\b"
+    << "\\b[jJ][sS][rR]{1,2}\\b"
+    << "\\b[rR][eE][tT]\\b"
+    << "\\b[jJ][mM][pP]\\b"
+    << "\\b[lL][dD][iIrR]?\\b"
+    << "\\b[lL][eE][aA]\\b"
+    << "\\b[sS][tT][rRiI]?\\b"
+    // The problem with this is that it allows the user to use 'BRnnn'
+    << "\\b[bB][rR][nNzZpP]{0,3}\\b";
 
   foreach (const QString& pattern, keywordPatterns) {
     rule.pattern = QRegularExpression(pattern);
-    rule.format = keywordFormat;
+    rule.format = instructionFormat;
+    highlightingRules.append(rule);
+  }
+
+  directiveFormat.setForeground(QColor(0xC7, 0xC7, 0x95));
+  QStringList directivePatterns;
+  directivePatterns << "(?=\\W)\\.[oO][rR][iI][gG]\\b"
+                    << "(?=\\W)\\.[eE][nN][dD]\\b"
+                    << "(?=\\W)\\.[bB][lL][kK][wW]\\b"
+                    << "(?=\\W)\\.[fF][iI][lL]{2}\\b"
+                    << "(?=\\W)\\.[sS][tT][rR][iI][nN][gG][zZ]\\b"
+#ifdef INCLUDE_ADDONS
+                    << "(?=\\W)\\.[sS][eE][tT]\\b"
+                    << "(?=\\W)\\.[lL][sS][hH][iI][fF][tT]\\b"
+                    << "(?=\\W)\\.[iI][nN][cC][lL][uU][dD][eE]\\b"
+                    << "(?=\\W)\\.[nN][eE][gG]\\b"
+                    << "(?=\\W)\\.[sS][uU][bB]\\b"
+#endif
+    ;
+
+  foreach (const QString& pattern, directivePatterns) {
+    rule.pattern = QRegularExpression(pattern);
+    rule.format = directiveFormat;
     highlightingRules.append(rule);
   }
 
@@ -61,9 +72,9 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
   }
 
   QStringList immediateValuePatterns;
-  immediateValuePatterns << "(\\s|,)#?-?\\d+"
-                         << "(\\s|,)0?[xX][\\da-fA-F]+"
-                         << "(\\s|,)0?[bB][01]+"
+  immediateValuePatterns << "[\\W]#?-?\\d+"
+                         << "[\\W]0?[xX][\\da-fA-F]+"
+                         << "[\\W]0?[bB][01]+"
 #ifdef INCLUDE_ADDONS
                          << "\\\\\\d+"
 #endif
@@ -87,7 +98,7 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
 #endif
 
   registerFormat.setForeground(QColor(0x95, 0xAE, 0xC7));
-  rule.pattern = QRegularExpression("(\\s|,)[rR][0-7]");
+  rule.pattern = QRegularExpression("[\\W][rR][0-7]");
   rule.format = registerFormat;
   highlightingRules.append(rule);
 
