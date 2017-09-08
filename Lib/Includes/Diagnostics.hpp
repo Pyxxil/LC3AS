@@ -32,8 +32,7 @@ struct diagnostic_type
   diagnostic_type(std::string t, Console::Colour col)
     : type(std::move(t))
     , colour(std::move(col))
-  {
-  }
+  {}
 
   friend std::ostream& operator<<(std::ostream& os, const diagnostic_type& t)
   {

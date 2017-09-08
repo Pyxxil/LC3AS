@@ -38,9 +38,8 @@ Sti::assemble(std::vector<std::shared_ptr<Token>>& tokens,
       return -1;
     }
 
-    offset =
-      static_cast<int>(symbols.find(tokens[2]->token)->second.address) -
-      (static_cast<int>(program_counter) + 1);
+    offset = static_cast<int>(symbols.find(tokens[2]->token)->second.address) -
+             (static_cast<int>(program_counter) + 1);
   } else {
     offset = std::static_pointer_cast<Immediate>(tokens[2])->value;
   }
@@ -53,8 +52,7 @@ Sti::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   provided = tokens[2];
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0xB000 |
-    ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+    0xB000 | ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
     (offset & 0x1FF)));
 
   return 1;

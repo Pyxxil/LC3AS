@@ -43,8 +43,7 @@ Not::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0x903F |
-    ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+    0x903F | ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
     ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6)));
 
   return 1;

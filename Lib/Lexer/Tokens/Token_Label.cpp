@@ -10,8 +10,7 @@ Label::Label(const std::string& name,
              size_t t_column)
   : Token(name, name, t_file, line_number, t_column)
   , instruction()
-{
-}
+{}
 
 int32_t
 Label::assemble(std::vector<std::shared_ptr<Token>>& tokens,

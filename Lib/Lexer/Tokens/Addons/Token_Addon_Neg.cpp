@@ -20,11 +20,7 @@ Neg::Neg(std::string&& directive,
          const std::string& t_file,
          size_t line_number,
          size_t column)
-  : Directive(std::move(directive),
-              std::move(directive_uppercase),
-              t_file,
-              line_number,
-              column)
+  : Directive(directive, directive_uppercase, t_file, line_number, column)
   , neg(std::make_shared<Not>("NOT", "NOT", t_file, line_number, column))
   , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
 {}

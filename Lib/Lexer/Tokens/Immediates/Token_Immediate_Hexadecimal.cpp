@@ -24,12 +24,14 @@ Hexadecimal::Hexadecimal(std::string& immediate,
 
     char* check = nullptr;
     const auto v = std::strtol(immediate.c_str(), &check, 16);
-    if (check == nullptr || v > 2 * static_cast<int>(std::numeric_limits<int16_t>::max())) {
+    if (check == nullptr ||
+        v > 2 * static_cast<int>(std::numeric_limits<int16_t>::max())) {
       is_valid = false;
       std::cout << "Failed with " << (check == nullptr) << " or "
                 << (v > std::numeric_limits<int16_t>::max()) << " or "
                 << (v < std::numeric_limits<int16_t>::min()) << '\n';
-      std::cout << "Because " << v << " > " << std::numeric_limits<int16_t>::max() << '\n';
+      std::cout << "Because " << v << " > "
+                << std::numeric_limits<int16_t>::max() << '\n';
     } else {
       value = static_cast<std::int16_t>(v);
     }

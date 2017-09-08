@@ -24,8 +24,8 @@ And::And(std::string&& instruction,
          const std::string& t_file,
          size_t line_number,
          size_t t_column)
-  : Instruction(std::move(instruction),
-                std::move(instruction_uppercase),
+  : Instruction(instruction,
+                instruction_uppercase,
                 t_file,
                 line_number,
                 t_column)
@@ -48,8 +48,8 @@ And::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     (std::static_pointer_cast<Register>(tokens[2])->reg) << 6));
 
   if (tokens[3]->type() == Token::REGISTER) {
-    assembled.front() |= static_cast<uint16_t>(
-      std::static_pointer_cast<Register>(tokens[3])->reg);
+    assembled.front() |=
+      static_cast<uint16_t>(std::static_pointer_cast<Register>(tokens[3])->reg);
   } else {
     assembled.front() |=
       0x20u | (static_cast<uint16_t>(
@@ -94,8 +94,7 @@ And::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     }
   }
 
-  if (!(tokens[1]->is_valid && tokens[2]->is_valid &&
-        tokens[3]->is_valid)) {
+  if (!(tokens[1]->is_valid && tokens[2]->is_valid && tokens[3]->is_valid)) {
     return (is_valid = false);
   }
 

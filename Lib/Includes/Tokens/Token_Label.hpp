@@ -19,8 +19,7 @@ public:
   uint16_t guess_memory_size(
     std::vector<std::shared_ptr<Token>>& tokens) const final;
 
-  bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) final;
+  bool valid_arguments(std::vector<std::shared_ptr<Token>>& tokens) final;
 
   void not_found(const std::map<std::string, Symbol>& match_candidates);
   void requires_too_many_bits(

@@ -32,8 +32,7 @@ Str::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0x7000 |
-    ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+    0x7000 | ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
     ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
     (std::static_pointer_cast<Immediate>(tokens[3])->value & 0x3F)));
 
@@ -64,8 +63,7 @@ Str::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     return (is_valid = false);
   }
 
-  if (!(tokens[1]->is_valid && tokens[2]->is_valid &&
-        tokens[3]->is_valid)) {
+  if (!(tokens[1]->is_valid && tokens[2]->is_valid && tokens[3]->is_valid)) {
     return (is_valid = false);
   }
 

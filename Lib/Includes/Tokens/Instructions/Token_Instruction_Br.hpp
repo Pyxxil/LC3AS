@@ -32,8 +32,7 @@ public:
   uint16_t guess_memory_size(
     std::vector<std::shared_ptr<Token>>& tokens) const final;
 
-  bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) final;
+  bool valid_arguments(std::vector<std::shared_ptr<Token>>& tokens) final;
 
   std::string disassemble(uint16_t& program_counter,
                           const std::string& symbol,

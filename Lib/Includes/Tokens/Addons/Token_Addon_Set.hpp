@@ -28,20 +28,19 @@ public:
       size_t line_number,
       size_t column);
 
-  token_type type() const override final;
+  token_type type() const final;
 
   int32_t assemble(std::vector<std::shared_ptr<Token>>& tokens,
                    const std::map<std::string, Symbol>& symbols,
-                   uint16_t program_counter) override final;
+                   uint16_t program_counter) final;
   uint16_t guess_memory_size(
-    std::vector<std::shared_ptr<Token>>& tokens) const override final;
+    std::vector<std::shared_ptr<Token>>& tokens) const final;
 
-  bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) override final;
+  bool valid_arguments(std::vector<std::shared_ptr<Token>>& tokens) final;
 
   std::string disassemble(uint16_t& program_counter,
                           const std::string& symbol,
-                          int width) const override final;
+                          int width) const final;
 
 private:
   std::shared_ptr<And> _and;

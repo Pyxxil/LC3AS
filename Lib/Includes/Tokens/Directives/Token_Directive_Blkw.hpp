@@ -25,8 +25,7 @@ public:
                               size_t expected,
                               size_t last_column) const final;
 
-  bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) final;
+  bool valid_arguments(std::vector<std::shared_ptr<Token>>& tokens) final;
 
   std::string disassemble(uint16_t& program_counter,
                           const std::string& symbol,

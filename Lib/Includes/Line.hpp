@@ -10,8 +10,7 @@ class Line
 public:
   explicit Line(const std::string& t_line)
     : m_line(t_line)
-  {
-  }
+  {}
 
   enum IGNORES
   {
@@ -25,11 +24,7 @@ public:
    */
   void ignore(size_t to_ignore)
   {
-    if (RESET == to_ignore) {
-      m_ignores = 0;
-    } else {
-      m_ignores |= to_ignore;
-    }
+    m_ignores = RESET == to_ignore ? 0 : m_ignores | to_ignore;
   }
 
   /*! Take a look at the next character in the line.
@@ -103,7 +98,7 @@ public:
     }
 
     // Couldn't find it
-    return -1u;
+    return static_cast<size_t>(-1u);
   }
 
   /*! Keep searching until pred becomes true
@@ -124,7 +119,7 @@ public:
     }
 
     // Didn't find it
-    return -1u;
+    return static_cast<size_t>(-1u);
   }
 
   /*! Grab a sub string from within the string

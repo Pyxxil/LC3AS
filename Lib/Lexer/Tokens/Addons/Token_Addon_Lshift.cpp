@@ -26,10 +26,10 @@ Lshift::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   const uint16_t machine_instruction = add->assembled.front();
 
-  assembled.insert(assembled.end(),
-                   static_cast<size_t>(
-                     std::static_pointer_cast<Immediate>(tokens[2])->value),
-                   machine_instruction);
+  assembled.insert(
+    assembled.end(),
+    static_cast<size_t>(std::static_pointer_cast<Immediate>(tokens[2])->value),
+    machine_instruction);
 
   return static_cast<int32_t>(assembled.size());
 }

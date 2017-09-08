@@ -22,9 +22,9 @@ public:
           size_t column);
 
   virtual bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) override final;
+    std::vector<std::shared_ptr<Token>>& tokens) final;
 
-  virtual token_type type() const override final;
+  virtual token_type type() const final;
 };
 
 #endif // TOKEN_ADDON_INCLUDE_HPP

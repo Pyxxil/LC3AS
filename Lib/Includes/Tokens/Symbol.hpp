@@ -44,7 +44,7 @@ struct Symbol
     return *this;
   }
 
-  ~Symbol() {}
+  ~Symbol() = default;
 
   uint16_t address;
   size_t line_number;

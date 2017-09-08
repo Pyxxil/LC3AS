@@ -55,35 +55,33 @@ private:
     const size_t string_length{ string.length() };
     const size_t target_length{ target.length() };
 
-    if (string_length == 0) {
+    if (0 == string_length) {
       return static_cast<long>(target_length);
     }
 
-    if (target_length == 0) {
+    if (0 == target_length) {
       return static_cast<long>(string_length);
     }
 
     std::vector<size_t> matrix0(string_length + 1);
     std::vector<size_t> matrix1(string_length + 1);
 
-    for (size_t i = 0; i < string_length + 1; ++i) {
+    size_t i = 0;
+    for (; i < string_length + 1; ++i) {
       matrix0[0] = i;
     }
 
-    for (size_t i = 0; i < target_length; ++i) {
+    for (i = 0; i < target_length; ++i) {
       matrix1[0] = i + 1;
 
-      for (size_t j = 0; j < string_length; j++) {
-        const size_t cost = string[j] == target[i] ? 0 : 1;
-        const size_t deletion{ matrix1[j] + 1 };
-        const size_t insertion{ matrix0[j + 1] + 1 };
-        const size_t substitution{ matrix0[j] + cost };
-        size_t cheapest{ std::min(deletion, insertion) };
-        cheapest = std::min(cheapest, substitution);
-        matrix1[j + 1] = cheapest;
+      size_t j = 0;
+      for (; j < string_length; j++) {
+        matrix1[j + 1] =
+          std::min(std::min(matrix1[j] + 1, matrix0[j + 1] + 1),
+                   matrix0[j] + static_cast<size_t>(string[j] == target[i]));
       }
 
-      for (size_t j = 0; j < string_length + 1; j++) {
+      for (j = 0; j < string_length + 1; j++) {
         matrix0[j] = matrix1[j];
       }
     }

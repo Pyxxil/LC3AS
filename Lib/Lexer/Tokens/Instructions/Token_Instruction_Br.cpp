@@ -34,8 +34,8 @@ Br::Br(std::string&& instruction,
        bool n,
        bool z,
        bool p)
-  : Instruction(std::move(instruction),
-                std::move(instruction_uppercase),
+  : Instruction(instruction,
+                instruction_uppercase,
                 t_file,
                 line_number,
                 t_column)
@@ -62,9 +62,8 @@ Br::assemble(std::vector<std::shared_ptr<Token>>& tokens,
       return -1;
     }
 
-    offset =
-      static_cast<int>(symbols.find(tokens[1]->token)->second.address) -
-      (static_cast<int>(program_counter) + 1);
+    offset = static_cast<int>(symbols.find(tokens[1]->token)->second.address) -
+             (static_cast<int>(program_counter) + 1);
   } else {
     offset = std::static_pointer_cast<Immediate>(tokens[1])->value;
   }

@@ -42,10 +42,10 @@ Blkw::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     }
   }
 
-  assembled.insert(assembled.end(),
-                   static_cast<size_t>(
-                     std::static_pointer_cast<Immediate>(tokens[1])->value),
-                   fill);
+  assembled.insert(
+    assembled.end(),
+    static_cast<size_t>(std::static_pointer_cast<Immediate>(tokens[1])->value),
+    fill);
 
   return static_cast<int32_t>(assembled.size());
 }

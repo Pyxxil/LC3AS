@@ -41,27 +41,27 @@ Character::Character(std::string& character,
         value = -value;
       }
       return;
-    } else {
-      is_valid = false;
-
-      Diagnostics::Diagnostic diagnostic(
-        Diagnostics::FileContext(file, line_number, column),
-        "Invalid character literal",
-        Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
-        Diagnostics::DIAGNOSTIC::ERROR);
-
-      diagnostic.provide_context(
-        std::make_unique<Diagnostics::HighlightContext>(
-          Diagnostics::SelectionContext(
-            Diagnostics::FileContext(file, line_number, column),
-            '^',
-            "Found here",
-            lexed_lines[file][line_number]),
-          '~',
-          character.length()));
-
-      Diagnostics::push(diagnostic);
     }
+
+    is_valid = false;
+
+    Diagnostics::Diagnostic diagnostic(
+      Diagnostics::FileContext(file, line_number, column),
+      "Invalid character literal",
+      Diagnostics::DIAGNOSTIC_TYPE::SYNTAX,
+      Diagnostics::DIAGNOSTIC::ERROR);
+
+    diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+      Diagnostics::SelectionContext(
+        Diagnostics::FileContext(file, line_number, column),
+        '^',
+        "Found here",
+        lexed_lines[file][line_number]),
+      '~',
+      character.length()));
+
+    Diagnostics::push(diagnostic);
+
   } else if (0u == character.length()) {
     Diagnostics::Diagnostic diagnostic(
       Diagnostics::FileContext(file, line_number, column),

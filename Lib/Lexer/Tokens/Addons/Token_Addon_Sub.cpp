@@ -39,10 +39,8 @@ Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     ++second_register_index;
   }
 
-  if (std::static_pointer_cast<Register>(tokens[first_register_index])
-        ->reg ==
-      std::static_pointer_cast<Register>(tokens[second_register_index])
-        ->reg) {
+  if (std::static_pointer_cast<Register>(tokens[first_register_index])->reg ==
+      std::static_pointer_cast<Register>(tokens[second_register_index])->reg) {
     std::vector<std::shared_ptr<Token>> vec = {
       set_zero, tokens[1], tokens[first_register_index], decimal_zero
     };
@@ -52,9 +50,8 @@ Sub::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
     ret = 1;
   } else {
-    std::vector<std::shared_ptr<Token>> vec = {
-      neg1, tokens[second_register_index]
-    };
+    std::vector<std::shared_ptr<Token>> vec = { neg1,
+                                                tokens[second_register_index] };
     ret += neg1->assemble(vec, symbols, program_counter);
 
     vec = { add,
@@ -128,8 +125,7 @@ Sub::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
       ++second_register_index;
     }
 
-    if (std::static_pointer_cast<Register>(tokens[first_register_index])
-          ->reg ==
+    if (std::static_pointer_cast<Register>(tokens[first_register_index])->reg ==
         std::static_pointer_cast<Register>(tokens[second_register_index])
           ->reg) {
       return 1u;
