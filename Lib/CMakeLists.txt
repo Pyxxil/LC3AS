@@ -1,7 +1,6 @@
 
 set(LEXER_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Lexer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/String_Matcher.cpp
     )
 
 set(LEXER_HEADER_FILES
@@ -38,6 +37,7 @@ set(TOKENS_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_Lea.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_Not.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_Ret.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_Rti.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_St.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_Sti.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Instructions/Token_Instruction_Str.cpp
@@ -80,6 +80,7 @@ set(TOKENS_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_Lea.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_Not.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_Ret.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_Rti.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_St.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_Sti.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Instructions/Token_Instruction_Str.hpp

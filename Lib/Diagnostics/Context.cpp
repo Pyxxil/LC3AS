@@ -9,39 +9,6 @@
 
 static const Console::Colour HIGHLIGHTER(Console::FOREGROUND_COLOUR::MAGENTA);
 
-Diagnostics::FileContext::FileContext(const std::string& name,
-                                      size_t t_line,
-                                      size_t t_col)
-  : file_name(name)
-  , column(t_col)
-  , line(t_line)
-{
-}
-
-Diagnostics::FileContext::FileContext(Diagnostics::Variant<std::string> name,
-                                      Diagnostics::Variant<size_t> t_line,
-                                      Diagnostics::Variant<size_t> t_col)
-  : file_name(std::move(name))
-  , column(std::move(t_col))
-  , line(std::move(t_line))
-{
-}
-
-Diagnostics::Context::Context(Diagnostics::FileContext file,
-                              std::string t_message,
-                              std::string t_line,
-                              Diagnostics::Context::CONTEXT_TYPE t_type)
-  : file_information(std::move(file))
-  , message(std::move(t_message))
-  , line(t_line)
-  , empty_line()
-  , context_type(t_type)
-{
-  for (size_t i = 0; i < file.get_column().var(); ++i) {
-    empty_line += 0 != std::isspace(t_line[i]) ? t_line[i] : ' ';
-  }
-}
-
 std::ostream&
 Diagnostics::Context::write_to(std::ostream& os) const
 {
@@ -62,8 +29,7 @@ Diagnostics::HighlightContext::HighlightContext(SelectionContext t_selector,
   , highlight_length(t_highlight_length - 1)
   , selector(t_selector)
   , fix_it(std::move(changer))
-{
-}
+{}
 
 std::ostream&
 Diagnostics::HighlightContext::write_to(std::ostream& os) const
@@ -94,8 +60,7 @@ Diagnostics::SelectionContext::SelectionContext(Diagnostics::FileContext file,
   : Context(std::move(file), std::move(t_message), t_line, SELECTOR)
   , selector(t_selector)
   , fix_it(std::move(changer))
-{
-}
+{}
 
 std::ostream&
 Diagnostics::SelectionContext::write_to(std::ostream& os) const

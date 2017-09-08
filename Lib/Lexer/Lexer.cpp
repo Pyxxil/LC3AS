@@ -238,6 +238,9 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
       case hash("RET", 3):
         return std::make_shared<Ret>(
           word, copy, file_name, line_number, t_column);
+      case hash("RTI", 3):
+        return std::make_shared<Rti>(
+          word, copy, file_name, line_number, t_column);
       case hash("ST", 2):
         return std::make_shared<St>(
           word, copy, file_name, line_number, t_column);

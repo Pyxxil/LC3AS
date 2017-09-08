@@ -1,19 +1,13 @@
-#ifndef TOKEN_OPERATOR_ADD_HPP
-#define TOKEN_OPERATOR_ADD_HPP
+#ifndef TOKEN_OPERATOR_RTI_HPP
+#define TOKEN_OPERATOR_RTI_HPP
 
 #include "Tokens/Token_Instruction.hpp"
 
-class Add : public Instruction
+class Rti : public Instruction
 {
 public:
-  Add() = default;
-  Add(const std::string& instruction,
+  Rti(const std::string& instruction,
       const std::string& instruction_uppercase,
-      const std::string& t_file,
-      size_t line_number,
-      size_t t_column);
-  Add(std::string&& instruction,
-      std::string&& instruction_uppercase,
       const std::string& t_file,
       size_t line_number,
       size_t t_column);

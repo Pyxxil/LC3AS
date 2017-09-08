@@ -1,21 +1,95 @@
 #ifndef STRING_MATCHER_HPP
 #define STRING_MATCHER_HPP
 
+#include <algorithm>
+#include <cstdlib>
+#include <limits>
 #include <string>
 #include <vector>
 
 class String_Matcher
 {
 public:
-  String_Matcher();
-  explicit String_Matcher(const std::string&);
+  String_Matcher()
+    : m_string{}
+    , best{ std::numeric_limits<long>::max(), "" }
+  {}
+  explicit String_Matcher(const std::string& t_string)
+    : m_string(t_string)
+    , best{ std::numeric_limits<long>::max(), "" }
+  {}
 
-  std::string best_match() const;
-  void consider(const std::string& str);
+  const std::string& best_match() const { return best.second; }
+
+  void consider(const std::string& str)
+  {
+    const long length_difference{ std::abs(
+      static_cast<long>(str.length() - m_string.length())) };
+    if (length_difference > best.first) {
+      return;
+    }
+
+    const long cutoff{
+      static_cast<long>(std::max(m_string.length(), str.length())) / 2
+    };
+    if (length_difference > cutoff) {
+      return;
+    }
+
+    const long distance{ levenshtein_distance(m_string, str) };
+    if (distance <= best.first || (str.length() > m_string.length() &&
+                                   best.second.length() < m_string.length())) {
+      /* The second half of this if statement should help in cases where we
+       * have the following: Valid labels = { oct, b } m_string = oc Without
+       * the second half of the if statement, this will get a best match of
+       * 'b', but it's likely that oct is a better guess.
+       */
+      best = { distance, str };
+    }
+  }
 
 private:
-  int32_t levenshtein_distance(const std::string& string,
-                               const std::string& target) const;
+  long levenshtein_distance(const std::string& string,
+                            const std::string& target) const
+  {
+    const size_t string_length{ string.length() };
+    const size_t target_length{ target.length() };
+
+    if (string_length == 0) {
+      return static_cast<long>(target_length);
+    }
+
+    if (target_length == 0) {
+      return static_cast<long>(string_length);
+    }
+
+    std::vector<size_t> matrix0(string_length + 1);
+    std::vector<size_t> matrix1(string_length + 1);
+
+    for (size_t i = 0; i < string_length + 1; ++i) {
+      matrix0[0] = i;
+    }
+
+    for (size_t i = 0; i < target_length; ++i) {
+      matrix1[0] = i + 1;
+
+      for (size_t j = 0; j < string_length; j++) {
+        const size_t cost = string[j] == target[i] ? 0 : 1;
+        const size_t deletion{ matrix1[j] + 1 };
+        const size_t insertion{ matrix0[j + 1] + 1 };
+        const size_t substitution{ matrix0[j] + cost };
+        size_t cheapest{ std::min(deletion, insertion) };
+        cheapest = std::min(cheapest, substitution);
+        matrix1[j + 1] = cheapest;
+      }
+
+      for (size_t j = 0; j < string_length + 1; j++) {
+        matrix0[j] = matrix1[j];
+      }
+    }
+
+    return static_cast<long>(matrix1[string_length]);
+  }
 
   std::string m_string;
 

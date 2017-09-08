@@ -12,18 +12,16 @@ class Variant
 {
 public:
   explicit Variant(
-    T var,
+    const T& var,
     Console::Colour col = Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
     : information(var)
     , colour(std::move(col))
-  {
-  }
+  {}
   Variant(const Variant<T>& other) = default;
   Variant(Variant<T>&& other) noexcept
     : information(other.information)
     , colour(std::move(other.colour))
-  {
-  }
+  {}
   Variant& operator=(const Variant<T>& rhs) = default;
   Variant& operator=(Variant<T>&& rhs) noexcept = default;
 
@@ -44,10 +42,19 @@ private:
 class FileContext
 {
 public:
-  FileContext(const std::string& name, size_t t_line, size_t t_col);
+  FileContext(const std::string& name, size_t t_line, size_t t_col)
+    : file_name(name)
+    , column(t_col)
+    , line(t_line)
+  {}
+
   FileContext(Variant<std::string> name,
               Variant<size_t> t_line,
-              Variant<size_t> t_col);
+              Variant<size_t> t_col)
+    : file_name(std::move(name))
+    , column(std::move(t_col))
+    , line(std::move(t_line))
+  {}
   FileContext(const FileContext& other) = default;
   FileContext(FileContext&& other) = default;
   FileContext& operator=(const FileContext& rhs) = default;
@@ -84,7 +91,17 @@ public:
   Context(FileContext file,
           std::string t_message,
           std::string t_line,
-          CONTEXT_TYPE t_type = NONE);
+          CONTEXT_TYPE t_type)
+    : file_information(std::move(file))
+    , message(std::move(t_message))
+    , line(t_line)
+    , empty_line()
+    , context_type(t_type)
+  {
+    for (size_t i = 0; i < file.get_column().var(); ++i) {
+      empty_line += 0 != std::isspace(t_line[i]) ? t_line[i] : ' ';
+    }
+  }
   Context(const Context& other) = default;
   Context(Context&& other) = default;
 

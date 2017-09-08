@@ -2,30 +2,6 @@
 
     BR main
 
-RSHIFT_SAVER0:
-    .FILL #0
-RSHIFT_SAVER1:
-    .FILL #0
-
-; Right shift the value in R2
-RSHIFT:
-    ST R0, RSHIFT_SAVER0    ; Save R0 as we'll be using it
-    ST R1, RSHIFT_SAVER1    ; Save R1 as we'll be using it
-    AND R0, R0, 0
-L1:
-    ADD R2, R2, -2
-    BRz L1_END
-    ADD R1, R2, 1
-    Brz L1_END
-    ADD R0, R0, 1
-    BR L1
-
-L1_END:
-    ADD R2, R0, 0
-    LD R0, RSHIFT_SAVER0
-    LD R1, RSHIFT_SAVER1
-    RET
-
 XOR_BITMAP:
     .FILL 0b1000000000000000
     .FILL 0b0100000000000000
@@ -110,7 +86,7 @@ main:
 
 L3:
     AND R4, R2, 1    // LSB
-    JSR RSHIFT
+    TRAP x26
     ADD R4, R4, 0
     BRz IF_END
     JSR XOR

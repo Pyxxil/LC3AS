@@ -63,8 +63,7 @@ Diagnostics::Diagnostic::Diagnostic(Diagnostics::FileContext file,
   , d(Config::is_set(Config::WARN_AS_ERROR) ? ERROR : diagnostic)
   , context()
   , info(std::move(file))
-{
-}
+{}
 
 Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic& other)
   : message(other.message)
@@ -72,8 +71,7 @@ Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic& other)
   , d(other.d)
   , context(std::move(other.context))
   , info(other.info)
-{
-}
+{}
 
 std::ostream&
 Diagnostics::Diagnostic::write_to(std::ostream& os) const

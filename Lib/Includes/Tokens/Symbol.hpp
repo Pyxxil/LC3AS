@@ -13,28 +13,38 @@ struct Symbol
     , file(t_file)
   {}
 
-    Symbol(const Symbol& other) = default;
-    Symbol(Symbol&& other) noexcept = default;
+  Symbol(const Symbol& other)
+    : address(other.address)
+    , line_number(other.line_number)
+    , column(other.column)
+    , file(other.file)
+  {}
+  Symbol(Symbol&& other) noexcept
+    : address(std::move(other.address))
+    , line_number(std::move(other.line_number))
+    , column(std::move(other.column))
+    , file(std::move(other.file))
+  {}
 
-    Symbol& operator=(const Symbol& other)
-    {
-      address = other.address;
-      line_number = other.line_number;
-      column = other.column;
-      file = other.file;
-      return *this;
-    }
+  Symbol& operator=(const Symbol& other)
+  {
+    address = other.address;
+    line_number = other.line_number;
+    column = other.column;
+    file = other.file;
+    return *this;
+  }
 
-    Symbol& operator=(Symbol&& other) noexcept
-    {
-      address = other.address;
-      line_number = other.line_number;
-      column = other.column;
-      file = other.file;
-      return *this;
-    }
+  Symbol& operator=(Symbol&& other) noexcept
+  {
+    address = std::move(other.address);
+    line_number = std::move(other.line_number);
+    column = std::move(other.column);
+    file = std::move(other.file);
+    return *this;
+  }
 
-    ~Symbol() = default;
+  ~Symbol() {}
 
   uint16_t address;
   size_t line_number;

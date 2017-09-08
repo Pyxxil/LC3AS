@@ -48,8 +48,8 @@ Add::assemble(std::vector<std::shared_ptr<Token>>& tokens,
     (std::static_pointer_cast<Register>(tokens[2])->reg << 6)));
 
   if (tokens[3]->type() == Token::REGISTER) {
-    assembled.front() |= static_cast<uint16_t>(
-      std::static_pointer_cast<Register>(tokens[3])->reg);
+    assembled.front() |=
+      static_cast<uint16_t>(std::static_pointer_cast<Register>(tokens[3])->reg);
   } else {
     assembled.front() |=
       0x20u | (static_cast<uint16_t>(
@@ -94,8 +94,7 @@ Add::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
     }
   }
 
-  return !(tokens[1]->is_valid && tokens[2]->is_valid &&
-           tokens[3]->is_valid)
+  return !(tokens[1]->is_valid && tokens[2]->is_valid && tokens[3]->is_valid)
            ? (is_valid = false)
            : is_valid;
 }

@@ -35,7 +35,7 @@ if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=shadow)
 endif ()
 
-set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto)
+set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto) #-fsave-optimization-record -Rpass-missed -Rpass=inline -Rpass=loop-vectorize -Rpass=loop-unroll -Rpass-analysis=inline -Rpass-analysis=loop-vectorize -Rpass-analysis=loop-unroll)
 if (OPTIMIZE)
     # Just for fun
     set(RELEASE_FLAGS ${RELEASE_FLAGS} -mtune=native -march=native)

@@ -4,5 +4,6 @@ ADD R1, R2, #0
 INCLUDED_LABEL
         .NEG R1
 
-;        .INCLUDE "include2.h" ; This should complain about recursive includes
+WARNING_THROWS
+        .INCLUDE "include2.h" ; This should complain about recursive includes
 

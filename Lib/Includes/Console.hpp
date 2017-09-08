@@ -99,10 +99,17 @@ struct Colour
     : fg(_fg)
     , bg(_bg)
     , mod(modifier)
-  {
-  }
-  Colour(const Colour& other) = default;
-  Colour(Colour&& other) = default;
+  {}
+  Colour(const Colour& other)
+    : fg(other.fg)
+    , bg(other.bg)
+    , mod(other.mod)
+  {}
+  Colour(Colour&& other)
+    : fg(std::move(other.fg))
+    , bg(std::move(other.bg))
+    , mod(std::move(other.mod))
+  {}
   Colour& operator=(const Colour& other) = default;
   Colour& operator=(Colour&& other) noexcept
   {

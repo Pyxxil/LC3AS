@@ -35,6 +35,7 @@
 #include "Tokens/Instructions/Token_Instruction_Lea.hpp"
 #include "Tokens/Instructions/Token_Instruction_Not.hpp"
 #include "Tokens/Instructions/Token_Instruction_Ret.hpp"
+#include "Tokens/Instructions/Token_Instruction_Rti.hpp"
 #include "Tokens/Instructions/Token_Instruction_St.hpp"
 #include "Tokens/Instructions/Token_Instruction_Sti.hpp"
 #include "Tokens/Instructions/Token_Instruction_Str.hpp"

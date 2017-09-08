@@ -26,8 +26,7 @@ public:
     , symbols(other->symbols)
     , parent(other)
     , tokens(other->tokens)
-  {
-  }
+  {}
   Lexer(const Lexer& other) = default;
   Lexer(Lexer&& other) = default;
 
@@ -52,10 +51,10 @@ public:
    * @param line_number The line number (only relevant for working with files).
    * @param col The column in the file that the token was found at
    */
-  ALWAYS_INLINE void addToken(std::string& token,
-                              std::vector<std::shared_ptr<Token>>& to,
-                              size_t line_number,
-                              size_t col)
+  void addToken(std::string& token,
+                std::vector<std::shared_ptr<Token>>& to,
+                size_t line_number,
+                size_t col)
   {
     if (!token.empty()) {
       // This effectively erases the token too, which saves a call to
