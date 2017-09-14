@@ -130,9 +130,3 @@ Set::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Set::type() const
-{
-  return Token::ADDON_SET;
-}

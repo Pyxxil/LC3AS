@@ -24,7 +24,7 @@ public:
          size_t line_number,
          size_t column);
 
-  token_type type() const final;
+  inline token_type type() const final { return ADDON_LSHIFT; }
 
   int32_t assemble(std::vector<std::shared_ptr<Token>>& tokens,
                    const std::map<std::string, Symbol>& symbols,
@@ -32,8 +32,7 @@ public:
   uint16_t guess_memory_size(
     std::vector<std::shared_ptr<Token>>& tokens) const final;
 
-  bool valid_arguments(
-    std::vector<std::shared_ptr<Token>>& tokens) final;
+  bool valid_arguments(std::vector<std::shared_ptr<Token>>& tokens) final;
 
   std::string disassemble(uint16_t& program_counter,
                           const std::string& symbol,

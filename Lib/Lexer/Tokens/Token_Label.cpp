@@ -65,7 +65,7 @@ Label::not_found(const std::map<std::string, Symbol>& match_candidates)
     matcher.consider(symbol.first);
   }
 
-  auto&& possible_match = std::move(matcher.best_match());
+  const auto& possible_match = matcher.best_match();
 
   Diagnostics::Diagnostic diagnostic(
     Diagnostics::FileContext(file, line, column),
@@ -162,10 +162,4 @@ Label::requires_too_many_bits(int allowed_bits,
     sym->first.length()));
 
   Diagnostics::push(diagnostic);
-}
-
-Token::token_type
-Label::type() const
-{
-  return Token::token_type::LABEL;
 }

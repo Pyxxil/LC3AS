@@ -16,9 +16,9 @@ std::map<std::string, std::vector<std::string>> lexed_lines;
 std::vector<std::string> open_files;
 
 static constexpr size_t hashed_letters[] = {
-  100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457,
-  65719,  70957, 50262, 48407, 51151, 41047, 39371, 35401, 37039,
-  28697,  27791, 20201, 21523, 6449,  4813,  16333, 13337,
+  100363, 99989, 97711, 97151, 92311, 80147, 82279, 72997, 66457, 65719, 70957,
+  50262,  48407, 51151, 41047, 39371, 35401, 37039, 28697, 27791, 20201, 21523,
+  6449,   4813,  16333, 13337, 3571,  5519,  26783, 71471, 68371, 104729
 };
 
 /*! Create a hash of a c-string.
@@ -31,18 +31,17 @@ static constexpr size_t hashed_letters[] = {
 static constexpr size_t
 hash(const char* const string, size_t length)
 {
-  size_t _hash{ 37 };
+  size_t hashed{ 37 };
   const size_t first_character = static_cast<size_t>(*string);
 
   for (size_t index = 0; index < length; ++index) {
-    _hash =
-      (_hash *
-       hashed_letters[(static_cast<size_t>(string[index]) - 0x41u) % 26]) ^
-      (first_character *
-       hashed_letters[(static_cast<size_t>(string[index]) - 0x41u) % 26]);
+    const size_t as_hashed{
+      hashed_letters[(static_cast<size_t>(string[index]) - 0x41u) & 0x1F]
+    };
+    hashed = (hashed * as_hashed) ^ (first_character * as_hashed);
   }
 
-  return _hash;
+  return hashed;
 }
 
 /*! The same as above, just at run time and with std::string objects
@@ -70,20 +69,20 @@ hash(const std::string& string)
 
   if (string.length() > 8 || string.length() < 2) {
     // There are no registers, directives, or instructions which are longer than
-    // 8 characters or less than 2, so this string itsn't one of them.
+    // 8 characters or less than 2, so this string isn't one of them.
     return 0;
   }
 
-  size_t _hash{ 37 };
+  size_t hashed{ 37 };
 
   for (const auto character : string) {
-    _hash =
-      (_hash * hashed_letters[(static_cast<size_t>(character) - 0x41u) % 26]) ^
-      (first_character *
-       hashed_letters[(static_cast<size_t>(character) - 0x41u) % 26]);
+    const size_t as_hashed{
+      hashed_letters[(static_cast<size_t>(character) - 0x41u) & 0x1F]
+    };
+    hashed = (hashed * as_hashed) ^ (first_character * as_hashed);
   }
 
-  return _hash;
+  return hashed;
 }
 
 /*! Include a given file (via token) into the current tokens
@@ -430,7 +429,7 @@ Lexer::tokenizeLine(std::string t_line,
       terminated_by = ' ';
 
       const size_t col = current_line.index() - 1;
-      current_line.skip_if(
+      current_line.skip_while(
         [](const auto&& c) -> bool { return std::isspace(c) != 0; });
       current_line >> character;
       if (0 == character) {

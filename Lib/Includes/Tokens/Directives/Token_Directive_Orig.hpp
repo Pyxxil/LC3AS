@@ -13,7 +13,7 @@ public:
        size_t line_number,
        size_t t_column);
 
-  Token::token_type type() const override;
+  inline token_type type() const final { return DIR_ORIG; }
 
   int32_t assemble(std::vector<std::shared_ptr<Token>>& tokens,
                    const std::map<std::string, Symbol>& symbols,

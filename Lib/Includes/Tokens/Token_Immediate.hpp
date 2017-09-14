@@ -13,7 +13,8 @@ public:
             size_t line_number,
             size_t t_column);
 
-  virtual Token::token_type type() const final;
+  inline virtual token_type type() const final { return IMMEDIATE; }
+
   void requires_too_many_bits(
     int allowed_bits,
     bool is_signed,

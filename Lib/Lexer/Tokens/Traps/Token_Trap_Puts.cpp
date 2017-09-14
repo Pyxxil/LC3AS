@@ -81,9 +81,3 @@ Puts::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Puts::type() const
-{
-  return Token::token_type::TRAP_PUTS;
-}

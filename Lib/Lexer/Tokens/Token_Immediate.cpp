@@ -41,9 +41,3 @@ Immediate::requires_too_many_bits(int allowed_bits,
 
   Diagnostics::push(diagnostic);
 }
-
-Token::token_type
-Immediate::type() const
-{
-  return Token::token_type::IMMEDIATE;
-}

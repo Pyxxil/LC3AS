@@ -81,9 +81,3 @@ Halt::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Halt::type() const
-{
-  return Token::token_type::TRAP_HALT;
-}

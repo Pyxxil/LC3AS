@@ -24,7 +24,7 @@ public:
   virtual bool valid_arguments(
     std::vector<std::shared_ptr<Token>>& tokens) final;
 
-  virtual token_type type() const final;
+  inline token_type type() const final { return ADDON_INCLUDE; }
 };
 
 #endif // TOKEN_ADDON_INCLUDE_HPP

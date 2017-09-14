@@ -101,9 +101,3 @@ Orig::disassemble(uint16_t& program_counter,
   ;
   return stream.str();
 }
-
-Token::token_type
-Orig::type() const
-{
-  return Token::DIR_ORIG;
-}

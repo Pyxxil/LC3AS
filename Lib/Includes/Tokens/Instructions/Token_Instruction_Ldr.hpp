@@ -12,7 +12,7 @@ public:
       size_t line_number,
       size_t t_column);
 
-  Token::token_type type() const final;
+  inline token_type type() const final { return OP_LDR; }
 
   int32_t assemble(std::vector<std::shared_ptr<Token>>& tokens,
                    const std::map<std::string, Symbol>& symbols,

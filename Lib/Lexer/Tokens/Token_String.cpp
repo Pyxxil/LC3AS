@@ -74,9 +74,3 @@ String::String(const std::string& string,
 
   assembled.emplace_back('\0');
 }
-
-Token::token_type
-String::type() const
-{
-  return Token::_STRING;
-}

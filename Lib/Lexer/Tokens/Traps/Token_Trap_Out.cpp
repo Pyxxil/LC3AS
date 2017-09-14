@@ -81,9 +81,3 @@ Out::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Out::type() const
-{
-  return Token::token_type::TRAP_OUT;
-}

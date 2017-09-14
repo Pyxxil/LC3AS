@@ -152,9 +152,3 @@ Add::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Add::type() const
-{
-  return Token::token_type::OP_ADD;
-}

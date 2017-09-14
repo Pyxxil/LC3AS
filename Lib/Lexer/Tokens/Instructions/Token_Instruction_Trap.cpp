@@ -106,9 +106,3 @@ Trap::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Trap::type() const
-{
-  return Token::token_type::OP_TRAP;
-}

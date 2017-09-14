@@ -25,9 +25,3 @@ Include::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 
   return is_valid;
 }
-
-Token::token_type
-Include::type() const
-{
-  return Token::ADDON_INCLUDE;
-}

@@ -32,14 +32,7 @@ public:
    * @return The next character in the line, unless we're at the end of the
    * line, in which case 0.
    */
-  char peek() const
-  {
-    if (at_end()) {
-      return 0;
-    }
-
-    return m_line[m_index];
-  }
+  inline char peek() const { return at_end() ? 0 : (*this)[m_index]; }
 
   /*! Retrieve the next character from the string
    *
@@ -65,13 +58,13 @@ public:
    * @param pred The function to call to check if we should stop.
    */
   template<typename Func>
-  void skip_if(Func&& pred)
+  void skip_while(Func&& pred)
   {
     while (!at_end()) {
       if (!pred(peek())) {
         return;
       }
-      ++m_index;
+      skip();
     }
   }
 
@@ -146,7 +139,12 @@ public:
    *
    * @return The character at the index
    */
-  inline char at(size_t index) const { return m_line[index]; }
+  inline char at(size_t index) const
+  {
+    return (index >= m_line.length()) ? 0 : (*this)[index];
+  }
+
+  inline char operator[](size_t index) const { return m_line[index]; }
 
   const Line& operator>>(char& c)
   {
@@ -164,7 +162,7 @@ private:
   const std::array<std::function<bool(char)>, 2> ignores{
     // Not strictly needed, but it doesn't hurt.
     [this](char) -> bool { return true; },
-    [this](char) -> bool { return at(index() - 1) != '\\'; }
+    [this](char) -> bool { return (*this)[index() - 1] != '\\'; }
   };
 };
 

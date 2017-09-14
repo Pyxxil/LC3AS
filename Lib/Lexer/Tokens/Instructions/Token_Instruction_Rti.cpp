@@ -16,12 +16,6 @@ Rti::Rti(const std::string& instruction,
                 t_column)
 {}
 
-Token::token_type
-Rti::type() const
-{
-  return Token::OP_RTI;
-}
-
 int32_t
 Rti::assemble(std::vector<std::shared_ptr<Token>>& tokens,
               const std::map<std::string, Symbol>& symbols,

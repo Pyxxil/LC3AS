@@ -191,9 +191,3 @@ Blkw::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Blkw::type() const
-{
-  return Token::token_type::DIR_BLKW;
-}

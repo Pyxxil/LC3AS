@@ -148,9 +148,3 @@ Ld::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Ld::type() const
-{
-  return Token::token_type::OP_LD;
-}

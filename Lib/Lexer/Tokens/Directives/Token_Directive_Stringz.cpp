@@ -124,9 +124,3 @@ Stringz::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Stringz::type() const
-{
-  return Token::token_type::DIR_STRINGZ;
-}

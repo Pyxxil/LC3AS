@@ -117,9 +117,3 @@ Fill::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Fill::type() const
-{
-  return Token::token_type::DIR_FILL;
-}

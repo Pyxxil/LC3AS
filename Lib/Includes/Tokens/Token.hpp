@@ -82,7 +82,7 @@ public:
 #endif
   };
 
-  virtual token_type type() const { return Token::NONE; }
+  inline virtual token_type type() const { return NONE; }
 
   std::string deduce_type() const;
 

@@ -121,9 +121,3 @@ Str::disassemble(uint16_t& program_counter,
 
   return stream.str();
 }
-
-Token::token_type
-Str::type() const
-{
-  return Token::token_type::OP_STR;
-}

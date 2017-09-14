@@ -11,7 +11,7 @@ public:
          size_t line_number,
          size_t t_column);
 
-  virtual Token::token_type type() const final;
+  inline token_type type() const final { return _STRING; }
 };
 
 #endif // TOKEN_STRING_HPP

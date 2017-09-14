@@ -32,7 +32,7 @@ public:
       size_t line_number,
       size_t column);
 
-  token_type type() const override final;
+  inline token_type type() const final { return ADDON_NEG; }
 
   int32_t assemble(std::vector<std::shared_ptr<Token>>& tokens,
                    const std::map<std::string, Symbol>& symbols,

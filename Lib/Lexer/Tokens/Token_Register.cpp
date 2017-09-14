@@ -32,9 +32,3 @@ Register::Register(const std::string& which,
     Diagnostics::push(diagnostic);
   }
 }
-
-Token::token_type
-Register::type() const
-{
-  return Token::token_type::REGISTER;
-}
