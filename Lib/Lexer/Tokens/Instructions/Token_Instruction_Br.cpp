@@ -137,6 +137,7 @@ Br::disassemble(uint16_t& program_counter,
     << symbol
     // Instruction itself
     << " BR";
+
   if (N) {
     stream << 'n';
   }

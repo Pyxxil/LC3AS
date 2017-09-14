@@ -84,8 +84,6 @@ private:
 };
 
 void
-push(Diagnostic&& message);
-void
 push(Diagnostic message);
 
 size_t

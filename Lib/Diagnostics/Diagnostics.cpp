@@ -29,12 +29,6 @@ Diagnostics::unwind()
 }
 
 void
-Diagnostics::push(Diagnostic&& message)
-{
-  diagnostics_log.emplace_back(message);
-}
-
-void
 Diagnostics::push(Diagnostic message)
 {
   diagnostics_log.emplace_back(std::move(message));

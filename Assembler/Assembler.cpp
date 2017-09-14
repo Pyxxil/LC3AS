@@ -186,14 +186,29 @@ void
 Assembler::Assembler::generate_machine_code()
 {
   for (size_t i = 0; i < tokens.size(); ++i) {
-    const auto& tokenized_line{ tokens[i] };
+    auto&& tokenized_line{ tokens[i] };
+    std::vector<std::shared_ptr<Token>> vec;
+
+    if (tokenized_line.front()->type() == Token::LABEL) {
+      if (tokenized_line.size() > 1) {
+        vec = std::vector<std::shared_ptr<Token>>(tokenized_line.begin() + 1,
+                                                  tokenized_line.end());
+      }
+    }
 
     for (const auto& assembled_line : tokenized_line.front()->as_assembled()) {
       if (!Config::is_set(Config::CONFIG_OPTIONS::BE_QUIET)) {
         // Not really much point in checking for these if the user wants
         // us to be quiet.
-        check_and_mark_warnings(tokenized_line, assembled_line, i);
+        if (tokenized_line.front()->type() == Token::LABEL) {
+          if (tokenized_line.size() > 1) {
+            check_and_mark_warnings(vec, assembled_line, i);
+          }
+        } else {
+          check_and_mark_warnings(tokenized_line, assembled_line, i);
+        }
       }
+
       assembled.push_back(assembled_line);
     }
   }
@@ -247,18 +262,34 @@ Assembler::Assembler::check_and_mark_warnings(
           '~',
           tokenized_line.front()->token.length()));
 
-      diagnostic.provide_context(
-        std::make_unique<Diagnostics::HighlightContext>(
-          Diagnostics::SelectionContext(
-            Diagnostics::FileContext(tokens[i - 1].front()->file,
-                                     tokens[i - 1].front()->line,
-                                     tokens[i - 1].front()->column),
-            '^',
-            "Checks the same condition code as this line",
-            lexed_lines[tokens[i - 1].front()->file]
-                       [tokens[i - 1].front()->line]),
-          '~',
-          tokens[i - 1].front()->token.length()));
+      // In the case of the previous instruction being on a line with a label,
+      // this stops us highlighting the label instead of the BR.
+      if (tokens[i - 1].front()->type() == Token::LABEL) {
+        diagnostic.provide_context(
+          std::make_unique<Diagnostics::HighlightContext>(
+            Diagnostics::SelectionContext(
+              Diagnostics::FileContext(tokens[i - 1][1]->file,
+                                       tokens[i - 1][1]->line,
+                                       tokens[i - 1][1]->column),
+              '^',
+              "Checks the same condition code as this line",
+              lexed_lines[tokens[i - 1][1]->file][tokens[i - 1][1]->line]),
+            '~',
+            tokens[i - 1][1]->token.length()));
+      } else {
+        diagnostic.provide_context(
+          std::make_unique<Diagnostics::HighlightContext>(
+            Diagnostics::SelectionContext(
+              Diagnostics::FileContext(tokens[i - 1].front()->file,
+                                       tokens[i - 1].front()->line,
+                                       tokens[i - 1].front()->column),
+              '^',
+              "Checks the same condition code as this line",
+              lexed_lines[tokens[i - 1].front()->file]
+                         [tokens[i - 1].front()->line]),
+            '~',
+            tokens[i - 1].front()->token.length()));
+      }
 
       Diagnostics::push(diagnostic);
     }
@@ -364,6 +395,16 @@ Assembler::Assembler::check_and_mark_warnings(
 
       Diagnostics::push(diagnostic);
     }
+  } else if (tokenized_line.front()->type() == Token::OP_RTI) {
+    // Technically it will only do nothing for now as Exceptions aren't
+    // implemented in the simulator I have...
+    Diagnostics::push(Diagnostics::Diagnostic(
+      Diagnostics::FileContext(tokenized_line.front()->file,
+                               tokenized_line.front()->line,
+                               tokenized_line.front()->column),
+      "RTI will do nothing in User mode.",
+      Diagnostics::LOGIC,
+      Diagnostics::WARNING));
   }
 }
 
@@ -371,10 +412,10 @@ Assembler::Assembler::check_and_mark_warnings(
  * Write the instructions to all relevant files.
  *
  * symbol file (.sym): The symbols found in the file.
- * hexadecimal file (.hex): The hexadecimal representation of each instruction.
- * binary file (.bin): The binary representation of each instruction.
- * object file (.obj): The machine code of each instruction.
- * list file (.lst):   Each instruction with it's address, hex representation,
+ * hexadecimal file (.hex): The hexadecimal representation of each
+ * instruction. binary file (.bin): The binary representation of each
+ * instruction. object file (.obj): The machine code of each instruction. list
+ * file (.lst):   Each instruction with it's address, hex representation,
  * binary representation, line number, and the string representation.
  *
  * @param file The source code file name as a string

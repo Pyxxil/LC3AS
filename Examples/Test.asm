@@ -13,7 +13,7 @@ WARNINGS:: :            ; Extraneous colons (warning count = 14)
         NOT R4 , , R5   ; Extraneous comma
         , JMP R7        ; Extraneous comma
         JSR WARNINGS::  ; Extraneous colons
-        BRn #0          ; Superfluous statement
+TEST:   BRn #0          ; Superfluous statement
         BRn #1          ; Checks same CC
         BRp #-1         ; Infinite loop
 
