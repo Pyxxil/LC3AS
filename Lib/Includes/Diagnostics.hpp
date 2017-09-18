@@ -51,8 +51,21 @@ public:
   Diagnostic(FileContext file,
              std::string t_message,
              DIAGNOSTIC_TYPE t_type,
-             DIAGNOSTIC diagnostic);
-  Diagnostic(Diagnostic& other);
+             DIAGNOSTIC diagnostic)
+    : message(std::move(t_message))
+    , d_type(t_type)
+    , d(Config::is_set(Config::WARN_AS_ERROR) ? ERROR : diagnostic)
+    , context()
+    , info(std::move(file))
+  {}
+
+  Diagnostic(Diagnostic& other)
+    : message(other.message)
+    , d_type(other.d_type)
+    , d(other.d)
+    , context(std::move(other.context))
+    , info(other.info)
+  {}
   Diagnostic(Diagnostic&& other) = default;
 
   Diagnostic& operator=(const Diagnostic& rhs) = default;

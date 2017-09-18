@@ -5,6 +5,8 @@
 NO_WARNINGS_OR_ERRORS:
         ADD R0, R0, R0  ; Shouldn't warn or err
         AND R0, R0, R0  ; Shouldn't warn or err
+.FILL   -\07
+.FILL   #
 
 WARNINGS:: :            ; Extraneous colons (warning count = 14)
 .ORIG 0x3001

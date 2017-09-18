@@ -32,7 +32,7 @@ public:
    * @return The next character in the line, unless we're at the end of the
    * line, in which case 0.
    */
-  inline char peek() const { return at_end() ? 0 : (*this)[m_index]; }
+  inline char peek() const { return at(m_index); }
 
   /*! Retrieve the next character from the string
    *
@@ -87,7 +87,7 @@ public:
           return ++m_index;
         }
       }
-      ++m_index;
+      skip();
     }
 
     // Couldn't find it
@@ -141,7 +141,7 @@ public:
    */
   inline char at(size_t index) const
   {
-    return (index >= m_line.length()) ? 0 : (*this)[index];
+    return static_cast<char>((index >= m_line.length()) ? 0 : (*this)[index]);
   }
 
   inline char operator[](size_t index) const { return m_line[index]; }
@@ -153,6 +153,8 @@ public:
   }
 
   inline size_t index() const { return m_index; }
+
+  const std::string& line() const { return m_line; }
 
 private:
   std::string m_line;

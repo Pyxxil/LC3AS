@@ -1,14 +1,6 @@
 #include "Tokens/Addons/Token_Addon_Include.hpp"
 #include "Tokens/Token.hpp"
 
-Include::Include(const std::string& t_token,
-                 const std::string& t_token_uppercase,
-                 const std::string& t_file,
-                 size_t line,
-                 size_t column)
-  : Token(t_token, t_token_uppercase, t_file, line, column)
-{}
-
 bool
 Include::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 {

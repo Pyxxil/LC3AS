@@ -8,8 +8,8 @@
 
 Console::Console(QWidget* parent)
   : QPlainTextEdit(parent)
+  , process(new QProcess)
 {
-  process = new QProcess;
   connect(
     process, SIGNAL(readyReadStandardOutput()), this, SLOT(updateOutput()));
 

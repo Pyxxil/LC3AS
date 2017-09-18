@@ -9,18 +9,12 @@ Octal::Octal(std::string& immediate,
              size_t t_column)
   : Immediate(immediate, immediate, t_file, line_number, t_column)
 {
-  immediate.front() = '0';
-
   char* check = nullptr;
   const auto v = std::strtol(immediate.c_str(), &check, 8);
+
   if (check == nullptr || v > std::numeric_limits<int16_t>::max() ||
       v < std::numeric_limits<int16_t>::min()) {
     is_valid = false;
-  } else {
-    value = static_cast<std::int16_t>(v);
-  }
-
-  if (!is_valid) {
     // TODO: Provide helpful fix-its here if possible (e.g. think of
     // changing to base 10/16, etc.)
     Diagnostics::Diagnostic diagnostic(
@@ -39,5 +33,7 @@ Octal::Octal(std::string& immediate,
       token.length()));
 
     Diagnostics::push(diagnostic);
+  } else {
+    value = static_cast<std::int16_t>(v);
   }
 }

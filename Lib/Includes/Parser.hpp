@@ -61,6 +61,9 @@ private:
 
   void do_first_pass();
   void do_second_pass();
+
+  uint16_t memory_requirement_of(const std::shared_ptr<Token>& t_token,
+                                 std::vector<std::shared_ptr<Token>>& t_tokens);
 };
 
 #endif

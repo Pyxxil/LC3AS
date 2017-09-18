@@ -32,7 +32,7 @@ set(DEBUG_FLAGS ${COMPILE_FLAGS} -g -pg -pedantic)
 if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ -Wno-error=effc++)
-    set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=shadow)
+    set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=shadow -Wno-error=missing-braces)
 endif ()
 
 set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto) #-fsave-optimization-record -Rpass-missed -Rpass=inline -Rpass=loop-vectorize -Rpass=loop-unroll -Rpass-analysis=inline -Rpass-analysis=loop-vectorize -Rpass-analysis=loop-unroll)

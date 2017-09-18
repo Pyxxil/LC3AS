@@ -48,25 +48,6 @@ Diagnostics::count()
   return diagnostics_log.size();
 }
 
-Diagnostics::Diagnostic::Diagnostic(Diagnostics::FileContext file,
-                                    std::string t_message,
-                                    Diagnostics::DIAGNOSTIC_TYPE t_type,
-                                    Diagnostics::DIAGNOSTIC diagnostic)
-  : message(std::move(t_message))
-  , d_type(t_type)
-  , d(Config::is_set(Config::WARN_AS_ERROR) ? ERROR : diagnostic)
-  , context()
-  , info(std::move(file))
-{}
-
-Diagnostics::Diagnostic::Diagnostic(Diagnostics::Diagnostic& other)
-  : message(other.message)
-  , d_type(other.d_type)
-  , d(other.d)
-  , context(std::move(other.context))
-  , info(other.info)
-{}
-
 std::ostream&
 Diagnostics::Diagnostic::write_to(std::ostream& os) const
 {

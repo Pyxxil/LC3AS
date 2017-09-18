@@ -6,6 +6,7 @@
 
 #include "Diagnostics.hpp"
 #include "Extra.hpp"
+#include "Line.hpp"
 #include "Tokens/Token.hpp"
 
 class Lexer
@@ -40,21 +41,26 @@ public:
   std::shared_ptr<Token> tokenize(std::string&& word,
                                   size_t line_number,
                                   size_t column);
-  void tokenizeLine(std::string line,
-                    size_t line_number,
-                    std::vector<std::shared_ptr<Token>>& into);
+  std::shared_ptr<Token> tokenize_immediate_or_label(std::string word,
+                                                     std::string copy,
+                                                     size_t line_number,
+                                                     size_t t_column);
+  void tokenize_line(Line&& line,
+                     size_t line_number,
+                     std::vector<std::shared_ptr<Token>>& into);
 
   /*! Add a token to the current line's tokens.
    *
    * @param token The string containing the token.
    * @param to The current tokens in the line.
-   * @param line_number The line number (only relevant for working with files).
+   * @param line_number The line number (only relevant for working with
+   * files).
    * @param col The column in the file that the token was found at
    */
-  void addToken(std::string& token,
-                std::vector<std::shared_ptr<Token>>& to,
-                size_t line_number,
-                size_t col)
+  void add_token(std::string& token,
+                 std::vector<std::shared_ptr<Token>>& to,
+                 size_t line_number,
+                 size_t col)
   {
     if (!token.empty()) {
       // This effectively erases the token too, which saves a call to

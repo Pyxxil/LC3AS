@@ -28,6 +28,9 @@ BEGIN_TEST:
                         ; before this change the value at the address of label
                         ; 'addr' or at the address of label 'cheat'
 
+begin_test              ; Just to test the hash function
+        .FILL 0
+
 EXTRA_FEATURES:         ; Some additional features not actually present in the
                         ; LC3 (besides adding octal literals)
         .NEG R1         ; Negation
@@ -39,8 +42,8 @@ EXTRA_FEATURES:         ; Some additional features not actually present in the
         .SUB R1, R2, R1
         .SUB R1, R2, R3
 
-oct     .FILL \0700     ; Octal values are also acceptable
-        ;oct .FILL \600 ; This should throw an error about multiple definitions
+oct     .FILL 0700     ; Octal values are also acceptable
+        ;oct .FILL 0600 ; This should throw an error about multiple definitions
                         ; of a label.
         .FILL 'A'
         .FILL '\n'

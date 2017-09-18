@@ -6,6 +6,52 @@
 #include "Lexer.hpp"
 #include "Tokens/Tokens.hpp"
 
+/**
+ * Make our best guess at how much memory a line requires.
+ *
+ * @param token: The token currently being processed.
+ * @param t_tokens: All of the tokens on that line (needed for calling
+ * guess_memory_size on token)
+ *
+ * @returns The best guess we have for how much memory the line requires.
+ */
+uint16_t
+Parser::memory_requirement_of(const std::shared_ptr<Token>& t_token,
+                              std::vector<std::shared_ptr<Token>>& t_tokens)
+{
+  if (!origin_seen) {
+    t_token->expected(".ORIG statement");
+    return 0u;
+  }
+
+  if (end_seen) {
+    // TODO: Do we show the user where the .END directive was?
+    Diagnostics::Diagnostic diagnostic(
+      Diagnostics::FileContext(t_token->file, t_token->line, t_token->column),
+      "Token after .END directive, it will be ignored.",
+      Diagnostics::SYNTAX,
+      Diagnostics::WARNING);
+
+    diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+      Diagnostics::SelectionContext(
+        Diagnostics::FileContext(end->file, end->line, end->column),
+        '^',
+        ".END directive defined here",
+        lexed_lines[end->file][end->line]),
+      '~',
+      end->token.length()));
+
+    Diagnostics::push(diagnostic);
+    return 0u;
+  }
+
+  if (t_token->valid_arguments(t_tokens)) {
+    return t_token->guess_memory_size(t_tokens);
+  }
+
+  return 0u;
+}
+
 /*! Generate the symbol table
  *
  * Create the symbol table, given a starting address by a .ORIG directive. If
@@ -18,51 +64,6 @@
 void
 Parser::do_first_pass()
 {
-  /**
-   * Make our best guess at how much memory a line requires.
-   *
-   * @param token: The token currently being processed.
-   * @param t_tokens: All of the tokens on that line (needed for calling
-   * guess_memory_size on token)
-   *
-   * @returns The best guess we have for how much memory the line requires.
-   */
-  const auto& memory_requirement_of = [this](const auto& token,
-                                             auto&& t_tokens) -> size_t {
-    if (!origin_seen) {
-      token->expected(".ORIG statement");
-      return 0;
-    }
-
-    if (end_seen) {
-      // TODO: Do we show the user where the .END directive was?
-      Diagnostics::Diagnostic diagnostic(
-        Diagnostics::FileContext(token->file, token->line, token->column),
-        "Token after .END directive, it will be ignored.",
-        Diagnostics::SYNTAX,
-        Diagnostics::WARNING);
-
-      diagnostic.provide_context(
-        std::make_unique<Diagnostics::HighlightContext>(
-          Diagnostics::SelectionContext(
-            Diagnostics::FileContext(end->file, end->line, end->column),
-            '^',
-            ".END directive defined here",
-            lexed_lines[end->file][end->line]),
-          '~',
-          end->token.length()));
-
-      Diagnostics::push(diagnostic);
-      return 0;
-    }
-
-    if (token->valid_arguments(t_tokens)) {
-      return token->guess_memory_size(t_tokens);
-    }
-
-    return 0;
-  };
-
   // TODO: As it is, if there is no .ORIG directive as the first instruction
   // TODO: in the file, we still look at the rest of the file. Is it smarter to
   // TODO: stop if we don't see it first? Or should we just default to setting
@@ -100,7 +101,7 @@ Parser::do_first_pass()
         break;
       }
       case Token::LABEL: {
-        auto memory_req =
+        const uint16_t memory_req =
           memory_requirement_of(tokenized_line.front(), tokenized_line);
         std::static_pointer_cast<Label>(tokenized_line.front())->address =
           internal_program_counter;

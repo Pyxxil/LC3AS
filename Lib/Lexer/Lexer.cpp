@@ -8,7 +8,6 @@
 #endif
 
 #include "LexHelper.hpp"
-#include "Line.hpp"
 #include "Tokens/Tokens.hpp"
 
 std::map<std::string, std::vector<std::string>> lexed_lines;
@@ -169,7 +168,7 @@ Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>>& t_tokens,
   size_t line_number{ 0 };
 
   for (const auto& line_entry : lexed_lines[file_name]) {
-    tokenizeLine(line_entry, line_number, tokenized_line);
+    tokenize_line(Line(line_entry), line_number, tokenized_line);
 
     if (!tokenized_line.empty()) {
 #ifdef INCLUDE_ADDONS
@@ -205,14 +204,14 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
   std::string copy{ word };
   std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
-  t_column -= word.length();
+  t_column -= copy.length();
 
   // TODO: While this makes it a bit more efficient, is it worth double
   // TODO: checking that the strings are the same after comparing the hash's?
   // TODO: Just as a precautionary measure.
 
   // This is non-zero if the string contains some letters.
-  const size_t hashed = hash(copy);
+  const size_t hashed{ hash(copy) };
 
   if (0u != hashed) {
     switch (hashed) {
@@ -360,35 +359,146 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
         break;
     }
   }
+  return tokenize_immediate_or_label(
+    std::move(word), std::move(copy), line_number, t_column);
+}
 
-  static const std::regex decimal("#?-?\\d+", std::regex_constants::optimize);
-  static const std::regex binary("-?0?[bB][01]+",
-                                 std::regex_constants::optimize);
-  static const std::regex hexadecimal("0?[xX][\\da-fA-F]+",
-                                      std::regex_constants::optimize);
-  static const std::regex octal("\\\\0[0-7]+", std::regex_constants::optimize);
-  static const std::regex label("\\.?[\\da-zA-Z_]+",
-                                std::regex_constants::optimize);
+/*! Check if the given token is a binary immediate value, a hexadecimal
+ * immediate value, or an octal immediate value.
+ *
+ * @param copy The uppercase copy of the token.
+ * @param index The index we want to start the check from
+ * @param word The token
+ * @param file_name The name of the file the token was found in
+ * @param line_number The line the token was found on
+ * @param t_column The column the token started on
+ *
+ * @return The tokenised value
+ */
+static std::shared_ptr<Token>
+check_binary_hex_or_octal(std::string copy,
+                          size_t index,
+                          std::string word,
+                          const std::string& file_name,
+                          size_t line_number,
+                          size_t t_column)
+{
+  if (copy.length() > index) {
+    switch (copy[index]) {
+      case 'B':
+        if (std::all_of(copy.begin() + index + 1, copy.end(), [](const auto c) {
+              return c == '0' || c == '1';
+            })) {
+          return std::make_shared<Binary>(
+            word, copy, file_name, line_number, t_column);
+        }
+        break;
+      case 'X':
+        if (std::all_of(copy.begin() + 3, copy.end(), [](const auto c) {
+              return std::isxdigit(c);
+            })) {
+          return std::make_shared<Hexadecimal>(
+            word, copy, file_name, line_number, t_column);
+        }
+      default:
+        break;
+    }
+  }
 
-  if (std::regex_match(word, decimal)) {
+  return std::make_shared<Octal>(word, file_name, line_number, t_column);
+}
+/*! Tokenize a word into an immediate value, label, or invalid token.
+ *
+ * If tokenize doesn't match anything, then these are the only three
+ * possibilites left.
+ *
+ * @param word The word to tokenise
+ * @param copy The upper case variant of the word
+ * @param line_number The line the token has been found on
+ * @param t_column The column at which the token was first observed
+ *
+ * @return The token
+ */
+std::shared_ptr<Token>
+Lexer::tokenize_immediate_or_label(std::string word,
+                                   std::string copy,
+                                   size_t line_number,
+                                   size_t t_column)
+{
+  // TODO: Make this a littler nicer to look at
+
+  if ('#' == copy.front()) {
+    // This can only ever be a decimal number
     return std::make_shared<Decimal>(word, file_name, line_number, t_column);
   }
 
-  if (std::regex_match(word, binary)) {
-    return std::make_shared<Binary>(
-      word, copy, file_name, line_number, t_column);
+  if ('-' == copy.front() && copy.length() > 1) {
+    switch (copy[1]) {
+      // For these, there is no reason to check if all of the values are
+      // valid base digits. No label can contain '-'
+      case 'B':
+        if (std::all_of(copy.begin() + 2, copy.end(), [](const auto c) {
+              return c == '0' || c == '1';
+            })) {
+          return std::make_shared<Binary>(
+            word, copy, file_name, line_number, t_column);
+        }
+        break;
+      case 'X':
+        if (std::all_of(copy.begin() + 2, copy.end(), [](const auto c) {
+              return std::isxdigit(c);
+            })) {
+          return std::make_shared<Hexadecimal>(
+            word, copy, file_name, line_number, t_column);
+        }
+      case '0':
+        return check_binary_hex_or_octal(std::move(copy),
+                                         2,
+                                         std::move(word),
+                                         file_name,
+                                         line_number,
+                                         t_column);
+      default:
+        if (std::isdigit(copy[1])) {
+          return std::make_shared<Decimal>(
+            word, file_name, line_number, t_column);
+        }
+        break;
+    }
+  } else if (std::isdigit(copy.front())) {
+    switch (copy.front()) {
+      case '0':
+        return check_binary_hex_or_octal(std::move(copy),
+                                         1,
+                                         std::move(word),
+                                         file_name,
+                                         line_number,
+                                         t_column);
+      default:
+        return std::make_shared<Decimal>(
+          word, file_name, line_number, t_column);
+    }
+  } else if ('B' == copy.front() && copy.length() > 1) {
+    if (std::all_of(copy.begin() + 1, copy.end(), [](const auto c) {
+          return c == '0' || c == '1';
+        })) {
+      return std::make_shared<Binary>(
+        word, copy, file_name, line_number, t_column);
+    }
+  } else if ('X' == copy.front() && copy.length() > 1) {
+    if (std::all_of(copy.begin() + 1, copy.end(), [](const auto c) {
+          return std::isxdigit(c);
+        })) {
+      return std::make_shared<Hexadecimal>(
+        word, copy, file_name, line_number, t_column);
+    }
   }
 
-  if (std::regex_match(word, hexadecimal)) {
-    return std::make_shared<Hexadecimal>(
-      word, copy, file_name, line_number, t_column);
-  }
-
-  if (std::regex_match(word, octal)) {
-    return std::make_shared<Octal>(word, file_name, line_number, t_column);
-  }
-
-  if (std::regex_match(word, label)) {
+  const bool is_valid_label =
+    std::all_of(word.begin() + static_cast<size_t>(word.front() == '.'),
+                word.end(),
+                [](const auto c) { return std::isalnum(c) || '_' == c; });
+  if (is_valid_label) {
     return std::make_shared<Label>(word, file_name, line_number, t_column);
   }
 
@@ -401,11 +511,11 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
 /*! Tokenize a single line from the file
  *
  * Go through each string (terminated by ',', space character (as defined by
- * std::isspace), or a comment (denoted by ';', "//")), and tokenize it, adding
- * it to a vector until the end of the line is reached. The end of a line is
- * determined when either a comment is hit, or the end of the line is reached
- * (that is, when the current index into the string is >= to the length of the
- * string).
+ * std::isspace), or a comment (denoted by ';', "//")), and tokenize it,
+ * adding it to a vector until the end of the line is reached. The end of a
+ * line is determined when either a comment is hit, or the end of the line is
+ * reached (that is, when the current index into the string is >= to the
+ * length of the string).
  *
  * @param line The line to tokenize
  * @param line_number The current line number. This is only relevant when
@@ -413,13 +523,12 @@ Lexer::tokenize(std::string&& word, size_t line_number, size_t t_column)
  * @param into The vector to tokenize the line into
  */
 void
-Lexer::tokenizeLine(std::string t_line,
-                    size_t line_number,
-                    std::vector<std::shared_ptr<Token>>& into)
+Lexer::tokenize_line(Line&& current_line,
+                     size_t line_number,
+                     std::vector<std::shared_ptr<Token>>& into)
 {
   std::string current;
   char terminated_by{ 0 };
-  Line current_line(t_line);
 
   while (!current_line.at_end()) {
     char character = current_line.next();
@@ -443,7 +552,7 @@ Lexer::tokenizeLine(std::string t_line,
         // Which, without this, would make 2 warnings (one for each
         // comma)
         terminated_by = 1;
-        addToken(current, into, line_number, col);
+        add_token(current, into, line_number, col);
       }
     }
 
@@ -475,7 +584,7 @@ Lexer::tokenizeLine(std::string t_line,
                 file_name, line_number, current_line.index() - 1),
               '^',
               "Found unexpected '/'; Did you mean '//'?",
-              t_line,
+              current_line.line(),
               "//"));
 
           Diagnostics::push(diagnostic);
@@ -501,13 +610,13 @@ Lexer::tokenizeLine(std::string t_line,
                 file_name, line_number, current_line.index() - 1),
               '^',
               "Found here",
-              t_line));
+              current_line.line()));
 
           Diagnostics::push(diagnostic);
           terminated_by = ',';
         }
 
-        addToken(current, into, line_number, current_line.index() - 1);
+        add_token(current, into, line_number, current_line.index() - 1);
         break;
       }
       case ':': {
@@ -525,13 +634,13 @@ Lexer::tokenizeLine(std::string t_line,
                 file_name, line_number, current_line.index() - 1),
               '^',
               "Found here",
-              t_line));
+              current_line.line()));
 
           Diagnostics::push(diagnostic);
           terminated_by = ':';
         }
 
-        addToken(current, into, line_number, current_line.index() - 1);
+        add_token(current, into, line_number, current_line.index() - 1);
         break;
       }
 #ifdef INCLUDE_ADDONS
@@ -546,10 +655,10 @@ Lexer::tokenizeLine(std::string t_line,
 #ifdef INCLUDE_ADDONS
           if ('\'' != character || current.length() != 1 ||
               '-' != current.front()) {
-            addToken(current, into, line_number, current_line.index());
+            add_token(current, into, line_number, current_line.index());
           }
 #else
-          addToken(current, into, line_number, current_line.index());
+          add_token(current, into, line_number, current_line.index());
 #endif
         }
 
@@ -582,7 +691,7 @@ Lexer::tokenizeLine(std::string t_line,
               Diagnostics::FileContext(file_name, line_number, begin - 1),
               '^',
               "Expected " + std::string({ character }) + " to match this one",
-              t_line));
+              current_line.line()));
           Diagnostics::push(diagnostic);
 #ifdef INCLUDE_ADDONS
         } else if ('\'' == character) {
@@ -612,7 +721,7 @@ Lexer::tokenizeLine(std::string t_line,
     }
   }
 end_of_line:
-  addToken(current, into, line_number, current_line.index());
+  add_token(current, into, line_number, current_line.index());
 }
 
 void

@@ -21,6 +21,10 @@ Rti::assemble(std::vector<std::shared_ptr<Token>>& tokens,
               const std::map<std::string, Symbol>& symbols,
               uint16_t program_counter)
 {
+  (void)program_counter;
+  (void)tokens;
+  (void)symbols;
+
   if (is_valid) {
     assembled.push_back(0x8000);
     return 1;
@@ -32,11 +36,9 @@ Rti::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 uint16_t
 Rti::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
 {
-  if (!is_valid) {
-    return 0;
-  }
+  (void)tokens;
 
-  return 1;
+  return static_cast<uint16_t>(is_valid);
 }
 
 bool
