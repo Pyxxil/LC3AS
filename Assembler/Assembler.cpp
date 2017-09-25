@@ -65,7 +65,8 @@ Assembler::Assembler::configure(int argc, char** args)
     option_parser.parse_positional("files");
     option_parser.parse(argc, args);
   } catch (const cxxopts::OptionException& e) {
-    std::cout << "LC3AS Command Line Error: " << e.what() << '\n';
+    std::cout << "LC3AS: " << e.what() << '\n';
+    std::cout << option_parser.help() << '\n';
     return false;
   }
 
@@ -81,15 +82,15 @@ Assembler::Assembler::configure(int argc, char** args)
     return false;
   }
 
-  const auto& files = option_parser["files"].as<std::vector<std::string>>();
+  auto&& files = option_parser["files"].as<std::vector<std::string>>();
   for (const auto& file : files) {
     files_to_assemble.emplace_back(file);
   }
 
   if (0 != option_parser.count("include")) {
-    const auto& dirs = option_parser["include"].as<std::vector<std::string>>();
+    auto&& dirs = option_parser["include"].as<std::vector<std::string>>();
     for (const auto& dir : dirs) {
-      Config::add_search_directory(dir);
+      Config::add_search_directory(dir); //, "User Included Directory");
     }
   }
 

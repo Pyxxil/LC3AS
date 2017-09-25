@@ -27,7 +27,7 @@ set (EDITOR_INCLUDE_FILES "")
 set (EDITOR_INCLUDE_DIRS "")
 set (EDITOR_SOURCE_FILES "")
 
-set(DEBUG_FLAGS ${COMPILE_FLAGS} -g -pg -pedantic)
+set(DEBUG_FLAGS ${COMPILE_FLAGS} -g -g3 -pg -pedantic)
 
 if (NOT WIN32)
     set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion)

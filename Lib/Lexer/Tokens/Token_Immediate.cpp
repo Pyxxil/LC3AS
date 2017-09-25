@@ -9,7 +9,8 @@ Immediate::Immediate(const std::string& immediate,
                      size_t line_number,
                      size_t t_column)
   : Token(immediate, immediate_uppercase, t_file, line_number, t_column)
-{}
+{
+}
 
 void
 Immediate::requires_too_many_bits(int allowed_bits,

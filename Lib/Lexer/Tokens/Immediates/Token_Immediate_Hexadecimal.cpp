@@ -25,34 +25,31 @@ Hexadecimal::Hexadecimal(std::string& immediate,
     char* check = nullptr;
     const auto v = std::strtol(immediate.c_str(), &check, 16);
     if (check == nullptr ||
-        v > 2 * static_cast<int>(std::numeric_limits<int16_t>::max())) {
+        v > (2 * static_cast<int>(std::numeric_limits<int16_t>::max()) + 1)) {
+      std::cout << "Failed the check with " << v << '\n';
+      std::cout << 2 * static_cast<int>(std::numeric_limits<int16_t>::max())
+                << '\n';
       is_valid = false;
-      std::cout << "Failed with " << (check == nullptr) << " or "
-                << (v > std::numeric_limits<int16_t>::max()) << " or "
-                << (v < std::numeric_limits<int16_t>::min()) << '\n';
-      std::cout << "Because " << v << " > "
-                << std::numeric_limits<int16_t>::max() << '\n';
     } else {
       value = static_cast<std::int16_t>(v);
+      return; // We're done here
     }
   }
 
-  if (!is_valid) {
-    Diagnostics::Diagnostic diagnostic(
+  Diagnostics::Diagnostic diagnostic(
+    Diagnostics::FileContext(file, line, t_column),
+    "Invalid literal for 16 bit signed base 16 value",
+    Diagnostics::INVALID_LITERAL,
+    Diagnostics::ERROR);
+
+  diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+    Diagnostics::SelectionContext(
       Diagnostics::FileContext(file, line, t_column),
-      "Invalid literal for 16 bit signed base 16 value",
-      Diagnostics::INVALID_LITERAL,
-      Diagnostics::ERROR);
+      '^',
+      "Found here",
+      lexed_lines[file][line]),
+    '~',
+    token.length()));
 
-    diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-      Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, t_column),
-        '^',
-        "Found here",
-        lexed_lines[file][line]),
-      '~',
-      token.length()));
-
-    Diagnostics::push(diagnostic);
-  }
+  Diagnostics::push(diagnostic);
 }

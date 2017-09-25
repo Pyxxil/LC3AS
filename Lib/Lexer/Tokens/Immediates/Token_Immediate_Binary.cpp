@@ -16,41 +16,40 @@ Binary::Binary(std::string& immediate,
 {
   bool negative = false;
 
-  if (immediate.front() == '-') {
+  if ('-' == immediate.front()) {
     negative = true;
     immediate.erase(0, 1);
   }
 
-  if (immediate.length() > 2 && std::toupper(immediate[1]) == 'B') {
+  if (immediate.length() > 2 && 'B' == immediate_uppercase[1]) {
     immediate.erase(0, 2);
-  } else if (std::toupper(immediate.front()) == 'B') {
+  } else if ('B' == immediate_uppercase.front()) {
     immediate.erase(0, 1);
   }
 
   if (immediate.length() > 16) {
     is_valid = false;
   } else {
-    value = static_cast<int16_t>(std::bitset<16>(immediate).to_ulong());
+    value = negative
+              ? -static_cast<int16_t>(std::bitset<16>(immediate).to_ulong())
+              : static_cast<int16_t>(std::bitset<16>(immediate).to_ulong());
+    return; // We're done here
   }
 
-  if (!is_valid) {
-    Diagnostics::Diagnostic diagnostic(
+  Diagnostics::Diagnostic diagnostic(
+    Diagnostics::FileContext(file, line, t_column),
+    "Invalid literal for 16 bit signed base 2 value",
+    Diagnostics::INVALID_LITERAL,
+    Diagnostics::ERROR);
+
+  diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
+    Diagnostics::SelectionContext(
       Diagnostics::FileContext(file, line, t_column),
-      "Invalid literal for 16 bit signed base 2 value",
-      Diagnostics::INVALID_LITERAL,
-      Diagnostics::ERROR);
+      '^',
+      "Found here",
+      lexed_lines[file][line]),
+    '~',
+    token.length()));
 
-    diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-      Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, t_column),
-        '^',
-        "Found here",
-        lexed_lines[file][line]),
-      '~',
-      token.length()));
-
-    Diagnostics::push(diagnostic);
-  } else if (negative) {
-    value = static_cast<int16_t>(-value);
-  }
+  Diagnostics::push(diagnostic);
 }

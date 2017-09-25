@@ -6,6 +6,7 @@ NO_WARNINGS_OR_ERRORS:
         ADD R0, R0, R0  ; Shouldn't warn or err
         AND R0, R0, R0  ; Shouldn't warn or err
 .FILL   -\07
+.INCLUDE "File that doesnt exist"
 .FILL   #
 
 WARNINGS:: :            ; Extraneous colons (warning count = 14)

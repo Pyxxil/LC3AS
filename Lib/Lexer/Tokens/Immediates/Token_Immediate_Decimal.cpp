@@ -12,7 +12,7 @@ Decimal::Decimal(std::string& immediate,
   if (immediate.length() > 7) {
     is_valid = false;
   } else {
-    if (immediate.front() == '#') {
+    if ('#' == immediate.front()) {
       immediate.erase(0, 1);
     }
 
@@ -20,12 +20,12 @@ Decimal::Decimal(std::string& immediate,
       char* check = nullptr;
       const auto v = std::strtol(immediate.c_str(), &check, 10);
 
-      if (check == nullptr || v > std::numeric_limits<int16_t>::max() ||
+      if (nullptr == check || v > std::numeric_limits<int16_t>::max() ||
           v < std::numeric_limits<int16_t>::min()) {
         is_valid = false;
       } else {
         value = static_cast<std::int16_t>(v);
-        return;
+        return; // We're done here
       }
     } else {
       // TODO: Should this be a warning, and just set the value to 0?

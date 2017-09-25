@@ -108,7 +108,7 @@ public:
       if (pred(peek())) {
         return m_index;
       }
-      ++m_index;
+      skip();
     }
 
     // Didn't find it
@@ -162,8 +162,9 @@ private:
   size_t m_ignores = 0;
 
   const std::array<std::function<bool(char)>, 2> ignores{
-    // Not strictly needed, but it doesn't hurt.
-    [this](char) -> bool { return true; },
+    [this](char) -> bool {
+      return true;
+    }, // Not strictly needed, but it doesn't hurt.
     [this](char) -> bool { return (*this)[index() - 1] != '\\'; }
   };
 };
