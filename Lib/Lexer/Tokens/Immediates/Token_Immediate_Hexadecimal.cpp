@@ -15,23 +15,19 @@ Hexadecimal::Hexadecimal(std::string& immediate,
   : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column)
 {
   if (immediate.length() > 6 || immediate.length() == 1 ||
-      (immediate.length() == 2 && std::toupper(immediate[1]) == 'X')) {
+      (immediate.length() == 2 && 'X' == immediate_uppercase[1])) {
     is_valid = false;
   } else {
-    if (std::toupper(immediate.front()) == 'X') {
+    if ('X' == immediate_uppercase.front()) {
       immediate.insert(0, 1, '0');
     }
 
     char* check = nullptr;
     const auto v = std::strtol(immediate.c_str(), &check, 16);
-    if (check == nullptr ||
-        v > (2 * static_cast<int>(std::numeric_limits<int16_t>::max()) + 1)) {
-      std::cout << "Failed the check with " << v << '\n';
-      std::cout << 2 * static_cast<int>(std::numeric_limits<int16_t>::max())
-                << '\n';
+    if (nullptr == check || v > (2 * std::numeric_limits<int16_t>::max()) + 1) {
       is_valid = false;
     } else {
-      value = static_cast<std::int16_t>(v);
+      value = static_cast<int16_t>(v);
       return; // We're done here
     }
   }

@@ -1,0 +1,11 @@
+
+set (TEST_SOURCE_FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/Test_main.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Test_Lexer.cpp"
+  PARENT_SCOPE
+  )
+
+set (TEST_INCLUDE_FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/catch.hpp"
+  PARENT_SCOPE
+  )

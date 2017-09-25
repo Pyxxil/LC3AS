@@ -12,9 +12,7 @@ Octal::Octal(std::string& immediate,
   char* check = nullptr;
   const auto v = std::strtol(immediate.c_str(), &check, 8);
 
-  if (nullptr == check || immediate.c_str() == check ||
-      v > std::numeric_limits<int16_t>::max() ||
-      v < std::numeric_limits<int16_t>::min()) {
+  if (nullptr == check || v > (2 * std::numeric_limits<int16_t>::max() + 1)) {
     is_valid = false;
     // TODO: Provide helpful fix-its here if possible (e.g. think of
     // changing to base 10/16, etc.)

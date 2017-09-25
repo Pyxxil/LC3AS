@@ -437,12 +437,11 @@ tokenize_octal_hex_bin(std::string copy,
   if (copy.length() > index) {
     switch (copy[index]) {
       case 'B':
-        if (is_valid_binary(1)) {
+        if ((0 == index || '0' == copy.front()) && is_valid_binary(1)) {
           return std::make_shared<Binary>(
             word, copy, file_name, line_number, t_column);
         }
-        break;
-      case 'X':
+      case 'X': // FALLTHROUGH
         if (is_valid_hexadecimal(1)) {
           return std::make_shared<Hexadecimal>(
             word, copy, file_name, line_number, t_column);
@@ -459,6 +458,8 @@ tokenize_octal_hex_bin(std::string copy,
   }
 
   if (is_valid_octal(0)) {
+    return std::make_shared<Hexadecimal>(
+      word, copy, file_name, line_number, t_column);
     return std::make_shared<Octal>(word, file_name, line_number, t_column);
   }
 
@@ -514,6 +515,20 @@ Lexer::tokenize_immediate_or_label(std::string word,
             break;
           case 'X':
             ++offset;
+            break;
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+            if ('-' == copy.front()) {
+              return std::make_shared<Decimal>(
+                word, file_name, line_number, t_column);
+            }
             break;
         }
       }

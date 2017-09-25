@@ -58,6 +58,8 @@ Diagnostics::Diagnostic::write_to(std::ostream& os) const
     Console::write_line(*context_item);
   }
 
+  os << '\n';
+
   return os;
 }
 
