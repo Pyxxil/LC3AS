@@ -1,6 +1,7 @@
 #ifndef LC3_ASSEMBLER_LEXHELPER_HPP
 #define LC3_ASSEMBLER_LEXHELPER_HPP
 
+#include <map>
 #include <string>
 #include <vector>
 

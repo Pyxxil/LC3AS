@@ -1,5 +1,7 @@
 #include "Tokens/Immediates/Token_Immediate_Octal.hpp"
 
+#include <limits>
+
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 

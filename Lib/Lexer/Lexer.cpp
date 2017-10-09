@@ -68,7 +68,7 @@ hash(const std::string& string)
 
   if (string.length() > 8 || string.length() < 2) {
     // There are no registers, directives, or instructions which are longer than
-    // 8 characters or less than 2, so this string isn't one of them.
+    // 8 characters, or less than 2, so this string isn't one of them.
     return 0;
   }
 
@@ -385,7 +385,10 @@ tokenize_label(std::string copy,
   const bool is_valid_label =
     std::all_of(word.begin() + static_cast<size_t>(word.front() == '.'),
                 word.end(),
-                [](const auto c) { return std::isalnum(c) || '_' == c; });
+                [](const auto c) { return std::isalnum(c) || '_' == c; }) &&
+    !('.' == word.front() &&
+      word.size() == 1); // Don't want to allow a single '.' to be a valid label
+
   if (is_valid_label) {
     return std::make_shared<Label>(word, file_name, line_number, t_column);
   }
@@ -641,9 +644,8 @@ Lexer::tokenize_line(Line current_line,
         goto end_of_line;
       }
       case ',': {
-        if (into.empty() ||
-            (' ' != terminated_by && 0 != terminated_by &&
-             1 != terminated_by) ||
+        if (into.empty() || (' ' != terminated_by && 0 != terminated_by &&
+                             1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(

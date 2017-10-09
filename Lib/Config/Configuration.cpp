@@ -24,8 +24,8 @@ struct Directory
   explicit Directory(const std::string& _directory, std::string _name = "")
     : directory(_directory)
     , name(std::move(_name))
-    , exists(fs::exists(directory))
-    , is_directory(fs::is_directory(directory))
+//    , exists(fs::exists(directory))
+//    , is_directory(fs::is_directory(directory))
   {}
 
   bool contains(const fs::path& path)
@@ -80,14 +80,17 @@ Config::set(size_t option)
 void
 Config::add_search_directory(const std::string& directory)
 {
-  search_directories.emplace_back(Directory(directory));
+  (void)directory;
+//  search_directories.emplace_back(Directory(directory));
 }
 
 void
 Config::add_search_directory(const std::string&& directory,
                              const std::string&& name)
 {
-  search_directories.emplace_back(Directory(directory, name));
+  (void)directory;
+  (void)name;
+//  search_directories.emplace_back(Directory(directory, name));
 }
 
 std::string

@@ -1,17 +1,23 @@
+#include <iomanip>
 #include <sstream>
 
 #include "catch.hpp"
 
 #include "Diagnostics.hpp"
+#include "LexHelper.hpp"
 #include "Lexer.hpp"
 #include "Tokens/Tokens.hpp"
-#include "iomanip"
+
+static const std::string f_name = "TEST";
 
 TEST_CASE(
   "The lexer can lex any 16 bit decimal, hexadecimal, binary, and octal value",
   "[lexer]")
 {
-  const std::string f_name = "TEST";
+  // This is just in case any of the test cases have things which create
+  // diagnostics
+  lexed_lines.insert(
+    std::pair<std::string, std::vector<std::string>>(f_name, { "" }));
 
   for (int i = std::numeric_limits<int16_t>::min();
        i < std::numeric_limits<int16_t>::max() + 1;
@@ -43,8 +49,7 @@ TEST_CASE(
     tokens = Lexer::tokenize_line(Line(ss.str()), f_name, 0);
     REQUIRE(tokens.size() == 1);
     REQUIRE(tokens.front()->type() == Token::IMMEDIATE);
-    REQUIRE(std::static_pointer_cast<Hexadecimal>(tokens.front())->value ==
-            static_cast<int16_t>(i));
+    REQUIRE(std::static_pointer_cast<Hexadecimal>(tokens.front())->value == i);
 
     ss.str("");
     ss << "0X" << std::hex << static_cast<int16_t>(i);
@@ -72,8 +77,7 @@ TEST_CASE(
     tokens = Lexer::tokenize_line(Line(ss.str()), f_name, 0);
     REQUIRE(tokens.size() == 1);
     REQUIRE(tokens.front()->type() == Token::IMMEDIATE);
-    REQUIRE(std::static_pointer_cast<Hexadecimal>(tokens.front())->value ==
-            static_cast<int16_t>(i));
+    REQUIRE(std::static_pointer_cast<Hexadecimal>(tokens.front())->value == i);
 
     ss.str("");
     ss << "0B" << std::bitset<16>(static_cast<int16_t>(i));
@@ -129,8 +133,6 @@ TEST_CASE("The lexer should be able to properly tokenize any variation of an "
           "instruction, directive, or register",
           "[lexer]")
 {
-  const std::string f_name = "TEST";
-
   for (auto i : permutations("add")) {
     auto tokens = Lexer::tokenize_line(Line(i), f_name, 0);
     REQUIRE(tokens.size() == 1);
@@ -266,4 +268,41 @@ TEST_CASE("The lexer should be able to properly tokenize any variation of an "
 #endif
 
   REQUIRE(Diagnostics::count() == 0);
+}
+
+TEST_CASE("The lexer shouldn't create invalid labels", "[lexer]")
+{
+  auto tokens = Lexer::tokenize_line(Line(".  "), f_name, 0);
+  REQUIRE(tokens.size() == 1);
+  REQUIRE(tokens.front()->type() == Token::NONE);
+  REQUIRE(Diagnostics::count() == 0); // Maybe later I'll change this so that an
+                                      // invalid token throws, but for now it
+                                      // seems easiest to just leave it for now
+                                      // and let it bubble up later on.
+
+  tokens = Lexer::tokenize_line(Line("_"), f_name, 0);
+  REQUIRE(tokens.size() == 1);
+  REQUIRE(tokens.front()->type() == Token::LABEL);
+  REQUIRE(Diagnostics::count() == 0);
+
+  tokens = Lexer::tokenize_line(Line("_:"), f_name, 0);
+  REQUIRE(tokens.size() == 1);
+  REQUIRE(tokens.front()->type() == Token::LABEL);
+  REQUIRE(Diagnostics::count() == 0);
+
+  // It should throw a warning if a ':' is found in a weird place
+  tokens = Lexer::tokenize_line(Line("_::"), f_name, 1);
+  REQUIRE(tokens.size() == 1);
+  REQUIRE(tokens.front()->type() == Token::LABEL);
+  REQUIRE(Diagnostics::count() == 1);
+  Diagnostics::reset();
+
+  // TODO: Apparently this results in 3 problems?
+  // TODO: It's also possible that single character labels result in resetting
+  // the column..
+  tokens = Lexer::tokenize_line(Line("_:::"), f_name, 2);
+  REQUIRE(tokens.size() == 1);
+  REQUIRE(tokens.front()->type() == Token::LABEL);
+  REQUIRE(Diagnostics::count() == 2);
+  Diagnostics::reset();
 }

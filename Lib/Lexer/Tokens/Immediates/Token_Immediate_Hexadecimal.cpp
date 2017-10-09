@@ -1,5 +1,6 @@
 #include "Tokens/Immediates/Token_Immediate_Hexadecimal.hpp"
 
+#include <limits>
 #if defined(_MSC_VER)
 #include <cctype>
 #endif
