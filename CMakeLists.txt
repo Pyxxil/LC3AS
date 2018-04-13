@@ -87,8 +87,8 @@ endif()
 
 
 if (APPLE)
-  find_package(Qt5Widgets REQUIRED PATHS "/usr/local/Cellar/qt5/5.9.1/lib/cmake/")
-  find_package(Qt5Gui REQUIRED PATHS "/usr/local/Cellar/qt5/5.9.1/lib/cmake/")
+  find_package(Qt5Widgets REQUIRED PATHS "/usr/local/Cellar/qt5/5.10.1/lib/cmake/")
+  find_package(Qt5Gui REQUIRED PATHS "/usr/local/Cellar/qt5/5.10.1/lib/cmake/")
 else ()
   find_package(Qt5Widgets)
 endif()

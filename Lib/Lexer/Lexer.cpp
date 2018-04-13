@@ -440,12 +440,20 @@ tokenize_octal_hex_bin(std::string copy,
   if (copy.length() > index) {
     switch (copy[index]) {
       case 'B':
-        if ((0 == index || '0' == copy.front()) && is_valid_binary(1)) {
+        if (copy.length() > (index + 1) && copy[index + 1] == '-' &&
+            is_valid_binary(2)) {
+          return std::make_shared<Binary>(
+            word, copy, file_name, line_number, t_column);
+        } else if ((0 == index || '0' == copy.front()) && is_valid_binary(1)) {
           return std::make_shared<Binary>(
             word, copy, file_name, line_number, t_column);
         }
       case 'X': // FALLTHROUGH
-        if (is_valid_hexadecimal(1)) {
+        if (copy.length() > (index + 1) && copy[index + 1] == '-' &&
+            is_valid_hexadecimal(2)) {
+          return std::make_shared<Hexadecimal>(
+            word, copy, file_name, line_number, t_column);
+        } else if (is_valid_hexadecimal(1)) {
           return std::make_shared<Hexadecimal>(
             word, copy, file_name, line_number, t_column);
         }
@@ -560,17 +568,15 @@ Lexer::tokenize_immediate_or_label(std::string word,
 /*! Tokenize a single line from the file
  *
  * Go through each string (terminated by ',', space character (as * defined by
- * std::isspace), or a comment (denoted by ';', "//")), and tokenize it, adding
- * it to a vector until the end of the line is reached. The end of a line is
- * determined when either a comment is hit, or the end of the line is reached
- * (that is, when the current index into the string is >= to the length of the
- * string).
+ * std::isspace), or a comment (denoted by ';', "//")), and tokenizing each
+ * word until the end of the line is reached. The end of a line is determined
+ * when either a comment is hit, or the end of the line is reached (that is,
+ * when the current index into the string is >= to the length of the string).
  *
- * @param line The line to tokenize
+ * @param current_line The line to tokenize
+ * @param file_name The name of the file being read from
  * @param line_number The current line number. This is only relevant
- * when
- * dealing with files, so defaults to 0.
- * @param into The vector to tokenize the line into
+ * when dealing with files, so defaults to 0.
  */
 std::vector<std::shared_ptr<Token>>
 Lexer::tokenize_line(Line current_line,
@@ -644,8 +650,9 @@ Lexer::tokenize_line(Line current_line,
         goto end_of_line;
       }
       case ',': {
-        if (into.empty() || (' ' != terminated_by && 0 != terminated_by &&
-                             1 != terminated_by) ||
+        if (into.empty() ||
+            (' ' != terminated_by && 0 != terminated_by &&
+             1 != terminated_by) ||
             (0u == current.length() && terminated_by != 1)) {
           Diagnostics::Diagnostic diagnostic(
             Diagnostics::FileContext(

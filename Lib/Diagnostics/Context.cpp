@@ -68,7 +68,7 @@ Diagnostics::SelectionContext::write_to(std::ostream& os) const
   file_information.write_to(os)
     << ' ' << diagnostic_colours[DIAGNOSTIC::NOTE] << ": " << message << '\n'
     << line << '\n'
-    << HIGHLIGHTER << empty_line << selector;
+    << empty_line << HIGHLIGHTER << selector;
 
   if (!fix_it.empty()) {
     os << '\n' << empty_line << fix_it;

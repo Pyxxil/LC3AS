@@ -23,6 +23,11 @@ Hexadecimal::Hexadecimal(std::string& immediate,
       immediate.insert(0, 1, '0');
     }
 
+    if (immediate[2] == '-') {
+      immediate.erase(immediate.begin() + 2);
+      immediate.insert(0, 1, '-');
+    }
+
     char* check = nullptr;
     const auto v = std::strtol(immediate.c_str(), &check, 16);
     if (nullptr == check || v > (2 * std::numeric_limits<int16_t>::max()) + 1) {

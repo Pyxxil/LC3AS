@@ -9,8 +9,8 @@
 /**
  * Make our best guess at how much memory a line requires.
  *
- * @param token: The token currently being processed.
- * @param t_tokens: All of the tokens on that line (needed for calling
+ * @param t_token The token currently being processed.
+ * @param t_tokens All of the tokens on that line (needed for calling
  * guess_memory_size on token)
  *
  * @returns The best guess we have for how much memory the line requires.
@@ -25,7 +25,6 @@ Parser::memory_requirement_of(const std::shared_ptr<Token>& t_token,
   }
 
   if (end_seen) {
-    // TODO: Do we show the user where the .END directive was?
     Diagnostics::Diagnostic diagnostic(
       Diagnostics::FileContext(t_token->file, t_token->line, t_token->column),
       "Token after .END directive, it will be ignored.",

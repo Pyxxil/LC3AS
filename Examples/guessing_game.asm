@@ -1,5 +1,3 @@
-.ORIG x3000
-
 ;
 ; This program will repeatedly ask the user to input a 2 digit number
 ; between 00 and 99 (to input a number between 0 and 9, they need to
@@ -19,17 +17,19 @@
 ; R5 | Temporary values
 ; R6 & R7 | Not used
 
-LD R1, NUMBER			; The number to guess
-LD R4, ASCII_OFFSET
+.ORIG x3000
+
+	LD R1, NUMBER		; The number to guess
+	LD R4, ASCII_OFFSET
 
 LOOP
 	LEA R0, PROMPT		; Print the prompt to the terminal
 	PUTS
 ; Grab first character
 	GETC
-	OUT					; We need to output it, as GETC doesn't
+	OUT			; We need to output it, as GETC doesn't
 	ADD R2, R0, R4		; This gives R2 the decimal value of the
-						; input character (0 if '0' is input)
+				; input character (0 if '0' is input)
 ; Grab second character
 	GETC
 	OUT
@@ -45,17 +45,17 @@ LOOP
 	ADD R2, R5, R2		; R2 = 2R2 + 8R2 = 10R2
 ; Make actual value
 	ADD R5, R2, R3		; This sets R5 to be, e.g. 12 if the user
-						; enter's '1' and '2'
+				; enter's '1' and '2'
 ; Negate the entered value (using 2's compliment)
-	NOT R5, R5			; Invert all bits
+	NOT R5, R5		; Invert all bits
 	ADD R5, R5, 1		; Add 1 to it
 	
 	ADD R5, R5, R1		; Perform R1 - R5 to check if they are equal,
-						; greater or less.
-	BRz FINISH			; If the CC is 'Z', then R1 - R5 = 0, and are
-						; therefore the same value
-	BRn GREATER_THAN	; If the CC is 'N', then R1 - R5 > 0, and
-						; therefore the number entered was greater
+				; greater or less.
+	BRz FINISH		; If the CC is 'Z', then R1 - R5 = 0, and are
+				; therefore the same value
+	BRn GREATER_THAN		; If the CC is 'N', then R1 - R5 > 0, and
+				; therefore the number entered was greater
 
 ; The value entered was less than the number
 LESS_THAN
@@ -74,7 +74,7 @@ FINISH
 	PUTS
 	HALT
 	
-NUMBER					; The number the user needs to guess
+NUMBER				; The number the user needs to guess
 	.FILL 6
 	
 PROMPT
@@ -90,7 +90,7 @@ GREATER
 	.STRINGZ "Greater\n"
 
 ASCII_OFFSET
-	.FILL 0xFFD0			; This is -0x30
+	.FILL 0xFFD0		; This is -0x30
 .END
 
 

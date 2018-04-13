@@ -27,6 +27,11 @@ Binary::Binary(std::string& immediate,
     immediate.erase(0, 1);
   }
 
+  if (immediate.front() == '-') {
+    negative = true;
+    immediate.erase(0, 1);
+  }
+
   if (immediate.length() > 16) {
     is_valid = false;
   } else {
