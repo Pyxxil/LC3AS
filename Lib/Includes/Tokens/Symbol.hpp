@@ -4,30 +4,19 @@
 #include <cstdint>
 #include <cstdlib>
 
-struct Symbol
-{
-  Symbol(uint16_t addr, size_t line, size_t t_column, const std::string& t_file)
-    : address(addr)
-    , line_number(line)
-    , column(t_column)
-    , file(t_file)
-  {}
+struct Symbol {
+  Symbol(uint16_t addr, size_t line, size_t t_column, const std::string &t_file)
+      : address(addr), line_number(line), column(t_column), file(t_file) {}
 
-  Symbol(const Symbol& other)
-    : address(other.address)
-    , line_number(other.line_number)
-    , column(other.column)
-    , file(other.file)
-  {}
-  Symbol(Symbol&& other) noexcept
-    : address(std::move(other.address))
-    , line_number(std::move(other.line_number))
-    , column(std::move(other.column))
-    , file(std::move(other.file))
-  {}
+  Symbol(const Symbol &other)
+      : address(other.address), line_number(other.line_number),
+        column(other.column), file(other.file) {}
+  Symbol(Symbol &&other) noexcept
+      : address(std::move(other.address)),
+        line_number(std::move(other.line_number)),
+        column(std::move(other.column)), file(std::move(other.file)) {}
 
-  Symbol& operator=(const Symbol& other)
-  {
+  Symbol &operator=(const Symbol &other) {
     address = other.address;
     line_number = other.line_number;
     column = other.column;
@@ -35,8 +24,7 @@ struct Symbol
     return *this;
   }
 
-  Symbol& operator=(Symbol&& other) noexcept
-  {
+  Symbol &operator=(Symbol &&other) noexcept {
     address = std::move(other.address);
     line_number = std::move(other.line_number);
     column = std::move(other.column);

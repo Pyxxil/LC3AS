@@ -5,15 +5,11 @@
 #include <functional>
 #include <string>
 
-class Line
-{
+class Line {
 public:
-  explicit Line(const std::string& t_line)
-    : m_line(t_line)
-  {}
+  explicit Line(const std::string &t_line) : m_line(t_line) {}
 
-  enum IGNORES
-  {
+  enum IGNORES {
     RESET = 0,
     ESCAPE_SEQUENCE = 1,
   };
@@ -22,8 +18,7 @@ public:
    *
    * @param to_ignore The things to ignore.
    */
-  void ignore(size_t to_ignore)
-  {
+  void ignore(size_t to_ignore) {
     m_ignores = RESET == to_ignore ? 0 : m_ignores | to_ignore;
   }
 
@@ -39,8 +34,7 @@ public:
    * @return The character read if we're not at the end of the string, 0
    * otherwise.
    */
-  char next()
-  {
+  char next() {
     const auto c = peek();
     if (0 != c) {
       ++m_index;
@@ -57,9 +51,7 @@ public:
    *
    * @param pred The function to call to check if we should stop.
    */
-  template<typename Func>
-  void skip_while(Func&& pred)
-  {
+  template <typename Func> void skip_while(Func &&pred) {
     while (!at_end()) {
       if (!pred(peek())) {
         return;
@@ -74,8 +66,7 @@ public:
    *
    * @return The index of the character, or -1 if it wasn't found
    */
-  size_t find_next(const char needle)
-  {
+  size_t find_next(const char needle) {
     while (!at_end()) {
       if (needle == peek()) {
         // TODO: Make this a little nicer somehow.
@@ -101,9 +92,7 @@ public:
    *
    * @returns The index of the character if pred is ever true, -1 otherwise.
    */
-  template<typename Func>
-  size_t find_if(Func&& pred)
-  {
+  template <typename Func> size_t find_if(Func &&pred) {
     while (!at_end()) {
       if (pred(peek())) {
         return m_index;
@@ -122,8 +111,7 @@ public:
    *
    * @return The substring in the line.
    */
-  std::string substr(size_t begin, size_t end) const
-  {
+  std::string substr(size_t begin, size_t end) const {
     return m_line.substr(begin, end - begin);
   }
 
@@ -139,22 +127,20 @@ public:
    *
    * @return The character at the index
    */
-  inline char at(size_t index) const
-  {
+  inline char at(size_t index) const {
     return static_cast<char>((index >= m_line.length()) ? 0 : (*this)[index]);
   }
 
   inline char operator[](size_t index) const { return m_line[index]; }
 
-  const Line& operator>>(char& c)
-  {
+  const Line &operator>>(char &c) {
     c = next();
     return *this;
   }
 
   inline size_t index() const { return m_index; }
 
-  const std::string& line() const { return m_line; }
+  const std::string &line() const { return m_line; }
 
 private:
   std::string m_line;
@@ -162,11 +148,10 @@ private:
   size_t m_ignores = 0;
 
   const std::array<std::function<bool(char)>, 2> ignores{
-    [this](char) -> bool {
-      return true;
-    }, // Not strictly needed, but it doesn't hurt.
-    [this](char) -> bool { return (*this)[index() - 1] != '\\'; }
-  };
+      [this](char) -> bool {
+        return true;
+      }, // Not strictly needed, but it doesn't hurt.
+      [this](char) -> bool { return (*this)[index() - 1] != '\\'; }};
 };
 
 #endif

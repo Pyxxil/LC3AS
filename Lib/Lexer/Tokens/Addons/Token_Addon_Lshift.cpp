@@ -4,42 +4,35 @@
 
 #include "Tokens/Tokens.hpp"
 
-Lshift::Lshift(const std::string& directive,
-               const std::string& directive_uppercase,
-               const std::string& t_file,
-               size_t line_number,
-               size_t column)
-  : Directive(directive, directive_uppercase, t_file, line_number, column)
-  , add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column))
-{}
+Lshift::Lshift(const std::string &directive,
+               const std::string &directive_uppercase,
+               const std::string &t_file, size_t line_number, size_t column)
+    : Directive(directive, directive_uppercase, t_file, line_number, column),
+      add(std::make_shared<Add>("ADD", "ADD", t_file, line_number, column)) {}
 
-int32_t
-Lshift::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-                 const std::map<std::string, Symbol>& symbols,
-                 uint16_t program_counter)
-{
-  std::vector<std::shared_ptr<Token>> vec = {
-    add, tokens[1], tokens[1], tokens[1]
-  };
+int32_t Lshift::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                         const std::map<std::string, Symbol> &symbols,
+                         uint16_t program_counter) {
+  std::vector<std::shared_ptr<Token>> vec = {add, tokens[1], tokens[1],
+                                             tokens[1]};
 
   add->assemble(vec, symbols, program_counter);
 
   const uint16_t machine_instruction = add->assembled.front();
 
-  assembled.insert(
-    assembled.end(),
-    static_cast<size_t>(std::static_pointer_cast<Immediate>(tokens[2])->value),
-    machine_instruction);
+  assembled.insert(assembled.end(),
+                   static_cast<size_t>(
+                       std::static_pointer_cast<Immediate>(tokens[2])->value),
+                   machine_instruction);
 
   return static_cast<int32_t>(assembled.size());
 }
 
-bool
-Lshift::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
-{
+bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   if (tokens.size() != 3) {
-    invalid_argument_count(
-      tokens.size(), 2, tokens.back()->column + tokens.back()->token.length());
+    invalid_argument_count(tokens.size(), 2,
+                           tokens.back()->column +
+                               tokens.back()->token.length());
     return (is_valid = false);
   }
 
@@ -71,26 +64,22 @@ Lshift::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 }
 
 uint16_t
-Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
-{
+Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
   if (!is_valid) {
     return 0;
   }
 
   return static_cast<uint16_t>(
-    std::static_pointer_cast<Immediate>(tokens[2])->value);
+      std::static_pointer_cast<Immediate>(tokens[2])->value);
 }
 
-std::string
-Lshift::disassemble(uint16_t& program_counter,
-                    const std::string& symbol,
-                    int width) const
-{
+std::string Lshift::disassemble(uint16_t &program_counter,
+                                const std::string &symbol, int width) const {
   std::stringstream stream;
 
   stream << add->disassemble(program_counter, symbol, width);
-  const std::string& disassembled_without_symbol =
-    add->disassemble(program_counter, "", width);
+  const std::string &disassembled_without_symbol =
+      add->disassemble(program_counter, "", width);
 
   // The previous instruction will increment this. We want it to be it's
   // original value, as we increment it ourselves in the loop below.

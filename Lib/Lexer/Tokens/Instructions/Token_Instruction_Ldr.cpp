@@ -7,23 +7,15 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Ldr::Ldr(const std::string& instruction,
-         const std::string& instruction_uppercase,
-         const std::string& t_file,
-         size_t line_number,
-         size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
-                t_file,
-                line_number,
-                t_column)
-{}
+Ldr::Ldr(const std::string &instruction,
+         const std::string &instruction_uppercase, const std::string &t_file,
+         size_t line_number, size_t t_column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  t_column) {}
 
-int32_t
-Ldr::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-              const std::map<std::string, Symbol>& symbols,
-              uint16_t program_counter)
-{
+int32_t Ldr::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                      const std::map<std::string, Symbol> &symbols,
+                      uint16_t program_counter) {
   (void)symbols;
   (void)program_counter;
 
@@ -32,19 +24,19 @@ Ldr::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0x6000 | ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
-    ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
-    (std::static_pointer_cast<Immediate>(tokens[3])->value & 0x3F)));
+      0x6000 |
+      ((std::static_pointer_cast<Register>(tokens[1])->reg & 0x7) << 9) |
+      ((std::static_pointer_cast<Register>(tokens[2])->reg & 0x7) << 6) |
+      (std::static_pointer_cast<Immediate>(tokens[3])->value & 0x3F)));
 
   return 1;
 }
 
-bool
-Ldr::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
-{
+bool Ldr::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   if (tokens.size() != 4) {
-    invalid_argument_count(
-      tokens.size(), 3, tokens.back()->column + tokens.back()->token.length());
+    invalid_argument_count(tokens.size(), 3,
+                           tokens.back()->column +
+                               tokens.back()->token.length());
     return (is_valid = false);
   }
 
@@ -69,8 +61,8 @@ Ldr::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 
   if (std::static_pointer_cast<Immediate>(tokens[3])->value > 31 ||
       std::static_pointer_cast<Immediate>(tokens[3])->value < -32) {
-    tokens[3]->requires_too_many_bits(
-      6, SIGNED, this, std::map<std::string, Symbol>());
+    tokens[3]->requires_too_many_bits(6, SIGNED, this,
+                                      std::map<std::string, Symbol>());
     return (is_valid = false);
   }
 
@@ -78,44 +70,40 @@ Ldr::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 }
 
 uint16_t
-Ldr::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
-{
+Ldr::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
   (void)tokens;
   return static_cast<uint16_t>(is_valid);
 }
 
-std::string
-Ldr::disassemble(uint16_t& program_counter,
-                 const std::string& symbol,
-                 int width) const
-{
+std::string Ldr::disassemble(uint16_t &program_counter,
+                             const std::string &symbol, int width) const {
   std::stringstream stream;
   stream
-    // Address in memory
-    << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-    << program_counter
-    << ')'
-    // Hexadecimal representation of instruction
-    << ' ' << std::hex << std::setfill('0') << std::setw(4)
-    << assembled.front()
-    // Binary representation of instruction
-    << ' '
-    << std::bitset<16>(assembled.front())
-    // Line the instruction is on
-    << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-    << line
-    << ')'
-    // Label at the current address (if any)
-    << ' ' << std::left << std::setfill(' ') << std::setw(width)
-    << symbol
-    // Instruction itself
-    << " LDR R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
-    << ((assembled.front() & 0x01C0) >> 6 & 7) << " #" << std::dec
-    << ((static_cast<int8_t>(assembled.front() & 0x3F) << 2) >> 2)
+      // Address in memory
+      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
+      << program_counter
+      << ')'
+      // Hexadecimal representation of instruction
+      << ' ' << std::hex << std::setfill('0') << std::setw(4)
+      << assembled.front()
+      // Binary representation of instruction
+      << ' '
+      << std::bitset<16>(assembled.front())
+      // Line the instruction is on
+      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
+      << line
+      << ')'
+      // Label at the current address (if any)
+      << ' ' << std::left << std::setfill(' ') << std::setw(width)
+      << symbol
+      // Instruction itself
+      << " LDR R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
+      << ((assembled.front() & 0x01C0) >> 6 & 7) << " #" << std::dec
+      << ((static_cast<int8_t>(assembled.front() & 0x3F) << 2) >> 2)
 #ifdef INCLUDE_ADDONS
-    << '\t' << file
+      << '\t' << file
 #endif
-    << '\n';
+      << '\n';
 
   ++program_counter;
 

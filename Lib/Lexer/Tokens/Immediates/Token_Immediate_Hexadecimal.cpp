@@ -8,13 +8,11 @@
 #include "Diagnostics.hpp"
 #include "LexHelper.hpp"
 
-Hexadecimal::Hexadecimal(std::string& immediate,
-                         const std::string& immediate_uppercase,
-                         const std::string& t_file,
-                         size_t line_number,
+Hexadecimal::Hexadecimal(std::string &immediate,
+                         const std::string &immediate_uppercase,
+                         const std::string &t_file, size_t line_number,
                          size_t t_column)
-  : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column)
-{
+    : Immediate(immediate, immediate_uppercase, t_file, line_number, t_column) {
   if (immediate.length() > 6 || immediate.length() == 1 ||
       (immediate.length() == 2 && 'X' == immediate_uppercase[1])) {
     is_valid = false;
@@ -28,7 +26,7 @@ Hexadecimal::Hexadecimal(std::string& immediate,
       immediate.insert(0, 1, '-');
     }
 
-    char* check = nullptr;
+    char *check = nullptr;
     const auto v = std::strtol(immediate.c_str(), &check, 16);
     if (nullptr == check || v > (2 * std::numeric_limits<int16_t>::max()) + 1) {
       is_valid = false;
@@ -39,19 +37,15 @@ Hexadecimal::Hexadecimal(std::string& immediate,
   }
 
   Diagnostics::Diagnostic diagnostic(
-    Diagnostics::FileContext(file, line, t_column),
-    "Invalid literal for 16 bit signed base 16 value",
-    Diagnostics::INVALID_LITERAL,
-    Diagnostics::ERROR);
+      Diagnostics::FileContext(file, line, t_column),
+      "Invalid literal for 16 bit signed base 16 value",
+      Diagnostics::INVALID_LITERAL, Diagnostics::ERROR);
 
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-    Diagnostics::SelectionContext(
-      Diagnostics::FileContext(file, line, t_column),
-      '^',
-      "Found here",
-      lexed_lines[file][line]),
-    '~',
-    token.length()));
+      Diagnostics::SelectionContext(
+          Diagnostics::FileContext(file, line, t_column), '^', "Found here",
+          lexed_lines[file][line]),
+      '~', token.length()));
 
   Diagnostics::push(diagnostic);
 }

@@ -12,14 +12,11 @@
  *
  */
 
-class Character : public Immediate
-{
+class Character : public Immediate {
 public:
   Character() = default;
-  Character(std::string& character,
-            const std::string& t_file,
-            size_t line_number,
-            size_t column);
+  Character(std::string &character, const std::string &t_file,
+            size_t line_number, size_t column);
 };
 
 #endif // TOKEN_ADDON_CHAR_HPP

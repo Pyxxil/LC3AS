@@ -6,23 +6,15 @@
 
 #include "Tokens/Token_Immediate.hpp"
 
-Trap::Trap(const std::string& instruction,
-           const std::string& instruction_uppercase,
-           const std::string& t_file,
-           size_t line_number,
-           size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
-                t_file,
-                line_number,
-                t_column)
-{}
+Trap::Trap(const std::string &instruction,
+           const std::string &instruction_uppercase, const std::string &t_file,
+           size_t line_number, size_t t_column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  t_column) {}
 
-int32_t
-Trap::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-               const std::map<std::string, Symbol>& symbols,
-               uint16_t program_counter)
-{
+int32_t Trap::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                       const std::map<std::string, Symbol> &symbols,
+                       uint16_t program_counter) {
   (void)symbols;
   (void)program_counter;
 
@@ -31,17 +23,16 @@ Trap::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0xF000 | (std::static_pointer_cast<Immediate>(tokens[1])->value & 0xFF)));
+      0xF000 | (std::static_pointer_cast<Immediate>(tokens[1])->value & 0xFF)));
 
   return 1;
 }
 
-bool
-Trap::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
-{
+bool Trap::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   if (tokens.size() != 2) {
-    invalid_argument_count(
-      tokens.size(), 1, tokens.back()->column + tokens.back()->token.length());
+    invalid_argument_count(tokens.size(), 1,
+                           tokens.back()->column +
+                               tokens.back()->token.length());
     return (is_valid = false);
   }
 
@@ -55,8 +46,8 @@ Trap::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
   }
 
   if (std::static_pointer_cast<Immediate>(tokens[1])->value > 0xFF) {
-    tokens[1]->requires_too_many_bits(
-      8, UNSIGNED, this, std::map<std::string, Symbol>());
+    tokens[1]->requires_too_many_bits(8, UNSIGNED, this,
+                                      std::map<std::string, Symbol>());
     return (is_valid = false);
   }
 
@@ -64,43 +55,39 @@ Trap::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 }
 
 uint16_t
-Trap::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
-{
+Trap::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
   (void)tokens;
   return static_cast<uint16_t>(is_valid);
 }
 
-std::string
-Trap::disassemble(uint16_t& program_counter,
-                  const std::string& symbol,
-                  int width) const
-{
+std::string Trap::disassemble(uint16_t &program_counter,
+                              const std::string &symbol, int width) const {
   std::stringstream stream;
   stream
-    // Address in memory
-    << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-    << program_counter
-    << ')'
-    // Hexadecimal representation of instruction
-    << ' ' << std::hex << std::setfill('0') << std::setw(4)
-    << assembled.front()
-    // Binary representation of instruction
-    << ' '
-    << std::bitset<16>(assembled.front())
-    // Line the instruction is on
-    << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-    << line
-    << ')'
-    // Label at the current address (if any)
-    << ' ' << std::left << std::setfill(' ') << std::setw(width)
-    << symbol
-    // Instruction itself
-    << " TRAP 0x" << std::right << std::hex << std::uppercase
-    << std::setfill('0') << std::setw(2) << (assembled.front() & 0xFF)
+      // Address in memory
+      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
+      << program_counter
+      << ')'
+      // Hexadecimal representation of instruction
+      << ' ' << std::hex << std::setfill('0') << std::setw(4)
+      << assembled.front()
+      // Binary representation of instruction
+      << ' '
+      << std::bitset<16>(assembled.front())
+      // Line the instruction is on
+      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
+      << line
+      << ')'
+      // Label at the current address (if any)
+      << ' ' << std::left << std::setfill(' ') << std::setw(width)
+      << symbol
+      // Instruction itself
+      << " TRAP 0x" << std::right << std::hex << std::uppercase
+      << std::setfill('0') << std::setw(2) << (assembled.front() & 0xFF)
 #ifdef INCLUDE_ADDONS
-    << '\t' << file
+      << '\t' << file
 #endif
-    << '\n';
+      << '\n';
 
   ++program_counter;
 

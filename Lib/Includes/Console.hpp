@@ -15,8 +15,7 @@
 
 namespace Console {
 #if defined(_MSC_VER)
-enum class FOREGROUND_COLOUR
-{
+enum class FOREGROUND_COLOUR {
   BLACK = 0,
   BLUE = 1,
   GREEN = 2,
@@ -28,8 +27,7 @@ enum class FOREGROUND_COLOUR
   RESET = 7,
 };
 
-enum class BACKGROUND_COLOUR
-{
+enum class BACKGROUND_COLOUR {
   BLACK = 0x00,
   RED = 0x40,
   GREEN = 0x20,
@@ -41,8 +39,7 @@ enum class BACKGROUND_COLOUR
   RESET = BACKGROUND_COLOUR::BLACK,
 };
 
-enum class MODIFIER
-{
+enum class MODIFIER {
   BOLD = FOREGROUND_INTENSITY,
   REVERSE = COMMON_LVB_REVERSE_VIDEO,
   UNDERLINE = COMMON_LVB_UNDERSCORE,
@@ -50,8 +47,7 @@ enum class MODIFIER
   RESET = NORMAL,
 };
 #else
-enum class FOREGROUND_COLOUR
-{
+enum class FOREGROUND_COLOUR {
   BLACK = 30,
   RED = 31,
   GREEN = 32,
@@ -63,8 +59,7 @@ enum class FOREGROUND_COLOUR
   RESET = 39
 };
 
-enum class BACKGROUND_COLOUR
-{
+enum class BACKGROUND_COLOUR {
   BLACK = 40,
   RED = 41,
   GREEN = 42,
@@ -76,8 +71,7 @@ enum class BACKGROUND_COLOUR
   RESET = 49
 };
 
-enum class MODIFIER
-{
+enum class MODIFIER {
   RESET = 0,
   BOLD = 1,
   FAINT = 2,
@@ -91,20 +85,14 @@ enum class MODIFIER
 };
 #endif
 
-struct Colour
-{
-  explicit Colour(FOREGROUND_COLOUR _fg,
-                  MODIFIER modifier = MODIFIER::NORMAL,
+struct Colour {
+  explicit Colour(FOREGROUND_COLOUR _fg, MODIFIER modifier = MODIFIER::NORMAL,
                   BACKGROUND_COLOUR _bg = BACKGROUND_COLOUR::RESET)
-    : fg(_fg)
-    , bg(_bg)
-    , mod(modifier)
-  {}
-  Colour(const Colour& other) = default;
-  Colour(Colour&& other) noexcept = default;
-  Colour& operator=(const Colour& other) = default;
-  Colour& operator=(Colour&& other) noexcept
-  {
+      : fg(_fg), bg(_bg), mod(modifier) {}
+  Colour(const Colour &other) = default;
+  Colour(Colour &&other) noexcept = default;
+  Colour &operator=(const Colour &other) = default;
+  Colour &operator=(Colour &&other) noexcept {
     if (this != &other) {
       fg = other.fg;
       bg = other.bg;
@@ -116,14 +104,13 @@ struct Colour
 
   ~Colour() = default;
 
-  friend std::ostream& operator<<(std::ostream& os, const Colour& colour)
-  {
+  friend std::ostream &operator<<(std::ostream &os, const Colour &colour) {
     if (!Config::is_set(Config::NO_COLOUR)) {
 #if defined(_MSC_VER)
       SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                               static_cast<int>(colour.fg) |
-                                static_cast<int>(colour.bg) |
-                                static_cast<int>(colour.mod));
+                                  static_cast<int>(colour.bg) |
+                                  static_cast<int>(colour.mod));
 #else
       return os << "\033[" << static_cast<int>(colour.fg) << ';'
                 << static_cast<int>(colour.bg) << ';'
@@ -134,12 +121,11 @@ struct Colour
     return os;
   }
 
-  bool operator==(const Colour& other) const
-  {
+  bool operator==(const Colour &other) const {
     return (fg == other.fg && bg == other.bg && mod == other.mod);
   }
 
-  bool operator!=(const Colour& other) const { return !(*this == other); }
+  bool operator!=(const Colour &other) const { return !(*this == other); }
 
 private:
   FOREGROUND_COLOUR fg;
@@ -149,33 +135,21 @@ private:
 
 const Colour reset(FOREGROUND_COLOUR::RESET, MODIFIER::RESET);
 
-template<typename T>
-inline void
-write(const T& message)
-{
+template <typename T> inline void write(const T &message) {
   message.write_to(std::cout);
 }
 
-template<typename T>
-inline void
-write(const T&& message)
-{
+template <typename T> inline void write(const T &&message) {
   message.write_to(std::cout);
 }
 
-template<typename T>
-void
-write_line(const T& message)
-{
+template <typename T> void write_line(const T &message) {
   message.write_to(std::cout) << '\n';
 }
 
-template<typename T>
-void
-write_line(const T&& message)
-{
+template <typename T> void write_line(const T &&message) {
   message.write_to(std::cout) << '\n';
 }
-}
+} // namespace Console
 
 #endif

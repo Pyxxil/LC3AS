@@ -4,20 +4,13 @@
 #include "LexHelper.hpp"
 #include "String_Matcher.hpp"
 
-Label::Label(const std::string& name,
-             const std::string& t_file,
-             size_t line_number,
-             size_t t_column)
-  : Token(name, name, t_file, line_number, t_column)
-  , instruction()
-{
-}
+Label::Label(const std::string &name, const std::string &t_file,
+             size_t line_number, size_t t_column)
+    : Token(name, name, t_file, line_number, t_column), instruction() {}
 
-int32_t
-Label::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-                const std::map<std::string, Symbol>& symbols,
-                uint16_t program_counter)
-{
+int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                        const std::map<std::string, Symbol> &symbols,
+                        uint16_t program_counter) {
   if (!is_valid) {
     return -1;
   }
@@ -34,9 +27,7 @@ Label::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   return ret;
 }
 
-bool
-Label::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
-{
+bool Label::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   if (tokens.size() > 1) {
     instruction = tokens[1];
     std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
@@ -47,8 +38,7 @@ Label::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 }
 
 uint16_t
-Label::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
-{
+Label::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
   if (tokens.size() > 1) {
     std::vector<std::shared_ptr<Token>> vec(tokens.begin() + 1, tokens.end());
     return vec.front()->guess_memory_size(vec);
@@ -57,65 +47,50 @@ Label::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
   return 0;
 }
 
-void
-Label::not_found(const std::map<std::string, Symbol>& match_candidates)
-{
+void Label::not_found(const std::map<std::string, Symbol> &match_candidates) {
   String_Matcher matcher(token);
 
-  for (const auto& symbol : match_candidates) {
+  for (const auto &symbol : match_candidates) {
     matcher.consider(symbol.first);
   }
 
-  const auto& possible_match = matcher.best_match();
+  const auto &possible_match = matcher.best_match();
 
   Diagnostics::Diagnostic diagnostic(
-    Diagnostics::FileContext(file, line, column),
-    "Invalid label",
-    Diagnostics::INVALID_LABEL,
-    Diagnostics::ERROR);
+      Diagnostics::FileContext(file, line, column), "Invalid label",
+      Diagnostics::INVALID_LABEL, Diagnostics::ERROR);
 
   if (!possible_match.empty()) {
-    auto&& sym = match_candidates.find(possible_match);
+    auto &&sym = match_candidates.find(possible_match);
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-      Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, column),
-        '^',
-        "No such label '" + token + "'; Did you mean '" + possible_match + "'?",
-        lexed_lines[file][line]),
-      '~',
-      token.size(),
-      possible_match));
+        Diagnostics::SelectionContext(
+            Diagnostics::FileContext(file, line, column), '^',
+            "No such label '" + token + "'; Did you mean '" + possible_match +
+                "'?",
+            lexed_lines[file][line]),
+        '~', token.size(), possible_match));
 
     // TODO: Fix match candidates to provide file, and column.
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-      Diagnostics::SelectionContext(
-        Diagnostics::FileContext(
-          sym->second.file, sym->second.line_number, sym->second.column),
-        '^',
-        "'" + possible_match + "' declared here",
-        lexed_lines[sym->second.file][sym->second.line_number]),
-      '~',
-      sym->first.length()));
+        Diagnostics::SelectionContext(
+            Diagnostics::FileContext(sym->second.file, sym->second.line_number,
+                                     sym->second.column),
+            '^', "'" + possible_match + "' declared here",
+            lexed_lines[sym->second.file][sym->second.line_number]),
+        '~', sym->first.length()));
   } else {
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-      Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, column),
-        '^',
-        "Label found here",
-        lexed_lines[file][line]),
-      '~',
-      token.size(),
-      possible_match));
+        Diagnostics::SelectionContext(
+            Diagnostics::FileContext(file, line, column), '^',
+            "Label found here", lexed_lines[file][line]),
+        '~', token.size(), possible_match));
   }
 
   Diagnostics::push(diagnostic);
 }
 
-std::string
-Label::disassemble(uint16_t& program_counter,
-                   const std::string& symbol,
-                   int width) const
-{
+std::string Label::disassemble(uint16_t &program_counter,
+                               const std::string &symbol, int width) const {
   if (!assembled.empty()) {
     return instruction->disassemble(program_counter, symbol, width);
   }
@@ -123,19 +98,14 @@ Label::disassemble(uint16_t& program_counter,
   return "";
 }
 
-void
-Label::requires_too_many_bits(int allowed_bits,
-                              bool is_signed,
-                              const Token* const caller,
-                              const std::map<std::string, Symbol>& symbols)
-{
+void Label::requires_too_many_bits(
+    int allowed_bits, bool is_signed, const Token *const caller,
+    const std::map<std::string, Symbol> &symbols) {
   (void)caller;
 
   Diagnostics::Diagnostic diagnostic(
-    Diagnostics::FileContext(file, line, column),
-    "Address too far away.",
-    Diagnostics::INVALID_LABEL,
-    Diagnostics::ERROR);
+      Diagnostics::FileContext(file, line, column), "Address too far away.",
+      Diagnostics::INVALID_LABEL, Diagnostics::ERROR);
 
   std::stringstream error_string;
   error_string << "Address of '" << token
@@ -144,23 +114,19 @@ Label::requires_too_many_bits(int allowed_bits,
                << " PC offset";
 
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-    Diagnostics::SelectionContext(Diagnostics::FileContext(file, line, column),
-                                  '^',
-                                  error_string.str(),
-                                  lexed_lines[file][line]),
-    '~',
-    token.length()));
+      Diagnostics::SelectionContext(
+          Diagnostics::FileContext(file, line, column), '^', error_string.str(),
+          lexed_lines[file][line]),
+      '~', token.length()));
 
   const auto sym = symbols.find(token);
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-    Diagnostics::SelectionContext(
-      Diagnostics::FileContext(
-        sym->second.file, sym->second.line_number, sym->second.column),
-      '^',
-      "'" + sym->first + "' declared here",
-      lexed_lines[sym->second.file][sym->second.line_number]),
-    '~',
-    sym->first.length()));
+      Diagnostics::SelectionContext(
+          Diagnostics::FileContext(sym->second.file, sym->second.line_number,
+                                   sym->second.column),
+          '^', "'" + sym->first + "' declared here",
+          lexed_lines[sym->second.file][sym->second.line_number]),
+      '~', sym->first.length()));
 
   Diagnostics::push(diagnostic);
 }

@@ -449,11 +449,10 @@ Assembler::Assembler::write(const std::string& file)
               << " Page Address\n//\t" << std::setfill('-')
               << std::setw(symbol_padding) << '-' << " ------------\n";
 
-  for (const auto& symbol : symbols) {
+  for (const auto& [label, symbol] : symbols) {
     symbol_file << "//\t" << std::setfill(' ') << std::setw(symbol_padding)
-                << symbol.first << ' ' << std::uppercase << std::hex
-                << std::setfill('0') << std::setw(4) << symbol.second.address
-                << '\n';
+                << label << ' ' << std::uppercase << std::hex
+                << std::setfill('0') << std::setw(4) << symbol.address << '\n';
   }
 
   const auto& symbol_at = [this](const std::uint16_t address) {

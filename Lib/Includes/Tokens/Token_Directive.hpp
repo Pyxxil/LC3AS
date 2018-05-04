@@ -3,15 +3,12 @@
 
 #include "Token.hpp"
 
-class Directive : public Token
-{
+class Directive : public Token {
 public:
   Directive() = default;
-  Directive(const std::string& directive,
-            const std::string& directive_uppercase,
-            const std::string& t_file,
-            size_t line_number,
-            size_t column);
+  Directive(const std::string &directive,
+            const std::string &directive_uppercase, const std::string &t_file,
+            size_t line_number, size_t column);
 };
 
 #endif // TOKEN_DIRECTIVE_HPP

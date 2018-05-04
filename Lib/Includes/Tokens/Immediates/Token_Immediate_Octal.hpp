@@ -3,12 +3,9 @@
 
 #include <Tokens/Token_Immediate.hpp>
 
-class Octal : public Immediate
-{
+class Octal : public Immediate {
 public:
-  Octal(std::string& immediate,
-        const std::string& t_file,
-        size_t line_number,
+  Octal(std::string &immediate, const std::string &t_file, size_t line_number,
         size_t t_column);
 };
 

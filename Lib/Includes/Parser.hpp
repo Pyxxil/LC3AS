@@ -8,34 +8,23 @@
 #include "Tokens/Symbol.hpp"
 #include "Tokens/Token.hpp"
 
-class Parser
-{
+class Parser {
 public:
   explicit Parser(std::string t_file)
-    : file(std::move(t_file))
-    , origin_seen(false)
-    , end_seen(false)
-    , internal_program_counter(0)
-    , program_counter(0)
-    , longest_symbol_length(20)
-    , symbols()
-    , tokens()
-    , origin()
-    , end()
-  {}
+      : file(std::move(t_file)), origin_seen(false), end_seen(false),
+        internal_program_counter(0), program_counter(0),
+        longest_symbol_length(20), symbols(), tokens(), origin(), end() {}
 
   int parse();
 
   inline uint16_t starting_address() const { return program_counter; }
 
-  inline const std::vector<std::vector<std::shared_ptr<Token>>>& parsed_tokens()
-    const
-  {
+  inline const std::vector<std::vector<std::shared_ptr<Token>>> &
+  parsed_tokens() const {
     return tokens;
   }
 
-  inline const std::map<std::string, Symbol>& parsed_symbols() const
-  {
+  inline const std::map<std::string, Symbol> &parsed_symbols() const {
     return symbols;
   }
 
@@ -62,8 +51,8 @@ private:
   void do_first_pass();
   void do_second_pass();
 
-  uint16_t memory_requirement_of(const std::shared_ptr<Token>& t_token,
-                                 std::vector<std::shared_ptr<Token>>& t_tokens);
+  uint16_t memory_requirement_of(const std::shared_ptr<Token> &t_token,
+                                 std::vector<std::shared_ptr<Token>> &t_tokens);
 };
 
 #endif

@@ -7,30 +7,22 @@
 #include "Console.hpp"
 
 namespace Diagnostics {
-template<class T>
-class Variant
-{
+template <class T> class Variant {
 public:
-  explicit Variant(
-    const T& var,
-    Console::Colour col = Console::Colour(Console::FOREGROUND_COLOUR::YELLOW))
-    : information(var)
-    , colour(std::move(col))
-  {}
-  Variant(const Variant<T>& other) = default;
-  Variant(Variant<T>&& other) noexcept
-    : information(other.information)
-    , colour(std::move(other.colour))
-  {}
-  Variant& operator=(const Variant<T>& rhs) = default;
-  Variant& operator=(Variant<T>&& rhs) noexcept = default;
+  explicit Variant(const T &var, Console::Colour col = Console::Colour(
+                                     Console::FOREGROUND_COLOUR::YELLOW))
+      : information(var), colour(std::move(col)) {}
+  Variant(const Variant<T> &other) = default;
+  Variant(Variant<T> &&other) noexcept
+      : information(other.information), colour(std::move(other.colour)) {}
+  Variant &operator=(const Variant<T> &rhs) = default;
+  Variant &operator=(Variant<T> &&rhs) noexcept = default;
 
   ~Variant() = default;
 
-  inline const T& var() const { return information; }
+  inline const T &var() const { return information; }
 
-  std::ostream& write_to(std::ostream& os) const
-  {
+  std::ostream &write_to(std::ostream &os) const {
     return os << colour << information << Console::reset;
   }
 
@@ -39,33 +31,25 @@ private:
   Console::Colour colour;
 };
 
-class FileContext
-{
+class FileContext {
 public:
-  FileContext(const std::string& name, size_t t_line, size_t t_col)
-    : file_name(name)
-    , column(t_col)
-    , line(t_line)
-  {}
+  FileContext(const std::string &name, size_t t_line, size_t t_col)
+      : file_name(name), column(t_col), line(t_line) {}
 
-  FileContext(Variant<std::string> name,
-              Variant<size_t> t_line,
+  FileContext(Variant<std::string> name, Variant<size_t> t_line,
               Variant<size_t> t_col)
-    : file_name(std::move(name))
-    , column(std::move(t_col))
-    , line(std::move(t_line))
-  {}
-  FileContext(const FileContext& other) = default;
-  FileContext(FileContext&& other) = default;
-  FileContext& operator=(const FileContext& rhs) = default;
-  FileContext& operator=(FileContext&& rhs) = default;
+      : file_name(std::move(name)), column(std::move(t_col)),
+        line(std::move(t_line)) {}
+  FileContext(const FileContext &other) = default;
+  FileContext(FileContext &&other) = default;
+  FileContext &operator=(const FileContext &rhs) = default;
+  FileContext &operator=(FileContext &&rhs) = default;
 
   ~FileContext() = default;
 
-  inline const Variant<size_t>& get_column() const { return column; }
+  inline const Variant<size_t> &get_column() const { return column; }
 
-  inline std::ostream& write_to(std::ostream& os) const
-  {
+  inline std::ostream &write_to(std::ostream &os) const {
     os << "In ";
     file_name.write_to(os) << ':';
     line.write_to(os) << ':';
@@ -78,39 +62,31 @@ private:
   Variant<size_t> line;
 };
 
-class Context
-{
+class Context {
 public:
-  enum CONTEXT_TYPE
-  {
+  enum CONTEXT_TYPE {
     NONE,
     SELECTOR,
     HIGHLIGHT,
   };
 
-  Context(FileContext file,
-          std::string t_message,
-          std::string t_line,
+  Context(FileContext file, std::string t_message, std::string t_line,
           CONTEXT_TYPE t_type)
-    : file_information(std::move(file))
-    , message(std::move(t_message))
-    , line(t_line)
-    , empty_line()
-    , context_type(t_type)
-  {
+      : file_information(std::move(file)), message(std::move(t_message)),
+        line(t_line), empty_line(), context_type(t_type) {
     for (size_t i = 0; i < file.get_column().var(); ++i) {
       empty_line += 0 != std::isspace(t_line[i]) ? t_line[i] : ' ';
     }
   }
-  Context(const Context& other) = default;
-  Context(Context&& other) = default;
+  Context(const Context &other) = default;
+  Context(Context &&other) = default;
 
-  Context& operator=(const Context& rhs) = default;
-  Context& operator=(Context&& rhs) = default;
+  Context &operator=(const Context &rhs) = default;
+  Context &operator=(Context &&rhs) = default;
 
   virtual ~Context() = default;
 
-  virtual std::ostream& write_to(std::ostream& os) const;
+  virtual std::ostream &write_to(std::ostream &os) const;
 
   inline CONTEXT_TYPE type() const { return context_type; }
 
@@ -123,23 +99,20 @@ public:
   CONTEXT_TYPE context_type;
 };
 
-class SelectionContext : public Context
-{
+class SelectionContext : public Context {
 public:
-  SelectionContext(FileContext file,
-                   char t_selector,
-                   std::string t_message,
-                   const std::string& t_line,
+  SelectionContext(FileContext file, char t_selector, std::string t_message,
+                   const std::string &t_line,
                    std::string changer = std::string());
-  SelectionContext(const SelectionContext& other) = default;
-  SelectionContext(SelectionContext&& other) = default;
+  SelectionContext(const SelectionContext &other) = default;
+  SelectionContext(SelectionContext &&other) = default;
 
-  SelectionContext& operator=(const SelectionContext& rhs) = default;
-  SelectionContext& operator=(SelectionContext&& rhs) = default;
+  SelectionContext &operator=(const SelectionContext &rhs) = default;
+  SelectionContext &operator=(SelectionContext &&rhs) = default;
 
   ~SelectionContext() override = default;
 
-  std::ostream& write_to(std::ostream& os) const override;
+  std::ostream &write_to(std::ostream &os) const override;
 
 private:
   char selector;
@@ -147,15 +120,12 @@ private:
   std::string fix_it;
 };
 
-class HighlightContext : public Context
-{
+class HighlightContext : public Context {
 public:
-  HighlightContext(SelectionContext t_selector,
-                   char t_highlighter,
-                   int t_highlight_length,
-                   std::string changer = std::string());
+  HighlightContext(SelectionContext t_selector, char t_highlighter,
+                   int t_highlight_length, std::string changer = std::string());
 
-  std::ostream& write_to(std::ostream& os) const override;
+  std::ostream &write_to(std::ostream &os) const override;
 
 private:
   char highlighter;

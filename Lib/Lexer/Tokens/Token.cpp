@@ -8,86 +8,76 @@
  *
  * @return The type string
  */
-std::string
-Token::deduce_type() const
-{
+std::string Token::deduce_type() const {
   switch (type()) {
-    case OP_BR:
-    case OP_ST:
-    case OP_LD:
-    case OP_LDR:
-    case OP_LEA:
-    case OP_LDI:
-    case OP_NOT:
-    case OP_RTI:
-    case OP_STI:
-    case OP_STR:
-    case OP_ADD:
-    case OP_AND:
-    case OP_JSR:
-    case OP_RET:
-    case OP_JMP:
-    case OP_JSRR:
-    case OP_TRAP:
-      return std::string("Instruction");
-    case DIR_END:
-    case DIR_FILL:
-    case DIR_BLKW:
-    case DIR_ORIG:
-    case DIR_STRINGZ:
+  case OP_BR:
+  case OP_ST:
+  case OP_LD:
+  case OP_LDR:
+  case OP_LEA:
+  case OP_LDI:
+  case OP_NOT:
+  case OP_RTI:
+  case OP_STI:
+  case OP_STR:
+  case OP_ADD:
+  case OP_AND:
+  case OP_JSR:
+  case OP_RET:
+  case OP_JMP:
+  case OP_JSRR:
+  case OP_TRAP:
+    return std::string("Instruction");
+  case DIR_END:
+  case DIR_FILL:
+  case DIR_BLKW:
+  case DIR_ORIG:
+  case DIR_STRINGZ:
 #ifdef INCLUDE_ADDONS
-    case ADDON_NEG:
-    case ADDON_SUB:
-    case ADDON_SET:
-    case ADDON_LSHIFT:
+  case ADDON_NEG:
+  case ADDON_SUB:
+  case ADDON_SET:
+  case ADDON_LSHIFT:
 #endif
-      return std::string("Directive");
-    case TRAP_IN:
-    case TRAP_OUT:
-    case TRAP_PUTS:
-    case TRAP_GETC:
-    case TRAP_HALT:
-    case TRAP_PUTSP:
-      return std::string("Trap Routine");
-    case REGISTER:
-      return std::string("Register");
-    case LABEL:
-      return std::string("Label");
-    case IMMEDIATE:
-      return std::string("Immediate Value");
-    case _STRING:
-      return std::string("String Literal");
-    default:
-      return std::string("None Type");
+    return std::string("Directive");
+  case TRAP_IN:
+  case TRAP_OUT:
+  case TRAP_PUTS:
+  case TRAP_GETC:
+  case TRAP_HALT:
+  case TRAP_PUTSP:
+    return std::string("Trap Routine");
+  case REGISTER:
+    return std::string("Register");
+  case LABEL:
+    return std::string("Label");
+  case IMMEDIATE:
+    return std::string("Immediate Value");
+  case _STRING:
+    return std::string("String Literal");
+  default:
+    return std::string("None Type");
   }
 }
 
-void
-Token::expected(const std::string& expects) const
-{
+void Token::expected(const std::string &expects) const {
   Diagnostics::Diagnostic diagnostic(
-    Diagnostics::FileContext(file, line, column),
-    "Expected " + expects,
-    Diagnostics::SYNTAX,
-    Diagnostics::ERROR);
+      Diagnostics::FileContext(file, line, column), "Expected " + expects,
+      Diagnostics::SYNTAX, Diagnostics::ERROR);
 
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-    Diagnostics::SelectionContext(Diagnostics::FileContext(file, line, column),
-                                  '^',
-                                  "Found '" + token +
-                                    "' ( Type: " + deduce_type() + " ) instead",
-                                  lexed_lines[file][line]),
-    '~',
-    token.length()));
+      Diagnostics::SelectionContext(
+          Diagnostics::FileContext(file, line, column), '^',
+          "Found '" + token + "' ( Type: " + deduce_type() + " ) instead",
+          lexed_lines[file][line]),
+      '~', token.length()));
 
   Diagnostics::push(diagnostic);
 }
 
-int32_t
-Token::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-                const std::map<std::string, Symbol>& symbols,
-                uint16_t program_counter)
-{
+int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                        const std::map<std::string, Symbol> &symbols,
+                        uint16_t program_counter) {
   (void)tokens;
   (void)symbols;
   (void)program_counter;
@@ -110,11 +100,8 @@ Token::assemble(std::vector<std::shared_ptr<Token>>& tokens,
  * @param expected The number of expected arguments.
  * @param last_column The final column used for highlighting.
  */
-void
-Token::invalid_argument_count(size_t provided,
-                              size_t expected,
-                              size_t last_column) const
-{
+void Token::invalid_argument_count(size_t provided, size_t expected,
+                                   size_t last_column) const {
   // This is not the best idea, but because tokens.size() returns the number of
   // arguments + the token itself, it's a little easier to do here.
   --provided;
@@ -127,20 +114,15 @@ Token::invalid_argument_count(size_t provided,
                << " provided";
 
   Diagnostics::Diagnostic diagnostic(
-    Diagnostics::FileContext(file, line, column),
-    error_string.str(),
-    Diagnostics::SYNTAX,
-    Diagnostics::ERROR);
+      Diagnostics::FileContext(file, line, column), error_string.str(),
+      Diagnostics::SYNTAX, Diagnostics::ERROR);
 
   if (0u != provided) { // To avoid printing the beginning token itself.
     diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
-      Diagnostics::SelectionContext(
-        Diagnostics::FileContext(file, line, column + token.length()),
-        ' ',
-        "Unexpected arguments found here",
-        lexed_lines[file][line]),
-      '~',
-      last_column - (column + token.length())));
+        Diagnostics::SelectionContext(
+            Diagnostics::FileContext(file, line, column + token.length()), ' ',
+            "Unexpected arguments found here", lexed_lines[file][line]),
+        '~', last_column - (column + token.length())));
   }
 
   Diagnostics::push(diagnostic);

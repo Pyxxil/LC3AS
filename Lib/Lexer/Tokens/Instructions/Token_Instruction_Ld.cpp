@@ -8,37 +8,21 @@
 #include "Tokens/Token_Label.hpp"
 #include "Tokens/Token_Register.hpp"
 
-Ld::Ld(const std::string& instruction,
-       const std::string& instruction_uppercase,
-       const std::string& t_file,
-       size_t line_number,
-       size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
-                t_file,
-                line_number,
-                t_column)
-  , provided()
-{}
+Ld::Ld(const std::string &instruction, const std::string &instruction_uppercase,
+       const std::string &t_file, size_t line_number, size_t t_column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  t_column),
+      provided() {}
 
-Ld::Ld(std::string&& instruction,
-       std::string&& instruction_uppercase,
-       const std::string& t_file,
-       size_t line_number,
-       size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
-                t_file,
-                line_number,
-                t_column)
-  , provided()
-{}
+Ld::Ld(std::string &&instruction, std::string &&instruction_uppercase,
+       const std::string &t_file, size_t line_number, size_t t_column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  t_column),
+      provided() {}
 
-int32_t
-Ld::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-             const std::map<std::string, Symbol>& symbols,
-             uint16_t program_counter)
-{
+int32_t Ld::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                     const std::map<std::string, Symbol> &symbols,
+                     uint16_t program_counter) {
   if (!is_valid) {
     return 0;
   }
@@ -64,18 +48,17 @@ Ld::assemble(std::vector<std::shared_ptr<Token>>& tokens,
 
   provided = tokens[2];
   assembled.emplace_back(static_cast<uint16_t>(
-    0x2000 | ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
-    (offset & 0x1FF)));
+      0x2000 | ((std::static_pointer_cast<Register>(tokens[1])->reg & 7) << 9) |
+      (offset & 0x1FF)));
 
   return 1;
 }
 
-bool
-Ld::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
-{
+bool Ld::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   if (tokens.size() != 3) {
-    invalid_argument_count(
-      tokens.size(), 2, tokens.back()->column + tokens.back()->token.length());
+    invalid_argument_count(tokens.size(), 2,
+                           tokens.back()->column +
+                               tokens.back()->token.length());
     return false;
   }
 
@@ -98,38 +81,34 @@ Ld::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 }
 
 uint16_t
-Ld::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
-{
+Ld::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
   (void)tokens;
   return static_cast<uint16_t>(is_valid);
 }
 
-std::string
-Ld::disassemble(uint16_t& program_counter,
-                const std::string& symbol,
-                int width) const
-{
+std::string Ld::disassemble(uint16_t &program_counter,
+                            const std::string &symbol, int width) const {
   std::stringstream stream;
   stream
-    // Address in memory
-    << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-    << program_counter
-    << ')'
-    // Hexadecimal representation of instruction
-    << ' ' << std::hex << std::setfill('0') << std::setw(4)
-    << assembled.front()
-    // Binary representation of instruction
-    << ' '
-    << std::bitset<16>(assembled.front())
-    // Line the instruction is on
-    << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-    << line
-    << ')'
-    // Label at the current address (if any)
-    << ' ' << std::left << std::setfill(' ') << std::setw(width)
-    << symbol
-    // Instruction itself
-    << " LD R" << ((assembled.front() & 0x0E00) >> 9 & 7) << ' ';
+      // Address in memory
+      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
+      << program_counter
+      << ')'
+      // Hexadecimal representation of instruction
+      << ' ' << std::hex << std::setfill('0') << std::setw(4)
+      << assembled.front()
+      // Binary representation of instruction
+      << ' '
+      << std::bitset<16>(assembled.front())
+      // Line the instruction is on
+      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
+      << line
+      << ')'
+      // Label at the current address (if any)
+      << ' ' << std::left << std::setfill(' ') << std::setw(width)
+      << symbol
+      // Instruction itself
+      << " LD R" << ((assembled.front() & 0x0E00) >> 9 & 7) << ' ';
 
   ++program_counter;
 

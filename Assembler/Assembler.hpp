@@ -8,8 +8,7 @@
 #include "Tokens/Tokens.hpp"
 
 namespace Assembler {
-class Assembler
-{
+class Assembler {
 public:
   Assembler() = default;
 
@@ -37,17 +36,16 @@ public:
   //      -O                              Perform peephole optimisations (if
   //                                      possible)
   //                                      TODO: Look into doing this.
-  bool configure(int argc, char** args);
+  bool configure(int argc, char **args);
 
   void assemble();
 
 private:
-  void write(const std::string& file);
+  void write(const std::string &file);
   void generate_machine_code();
   void check_and_mark_warnings(
-    const std::vector<std::shared_ptr<Token>>& tokenized_line,
-    uint16_t assembled_line,
-    size_t i);
+      const std::vector<std::shared_ptr<Token>> &tokenized_line,
+      uint16_t assembled_line, size_t i);
 
   std::vector<std::string> files_to_assemble;
   std::vector<std::vector<std::shared_ptr<Token>>> tokens;
@@ -56,8 +54,7 @@ private:
   int symbol_padding{};
 };
 
-int
-assemble(int argc, char** args);
+int assemble(int argc, char **args);
 } // namespace Assembler
 
 #endif
