@@ -15,9 +15,9 @@ enum CONFIG_OPTIONS {
 
 extern size_t configuration;
 
-bool is_set(size_t option);
+inline bool is_set(size_t option) { return (configuration & option) != 0; }
 
-void set(size_t option);
+inline void set(size_t option) { configuration |= option; }
 
 void add_search_directory(const std::string &directory);
 void add_search_directory(const std::string &&directory,

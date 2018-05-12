@@ -10,13 +10,13 @@ MainWindow::MainWindow(QWidget* parent)
   setupEditor();
   setupConsole();
 
-  QVBoxLayout* layout = new QVBoxLayout;
+  auto* layout = new QVBoxLayout;
   layout->addWidget(editor);
   layout->setStretch(0, 1);
   layout->addWidget(console);
   layout->setContentsMargins(5, 5, 5, 5);
 
-  QWidget* window = new QWidget();
+  auto* window = new QWidget();
   window->setLayout(layout);
 
   setCentralWidget(window);

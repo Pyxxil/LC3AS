@@ -37,17 +37,17 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
 
   directiveFormat.setForeground(QColor(0xC7, 0xC7, 0x95));
   QStringList directivePatterns;
-  directivePatterns << "(?=\\W)\\.[oO][rR][iI][gG]\\b"
-                    << "(?=\\W)\\.[eE][nN][dD]\\b"
-                    << "(?=\\W)\\.[bB][lL][kK][wW]\\b"
-                    << "(?=\\W)\\.[fF][iI][lL]{2}\\b"
-                    << "(?=\\W)\\.[sS][tT][rR][iI][nN][gG][zZ]\\b"
+  directivePatterns << R"((?=\W)\.[oO][rR][iI][gG]\b)"
+                    << R"((?=\W)\.[eE][nN][dD]\b)"
+                    << R"((?=\W)\.[bB][lL][kK][wW]\b)"
+                    << R"((?=\W)\.[fF][iI][lL]{2}\b)"
+                    << R"((?=\W)\.[sS][tT][rR][iI][nN][gG][zZ]\b)"
 #ifdef INCLUDE_ADDONS
-                    << "(?=\\W)\\.[sS][eE][tT]\\b"
-                    << "(?=\\W)\\.[lL][sS][hH][iI][fF][tT]\\b"
-                    << "(?=\\W)\\.[iI][nN][cC][lL][uU][dD][eE]\\b"
-                    << "(?=\\W)\\.[nN][eE][gG]\\b"
-                    << "(?=\\W)\\.[sS][uU][bB]\\b"
+                    << R"((?=\W)\.[sS][eE][tT]\b)"
+                    << R"((?=\W)\.[lL][sS][hH][iI][fF][tT]\b)"
+                    << R"((?=\W)\.[iI][nN][cC][lL][uU][dD][eE]\b)"
+                    << R"((?=\W)\.[nN][eE][gG]\b)"
+                    << R"((?=\W)\.[sS][uU][bB]\b)"
 #endif
     ;
 
@@ -76,7 +76,7 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
                          << "[\\W]0?[xX][\\da-fA-F]+"
                          << "[\\W]0?[bB][01]+"
 #ifdef INCLUDE_ADDONS
-                         << "\\\\\\d+"
+                         << R"(\\\d+)"
 #endif
     ;
 

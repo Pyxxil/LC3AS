@@ -63,10 +63,6 @@ static std::vector<Directory> search_directories;
 
 size_t Config::configuration = 0;
 
-bool Config::is_set(size_t option) { return (configuration & option) != 0; }
-
-void Config::set(size_t option) { configuration |= option; }
-
 void Config::add_search_directory(const std::string &directory) {
   (void)directory;
   //  search_directories.emplace_back(Directory(directory));

@@ -12,7 +12,7 @@ class SyntaxHighlighter : public QSyntaxHighlighter
   Q_OBJECT
 
 public:
-  SyntaxHighlighter(QTextDocument* parent = 0);
+  SyntaxHighlighter(QTextDocument* parent = nullptr);
 
 protected:
   void highlightBlock(const QString& text) override;

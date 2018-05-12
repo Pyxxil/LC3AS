@@ -61,13 +61,11 @@ void Parser::do_first_pass() {
   // TODO: stop if we don't see it first? Or should we just default to setting
   // TODO: the memory address to 0x3000?
   for (auto &&tokenized_line : tokens) {
-    switch (tokenized_line.front()->type()) {
+    switch (auto &&token = tokenized_line.front(); token->type()) {
     case Token::DIR_ORIG: {
       if (origin_seen) {
         Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(tokenized_line.front()->file,
-                                     tokenized_line.front()->line,
-                                     tokenized_line.front()->column),
+            Diagnostics::FileContext(token->file, token->line, token->column),
             "Redefinition of Origin memory address",
             Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::WARNING);
 
@@ -84,60 +82,54 @@ void Parser::do_first_pass() {
         break;
       }
       origin_seen = true;
-      origin = tokenized_line.front();
-      internal_program_counter +=
-          memory_requirement_of(tokenized_line.front(), tokenized_line);
+      origin = token;
+      internal_program_counter += memory_requirement_of(token, tokenized_line);
       break;
     }
     case Token::LABEL: {
-      const uint16_t memory_req =
-          memory_requirement_of(tokenized_line.front(), tokenized_line);
-      std::static_pointer_cast<Label>(tokenized_line.front())->address =
+      const uint16_t memory_req = memory_requirement_of(token, tokenized_line);
+      std::static_pointer_cast<Label>(token)->address =
           internal_program_counter;
 
-      for (const auto &symbol : symbols) {
-        if (symbol.second.address == internal_program_counter) {
+      for (auto &&[_, symbol] : symbols) {
+        if (symbol.address == internal_program_counter) {
           Diagnostics::Diagnostic diagnostic(
-              Diagnostics::FileContext(tokenized_line.front()->file,
-                                       tokenized_line.front()->line,
-                                       tokenized_line.front()->column),
+              Diagnostics::FileContext(token->file, token->line, token->column),
               "Multiple labels found for address",
               Diagnostics::MULTIPLE_DEFINITIONS, Diagnostics::ERROR);
 
           diagnostic.provide_context(
               std::make_unique<Diagnostics::SelectionContext>(
-                  Diagnostics::FileContext(symbol.second.file,
-                                           symbol.second.line_number,
-                                           symbol.second.column),
+                  Diagnostics::FileContext(symbol.file, symbol.line_number,
+                                           symbol.column),
                   '^', "Previous label found here",
-                  lexed_lines[symbol.second.file][symbol.second.line_number]));
+                  lexed_lines[symbol.file][symbol.line_number]));
 
           Diagnostics::push(diagnostic);
           break;
         }
       }
 
-      if (0u != symbols.count(tokenized_line.front()->token)) {
+      auto &&[symbol, inserted] = symbols.try_emplace(
+          token->token, Symbol(internal_program_counter, token->line,
+                               token->column, token->file));
+      if (!inserted) {
         // TODO: Fix the way these are handled. At the moment, any errors
         // TODO: thrown here from labels that have been included (from the
         // TODO: same file) won't actually be useful due to the fact that it
         // TODO: doesn't tell the user where the .include was found.
-        auto &&sym = symbols.at(tokenized_line.front()->token);
+        auto &&sym = symbol->second;
         Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(tokenized_line.front()->file,
-                                     tokenized_line.front()->line,
-                                     tokenized_line.front()->column),
+            Diagnostics::FileContext(token->file, token->line, token->column),
             "Multiple definitions of label", Diagnostics::MULTIPLE_DEFINITIONS,
             Diagnostics::ERROR);
 
         diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
-                Diagnostics::FileContext(tokenized_line.front()->file,
-                                         tokenized_line.front()->line,
-                                         tokenized_line.front()->column),
+                Diagnostics::FileContext(token->file, token->line,
+                                         token->column),
                 '^', "Redefinition of this label",
-                lexed_lines[tokenized_line.front()->file]
-                           [tokenized_line.front()->line]));
+                lexed_lines[token->file][token->line]));
 
         diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
@@ -146,17 +138,10 @@ void Parser::do_first_pass() {
                 lexed_lines[sym.file][sym.line_number]));
 
         Diagnostics::push(diagnostic);
+      } else {
+        longest_symbol_length = std::max(
+            longest_symbol_length, static_cast<int>(token->token.length()));
       }
-
-      symbols.insert(std::pair<std::string, Symbol>(
-          tokenized_line.front()->token,
-          Symbol(internal_program_counter, tokenized_line.front()->line,
-                 tokenized_line.front()->column,
-                 tokenized_line.front()->file)));
-
-      longest_symbol_length =
-          std::max(longest_symbol_length,
-                   static_cast<int>(tokenized_line.front()->token.length()));
 
       internal_program_counter += memory_req;
       break;
@@ -164,9 +149,7 @@ void Parser::do_first_pass() {
     case Token::DIR_END: {
       if (end_seen) {
         Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(tokenized_line.front()->file,
-                                     tokenized_line.front()->line,
-                                     tokenized_line.front()->column),
+            Diagnostics::FileContext(token->file, token->line, token->column),
             "Extra .END directive", Diagnostics::MULTIPLE_DEFINITIONS,
             Diagnostics::WARNING);
 
@@ -180,14 +163,13 @@ void Parser::do_first_pass() {
 
         Diagnostics::push(diagnostic);
       } else {
-        end = tokenized_line.front();
+        end = token;
         end_seen = true;
       }
       break;
     }
     default:
-      internal_program_counter +=
-          memory_requirement_of(tokenized_line.front(), tokenized_line);
+      internal_program_counter += memory_requirement_of(token, tokenized_line);
       break;
     }
   }
@@ -201,14 +183,14 @@ void Parser::do_first_pass() {
  */
 void Parser::do_second_pass() {
   for (auto &&tokenized_line : tokens) {
-    if (tokenized_line.front()->type() == Token::DIR_END) {
+    auto &&token = tokenized_line.front();
+    if (token->type() == Token::DIR_END) {
       end_seen = true;
       break;
     }
 
-    internal_program_counter +=
-        static_cast<uint16_t>(tokenized_line.front()->assemble(
-            tokenized_line, symbols, internal_program_counter));
+    internal_program_counter += static_cast<uint16_t>(
+        token->assemble(tokenized_line, symbols, internal_program_counter));
   }
 }
 

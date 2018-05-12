@@ -14,7 +14,7 @@ Not::Not(const std::string &instruction,
 
 Not::Not(std::string &&instruction, std::string &&instruction_uppercase,
          const std::string &t_file, size_t line_number, size_t t_column)
-    : Instruction(std::move(instruction), std::move(instruction_uppercase),
+    : Instruction(instruction, instruction_uppercase,
                   t_file, line_number, t_column) {}
 
 int32_t Not::assemble(std::vector<std::shared_ptr<Token>> &tokens,

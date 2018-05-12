@@ -18,7 +18,7 @@ public:
    *
    * @param to_ignore The things to ignore.
    */
-  void ignore(size_t to_ignore) {
+  inline void ignore(size_t to_ignore) {
     m_ignores = RESET == to_ignore ? 0 : m_ignores | to_ignore;
   }
 
@@ -148,7 +148,7 @@ private:
   size_t m_ignores = 0;
 
   const std::array<std::function<bool(char)>, 2> ignores{
-      [this](char) -> bool {
+      [](char) -> bool {
         return true;
       }, // Not strictly needed, but it doesn't hurt.
       [this](char) -> bool { return (*this)[index() - 1] != '\\'; }};

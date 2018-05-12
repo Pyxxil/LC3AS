@@ -4,7 +4,7 @@
 #include <string_view>
 
 #if defined(_MSC_VER)
-// Windows doesn't like not having this here apparently.
+// Windows likes having this here apparently.
 #include <cctype>
 #endif
 
@@ -33,7 +33,7 @@ static inline constexpr bool valid_char(size_t ch) {
  */
 static constexpr size_t hash(std::string_view string) {
   size_t hashed{37};
-  const size_t first_character = static_cast<size_t>(string.front());
+  const auto first_character = static_cast<size_t>(string.front());
 
   if (!valid_char(first_character)) {
     // Basically, we don't really want something that's likely to be an
@@ -105,7 +105,7 @@ void Lexer::include_file(std::vector<std::shared_ptr<Token>> &t_line) {
   }
 }
 
-/*! Lex this lexers file into a stream of tokens
+/*! Lex this lexers file into a stream of tokens and symbols.
  *
  * @param t_tokens The stream to lex the tokens into.
  * @param t_symbols The stream to lex any symbols found into.
@@ -173,9 +173,7 @@ std::shared_ptr<Token> Lexer::tokenize(std::string word,
   // TODO: Just as a precautionary measure.
 
   // This is non-zero if the string contains some letters.
-  const size_t hashed{hash(copy)};
-
-  if (0u != hashed) {
+  if (const size_t hashed{hash(copy)}; 0u != hashed) {
     switch (hashed) {
     case hash("ADD"):
       return std::make_shared<Add>(word, copy, file_name, line_number,
@@ -235,18 +233,25 @@ std::shared_ptr<Token> Lexer::tokenize(std::string word,
     case hash("GETC"):
       return std::make_shared<Getc>(word, copy, file_name, line_number,
                                     t_column);
-    case hash("OUT"): // FALLTHROUGH
+    case hash("OUT"):
+      [[fallthrough]];
     case hash("PUTC"):
       return std::make_shared<Out>(word, copy, file_name, line_number,
                                    t_column);
     case hash("IN"):
       return std::make_shared<In>(word, copy, file_name, line_number, t_column);
-    case hash("BR"):    // FALLTHROUGH
-    case hash("BRNZP"): // FALLTHROUGH
-    case hash("BRNPZ"): // FALLTHROUGH
-    case hash("BRZNP"): // FALLTHROUGH
-    case hash("BRZPN"): // FALLTHROUGH
-    case hash("BRPNZ"): // FALLTHROUGH
+    case hash("BR"):
+      [[fallthrough]];
+    case hash("BRNZP"):
+      [[fallthrough]];
+    case hash("BRNPZ"):
+      [[fallthrough]];
+    case hash("BRZNP"):
+      [[fallthrough]];
+    case hash("BRZPN"):
+      [[fallthrough]];
+    case hash("BRPNZ"):
+      [[fallthrough]];
     case hash("BRPZN"):
       return std::make_shared<Br>(word, copy, file_name, line_number, t_column,
                                   true, true, true);
@@ -259,15 +264,18 @@ std::shared_ptr<Token> Lexer::tokenize(std::string word,
     case hash("BRP"):
       return std::make_shared<Br>(word, copy, file_name, line_number, t_column,
                                   false, false, true);
-    case hash("BRNZ"): // FALLTHROUGH
+    case hash("BRNZ"):
+      [[fallthrough]];
     case hash("BRZN"):
       return std::make_shared<Br>(word, copy, file_name, line_number, t_column,
                                   true, true, false);
-    case hash("BRNP"): // FALLTHROUGH
+    case hash("BRNP"):
+      [[fallthrough]];
     case hash("BRPN"):
       return std::make_shared<Br>(word, copy, file_name, line_number, t_column,
                                   true, false, true);
-    case hash("BRZP"): // FALLTHROUGH
+    case hash("BRZP"):
+      [[fallthrough]];
     case hash("BRPZ"):
       return std::make_shared<Br>(word, copy, file_name, line_number, t_column,
                                   false, true, true);
@@ -286,13 +294,20 @@ std::shared_ptr<Token> Lexer::tokenize(std::string word,
     case hash(".STRINGZ"):
       return std::make_shared<Stringz>(word, copy, file_name, line_number,
                                        t_column);
-    case hash("R0"): // FALLTHROUGH
-    case hash("R1"): // FALLTHROUGH
-    case hash("R2"): // FALLTHROUGH
-    case hash("R3"): // FALLTHROUGH
-    case hash("R4"): // FALLTHROUGH
-    case hash("R5"): // FALLTHROUGH
-    case hash("R6"): // FALLTHROUGH
+    case hash("R0"):
+      [[fallthrough]];
+    case hash("R1"):
+      [[fallthrough]];
+    case hash("R2"):
+      [[fallthrough]];
+    case hash("R3"):
+      [[fallthrough]];
+    case hash("R4"):
+      [[fallthrough]];
+    case hash("R5"):
+      [[fallthrough]];
+    case hash("R6"):
+      [[fallthrough]];
     case hash("R7"):
       return std::make_shared<Register>(word, copy, file_name, line_number,
                                         t_column);
@@ -335,13 +350,12 @@ static std::shared_ptr<Token> tokenize_label(std::string copy, std::string word,
                                              const std::string &file_name,
                                              size_t line_number,
                                              size_t t_column) {
+  // Don't want to allow a single '.' to be a valid label
   const bool is_valid_label =
-      std::all_of(word.begin() + static_cast<size_t>(word.front() == '.'),
+      !('.' == word.front() && word.size() == 1) &&
+      std::all_of(word.begin() + static_cast<long>(word.front() == '.'),
                   word.end(),
-                  [](const auto c) { return std::isalnum(c) || '_' == c; }) &&
-      !('.' == word.front() &&
-        word.size() ==
-            1); // Don't want to allow a single '.' to be a valid label
+                  [](const auto c) { return std::isalnum(c) || '_' == c; });
 
   if (is_valid_label) {
     return std::make_shared<Label>(word, file_name, line_number, t_column);
@@ -352,6 +366,24 @@ static std::shared_ptr<Token> tokenize_label(std::string copy, std::string word,
   token->is_valid = false;
   return token;
 }
+
+static constexpr auto is_valid_binary = [](const auto &string, long offset,
+                                           long index) -> bool {
+  return std::all_of(string.begin() + offset + index, string.end(),
+                     [](const auto c) { return c == '0' || c == '1'; });
+};
+
+static constexpr auto is_valid_hexadecimal = [](const auto &string, long offset,
+                                                long index) -> bool {
+  return std::all_of(string.begin() + offset + index, string.end(),
+                     [](const auto c) { return std::isxdigit(c); });
+};
+
+static constexpr auto is_valid_octal = [](const auto &string, long offset,
+                                          long index) -> bool {
+  return std::all_of(string.begin() + offset + index, string.end(),
+                     [](const auto c) { return c >= 0x30 && c <= 0x37; });
+};
 
 /*! Check if the given token is a binary immediate value, a hexadecimal
  * immediate value, or an octal immediate value.
@@ -369,44 +401,32 @@ static std::shared_ptr<Token>
 tokenize_octal_hex_bin(std::string copy, size_t index, std::string word,
                        const std::string &file_name, size_t line_number,
                        size_t t_column) {
-  const auto is_valid_binary = [&copy, index](size_t offset) -> bool {
-    return std::all_of(copy.begin() + offset + index, copy.end(),
-                       [](const auto c) { return c == '0' || c == '1'; });
-  };
-
-  const auto is_valid_hexadecimal = [&copy, index](size_t offset) -> bool {
-    return std::all_of(copy.begin() + offset + index, copy.end(),
-                       [](const auto c) { return std::isxdigit(c); });
-  };
-
-  const auto is_valid_octal = [&copy, index](size_t offset) -> bool {
-    return std::all_of(copy.begin() + offset + index, copy.end(),
-                       [](const auto c) { return c >= 0x30 && c <= 0x37; });
-  };
-
+  const auto idx = static_cast<long>(index);
   if (copy.length() > index) {
     switch (copy[index]) {
     case 'B':
       if (copy.length() > (index + 1) && copy[index + 1] == '-' &&
-          is_valid_binary(2)) {
+          is_valid_binary(copy, 2, idx)) {
         return std::make_shared<Binary>(word, copy, file_name, line_number,
                                         t_column);
-      } else if ((0 == index || '0' == copy.front()) && is_valid_binary(1)) {
+      } else if ((0 == index || '0' == copy.front()) &&
+                 is_valid_binary(copy, 1, idx)) {
         return std::make_shared<Binary>(word, copy, file_name, line_number,
                                         t_column);
       }
-    case 'X': // FALLTHROUGH
+      [[fallthrough]];
+    case 'X':
       if (copy.length() > (index + 1) && copy[index + 1] == '-' &&
-          is_valid_hexadecimal(2)) {
+          is_valid_hexadecimal(copy, 2, idx)) {
         return std::make_shared<Hexadecimal>(word, copy, file_name, line_number,
                                              t_column);
-      } else if (is_valid_hexadecimal(1)) {
+      } else if (is_valid_hexadecimal(copy, 1, idx)) {
         return std::make_shared<Hexadecimal>(word, copy, file_name, line_number,
                                              t_column);
       }
       break;
     default:
-      if (is_valid_octal(1)) {
+      if (is_valid_octal(copy, 1, idx)) {
         return std::make_shared<Octal>(word, file_name, line_number, t_column);
       }
       return tokenize_label(std::move(copy), std::move(word), file_name,
@@ -414,7 +434,7 @@ tokenize_octal_hex_bin(std::string copy, size_t index, std::string word,
     }
   }
 
-  if (is_valid_octal(0)) {
+  if (is_valid_octal(copy, 0, idx)) {
     return std::make_shared<Hexadecimal>(word, copy, file_name, line_number,
                                          t_column);
     return std::make_shared<Octal>(word, file_name, line_number, t_column);
@@ -446,17 +466,27 @@ Lexer::tokenize_immediate_or_label(std::string word, std::string copy,
 
     switch (copy.front()) {
     case '#': // This can only ever be a decimal number
+      [[fallthrough]];
     case '1':
+      [[fallthrough]];
     case '2':
+      [[fallthrough]];
     case '3':
+      [[fallthrough]];
     case '4':
+      [[fallthrough]];
     case '5':
+      [[fallthrough]];
     case '6':
+      [[fallthrough]];
     case '7':
+      [[fallthrough]];
     case '8':
+      [[fallthrough]];
     case '9':
       return std::make_shared<Decimal>(word, file_name, line_number, t_column);
     case 'B':
+      [[fallthrough]];
     case 'X':
       --offset;
     case '-': {
@@ -470,14 +500,23 @@ Lexer::tokenize_immediate_or_label(std::string word, std::string copy,
         ++offset;
         break;
       case '1':
+        [[fallthrough]];
       case '2':
+        [[fallthrough]];
       case '3':
+        [[fallthrough]];
       case '4':
+        [[fallthrough]];
       case '5':
+        [[fallthrough]];
       case '6':
+        [[fallthrough]];
       case '7':
+        [[fallthrough]];
       case '8':
+        [[fallthrough]];
       case '9':
+
         if ('-' == copy.front()) {
           return std::make_shared<Decimal>(word, file_name, line_number,
                                            t_column);
@@ -552,9 +591,8 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
     // std::cout << "Working with " << character << '\n';
 
     switch (character) {
-    case ';': { // Hit a comment
-      goto end_of_line;
-    }
+    case ';': // Hit a comment
+      [[fallthrough]];
     case '\r': {
       // std::getline doesn't consume '\r' (at least on OSX)
       goto end_of_line;
@@ -628,6 +666,7 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
     }
 #ifdef INCLUDE_ADDONS
     case '\'':
+      [[fallthrough]];
 #endif
     case '"': {
       // TODO: This should actually just throw an error
@@ -653,18 +692,17 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
       current_line.ignore(Line::RESET);
 
       if (-1u == end) {
-        std::stringstream stream;
 #ifdef INCLUDE_ADDONS
-        stream << "Unterminated "
-               << (character == '\'' ? "character" : "string");
+        const std::string error(character == '\'' ? "Unterminated character"
+                                                  : "Unterminated string");
 #else
-        stream << "Unterminated string";
+        const std::string error("Unterminated string");
 #endif
         into.clear();
 
         Diagnostics::Diagnostic diagnostic(
-            Diagnostics::FileContext(file_name, line_number, begin - 1),
-            stream.str(), Diagnostics::SYNTAX, Diagnostics::ERROR);
+            Diagnostics::FileContext(file_name, line_number, begin - 1), error,
+            Diagnostics::SYNTAX, Diagnostics::ERROR);
 
         diagnostic.provide_context(
             std::make_unique<Diagnostics::SelectionContext>(
@@ -678,15 +716,15 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
 #ifdef INCLUDE_ADDONS
       } else if ('\'' == character) {
         current = current_line.substr(begin, end - 1);
-        into.push_back(std::make_shared<Character>(
+        into.emplace_back(std::make_shared<Character>(
             current, file_name, line_number,
             current_line.index() - current.length() - 1));
 #endif
       } else {
         current = current_line.substr(begin, end - 1);
-        into.push_back(std::make_shared<String>(current, file_name, line_number,
-                                                current_line.index() -
-                                                    current.length() - 1));
+        into.emplace_back(std::make_shared<String>(
+            current, file_name, line_number,
+            current_line.index() - current.length() - 1));
       }
       current.erase();
       break;
