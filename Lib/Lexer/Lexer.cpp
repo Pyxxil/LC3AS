@@ -118,12 +118,13 @@ void Lexer::lex(std::vector<std::vector<std::shared_ptr<Token>>> &t_tokens,
   }
 
   std::string t_line;
+  t_line.reserve(100);
 
   lexed_lines.insert(std::make_pair<std::string, std::vector<std::string>>(
       std::string(file_name), {std::string()}));
 
   while (std::getline(file, t_line)) {
-    lexed_lines[file_name].emplace_back(t_line);
+    lexed_lines[file_name].emplace_back(std::move(t_line));
   }
 
   std::vector<std::shared_ptr<Token>> tokenized_line;
@@ -164,7 +165,9 @@ std::shared_ptr<Token> Lexer::tokenize(std::string word,
                                        const std::string &file_name,
                                        size_t line_number, size_t t_column) {
   std::string copy{word};
-  std::transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
+  for (auto &c : copy) {
+    c = std::toupper(c);
+  }
 
   t_column -= copy.length();
 
@@ -588,8 +591,6 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
       }
     }
 
-    // std::cout << "Working with " << character << '\n';
-
     switch (character) {
     case ';': // Hit a comment
       [[fallthrough]];
@@ -618,6 +619,8 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
         Diagnostics::push(diagnostic);
       }
 
+      // Not strictly best practice, but saves the use of setting and checking a
+      // flag, and allows us to skip consuming the rest of the line
       goto end_of_line;
     }
     case ',': {
@@ -766,7 +769,7 @@ Lexer::Lexer(Lexer *const t_parent, const std::string &t_file, size_t t_line,
   if (file.fail()) {
     is_fail = true;
     Diagnostics::Diagnostic diagnostic(
-        Diagnostics::FileContext(file_name, line, t_col), "Unable to open file",
+        Diagnostics::FileContext(file_name, 0, 0), "Unable to open file",
         Diagnostics::INVALID_FILE, Diagnostics::ERROR);
 
     provide_context(diagnostic);

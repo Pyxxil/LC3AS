@@ -1,26 +1,39 @@
 #include "Tokens/Instructions/Token_Instruction_And.hpp"
 
-#include <bitset>
-#include <iomanip>
-#include <sstream>
+#include <fmt/ostream.h>
 
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-And::And(const std::string &instruction,
-         const std::string &instruction_uppercase, const std::string &t_file,
-         size_t line_number, size_t t_column)
-    : Instruction(instruction, instruction_uppercase, t_file, line_number,
-                  t_column) {}
+And::And(const std::string& instruction,
+         const std::string& instruction_uppercase,
+         const std::string& t_file,
+         size_t line_number,
+         size_t t_column)
+  : Instruction(instruction,
+                instruction_uppercase,
+                t_file,
+                line_number,
+                t_column)
+{}
 
-And::And(std::string &&instruction, std::string &&instruction_uppercase,
-         const std::string &t_file, size_t line_number, size_t t_column)
-    : Instruction(instruction, instruction_uppercase, t_file, line_number,
-                  t_column) {}
+And::And(std::string&& instruction,
+         std::string&& instruction_uppercase,
+         const std::string& t_file,
+         size_t line_number,
+         size_t t_column)
+  : Instruction(instruction,
+                instruction_uppercase,
+                t_file,
+                line_number,
+                t_column)
+{}
 
-int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                      const std::map<std::string, Symbol> &symbols,
-                      uint16_t program_counter) {
+int32_t
+And::assemble(std::vector<std::shared_ptr<Token>>& tokens,
+              const std::map<std::string, Symbol>& symbols,
+              uint16_t program_counter)
+{
   (void)symbols;
   (void)program_counter;
 
@@ -29,24 +42,26 @@ int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-      0x5000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 9) |
-      (std::static_pointer_cast<Register>(tokens[2])->reg) << 6));
+    0x5000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 9) |
+    (std::static_pointer_cast<Register>(tokens[2])->reg) << 6));
 
   if (tokens[3]->type() == Token::REGISTER) {
-    assembled.front() |= static_cast<uint16_t>(
-        std::static_pointer_cast<Register>(tokens[3])->reg);
+    assembled.front() |=
+      static_cast<uint16_t>(std::static_pointer_cast<Register>(tokens[3])->reg);
   } else {
     assembled.front() |=
-        0x20u | (static_cast<uint16_t>(
-                     std::static_pointer_cast<Immediate>(tokens[3])->value) &
-                 0x1Fu);
+      0x20u | (static_cast<uint16_t>(
+                 std::static_pointer_cast<Immediate>(tokens[3])->value) &
+               0x1Fu);
   }
 
   return 1;
 }
 
-bool And::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
-  if (tokens.size() != 4) {
+bool
+And::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
+{
+  if (tokens.size() != 4 && tokens.size() != 3) {
     invalid_argument_count(tokens.size(), 3,
                            tokens.back()->column +
                                tokens.back()->token.length());
@@ -58,18 +73,19 @@ bool And::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
     return (is_valid = false);
   }
 
-  if (tokens[2]->type() != Token::REGISTER) {
-    tokens[2]->expected("register");
+  if (tokens[2]->type() != Token::REGISTER &&
+      (tokens.size() == 3 && tokens[2]->type() != Token::IMMEDIATE)) {
+    tokens[2]->expected("register or immediate value");
     return (is_valid = false);
   }
 
-  if (tokens[3]->type() != Token::REGISTER &&
-      tokens[3]->type() != Token::IMMEDIATE) {
+  if (tokens.size() == 4 && (tokens[3]->type() != Token::REGISTER &&
+                             tokens[3]->type() != Token::IMMEDIATE)) {
     tokens[3]->expected("register or immediate value");
     return (is_valid = false);
   }
 
-  if (tokens[3]->type() == Token::IMMEDIATE) {
+  if (tokens.size() == 4 && tokens[3]->type() == Token::IMMEDIATE) {
     if (std::static_pointer_cast<Immediate>(tokens[3])->value > 15 ||
         std::static_pointer_cast<Immediate>(tokens[3])->value < -16) {
       tokens[3]->requires_too_many_bits(5, SIGNED, this,
@@ -78,59 +94,62 @@ bool And::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
     }
   }
 
-  if (!(tokens[1]->is_valid && tokens[2]->is_valid && tokens[3]->is_valid)) {
-    return (is_valid = false);
-  }
-
-  return is_valid;
+  return !(tokens[1]->is_valid && tokens[2]->is_valid &&
+           ((tokens.size() == 4 && tokens[3]->is_valid) || tokens.size() == 3))
+             ? (is_valid = false)
+             : is_valid;
 }
 
 uint16_t
-And::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
+And::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
+{
   (void)tokens;
   return static_cast<uint16_t>(is_valid);
 }
 
-std::string And::disassemble(uint16_t &program_counter,
-                             const std::string &symbol, int width) const {
-  std::stringstream stream;
-  stream
-      // Address in memory
-      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-      << program_counter
-      << ')'
-      // Hexadecimal representation of instruction
-      << ' ' << std::hex << std::setfill('0') << std::setw(4)
-      << assembled.front()
-      // Binary representation of instruction
-      << ' '
-      << std::bitset<16>(assembled.front())
-      // Line the instruction is on
-      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-      << line
-      << ')'
-      // Label at the current address (if any)
-      << ' ' << std::left << std::setfill(' ') << std::setw(width)
-      << symbol
-      // Instruction itself
-      << " AND R" << ((assembled.front() & 0x0E00) >> 9 & 7) << " R"
-      << ((assembled.front() & 0x01C0) >> 6 & 7) << ' ';
-
-  if (0 != (assembled.front() & 0x0020)) {
-    stream << '#' << std::dec
-           << (static_cast<int8_t>(
-                   static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
-               3);
-  } else {
-    stream << 'R' << (assembled.front() & 7);
-  }
+std::string
+And::disassemble(uint16_t& program_counter,
+                 const std::string& symbol,
+                 int width) const
+{
+  const auto value = assembled.front();
 
 #ifdef INCLUDE_ADDONS
-  stream << '\t' << file;
+  return fmt::format(
+    "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} AND R{5:d} R{6:d} "
+    "{7:s}\t{8:s}\n",
+    program_counter++,
+    value,
+    line,
+    symbol,
+    width,
+    value >> 9 & 0x7,
+    value >> 6 & 0x7,
+    value & 0x20
+      ? fmt::format(
+          "#{:d}",
+          (static_cast<int8_t>(
+             static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
+           3))
+      : fmt::format("R{:d}", value & 7),
+    file);
+#else
+  return fmt::format(
+    "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} AND R{5:d} R{6:d} "
+    "{7:s}\n",
+    program_counter++,
+    value,
+    line,
+    symbol,
+    width,
+    value >> 9 & 0x7,
+    value >> 6 & 0x7,
+    value & 0x20
+      ? fmt::format(
+          "#{:d}",
+          (static_cast<int8_t>(
+             static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
+           3))
+      : fmt::format("R{:d}", value & 7));
 #endif
-  stream << '\n';
-
-  ++program_counter;
-
-  return stream.str();
 }

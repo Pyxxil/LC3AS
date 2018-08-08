@@ -1,6 +1,8 @@
 #ifndef LC3_ASSEMBLER_CONSOLE_HPP
 #define LC3_ASSEMBLER_CONSOLE_HPP
 
+#include <fmt/ostream.h>
+#include <fmt/printf.h>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -104,7 +106,7 @@ struct Colour {
 
   ~Colour() = default;
 
-  friend std::ostream &operator<<(std::ostream &os, const Colour &colour) {
+  friend auto &operator<<(std::ostream &os, const Colour &colour) {
     if (!Config::is_set(Config::NO_COLOUR)) {
 #if defined(_MSC_VER)
       SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -136,19 +138,19 @@ private:
 const Colour reset(FOREGROUND_COLOUR::RESET, MODIFIER::RESET);
 
 template <typename T> inline void write(const T &message) {
-  message.write_to(std::cout);
+  fmt::print("{}", message);
 }
 
 template <typename T> inline void write(const T &&message) {
-  message.write_to(std::cout);
+  fmt::print("{}", message);
 }
 
 template <typename T> void write_line(const T &message) {
-  message.write_to(std::cout) << '\n';
+  fmt::print("{}\n", message);
 }
 
 template <typename T> void write_line(const T &&message) {
-  message.write_to(std::cout) << '\n';
+  fmt::print("{}\n", message);
 }
 } // namespace Console
 

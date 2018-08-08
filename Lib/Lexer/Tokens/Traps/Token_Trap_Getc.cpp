@@ -1,7 +1,6 @@
 #include "Tokens/Traps/Token_Trap_Getc.hpp"
 
-#include <iomanip>
-#include <sstream>
+#include <fmt/ostream.h>
 
 Getc::Getc(const std::string &trap, const std::string &trap_uppercase,
            const std::string &t_file, size_t line_number, size_t t_column)
@@ -42,31 +41,15 @@ Getc::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
 
 std::string Getc::disassemble(uint16_t &program_counter,
                               const std::string &symbol, int width) const {
-  std::stringstream stream;
-  stream
-      // Address in memory
-      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-      << program_counter
-      << ')'
-      // Hexadecimal representation of instruction
-      << " F020"
-      // Binary representation of instruction
-      << " 1111000000100000"
-      // Line the instruction is on
-      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-      << line
-      << ')'
-      // Label at the current address (if any)
-      << ' ' << std::left << std::setfill(' ') << std::setw(width)
-      << symbol
-      // Instruction itself
-      << " GETC"
 #ifdef INCLUDE_ADDONS
-      << '\t' << file
+  return fmt::format(
+      "({0:04X}) F020 1111000000100000 ({1: >4d}) {2: <{3}s} GETC\t{4:s}\n",
+      program_counter++, line, symbol, width, file
+  );
+#else
+  return fmt::format(
+      "({0:04X}) F020 1111000000100000 ({1: >4d}) {2: <{3}s} GETC\n",
+      program_counter++, line, symbol, width
+  );
 #endif
-      << '\n';
-
-  ++program_counter;
-
-  return stream.str();
 }

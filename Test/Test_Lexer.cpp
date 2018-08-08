@@ -10,18 +10,16 @@
 
 static const std::string f_name = "TEST";
 
-TEST_CASE(
-  "The lexer can lex any 16 bit decimal, hexadecimal, binary, and octal value",
-  "[lexer]")
-{
+TEST_CASE("The lexer can lex any 16 bit decimal, hexadecimal, binary, and "
+          "octal value",
+          "[lexer]") {
   // This is just in case any of the test cases have things which create
   // diagnostics
   lexed_lines.insert(
-    std::pair<std::string, std::vector<std::string>>(f_name, { "" }));
+      std::pair<std::string, std::vector<std::string>>(f_name, {""}));
 
   for (int i = std::numeric_limits<int16_t>::min();
-       i < std::numeric_limits<int16_t>::max() + 1;
-       ++i) {
+       i < std::numeric_limits<int16_t>::max() + 1; ++i) {
     std::stringstream ss;
     ss << "#" << i;
 
@@ -106,9 +104,7 @@ TEST_CASE(
   }
 }
 
-std::vector<std::string>
-permutations(std::string str)
-{
+std::vector<std::string> permutations(std::string str) {
   std::vector<std::string> perms;
 
   const size_t bitmap = 2 << (str.length() - 1);
@@ -117,9 +113,9 @@ permutations(std::string str)
     std::string s;
     for (size_t j = 0; j < str.length(); ++j) {
       if (0 != (i & (1 << j))) {
-        s += std::toupper(str[j]);
+          s.push_back(std::toupper(str[j]));
       } else {
-        s += std::tolower(str[j]);
+          s.push_back(std::tolower(str[j]));
       }
     }
 
@@ -131,8 +127,7 @@ permutations(std::string str)
 
 TEST_CASE("The lexer should be able to properly tokenize any variation of an "
           "instruction, directive, or register",
-          "[lexer]")
-{
+          "[lexer]") {
   for (auto i : permutations("add")) {
     auto tokens = Lexer::tokenize_line(Line(i), f_name, 0);
     REQUIRE(tokens.size() == 1);
@@ -270,8 +265,7 @@ TEST_CASE("The lexer should be able to properly tokenize any variation of an "
   REQUIRE(Diagnostics::count() == 0);
 }
 
-TEST_CASE("The lexer shouldn't create invalid labels", "[lexer]")
-{
+TEST_CASE("The lexer shouldn't create invalid labels", "[lexer]") {
   auto tokens = Lexer::tokenize_line(Line(".  "), f_name, 0);
   REQUIRE(tokens.size() == 1);
   REQUIRE(tokens.front()->type() == Token::NONE);

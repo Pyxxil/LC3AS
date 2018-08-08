@@ -36,9 +36,9 @@ set (TEST_INCLUDE_FILES "")
 set(DEBUG_FLAGS ${COMPILE_FLAGS} -g -g3 -pg -pedantic)
 
 if (NOT WIN32)
-  set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion)
-  set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ -Wno-error=effc++)
-  set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=shadow -Wno-error=missing-braces)
+  # set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wall -Werror -Wextra -Wshadow -Wnon-virtual-dtor -Wconversion -Wno-error=conversion)
+  # set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Weffc++ -Wno-error=effc++)
+  #  set(DEBUG_FLAGS ${DEBUG_FLAGS} -Wsign-conversion -Wno-error=shadow -Wno-error=missing-braces)
 endif ()
 
 set(RELEASE_FLAGS ${COMPILE_FLAGS} -flto) #-fsave-optimization-record -Rpass-missed -Rpass=inline -Rpass=loop-vectorize -Rpass=loop-unroll -Rpass-analysis=inline -Rpass-analysis=loop-vectorize -Rpass-analysis=loop-unroll)
@@ -49,6 +49,18 @@ endif()
 
 if (NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE "Release")
+endif()
+
+include(FetchContent)
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt
+)
+
+FetchContent_GetProperties(fmt)
+if(NOT fmt_POPULATED)
+  FetchContent_Populate(fmt)
+  add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/Lib")
@@ -65,14 +77,16 @@ add_library(LC3 STATIC
   "${LIBRARY_SOURCE_FILES}"
   "${LIBRARY_HEADER_FILES}"
   )
+target_link_libraries (LC3 PRIVATE fmt)
+target_link_libraries (LC3AS PRIVATE fmt)
 
 set (CMAKE_AUTOMOC ON)
 
-add_executable(LC3EDIT
-  "${EDITOR_SOURCE_FILES}"
-  "${EDITOR_INCLUDE_FILES}"
-  "${EDITOR_UI_FILES}"
-  )
+#add_executable(LC3EDIT
+#  "${EDITOR_SOURCE_FILES}"
+#  "${EDITOR_INCLUDE_FILES}"
+#  "${EDITOR_UI_FILES}"
+#  )
 
 if (TEST)
   add_subdirectory("${CMAKE_SOURCE_DIR}/Test")
@@ -83,12 +97,13 @@ if (TEST)
   target_include_directories(LC3TEST PUBLIC "${TEST_INCLUDE_DIRS}"
     "${LIBRARY_INCLUDE_DIRECTORIES}")
   target_link_libraries(LC3TEST PUBLIC LC3)
+  target_link_libraries (LC3TEST PRIVATE fmt)
 endif()
 
 
 if (APPLE)
-  find_package(Qt5Widgets REQUIRED PATHS "/usr/local/Cellar/qt5/5.10.1/lib/cmake/")
-  find_package(Qt5Gui REQUIRED PATHS "/usr/local/Cellar/qt5/5.10.1/lib/cmake/")
+  find_package(Qt5Widgets REQUIRED PATHS "/usr/local/Cellar/qt5/5.11.1/lib/cmake/")
+  find_package(Qt5Gui REQUIRED PATHS "/usr/local/Cellar/qt5/5.11.1/lib/cmake/")
 else ()
   find_package(Qt5Widgets)
 endif()
@@ -102,10 +117,10 @@ target_include_directories(LC3 PUBLIC "${LIBRARY_INCLUDE_DIRECTORIES}")
 target_compile_options(LC3 PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
 target_compile_options(LC3 PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
 
-target_include_directories(LC3EDIT PUBLIC "${EDITOR_INCLUDE_DIRS}")
-target_compile_options(LC3EDIT PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
-target_compile_options(LC3EDIT PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
-target_link_libraries(LC3EDIT Qt5::Widgets Qt5::Gui)
+#target_include_directories(LC3EDIT PUBLIC "${EDITOR_INCLUDE_DIRS}")
+#target_compile_options(LC3EDIT PUBLIC "$<$<CONFIG:DEBUG>:${DEBUG_FLAGS}>")
+#target_compile_options(LC3EDIT PUBLIC "$<$<CONFIG:RELEASE>:${RELEASE_FLAGS}>")
+#target_link_libraries(LC3EDIT Qt5::Widgets Qt5::Gui)
 
 if (APPLE AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # Clang is the only compiler I've used that doesn't have std::experimental::filesystem yet (on OSX, anyways)
@@ -123,7 +138,7 @@ endif ()
 if (ALLOW_EXTRAS)
   target_compile_definitions(LC3AS PUBLIC INCLUDE_ADDONS)
   target_compile_definitions(LC3 PUBLIC INCLUDE_ADDONS)
-  target_compile_definitions(LC3EDIT PUBLIC INCLUDE_ADDONS)
+  #  target_compile_definitions(LC3EDIT PUBLIC INCLUDE_ADDONS)
   if (TEST)
     target_compile_definitions(LC3TEST PUBLIC INCLUDE_ADDONS)
   endif()

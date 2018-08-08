@@ -56,9 +56,7 @@ public:
     if (!token.empty()) {
       // This effectively erases the token too, which saves a call to
       // token.erase()
-      // std::cout << token << '\n';
       to.push_back(tokenize(std::move(token), file_name, line_number, col));
-      // token = std::string();
     }
   }
 

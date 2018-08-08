@@ -1,8 +1,7 @@
 #include "SyntaxHighlighter.hpp"
 
-SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
-  : QSyntaxHighlighter(parent)
-{
+SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent)
+    : QSyntaxHighlighter(parent) {
   HighlightingRule rule;
   /* Maybe at some later point.
     labelFormat.setForeground(Qt::darkGreen);
@@ -16,20 +15,20 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
   instructionFormat.setFontWeight(QFont::Bold);
   QStringList keywordPatterns;
   keywordPatterns
-    << "\\b[aA][dD]{2}\\b"
-    << "\\b[aA][nN][dD]\\b"
-    << "\\b[nN][oO][tT]\\b"
-    << "\\b[tT][rR][aA][pP]\\b"
-    << "\\b[jJ][sS][rR]{1,2}\\b"
-    << "\\b[rR][eE][tT]\\b"
-    << "\\b[jJ][mM][pP]\\b"
-    << "\\b[lL][dD][iIrR]?\\b"
-    << "\\b[lL][eE][aA]\\b"
-    << "\\b[sS][tT][rRiI]?\\b"
-    // The problem with this is that it allows the user to use 'BRnnn'
-    << "\\b[bB][rR][nNzZpP]{0,3}\\b";
+      << "\\b[aA][dD]{2}\\b"
+      << "\\b[aA][nN][dD]\\b"
+      << "\\b[nN][oO][tT]\\b"
+      << "\\b[tT][rR][aA][pP]\\b"
+      << "\\b[jJ][sS][rR]{1,2}\\b"
+      << "\\b[rR][eE][tT]\\b"
+      << "\\b[jJ][mM][pP]\\b"
+      << "\\b[lL][dD][iIrR]?\\b"
+      << "\\b[lL][eE][aA]\\b"
+      << "\\b[sS][tT][rRiI]?\\b"
+      // The problem with this is that it allows the user to use 'BRnnn'
+      << "\\b[bB][rR][nNzZpP]{0,3}\\b";
 
-  foreach (const QString& pattern, keywordPatterns) {
+  foreach (const QString &pattern, keywordPatterns) {
     rule.pattern = QRegularExpression(pattern);
     rule.format = instructionFormat;
     highlightingRules.append(rule);
@@ -49,9 +48,9 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
                     << R"((?=\W)\.[nN][eE][gG]\b)"
                     << R"((?=\W)\.[sS][uU][bB]\b)"
 #endif
-    ;
+      ;
 
-  foreach (const QString& pattern, directivePatterns) {
+  foreach (const QString &pattern, directivePatterns) {
     rule.pattern = QRegularExpression(pattern);
     rule.format = directiveFormat;
     highlightingRules.append(rule);
@@ -65,7 +64,7 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
                << "\\b[iI][nN]\\b"
                << "\\b[hH][aA][lL][tT]\\b";
 
-  foreach (const QString& pattern, trapPatterns) {
+  foreach (const QString &pattern, trapPatterns) {
     rule.pattern = QRegularExpression(pattern);
     rule.format = trapKeywordFormat;
     highlightingRules.append(rule);
@@ -78,10 +77,10 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
 #ifdef INCLUDE_ADDONS
                          << R"(\\\d+)"
 #endif
-    ;
+      ;
 
   immediateValueFormat.setForeground(QColor(0xC7, 0xAE, 0x95));
-  foreach (const QString& pattern, immediateValuePatterns) {
+  foreach (const QString &pattern, immediateValuePatterns) {
     rule.pattern = QRegularExpression(pattern);
     rule.format = immediateValueFormat;
     highlightingRules.append(rule);
@@ -110,12 +109,10 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument* parent)
   highlightingRules.append(rule);
 }
 
-void
-SyntaxHighlighter::highlightBlock(const QString& text)
-{
-  foreach (const HighlightingRule& rule, highlightingRules) {
+void SyntaxHighlighter::highlightBlock(const QString &text) {
+  foreach (const HighlightingRule &rule, highlightingRules) {
     QRegularExpressionMatchIterator matchIterator =
-      rule.pattern.globalMatch(text);
+        rule.pattern.globalMatch(text);
     while (matchIterator.hasNext()) {
       QRegularExpressionMatch match = matchIterator.next();
       setFormat(match.capturedStart(), match.capturedLength(), rule.format);

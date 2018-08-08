@@ -3,23 +3,17 @@
 
 #include "Editor.hpp"
 
-Editor::Editor(QWidget* parent)
-  : QPlainTextEdit(parent)
-{
+Editor::Editor(QWidget *parent) : QPlainTextEdit(parent) {
   lineNumberArea = new LineNumberArea(this);
 
-  connect(this,
-          SIGNAL(blockCountChanged(int)),
-          this,
+  connect(this, SIGNAL(blockCountChanged(int)), this,
           SLOT(updateLineNumberAreaWidth(int)));
-  connect(this,
-          SIGNAL(updateRequest(QRect, int)),
-          this,
+  connect(this, SIGNAL(updateRequest(QRect, int)), this,
           SLOT(updateLineNumberArea(QRect, int)));
-  connect(
-    this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-  connect(
-    this, SIGNAL(modificationChanged(bool)), this, SLOT(textModified(bool)));
+  connect(this, SIGNAL(cursorPositionChanged()), this,
+          SLOT(highlightCurrentLine()));
+  connect(this, SIGNAL(modificationChanged(bool)), this,
+          SLOT(textModified(bool)));
 
   setCursorWidth(9);
 
@@ -34,9 +28,7 @@ Editor::Editor(QWidget* parent)
   highlightCurrentLine();
 }
 
-int
-Editor::lineNumberAreaWidth()
-{
+int Editor::lineNumberAreaWidth() {
   int digits = 1;
   int max = qMax(1, blockCount());
   while (max >= 10) {
@@ -49,15 +41,11 @@ Editor::lineNumberAreaWidth()
   return space;
 }
 
-void
-Editor::updateLineNumberAreaWidth(int /* newBlockCount */)
-{
+void Editor::updateLineNumberAreaWidth(int /* newBlockCount */) {
   setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
-void
-Editor::updateLineNumberArea(const QRect& rect, int dy)
-{
+void Editor::updateLineNumberArea(const QRect &rect, int dy) {
   if (dy) {
     lineNumberArea->scroll(0, dy);
   } else {
@@ -69,19 +57,15 @@ Editor::updateLineNumberArea(const QRect& rect, int dy)
   }
 }
 
-void
-Editor::resizeEvent(QResizeEvent* e)
-{
+void Editor::resizeEvent(QResizeEvent *e) {
   QPlainTextEdit::resizeEvent(e);
 
   const QRect cr = contentsRect();
   lineNumberArea->setGeometry(
-    QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+      QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
-void
-Editor::highlightCurrentLine()
-{
+void Editor::highlightCurrentLine() {
   QList<QTextEdit::ExtraSelection> extraSelections;
 
   if (!isReadOnly()) {
@@ -99,28 +83,22 @@ Editor::highlightCurrentLine()
   setExtraSelections(extraSelections);
 }
 
-void
-Editor::lineNumberAreaPaintEvent(QPaintEvent* event)
-{
+void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
   QPainter painter(lineNumberArea);
   painter.fillRect(event->rect(), QColor(0x56, 0x5E, 0x65));
 
   QTextBlock block = firstVisibleBlock();
   int blockNumber = block.blockNumber();
   int top = static_cast<int>(
-    blockBoundingGeometry(block).translated(contentOffset()).top());
+      blockBoundingGeometry(block).translated(contentOffset()).top());
   int bottom = top + static_cast<int>(blockBoundingRect(block).height());
 
   while (block.isValid() && top <= event->rect().bottom()) {
     if (block.isVisible() && bottom >= event->rect().top()) {
       const QString number = QString::number(blockNumber + 1);
       painter.setPen(QColor(0xDF, 0xE2, 0xE5));
-      painter.drawText(0,
-                       top,
-                       lineNumberArea->width(),
-                       fontMetrics().height(),
-                       Qt::AlignRight,
-                       number);
+      painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
+                       Qt::AlignRight, number);
     }
 
     block = block.next();

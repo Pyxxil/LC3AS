@@ -198,20 +198,20 @@ void Parser::do_second_pass() {
  *
  * @return 0 on success, anything else for failure.
  */
-int Parser::parse() {
+bool Parser::parse() {
   Lexer lexer(file);
   lexer.lex(tokens, symbols);
 
   if (!Config::is_set(Config::KEEP_GOING) && Diagnostics::critical()) {
     // There were errors, so don't bother continuing.
-    return 1;
+    return false;
   }
 
   do_first_pass();
 
   if (!Config::is_set(Config::KEEP_GOING) && Diagnostics::critical()) {
     // There were errors, so don't bother continuing.
-    return 1;
+    return false;
   }
 
   origin_seen = false;
@@ -224,5 +224,5 @@ int Parser::parse() {
 
   // Tell the caller whether there were errors on the second pass, or not (in
   // which case, the caller can continue the assembly).
-  return static_cast<int>(Diagnostics::critical());
+  return Diagnostics::critical();
 }

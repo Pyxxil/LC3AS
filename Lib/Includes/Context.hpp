@@ -26,6 +26,10 @@ public:
     return os << colour << information << Console::reset;
   }
 
+  friend std::ostream &operator<<(std::ostream &os, const Variant<T> &variant) {
+    return os << variant.colour << variant.information << Console::reset;
+  }
+
 private:
   T information;
   Console::Colour colour;
@@ -47,9 +51,9 @@ public:
 
   ~FileContext() = default;
 
-  inline const Variant<size_t> &get_column() const { return column; }
+  inline const auto &get_column() const { return column; }
 
-  inline std::ostream &write_to(std::ostream &os) const {
+  inline auto &write_to(std::ostream &os) const {
     os << "In ";
     file_name.write_to(os) << ':';
     line.write_to(os) << ':';
@@ -83,6 +87,11 @@ public:
 
   Context &operator=(const Context &rhs) = default;
   Context &operator=(Context &&rhs) = default;
+
+  friend auto &operator<<(std::ostream &os, const Context &context) {
+    context.write_to(os);
+    return os;
+  }
 
   virtual ~Context() = default;
 

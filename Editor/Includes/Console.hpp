@@ -8,22 +8,21 @@ class QProcess;
 
 class Editor;
 
-class Console : public QPlainTextEdit
-{
+class Console : public QPlainTextEdit {
   Q_OBJECT
 
 public:
-  Console(QWidget* parent = 0);
+  Console(QWidget *parent = 0);
 
 public slots:
-  void run(Editor* editor);
+  void run(Editor *editor);
   void updateOutput();
 
 signals:
   bool saveFirst();
 
 private:
-  QProcess* process;
+  QProcess *process;
 };
 
 #endif

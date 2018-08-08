@@ -69,6 +69,11 @@ public:
 
   std::ostream &write_to(std::ostream &os) const;
 
+  friend std::ostream &operator<<(std::ostream &os, const Diagnostic &diag) {
+    diag.write_to(os);
+    return os << '\n';
+  }
+
 private:
   std::string message;
   DIAGNOSTIC_TYPE d_type;

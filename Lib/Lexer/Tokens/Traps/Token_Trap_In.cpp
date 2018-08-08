@@ -1,7 +1,6 @@
 #include "Tokens/Traps/Token_Trap_In.hpp"
 
-#include <iomanip>
-#include <sstream>
+#include <fmt/ostream.h>
 
 In::In(const std::string &trap, const std::string &trap_uppercase,
        const std::string &t_file, size_t line_number, size_t t_column)
@@ -42,31 +41,15 @@ In::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
 
 std::string In::disassemble(uint16_t &program_counter,
                             const std::string &symbol, int width) const {
-  std::stringstream stream;
-  stream
-      // Address in memory
-      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-      << program_counter
-      << ')'
-      // Hexadecimal representation of instruction
-      << " F023"
-      // Binary representation of instruction
-      << " 1111000000100011"
-      // Line the instruction is on
-      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-      << line
-      << ')'
-      // Label at the current address (if any)
-      << ' ' << std::left << std::setfill(' ') << std::setw(width)
-      << symbol
-      // Instruction itself
-      << " IN"
 #ifdef INCLUDE_ADDONS
-      << '\t' << file
+  return fmt::format(
+      "({0:04X}) F023 1111000000100011 ({1: >4d}) {2: <{3}s} IN\t{4:s}\n",
+      program_counter++, line, symbol, width, file
+  );
+#else
+  return fmt::format(
+      "({0:04X}) F023 1111000000100011 ({1: >4d}) {2: <{3}s} IN\n",
+      program_counter++, line, symbol, width
+  );
 #endif
-      << '\n';
-
-  ++program_counter;
-
-  return stream.str();
 }

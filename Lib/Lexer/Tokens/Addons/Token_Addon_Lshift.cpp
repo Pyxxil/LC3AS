@@ -1,6 +1,6 @@
 #include "Tokens/Addons/Token_Addon_Lshift.hpp"
 
-#include <sstream>
+#include <fmt/ostream.h>
 
 #include "Tokens/Tokens.hpp"
 
@@ -75,20 +75,19 @@ Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
 
 std::string Lshift::disassemble(uint16_t &program_counter,
                                 const std::string &symbol, int width) const {
-  std::stringstream stream;
-
-  stream << add->disassemble(program_counter, symbol, width);
-  const std::string &disassembled_without_symbol =
-      add->disassemble(program_counter, "", width);
+  auto &&string = fmt::format("{0:s}\n",
+      add->disassemble(program_counter, symbol, width));
 
   // The previous instruction will increment this. We want it to be it's
   // original value, as we increment it ourselves in the loop below.
+  auto &&disassembled_without_symbol = add->disassemble(program_counter, "", width);
+
   --program_counter;
 
   for (size_t shift = 1; shift < assembled.size(); ++shift) {
-    stream << disassembled_without_symbol;
+    string += fmt::format("{0:s}\n", disassembled_without_symbol);
     ++program_counter;
   }
 
-  return stream.str();
+  return string;
 }

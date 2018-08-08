@@ -2,21 +2,19 @@
 
 #include "MainWindow.hpp"
 
-MainWindow::MainWindow(QWidget* parent)
-  : QMainWindow(parent)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setupMenus();
 
   setupEditor();
   setupConsole();
 
-  auto* layout = new QVBoxLayout;
+  auto *layout = new QVBoxLayout;
   layout->addWidget(editor);
   layout->setStretch(0, 1);
   layout->addWidget(console);
   layout->setContentsMargins(5, 5, 5, 5);
 
-  auto* window = new QWidget();
+  auto *window = new QWidget();
   window->setLayout(layout);
 
   setCentralWidget(window);
@@ -28,27 +26,20 @@ MainWindow::MainWindow(QWidget* parent)
   setWindowTitle(tr("LC3Edit"));
 }
 
-void
-MainWindow::about()
-{
+void MainWindow::about() {
   QMessageBox::about(
-    this,
-    tr("About LC3Edit"),
-    tr("<p><b>LC3Edit</b> is a simple editor for the toy assembly "
-       "language that is run on the LC3 simulator</p>"));
+      this, tr("About LC3Edit"),
+      tr("<p><b>LC3Edit</b> is a simple editor for the toy assembly "
+         "language that is run on the LC3 simulator</p>"));
 }
 
-void
-MainWindow::setupMenus()
-{
+void MainWindow::setupMenus() {
   setupFileMenu();
   setupBuildMenu();
   setupHelpMenu();
 }
 
-void
-MainWindow::newFile()
-{
+void MainWindow::newFile() {
   if (editor->hasBeenModified()) {
     QMessageBox msgBox;
     msgBox.setText("This document has been modified.");
@@ -58,17 +49,17 @@ MainWindow::newFile()
     msgBox.setDefaultButton(QMessageBox::Save);
     int ret = msgBox.exec();
     switch (ret) {
-      case QMessageBox::Save:
-        save();
-      case QMessageBox::Discard:
-        editor->open_file = QString();
-        editor->clear();
-        emit editor->modificationChanged(false);
-        break;
-      case QMessageBox::Cancel:
-        break;
-      default:
-        break;
+    case QMessageBox::Save:
+      save();
+    case QMessageBox::Discard:
+      editor->open_file = QString();
+      editor->clear();
+      emit editor->modificationChanged(false);
+      break;
+    case QMessageBox::Cancel:
+      break;
+    default:
+      break;
     }
   } else {
     editor->open_file = QString();
@@ -77,9 +68,7 @@ MainWindow::newFile()
   }
 }
 
-bool
-MainWindow::save()
-{
+bool MainWindow::save() {
   if (!editor->open_file.isEmpty()) {
     QFile file(editor->open_file);
     if (file.open(QFile::WriteOnly | QFile::Text)) {
@@ -94,9 +83,7 @@ MainWindow::save()
   return false;
 }
 
-bool
-MainWindow::saveAs(const QString& path)
-{
+bool MainWindow::saveAs(const QString &path) {
   QString filename = path;
 
   if (filename.isNull()) {
@@ -116,9 +103,7 @@ MainWindow::saveAs(const QString& path)
   return false;
 }
 
-void
-MainWindow::openFile(const QString& path)
-{
+void MainWindow::openFile(const QString &path) {
   if (editor->hasBeenModified()) {
     QMessageBox msgBox;
     msgBox.setText("This document has been modified.");
@@ -128,15 +113,15 @@ MainWindow::openFile(const QString& path)
     msgBox.setDefaultButton(QMessageBox::Save);
     int ret = msgBox.exec();
     switch (ret) {
-      case QMessageBox::Save:
-        save();
-      case QMessageBox::Discard:
-        editor->open_file = QString();
-        break;
-      case QMessageBox::Cancel:
-        break;
-      default:
-        break;
+    case QMessageBox::Save:
+      save();
+    case QMessageBox::Discard:
+      editor->open_file = QString();
+      break;
+    case QMessageBox::Cancel:
+      break;
+    default:
+      break;
     }
   }
 
@@ -156,9 +141,7 @@ MainWindow::openFile(const QString& path)
   }
 }
 
-void
-MainWindow::setupEditor()
-{
+void MainWindow::setupEditor() {
   QFont font;
   font.setFamily("Courier");
   font.setFixedPitch(true);
@@ -170,9 +153,7 @@ MainWindow::setupEditor()
   highlighter = new SyntaxHighlighter(editor->document());
 }
 
-void
-MainWindow::setupConsole()
-{
+void MainWindow::setupConsole() {
   QFont font;
   font.setFamily("Courier");
   font.setFixedPitch(true);
@@ -184,47 +165,39 @@ MainWindow::setupConsole()
   connect(console, SIGNAL(saveFirst()), this, SLOT(save()));
 }
 
-void
-MainWindow::setupFileMenu()
-{
-  QMenu* fileMenu = new QMenu(tr("&File"), this);
+void MainWindow::setupFileMenu() {
+  QMenu *fileMenu = new QMenu(tr("&File"), this);
   menuBar()->addMenu(fileMenu);
 
   fileMenu->addAction(tr("&New"), this, SLOT(newFile()), QKeySequence::New);
-  fileMenu->addAction(
-    tr("&Open..."), this, SLOT(openFile()), QKeySequence::Open);
+  fileMenu->addAction(tr("&Open..."), this, SLOT(openFile()),
+                      QKeySequence::Open);
   fileMenu->addAction(tr("&Save"), this, SLOT(save()), QKeySequence::Save);
-  fileMenu->addAction(
-    tr("Save As"), this, SLOT(saveAs()), QKeySequence::SaveAs);
+  fileMenu->addAction(tr("Save As"), this, SLOT(saveAs()),
+                      QKeySequence::SaveAs);
 
-  QMenu* exitMenu = new QMenu(tr("Exit"), this);
+  QMenu *exitMenu = new QMenu(tr("Exit"), this);
   menuBar()->addMenu(exitMenu);
   exitMenu->addAction(tr("E&xit"), this, SLOT(close()), QKeySequence::Quit);
 }
 
-void
-MainWindow::setupBuildMenu()
-{
-  QMenu* buildMenu = new QMenu(tr("&Build"), this);
+void MainWindow::setupBuildMenu() {
+  QMenu *buildMenu = new QMenu(tr("&Build"), this);
   menuBar()->addMenu(buildMenu);
 
-  buildMenu->addAction(
-    tr("&Build"), this, SIGNAL(run()), QKeySequence(Qt::CTRL + Qt::Key_B));
+  buildMenu->addAction(tr("&Build"), this, SIGNAL(run()),
+                       QKeySequence(Qt::CTRL + Qt::Key_B));
 }
 
-void
-MainWindow::setupHelpMenu()
-{
-  QMenu* helpMenu = new QMenu(tr("&Help"), this);
+void MainWindow::setupHelpMenu() {
+  QMenu *helpMenu = new QMenu(tr("&Help"), this);
   menuBar()->addMenu(helpMenu);
 
   helpMenu->addAction(tr("&About"), this, SLOT(about()));
   helpMenu->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()));
 }
 
-void
-MainWindow::closeEvent(QCloseEvent* event)
-{
+void MainWindow::closeEvent(QCloseEvent *event) {
   // Ensure that, if the user has changed something, that they really do want to
   // close the window. If they do, check if they want to save the file.
   if (editor->hasBeenModified()) {
@@ -236,15 +209,15 @@ MainWindow::closeEvent(QCloseEvent* event)
     msgBox.setDefaultButton(QMessageBox::Save);
     int ret = msgBox.exec();
     switch (ret) {
-      case QMessageBox::Save:
-        save();
-      case QMessageBox::Discard:
-        event->accept();
-        break;
-      case QMessageBox::Cancel:
-        event->ignore();
-      default:
-        break;
+    case QMessageBox::Save:
+      save();
+    case QMessageBox::Discard:
+      event->accept();
+      break;
+    case QMessageBox::Cancel:
+      event->ignore();
+    default:
+      break;
     }
   } else {
     event->accept();

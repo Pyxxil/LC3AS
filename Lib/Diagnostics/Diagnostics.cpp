@@ -1,10 +1,12 @@
 #include "Diagnostics.hpp"
 
 #include <algorithm>
+#include <fmt/ostream.h>
 
 #include "Configuration.hpp"
 
 static std::deque<Diagnostics::Diagnostic> diagnostics_log;
+static bool is_critical = false;
 
 const Diagnostics::diagnostic_type Diagnostics::diagnostic_colours[] = {
     Diagnostics::diagnostic_type(
@@ -18,21 +20,19 @@ const Diagnostics::diagnostic_type Diagnostics::diagnostic_colours[] = {
                                 Console::MODIFIER::BOLD))};
 
 void Diagnostics::unwind() {
-  while (!diagnostics_log.empty()) {
-    auto &&diagnostic = diagnostics_log.front();
-    Console::write(diagnostic);
-    diagnostics_log.pop_front();
-  }
+  std::for_each(diagnostics_log.begin(), diagnostics_log.end(),
+                [](auto &&diagnositc) { fmt::print("{}", diagnositc); });
+  diagnostics_log.clear();
 }
 
 void Diagnostics::push(Diagnostic message) {
+  if (ERROR == message.type()) {
+    is_critical = true;
+  }
   diagnostics_log.emplace_back(std::move(message));
 }
 
-bool Diagnostics::critical() {
-  return std::any_of(diagnostics_log.cbegin(), diagnostics_log.cend(),
-                     [](auto &&diag) { return diag.is_critical(); });
-}
+bool Diagnostics::critical() { return is_critical; }
 
 size_t Diagnostics::count() { return diagnostics_log.size(); }
 
@@ -41,10 +41,8 @@ std::ostream &Diagnostics::Diagnostic::write_to(std::ostream &os) const {
                     << '\n';
 
   for (auto &&context_item : context) {
-    Console::write_line(*context_item);
+    os << *context_item << '\n';
   }
-
-  os << '\n';
 
   return os;
 }

@@ -15,7 +15,7 @@ public:
       : m_string(t_string), best{std::numeric_limits<long>::max(),
                                  std::string()} {}
 
-  const std::string &best_match() const { return best.second; }
+  const auto &best_match() const { return best.second; }
 
   void consider(const std::string &str) {
     const long length_difference{

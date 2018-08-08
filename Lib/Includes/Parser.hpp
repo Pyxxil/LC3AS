@@ -15,18 +15,13 @@ public:
         internal_program_counter(0), program_counter(0),
         longest_symbol_length(20), symbols(), tokens(), origin(), end() {}
 
-  int parse();
+  bool parse();
 
-  inline uint16_t starting_address() const { return program_counter; }
+  uint16_t starting_address() const { return program_counter; }
 
-  inline const std::vector<std::vector<std::shared_ptr<Token>>> &
-  parsed_tokens() const {
-    return tokens;
-  }
+  inline const auto &parsed_tokens() const { return tokens; }
 
-  inline const std::map<std::string, Symbol> &parsed_symbols() const {
-    return symbols;
-  }
+  inline const auto &parsed_symbols() const { return symbols; }
 
   inline int symbol_padding() const { return longest_symbol_length; }
 

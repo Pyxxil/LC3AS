@@ -9,19 +9,18 @@
 
 class QTextEdit;
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  MainWindow(QWidget* parent = nullptr);
+  MainWindow(QWidget *parent = nullptr);
 
 public slots:
   void about();
   void newFile();
   bool save();
-  bool saveAs(const QString& path = QString());
-  void openFile(const QString& path = QString());
+  bool saveAs(const QString &path = QString());
+  void openFile(const QString &path = QString());
 
 signals:
   void run();
@@ -34,11 +33,11 @@ private:
   void setupBuildMenu();
   void setupHelpMenu();
 
-  void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent *event) override;
 
-  Editor* editor;
-  Console* console;
-  SyntaxHighlighter* highlighter;
+  Editor *editor;
+  Console *console;
+  SyntaxHighlighter *highlighter;
 };
 
 #endif // MAINWINDOW_H

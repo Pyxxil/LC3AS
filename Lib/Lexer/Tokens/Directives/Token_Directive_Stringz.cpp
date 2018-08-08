@@ -1,18 +1,20 @@
 #include "Tokens/Directives/Token_Directive_Stringz.hpp"
 
-#include <bitset>
-#include <iomanip>
-#include <sstream>
+#include <fmt/ostream.h>
 
-Stringz::Stringz(const std::string &directive,
-                 const std::string &directive_uppercase,
-                 const std::string &t_file, size_t line_number, size_t t_column)
-    : Directive(directive, directive_uppercase, t_file, line_number, t_column) {
-}
+Stringz::Stringz(const std::string& directive,
+                 const std::string& directive_uppercase,
+                 const std::string& t_file,
+                 size_t line_number,
+                 size_t t_column)
+  : Directive(directive, directive_uppercase, t_file, line_number, t_column)
+{}
 
-int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                          const std::map<std::string, Symbol> &symbols,
-                          uint16_t program_counter) {
+int32_t
+Stringz::assemble(std::vector<std::shared_ptr<Token>>& tokens,
+                  const std::map<std::string, Symbol>& symbols,
+                  uint16_t program_counter)
+{
   (void)program_counter;
   (void)symbols;
 
@@ -25,11 +27,12 @@ int32_t Stringz::assemble(std::vector<std::shared_ptr<Token>> &tokens,
   return static_cast<int32_t>(assembled.size());
 }
 
-bool Stringz::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
+bool
+Stringz::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
+{
   if (tokens.size() != 2) {
-    invalid_argument_count(tokens.size(), 1,
-                           tokens.back()->column +
-                               tokens.back()->token.length());
+    invalid_argument_count(
+      tokens.size(), 1, tokens.back()->column + tokens.back()->token.length());
     return (is_valid = false);
   }
 
@@ -46,72 +49,61 @@ bool Stringz::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
 }
 
 uint16_t
-Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
+Stringz::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
+{
   return static_cast<uint16_t>(is_valid) *
          static_cast<uint16_t>(tokens[1]->assembled.size());
 }
 
-std::string Stringz::disassemble(uint16_t &program_counter,
-                                 const std::string &symbol, int width) const {
-  std::stringstream stream;
+std::string
+Stringz::disassemble(uint16_t& program_counter,
+                     const std::string& symbol,
+                     int width) const
+{
 
-  stream
-      // Address in memory
-      << '(' << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
-      << program_counter
-      << ')'
-      // Hexadecimal representation of instruction
-      << ' ' << std::hex << std::setfill('0') << std::setw(4) << std::right
-      << assembled.front()
-      // Binary representation of instruction
-      << ' '
-      << std::bitset<16>(static_cast<unsigned long long>(assembled.front()))
-      // Line the instruction is on
-      << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-      << line
-      << ')'
-      // Label at the current address (if any)
-      << ' ' << std::left << std::setfill(' ') << std::setw(width)
-      << symbol
-      // Instruction itself
-      << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4)
-      << std::right << assembled.front()
+  const auto value = assembled.front();
 #ifdef INCLUDE_ADDONS
-      << '\t' << file
+  std::string ret = fmt::format("({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: "
+                                "<{4}s} .FILL {1:#06X}\t{5:s}\n",
+                                program_counter,
+                                value,
+                                line,
+                                symbol,
+                                width,
+                                file);
+#else
+  std::string ret = fmt::format(
+    "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} .FILL {1:#06X}\n",
+    program_counter,
+    value,
+    line,
+    symbol,
+    width);
 #endif
-      << '\n';
 
   ++program_counter;
 
-  for (size_t index = 1; index != assembled.size(); ++index) {
-    stream
-        // Address in memory
-        << '(' << std::hex << std::uppercase << std::setfill('0')
-        << std::setw(4) << program_counter
-        << ')'
-        // Hexadecimal representation of instruction
-        << ' ' << std::hex << std::setfill('0') << std::setw(4)
-        << assembled[index]
-        // Binary representation of instruction
-        << ' '
-        << std::bitset<16>(static_cast<unsigned long long>(assembled[index]))
-        // Line the instruction is on
-        << " (" << std::setfill(' ') << std::right << std::dec << std::setw(4)
-        << line
-        << ')'
-        // Label at the current address (if any)
-        << ' ' << std::setfill(' ') << std::setw(width)
-        << ' '
-        // Instruction itself
-        << " .FILL 0x" << std::hex << std::setfill('0') << std::setw(4)
-        << assembled[index]
+  for (size_t index = 1; index < assembled.size(); ++index, ++program_counter) {
+    const auto value = assembled[index];
 #ifdef INCLUDE_ADDONS
-        << '\t' << file
+    ret += fmt::format("({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} .FILL "
+                       "{1:#06X}\t{5:s}\n",
+                       program_counter,
+                       value,
+                       line,
+                       std::string(),
+                       width,
+                       file);
+#else
+    ret += fmt::format(
+      "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} .FILL {1:#06X}\n",
+      program_counter,
+      value,
+      line,
+      std::string(),
+      width);
 #endif
-        << '\n';
-
-    ++program_counter;
   }
 
-  return stream.str();
+  return ret;
 }

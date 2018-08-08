@@ -1,5 +1,6 @@
 #include "Assembler.hpp"
 
+#include <fmt/core.h>
 #include <fstream>
 #include <iomanip>
 
@@ -135,13 +136,7 @@ void Assembler::Assembler::assemble() {
     f.close();
 
     if (!Config::is_set(Config::CONFIG_OPTIONS::BE_QUIET)) {
-      Console::write(Diagnostics::Variant<std::string>(
-          "--- ", Console::Colour(Console::FOREGROUND_COLOUR::RESET)));
-      Console::write(Diagnostics::Variant<std::string>(
-          "Assembling file '" + file + "'",
-          Console::Colour(Console::FOREGROUND_COLOUR::RESET)));
-      Console::write(Diagnostics::Variant<std::string>(
-          " ---\n", Console::Colour(Console::FOREGROUND_COLOUR::RESET)));
+      fmt::print("--- Assembling file {} ---\n", file);
     }
 
     Parser parser(file);
