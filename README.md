@@ -29,6 +29,8 @@ These are:
  - .SET Rs, imm : Set the value in Rs to the value supplied by imm
  - .NEG Rs : Perform 2's compliment on the supplied register
  - .SUB Rd, Rs[, Rt] : Subtract Rt from Rs if supplied, otherwise subtract Rs from Rd. Put the result into Rd
+ - ADD and AND modes for two operands, e.g. ADD R0, R1 or AND R0, #0, which will
+ use the dest register as one of the source registers
 
 ### Known Incompatibilities
 
