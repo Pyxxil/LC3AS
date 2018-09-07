@@ -94,15 +94,7 @@ struct Colour {
   Colour(const Colour &other) = default;
   Colour(Colour &&other) noexcept = default;
   Colour &operator=(const Colour &other) = default;
-  Colour &operator=(Colour &&other) noexcept {
-    if (this != &other) {
-      fg = other.fg;
-      bg = other.bg;
-      mod = other.mod;
-    }
-
-    return *this;
-  }
+  Colour &operator=(Colour &&other) noexcept = default;
 
   ~Colour() = default;
 

@@ -106,6 +106,7 @@ if (ALLOW_EXTRAS)
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Addons/Token_Addon_Neg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Addons/Token_Addon_Set.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Addons/Token_Addon_Sub.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Lexer/Tokens/Addons/Token_Addon_Jmpt.cpp
     )
 
   set (TOKENS_HEADER_FILES
@@ -116,6 +117,7 @@ if (ALLOW_EXTRAS)
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Neg.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Set.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Sub.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Tokens/Addons/Token_Addon_Jmpt.hpp
     )
 endif ()
 

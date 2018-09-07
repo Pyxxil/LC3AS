@@ -5,35 +5,20 @@
 #include "Tokens/Token_Immediate.hpp"
 #include "Tokens/Token_Register.hpp"
 
-And::And(const std::string& instruction,
-         const std::string& instruction_uppercase,
-         const std::string& t_file,
-         size_t line_number,
-         size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
-                t_file,
-                line_number,
-                t_column)
-{}
+And::And(const std::string &instruction,
+         const std::string &instruction_uppercase, const std::string &t_file,
+         size_t line_number, size_t t_column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  t_column) {}
 
-And::And(std::string&& instruction,
-         std::string&& instruction_uppercase,
-         const std::string& t_file,
-         size_t line_number,
-         size_t t_column)
-  : Instruction(instruction,
-                instruction_uppercase,
-                t_file,
-                line_number,
-                t_column)
-{}
+And::And(std::string &&instruction, std::string &&instruction_uppercase,
+         const std::string &t_file, size_t line_number, size_t t_column)
+    : Instruction(instruction, instruction_uppercase, t_file, line_number,
+                  t_column) {}
 
-int32_t
-And::assemble(std::vector<std::shared_ptr<Token>>& tokens,
-              const std::map<std::string, Symbol>& symbols,
-              uint16_t program_counter)
-{
+int32_t And::assemble(std::vector<std::shared_ptr<Token>> &tokens,
+                      const std::map<std::string, Symbol> &symbols,
+                      uint16_t program_counter) {
   (void)symbols;
   (void)program_counter;
 
@@ -42,25 +27,23 @@ And::assemble(std::vector<std::shared_ptr<Token>>& tokens,
   }
 
   assembled.emplace_back(static_cast<uint16_t>(
-    0x5000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 9) |
-    (std::static_pointer_cast<Register>(tokens[2])->reg) << 6));
+      0x5000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 9) |
+      (std::static_pointer_cast<Register>(tokens[2])->reg) << 6));
 
   if (tokens[3]->type() == Token::REGISTER) {
-    assembled.front() |=
-      static_cast<uint16_t>(std::static_pointer_cast<Register>(tokens[3])->reg);
+    assembled.front() |= static_cast<uint16_t>(
+        std::static_pointer_cast<Register>(tokens[3])->reg);
   } else {
     assembled.front() |=
-      0x20u | (static_cast<uint16_t>(
-                 std::static_pointer_cast<Immediate>(tokens[3])->value) &
-               0x1Fu);
+        0x20u | (static_cast<uint16_t>(
+                     std::static_pointer_cast<Immediate>(tokens[3])->value) &
+                 0x1Fu);
   }
 
   return 1;
 }
 
-bool
-And::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
-{
+bool And::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   if (tokens.size() != 4 && tokens.size() != 3) {
     invalid_argument_count(tokens.size(), 3,
                            tokens.back()->column +
@@ -69,19 +52,19 @@ And::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
   }
 
   if (tokens[1]->type() != Token::REGISTER) {
-    tokens[1]->expected("register");
+    tokens[1]->expected(Expected::REGISTER);
     return (is_valid = false);
   }
 
   if (tokens[2]->type() != Token::REGISTER &&
       (tokens.size() == 3 && tokens[2]->type() != Token::IMMEDIATE)) {
-    tokens[2]->expected("register or immediate value");
+    tokens[2]->expected(Expected::REGISTER_OR_IMMEDIATE_VAL);
     return (is_valid = false);
   }
 
   if (tokens.size() == 4 && (tokens[3]->type() != Token::REGISTER &&
                              tokens[3]->type() != Token::IMMEDIATE)) {
-    tokens[3]->expected("register or immediate value");
+    tokens[3]->expected(Expected::REGISTER_OR_IMMEDIATE_VAL);
     return (is_valid = false);
   }
 
@@ -101,55 +84,41 @@ And::valid_arguments(std::vector<std::shared_ptr<Token>>& tokens)
 }
 
 uint16_t
-And::guess_memory_size(std::vector<std::shared_ptr<Token>>& tokens) const
-{
+And::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
   (void)tokens;
   return static_cast<uint16_t>(is_valid);
 }
 
-std::string
-And::disassemble(uint16_t& program_counter,
-                 const std::string& symbol,
-                 int width) const
-{
+std::string And::disassemble(uint16_t &program_counter,
+                             const std::string &symbol, int width) const {
   const auto value = assembled.front();
 
 #ifdef INCLUDE_ADDONS
   return fmt::format(
-    "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} AND R{5:d} R{6:d} "
-    "{7:s}\t{8:s}\n",
-    program_counter++,
-    value,
-    line,
-    symbol,
-    width,
-    value >> 9 & 0x7,
-    value >> 6 & 0x7,
-    value & 0x20
-      ? fmt::format(
-          "#{:d}",
-          (static_cast<int8_t>(
-             static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
-           3))
-      : fmt::format("R{:d}", value & 7),
-    file);
+      "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} AND R{5:d} R{6:d} "
+      "{7:s}\t{8:s}\n",
+      program_counter++, value, line, symbol, width, value >> 9 & 0x7,
+      value >> 6 & 0x7,
+      (value & 0x20) != 0
+          ? fmt::format(
+                "#{:d}",
+                (static_cast<int8_t>(
+                     static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
+                 3))
+          : fmt::format("R{:d}", value & 7),
+      file);
 #else
   return fmt::format(
-    "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} AND R{5:d} R{6:d} "
-    "{7:s}\n",
-    program_counter++,
-    value,
-    line,
-    symbol,
-    width,
-    value >> 9 & 0x7,
-    value >> 6 & 0x7,
-    value & 0x20
-      ? fmt::format(
-          "#{:d}",
-          (static_cast<int8_t>(
-             static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
-           3))
-      : fmt::format("R{:d}", value & 7));
+      "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} AND R{5:d} R{6:d} "
+      "{7:s}\n",
+      program_counter++, value, line, symbol, width, value >> 9 & 0x7,
+      value >> 6 & 0x7,
+      (value & 0x20) != 0
+          ? fmt::format(
+                "#{:d}",
+                (static_cast<int8_t>(
+                     static_cast<std::int8_t>(assembled.front() & 0x1F) << 3) >>
+                 3))
+          : fmt::format("R{:d}", value & 7));
 #endif
 }

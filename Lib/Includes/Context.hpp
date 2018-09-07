@@ -45,9 +45,9 @@ public:
       : file_name(std::move(name)), column(std::move(t_col)),
         line(std::move(t_line)) {}
   FileContext(const FileContext &other) = default;
-  FileContext(FileContext &&other) = default;
+  FileContext(FileContext &&other) noexcept = default;
   FileContext &operator=(const FileContext &rhs) = default;
-  FileContext &operator=(FileContext &&rhs) = default;
+  FileContext &operator=(FileContext &&rhs) noexcept = default;
 
   ~FileContext() = default;
 
@@ -114,10 +114,10 @@ public:
                    const std::string &t_line,
                    std::string changer = std::string());
   SelectionContext(const SelectionContext &other) = default;
-  SelectionContext(SelectionContext &&other) = default;
+  // SelectionContext(SelectionContext &&other) noexcept = default;
 
   SelectionContext &operator=(const SelectionContext &rhs) = default;
-  SelectionContext &operator=(SelectionContext &&rhs) = default;
+  // SelectionContext &operator=(SelectionContext &&rhs) noexcept = default;
 
   ~SelectionContext() override = default;
 

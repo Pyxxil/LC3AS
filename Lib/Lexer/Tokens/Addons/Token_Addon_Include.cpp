@@ -10,7 +10,7 @@ bool Include::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   }
 
   if (tokens[1]->type() != Token::_STRING || !tokens[1]->is_valid) {
-    tokens[1]->expected("string");
+    tokens[1]->expected(Expected::STRING_LITERAL);
     return (is_valid = false);
   }
 

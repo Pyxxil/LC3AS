@@ -37,7 +37,7 @@ bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   }
 
   if (tokens[1]->type() != Token::REGISTER) {
-    tokens[1]->expected("register");
+    tokens[1]->expected(Expected::REGISTER);
     return (is_valid = false);
   }
 
@@ -46,7 +46,7 @@ bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   }
 
   if (tokens[2]->type() != Token::IMMEDIATE) {
-    tokens[2]->expected("immediate value");
+    tokens[2]->expected(Expected::IMMEDIATE_VALUE);
     return (is_valid = false);
   }
 
@@ -56,7 +56,8 @@ bool Lshift::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
 
   if (std::static_pointer_cast<Immediate>(tokens[2])->value > 15 ||
       std::static_pointer_cast<Immediate>(tokens[2])->value < 1) {
-    tokens[2]->expected("4 bit unsigned value between 1 and 15 (inclusive)");
+    tokens[2]->requires_too_many_bits(4, UNSIGNED, this,
+                                      std::map<std::string, Symbol>());
     return (is_valid = false);
   }
 
@@ -75,12 +76,13 @@ Lshift::guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
 
 std::string Lshift::disassemble(uint16_t &program_counter,
                                 const std::string &symbol, int width) const {
-  auto &&string = fmt::format("{0:s}\n",
-      add->disassemble(program_counter, symbol, width));
+  auto &&string =
+      fmt::format("{0:s}\n", add->disassemble(program_counter, symbol, width));
 
   // The previous instruction will increment this. We want it to be it's
   // original value, as we increment it ourselves in the loop below.
-  auto &&disassembled_without_symbol = add->disassemble(program_counter, "", width);
+  auto &&disassembled_without_symbol =
+      add->disassemble(program_counter, "", width);
 
   --program_counter;
 

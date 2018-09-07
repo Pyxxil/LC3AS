@@ -44,7 +44,7 @@ bool Neg::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   }
 
   if (tokens[1]->type() != Token::REGISTER) {
-    tokens[1]->expected("register");
+    tokens[1]->expected(Expected::REGISTER);
     return (is_valid = false);
   }
 

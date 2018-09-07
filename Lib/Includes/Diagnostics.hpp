@@ -50,10 +50,10 @@ public:
   Diagnostic(Diagnostic &other)
       : message(other.message), d_type(other.d_type), d(other.d),
         context(std::move(other.context)), info(other.info) {}
-  Diagnostic(Diagnostic &&other) = default;
+  Diagnostic(Diagnostic &&other) noexcept = default;
 
   Diagnostic &operator=(const Diagnostic &rhs) = default;
-  Diagnostic &operator=(Diagnostic &&rhs) = default;
+  Diagnostic &operator=(Diagnostic &&rhs) noexcept = default;
 
   ~Diagnostic() = default;
 

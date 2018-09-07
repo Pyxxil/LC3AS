@@ -10,7 +10,7 @@ Immediate::Immediate(const std::string &immediate,
     : Token(immediate, immediate_uppercase, t_file, line_number, t_column) {}
 
 void Immediate::requires_too_many_bits(
-    int allowed_bits, bool is_signed, const Token *const caller,
+    int allowed_bits, Signedness is_signed, const Token *const caller,
     const std::map<std::string, Symbol> &symbols) {
   (void)symbols;
   (void)caller;
@@ -22,7 +22,7 @@ void Immediate::requires_too_many_bits(
   std::stringstream error_string;
   error_string << "Immediate value '" << token
                << "' can not be represented as a " << allowed_bits << " bit "
-               << (is_signed ? "signed" : "unsigned") << " value";
+               << (is_signed == SIGNED ? "signed" : "unsigned") << " value";
 
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
       Diagnostics::SelectionContext(

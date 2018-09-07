@@ -27,7 +27,10 @@ std::string Token::deduce_type() const {
   case OP_JMP:
   case OP_JSRR:
   case OP_TRAP:
-    return std::string("Instruction");
+#ifdef INCLUDE_ADDONS
+  case ADDON_JMPT:
+#endif
+    return std::string{"Instruction"};
   case DIR_END:
   case DIR_FILL:
   case DIR_BLKW:
@@ -39,30 +42,30 @@ std::string Token::deduce_type() const {
   case ADDON_SET:
   case ADDON_LSHIFT:
 #endif
-    return std::string("Directive");
+    return std::string{"Directive"};
   case TRAP_IN:
   case TRAP_OUT:
   case TRAP_PUTS:
   case TRAP_GETC:
   case TRAP_HALT:
   case TRAP_PUTSP:
-    return std::string("Trap Routine");
+    return std::string{"Trap Routine"};
   case REGISTER:
-    return std::string("Register");
+    return std::string{"Register"};
   case LABEL:
-    return std::string("Label");
+    return std::string{"Label"};
   case IMMEDIATE:
-    return std::string("Immediate Value");
+    return std::string{"Immediate Value"};
   case _STRING:
-    return std::string("String Literal");
+    return std::string{"String Literal"};
   default:
-    return std::string("None Type");
+    return std::string{"None Type"};
   }
 }
 
-void Token::expected(const std::string &expects) const {
+void Token::expected(Expected expect) const {
   Diagnostics::Diagnostic diagnostic(
-      Diagnostics::FileContext(file, line, column), "Expected " + expects,
+      Diagnostics::FileContext(file, line, column), expects[expect],
       Diagnostics::SYNTAX, Diagnostics::ERROR);
 
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
@@ -75,13 +78,10 @@ void Token::expected(const std::string &expects) const {
   Diagnostics::push(diagnostic);
 }
 
-int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                        const std::map<std::string, Symbol> &symbols,
-                        uint16_t program_counter) {
-  (void)tokens;
-  (void)symbols;
-  (void)program_counter;
-  expected("one of: Instruction, Label, or Directive");
+int32_t Token::assemble(std::vector<std::shared_ptr<Token>> & /*tokens*/,
+                        const std::map<std::string, Symbol> & /*symbols*/,
+                        uint16_t /*program_counter*/) {
+  expected(Expected::INSTRUCTION_LABEL_OR_DIRECTIVE);
   return -1;
 }
 
@@ -102,8 +102,8 @@ int32_t Token::assemble(std::vector<std::shared_ptr<Token>> &tokens,
  */
 void Token::invalid_argument_count(size_t provided, size_t expected,
                                    size_t last_column) const {
-  // This is not the best idea, but because tokens.size() returns the number of
-  // arguments + the token itself, it's a little easier to do here.
+  // This is not the best idea, but because tokens.size() returns the number
+  // of arguments + the token itself, it's a little easier to do here.
   --provided;
 
   std::stringstream error_string;

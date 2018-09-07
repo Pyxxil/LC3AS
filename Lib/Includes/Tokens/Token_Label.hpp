@@ -20,7 +20,8 @@ public:
 
   void not_found(const std::map<std::string, Symbol> &match_candidates);
   void
-  requires_too_many_bits(int allowed_bits, bool is_signed, const Token *caller,
+  requires_too_many_bits(int allowed_bits, Signedness is_signed,
+                         const Token *caller,
                          const std::map<std::string, Symbol> &symbols) final;
 
   std::string disassemble(uint16_t &program_counter, const std::string &symbol,

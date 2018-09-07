@@ -31,7 +31,7 @@ public:
 
   static std::shared_ptr<Token> tokenize(std::string word,
                                          const std::string &file_name,
-                                         size_t line_number, size_t column);
+                                         size_t line_number, size_t t_column);
 
   static std::shared_ptr<Token>
   tokenize_immediate_or_label(std::string word, std::string copy,
@@ -39,7 +39,8 @@ public:
                               size_t t_column);
 
   static std::vector<std::shared_ptr<Token>>
-  tokenize_line(Line line, const std::string &file_name, size_t line_number);
+  tokenize_line(Line current_line, const std::string &file_name,
+                size_t line_number);
 
   /*! Add a token to the current line's tokens.
    *

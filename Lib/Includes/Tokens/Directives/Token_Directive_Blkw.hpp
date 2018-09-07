@@ -7,7 +7,7 @@
 class Blkw : public Directive {
 public:
   Blkw(const std::string &directive, const std::string &directive_uppercase,
-       const std::string &t_file, size_t line_number, size_t column);
+       const std::string &t_file, size_t line_number, size_t t_column);
 
   inline token_type type() const final { return DIR_BLKW; }
 

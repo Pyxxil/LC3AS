@@ -83,18 +83,18 @@ bool Sub::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   }
 
   if (tokens[1]->type() != Token::REGISTER) {
-    tokens[1]->expected("register");
+    tokens[1]->expected(Expected::REGISTER);
     return (is_valid = false);
   }
 
   if (tokens[2]->type() != Token::REGISTER) {
-    tokens[2]->expected("register");
+    tokens[2]->expected(Expected::REGISTER);
     return (is_valid = false);
   }
 
   if (tokens.size() == 4) {
     if (tokens[3]->type() != Token::REGISTER) {
-      tokens[3]->expected("register");
+      tokens[3]->expected(Expected::REGISTER);
       return (is_valid = false);
     }
 

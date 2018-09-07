@@ -44,6 +44,7 @@
 #ifdef INCLUDE_ADDONS
 #include "Tokens/Addons/Token_Addon_Char.hpp"
 #include "Tokens/Addons/Token_Addon_Include.hpp"
+#include "Tokens/Addons/Token_Addon_Jmpt.hpp"
 #include "Tokens/Addons/Token_Addon_Lshift.hpp"
 #include "Tokens/Addons/Token_Addon_Neg.hpp"
 #include "Tokens/Addons/Token_Addon_Set.hpp"

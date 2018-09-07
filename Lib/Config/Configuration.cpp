@@ -61,7 +61,7 @@ struct Directory {
 
 static std::vector<Directory> search_directories;
 
-size_t Config::configuration = 0;
+size_t Config::configuration{0};
 
 void Config::add_search_directory(const std::string &directory) {
   (void)directory;
@@ -81,7 +81,7 @@ std::string Config::find_path(const std::string &path) {
   const fs::path p{path};
 
   if (!fs::is_regular_file(p)) {
-    return std::string();
+    return {};
   }
 
   if (p.is_absolute() && fs::exists(p)) {
@@ -100,5 +100,5 @@ std::string Config::find_path(const std::string &path) {
     }
   }
 
-  return std::string();
+  return {};
 }

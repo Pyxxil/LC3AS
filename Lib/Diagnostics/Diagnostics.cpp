@@ -47,4 +47,7 @@ std::ostream &Diagnostics::Diagnostic::write_to(std::ostream &os) const {
   return os;
 }
 
-void Diagnostics::reset() { diagnostics_log.clear(); }
+void Diagnostics::reset() {
+  diagnostics_log.clear();
+  is_critical = false;
+}

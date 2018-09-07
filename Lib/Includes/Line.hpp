@@ -8,6 +8,13 @@
 class Line {
 public:
   explicit Line(const std::string &t_line) : m_line(t_line) {}
+  Line(const Line &) = default;
+  Line(Line &&) = default;
+
+  Line &operator=(const Line &) = default;
+  Line &operator=(Line &&) noexcept = default;
+
+  ~Line() = default;
 
   enum IGNORES {
     RESET = 0,

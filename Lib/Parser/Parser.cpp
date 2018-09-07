@@ -19,7 +19,7 @@ uint16_t
 Parser::memory_requirement_of(const std::shared_ptr<Token> &t_token,
                               std::vector<std::shared_ptr<Token>> &t_tokens) {
   if (!origin_seen) {
-    t_token->expected(".ORIG statement");
+    t_token->expected(Expected::ORIG_STATEMENT);
     return 0u;
   }
 
@@ -224,5 +224,5 @@ bool Parser::parse() {
 
   // Tell the caller whether there were errors on the second pass, or not (in
   // which case, the caller can continue the assembly).
-  return Diagnostics::critical();
+  return !Diagnostics::critical();
 }

@@ -22,5 +22,7 @@ Register::Register(const std::string &which, const std::string &which_uppercase,
         '~', token.length(), "R{0..7}"));
 
     Diagnostics::push(diagnostic);
+
+    is_valid = false;
   }
 }

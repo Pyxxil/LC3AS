@@ -1,6 +1,7 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 
+#include <array>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -12,6 +13,28 @@
 enum Signedness : bool {
   UNSIGNED = false,
   SIGNED = true,
+};
+
+enum Expected {
+  REGISTER = 0,
+  IMMEDIATE_VALUE = 1,
+  VALID_TRAP_VEC = 2,
+  REGISTER_OR_IMMEDIATE_VAL = 3,
+  LABEL_OR_IMMEDIATE_VAL = 4,
+  STRING_LITERAL = 5,
+  ORIG_STATEMENT = 6,
+  INSTRUCTION_LABEL_OR_DIRECTIVE = 7,
+};
+
+static const std::array<std::string, 8> expects{
+    "Expected register",
+    "Expected immediate value",
+    "Expected valid trap vector",
+    "Expected register or immediate value",
+    "Expected label or immediate value",
+    "Expected string literal",
+    "Expected .ORIG statement",
+    "Expected one of: Instruction, Label, or Directive",
 };
 
 class Token {
@@ -69,6 +92,7 @@ public:
     ADDON_SET,
     ADDON_LSHIFT,
     ADDON_INCLUDE,
+    ADDON_JMPT,
 #endif
   };
 
@@ -80,20 +104,20 @@ public:
                            const std::map<std::string, Symbol> &symbols,
                            uint16_t program_counter);
 
-  virtual void expected(const std::string &expects) const;
+  virtual void expected(Expected expect) const;
   virtual void invalid_argument_count(size_t provided, size_t expected,
                                       size_t last_column) const;
 
   virtual bool valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
     (void)tokens;
-    expected("one of: Instruction, Label, or Directive");
+    expected(Expected::INSTRUCTION_LABEL_OR_DIRECTIVE);
     return false;
   }
 
   virtual uint16_t
   guess_memory_size(std::vector<std::shared_ptr<Token>> &tokens) const {
     (void)tokens;
-    expected("one of: Instruction, Label, or Directive");
+    expected(Expected::INSTRUCTION_LABEL_OR_DIRECTIVE);
     return 0;
   }
 
@@ -102,12 +126,12 @@ public:
     (void)program_counter;
     (void)symbol;
     (void)width;
-    expected("one of: Instruction, Label, or Directive");
+    expected(Expected::INSTRUCTION_LABEL_OR_DIRECTIVE);
     return std::string();
   }
 
   virtual void
-  requires_too_many_bits(int allowed_bits, bool is_signed,
+  requires_too_many_bits(int allowed_bits, Signedness is_signed,
                          const Token *const caller,
                          const std::map<std::string, Symbol> &symbols) {
     (void)allowed_bits;

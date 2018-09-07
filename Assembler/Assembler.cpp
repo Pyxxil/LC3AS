@@ -140,7 +140,7 @@ void Assembler::Assembler::assemble() {
     }
 
     Parser parser(file);
-    if ((0 == parser.parse()) || Config::is_set(Config::KEEP_GOING)) {
+    if (parser.parse() || Config::is_set(Config::KEEP_GOING)) {
       // No errors (or user wants us to proceed), so let's write to the
       // associated files.
       tokens = parser.parsed_tokens();
@@ -220,12 +220,73 @@ void Assembler::Assembler::check_and_mark_warnings(
 
   // TODO: Add a .BLKW warning for taking up a lot of memory.
 
-  switch (auto &&token = tokenized_line.front(); token->type()) {
+  switch (const auto &token = tokenized_line.front(); token->type()) {
   default:
     // Don't really have any ideas on what to complain about for other tokens...
     break;
+  case Token::OP_AND:
+    // Check if the previous instruction was an AND instruction, and if so check
+    // if it also is for clearing the register
+    if (((assembled_line & 0x3F) == 0x20) &&
+        ((assembled.back() & 0xF000) == 0x5000) &&
+        ((assembled.back() & 0x3F) == 0x20) &&
+        (assembled_line & 0x0FC0) == (assembled.back() & 0x0FC0) &&
+        tokens[i - 1].size() > 1) {
+      // Checking the size is to do with making sure the previous line wasn't
+      // just a label, as that would probably mean that the previous instruction
+      // for this actually is probably part of something else
+      Diagnostics::Diagnostic diagnostic(
+          Diagnostics::FileContext(token->file, token->line, token->column),
+          "Statement before this one also clears the same register",
+          Diagnostics::LOGIC, Diagnostics::WARNING);
+
+      diagnostic.provide_context(
+          std::make_unique<Diagnostics::HighlightContext>(
+              Diagnostics::SelectionContext(
+                  Diagnostics::FileContext(token->file, token->line,
+                                           token->column),
+                  '^', "This might mean this line is superfluous",
+                  lexed_lines[token->file][token->line]),
+              '~', token->token.length()));
+
+      // In the case of the previous instruction being on a line with a label,
+      // this stops us highlighting the label instead of the BR.
+      if (const auto &previous_line_first_token = tokens[i - 1].front();
+          previous_line_first_token->type() == Token::LABEL) {
+        const auto &previous_token = tokens[i - 1][1];
+        diagnostic.provide_context(
+            std::make_unique<Diagnostics::HighlightContext>(
+                Diagnostics::SelectionContext(
+                    Diagnostics::FileContext(previous_token->file,
+                                             previous_token->line,
+                                             previous_token->column),
+                    '^', "This line also clears the register",
+                    lexed_lines[previous_token->file][previous_token->line]),
+                '~', previous_token->token.length()));
+      } else {
+        diagnostic.provide_context(
+            std::make_unique<Diagnostics::HighlightContext>(
+                Diagnostics::SelectionContext(
+                    Diagnostics::FileContext(previous_line_first_token->file,
+                                             previous_line_first_token->line,
+                                             previous_line_first_token->column),
+                    '^', "This line also clears the register",
+                    lexed_lines[previous_line_first_token->file]
+                               [previous_line_first_token->line]),
+                '~', previous_line_first_token->token.length()));
+      }
+
+      Diagnostics::push(diagnostic);
+    }
+    // TODO: Complain about multiple AND with #0 statements
+    break;
   case Token::OP_BR:
-    if ((assembled_line & 0xFE00) == (assembled.back() & 0xFE00)) {
+    if ((assembled_line & 0xFE00) == (assembled.back() & 0xFE00) &&
+        tokens[i - 1].size() > 1) {
+      // Checking the size is to do with making sure the previous line wasn't
+      // just a label, as that would probably mean that the previous instruction
+      // for this actually is probably part of something else
+
       Diagnostics::Diagnostic diagnostic(
           Diagnostics::FileContext(token->file, token->line, token->column),
           "Statement before this one checks for the same condition code",
@@ -242,9 +303,9 @@ void Assembler::Assembler::check_and_mark_warnings(
 
       // In the case of the previous instruction being on a line with a label,
       // this stops us highlighting the label instead of the BR.
-      if (auto &&previous_line_first_token = tokens[i - 1].front();
+      if (const auto &previous_line_first_token = tokens[i - 1].front();
           previous_line_first_token->type() == Token::LABEL) {
-        auto &&previous_token = tokens[i - 1][1];
+        const auto &previous_token = tokens[i - 1][1];
         diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
@@ -276,7 +337,7 @@ void Assembler::Assembler::check_and_mark_warnings(
           Diagnostics::FileContext(token->file, token->line, token->column),
           "Superfluous statement", Diagnostics::LOGIC, Diagnostics::WARNING);
 
-      auto &&next_token = tokenized_line[1];
+      const auto &next_token = tokenized_line[1];
       diagnostic.provide_context(
           std::make_unique<Diagnostics::HighlightContext>(
               Diagnostics::SelectionContext(
@@ -289,7 +350,7 @@ void Assembler::Assembler::check_and_mark_warnings(
               '~', next_token->token.length()));
 
       if (next_token->type() == Token::LABEL) {
-        auto &&sym = symbols.find(next_token->token);
+        const auto &sym = symbols.find(next_token->token);
         diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
@@ -307,7 +368,7 @@ void Assembler::Assembler::check_and_mark_warnings(
           Diagnostics::FileContext(token->file, token->line, token->column),
           "Possible infinite loop", Diagnostics::LOGIC, Diagnostics::WARNING);
 
-      auto &&next_token = tokenized_line[1];
+      const auto &next_token = tokenized_line[1];
       diagnostic.provide_context(
           std::make_unique<Diagnostics::HighlightContext>(
               Diagnostics::SelectionContext(
@@ -318,7 +379,7 @@ void Assembler::Assembler::check_and_mark_warnings(
               '~', next_token->token.length()));
 
       if (next_token->type() == Token::LABEL) {
-        auto &&sym = symbols.find(next_token->token);
+        const auto &sym = symbols.find(next_token->token);
         diagnostic.provide_context(
             std::make_unique<Diagnostics::HighlightContext>(
                 Diagnostics::SelectionContext(
@@ -420,7 +481,7 @@ void Assembler::Assembler::write(const std::string &file) {
 
   std::uint16_t pc = 0;
 
-  const std::string empty;
+  static const std::string empty{};
 
   for (const auto &tokenized_line : tokens) {
     const auto &symbol = symbol_at(pc);

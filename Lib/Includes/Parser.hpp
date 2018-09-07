@@ -14,6 +14,13 @@ public:
       : file(std::move(t_file)), origin_seen(false), end_seen(false),
         internal_program_counter(0), program_counter(0),
         longest_symbol_length(20), symbols(), tokens(), origin(), end() {}
+  Parser(const Parser &other) = default;
+  Parser(Parser &&other) noexcept = default;
+
+  Parser &operator=(const Parser &rhs) = default;
+  Parser &operator=(Parser &&rhs) noexcept = default;
+
+  ~Parser() = default;
 
   bool parse();
 

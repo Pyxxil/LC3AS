@@ -4,9 +4,9 @@
 #include "LexHelper.hpp"
 #include "String_Matcher.hpp"
 
-Label::Label(const std::string &name, const std::string &t_file,
+Label::Label(const std::string &label, const std::string &t_file,
              size_t line_number, size_t t_column)
-    : Token(name, name, t_file, line_number, t_column), instruction() {}
+    : Token(label, label, t_file, line_number, t_column) {}
 
 int32_t Label::assemble(std::vector<std::shared_ptr<Token>> &tokens,
                         const std::map<std::string, Symbol> &symbols,
@@ -99,7 +99,7 @@ std::string Label::disassemble(uint16_t &program_counter,
 }
 
 void Label::requires_too_many_bits(
-    int allowed_bits, bool is_signed, const Token *const caller,
+    int allowed_bits, Signedness is_signed, const Token *const caller,
     const std::map<std::string, Symbol> &symbols) {
   (void)caller;
 
@@ -110,8 +110,8 @@ void Label::requires_too_many_bits(
   std::stringstream error_string;
   error_string << "Address of '" << token
                << "' requires offset which can't be represented in a "
-               << allowed_bits << " bit " << (is_signed ? "signed" : "unsigned")
-               << " PC offset";
+               << allowed_bits << " bit "
+               << (is_signed == SIGNED ? "signed" : "unsigned") << " PC offset";
 
   diagnostic.provide_context(std::make_unique<Diagnostics::HighlightContext>(
       Diagnostics::SelectionContext(

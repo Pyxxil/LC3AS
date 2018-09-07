@@ -315,6 +315,9 @@ std::shared_ptr<Token> Lexer::tokenize(std::string word,
       return std::make_shared<Register>(word, copy, file_name, line_number,
                                         t_column);
 #ifdef INCLUDE_ADDONS
+    case hash("JMPT"):
+      return std::make_shared<Jmpt>(word, copy, file_name, line_number,
+                                    t_column);
     case hash(".NEG"):
       return std::make_shared<Neg>(word, copy, file_name, line_number,
                                    t_column);
@@ -370,20 +373,20 @@ static std::shared_ptr<Token> tokenize_label(std::string copy, std::string word,
   return token;
 }
 
-static constexpr auto is_valid_binary = [](const auto &string, long offset,
-                                           long index) -> bool {
+static constexpr auto is_valid_binary(const auto &string, long offset,
+                                      long index) -> bool {
   return std::all_of(string.begin() + offset + index, string.end(),
                      [](const auto c) { return c == '0' || c == '1'; });
 };
 
-static constexpr auto is_valid_hexadecimal = [](const auto &string, long offset,
-                                                long index) -> bool {
+static constexpr auto is_valid_hexadecimal(const auto &string, long offset,
+                                           long index) -> bool {
   return std::all_of(string.begin() + offset + index, string.end(),
                      [](const auto c) { return std::isxdigit(c); });
 };
 
-static constexpr auto is_valid_octal = [](const auto &string, long offset,
-                                          long index) -> bool {
+static constexpr auto is_valid_octal(const auto &string, long offset,
+                                     long index) -> bool {
   return std::all_of(string.begin() + offset + index, string.end(),
                      [](const auto c) { return c >= 0x30 && c <= 0x37; });
 };
@@ -438,8 +441,6 @@ tokenize_octal_hex_bin(std::string copy, size_t index, std::string word,
   }
 
   if (is_valid_octal(copy, 0, idx)) {
-    return std::make_shared<Hexadecimal>(word, copy, file_name, line_number,
-                                         t_column);
     return std::make_shared<Octal>(word, file_name, line_number, t_column);
   }
 
@@ -488,10 +489,20 @@ Lexer::tokenize_immediate_or_label(std::string word, std::string copy,
       [[fallthrough]];
     case '9':
       return std::make_shared<Decimal>(word, file_name, line_number, t_column);
-    case 'B':
-      [[fallthrough]];
-    case 'X':
-      --offset;
+    case 'B': {
+      if (is_valid_binary(copy, offset, 0)) {
+        return std::make_shared<Binary>(word, copy, file_name, line_number,
+                                        t_column);
+      }
+      break;
+    }
+    case 'X': {
+      if (is_valid_hexadecimal(copy, offset, 0)) {
+        return std::make_shared<Hexadecimal>(word, copy, file_name, line_number,
+                                             t_column);
+      }
+      break;
+    }
     case '-': {
       switch (copy[1]) {
       // For these, there is no reason to check if all of the values are
@@ -519,14 +530,15 @@ Lexer::tokenize_immediate_or_label(std::string word, std::string copy,
       case '8':
         [[fallthrough]];
       case '9':
-
         if ('-' == copy.front()) {
           return std::make_shared<Decimal>(word, file_name, line_number,
                                            t_column);
         }
         break;
+      default:
+        break;
       }
-    }
+    } break;
     case '0':
       return tokenize_octal_hex_bin(std::move(copy), offset, std::move(word),
                                     file_name, line_number, t_column);
@@ -619,8 +631,8 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
         Diagnostics::push(diagnostic);
       }
 
-      // Not strictly best practice, but saves the use of setting and checking a
-      // flag, and allows us to skip consuming the rest of the line
+      // Not strictly best practice, but saves the use of setting and checking
+      // a flag, and allows us to skip consuming the rest of the line
       goto end_of_line;
     }
     case ',': {
@@ -696,10 +708,11 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
 
       if (-1u == end) {
 #ifdef INCLUDE_ADDONS
-        const std::string error(character == '\'' ? "Unterminated character"
-                                                  : "Unterminated string");
+        static const std::string error(character == '\''
+                                           ? "Unterminated character"
+                                           : "Unterminated string");
 #else
-        const std::string error("Unterminated string");
+        static const std::string error("Unterminated string");
 #endif
         into.clear();
 
@@ -713,7 +726,7 @@ Lexer::tokenize_line(Line current_line, const std::string &file_name,
                 // the last character
                 Diagnostics::FileContext(file_name, line_number, begin - 1),
                 '^',
-                "Expected " + std::string({character}) + " to match this one",
+                "Expected " + std::string(1, character) + " to match this one",
                 current_line.line()));
         Diagnostics::push(diagnostic);
 #ifdef INCLUDE_ADDONS
@@ -756,16 +769,12 @@ void Lexer::provide_context(Diagnostics::Diagnostic &diagnostic) {
   }
 }
 
-Lexer::Lexer(const std::string &t_file)
-    : line(0), column(0), length(0), file_name(t_file), file(t_file), symbols(),
-      parent(nullptr), tokens() {
-  open_files.emplace_back(file_name);
-}
+Lexer::Lexer(const std::string &t_file) : Lexer(nullptr, t_file, 0, 0, 0) {}
 
 Lexer::Lexer(Lexer *const t_parent, const std::string &t_file, size_t t_line,
              size_t t_col, size_t len)
     : line(t_line), column(t_col), length(len), file_name(t_file), file(t_file),
-      symbols(), parent(t_parent), tokens() {
+      parent(t_parent) {
   if (file.fail()) {
     is_fail = true;
     Diagnostics::Diagnostic diagnostic(

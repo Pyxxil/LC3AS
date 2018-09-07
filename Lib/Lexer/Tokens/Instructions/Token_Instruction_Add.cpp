@@ -17,11 +17,8 @@ Add::Add(std::string &&instruction, std::string &&instruction_uppercase,
                   t_column) {}
 
 int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens,
-                      const std::map<std::string, Symbol> &symbols,
-                      uint16_t program_counter) {
-  (void)symbols;
-  (void)program_counter;
-
+                      const std::map<std::string, Symbol> & /* symbols */,
+                      uint16_t /* program_counter */) {
   if (!is_valid) {
     return 0;
   }
@@ -30,6 +27,8 @@ int32_t Add::assemble(std::vector<std::shared_ptr<Token>> &tokens,
       0x1000 | (std::static_pointer_cast<Register>(tokens[1])->reg << 9)));
 
   if (tokens.size() == 4) { // We have a normal ADD
+    assembled.front() |=
+        (std::static_pointer_cast<Register>(tokens[2])->reg << 6);
     if (tokens[3]->type() == Token::REGISTER) {
       assembled.front() |= static_cast<uint16_t>(
           std::static_pointer_cast<Register>(tokens[3])->reg);
@@ -65,19 +64,19 @@ bool Add::valid_arguments(std::vector<std::shared_ptr<Token>> &tokens) {
   }
 
   if (tokens[1]->type() != Token::REGISTER) {
-    tokens[1]->expected("register");
+    tokens[1]->expected(Expected::REGISTER);
     return (is_valid = false);
   }
 
   if (tokens[2]->type() != Token::REGISTER &&
       (tokens.size() == 3 && tokens[2]->type() != Token::IMMEDIATE)) {
-    tokens[2]->expected("register or immediate value");
+    tokens[2]->expected(Expected::REGISTER_OR_IMMEDIATE_VAL);
     return (is_valid = false);
   }
 
   if (tokens.size() == 4 && (tokens[3]->type() != Token::REGISTER &&
                              tokens[3]->type() != Token::IMMEDIATE)) {
-    tokens[3]->expected("register or immediate value");
+    tokens[3]->expected(Expected::REGISTER_OR_IMMEDIATE_VAL);
     return (is_valid = false);
   }
 
@@ -112,7 +111,7 @@ std::string Add::disassemble(uint16_t &program_counter,
       "{7:s}\t{8:s}\n",
       program_counter++, value, line, symbol, width, value >> 9 & 0x7,
       value >> 6 & 0x7,
-      value & 0x20
+      (value & 0x20) != 0
           ? fmt::format(
                 "#{:d}",
                 (static_cast<int8_t>(
@@ -122,11 +121,11 @@ std::string Add::disassemble(uint16_t &program_counter,
       file);
 #else
   return fmt::format(
-      "({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} ADD R{5:d} R{6:d} "
-      "{7:s}\n",
+      fmt("({0:04X}) {1:04X} {1:016b} ({2: >4d}) {3: <{4}s} ADD R{5:d} R{6:d} "
+          "{7:s}\n"),
       program_counter++, value, line, symbol, width, value >> 9 & 0x7,
       value >> 6 & 0x7,
-      value & 0x20
+      (value & 0x20) != 0
           ? fmt::format(
                 "#{:d}",
                 (static_cast<int8_t>(
